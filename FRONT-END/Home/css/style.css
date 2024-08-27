@@ -1,0 +1,108 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+ 
+.navbar{
+    width: 100%;
+    background-color: white;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-nav{
+    background-color: #890cac;
+    border-radius: 5px;
+}
+.nav1{
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.log{
+    margin-right: 5%;
+    color: black;
+    font-weight: bold;
+}
+
+.nav-link{
+    color: white;
+    text-decoration: none;
+    margin: 8px;
+    
+}
+
+section{
+    background-image: url(..//img/Fondo.jpeg);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    color: white;
+    text-align: center;
+    font-size: 20px;
+    padding: 450px 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn{
+    margin-top: 5%;   
+}
+.fa-bars{
+    font-size: 40px;
+}
+
+@media (max-width: 768px) {
+    .nav1{
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+    .log{
+        margin-right: 0;
+        margin-left: auto;
+        margin-bottom: 15px;
+        text-align: center;
+        display: block;
+    }
+
+    .navbar-nav{
+        text-align: center;
+    }
+}
+
+
+@media (max-width: 576px) {
+    .fa-bars {
+        font-size: 25px;
+    }
+
+    .btn {
+        font-size: 16px;
+    }
+
+    section {
+        padding: 350px 10px;
+    }
+
+    .navbar-brand img {
+        width: 130px;
+    }
+}
+
+footer{
+    overflow-x: hidden;
+}
+
+.iconos{
+    font-size: 50px;
+    text-align: center;
+    text-decoration:none;
+}
