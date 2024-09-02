@@ -11,7 +11,25 @@
     z-index: 1000;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-
+.navbar-nav{
+    background-color: #890cac;
+    border-radius: 5px;
+}
+.nav1{
+    margin-right: auto;
+    margin-left: auto;
+}
+.log{
+    margin-right: 5%;
+    color: black;
+    font-weight: bold;
+}
+.nav-link{
+    color: white;
+    text-decoration: none;
+    margin: 8px;
+    
+}
 .login{
     max-width: 400px;
     min-width: 400px;
@@ -170,4 +188,26 @@ section{
 .boton:hover{
     background-color: rgba(255, 255, 255, 0.5);
     text-decoration: none;
+}
+footer {
+    background-color: white;
+    text-align: left;
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    text-align: left;
+    overflow-x: hidden;
+}
+
+/* Estilo para los enlaces de ayuda en el footer */
+.footer-links ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.footer-links a {
+    text-decoration: none;
+    color: #6c757d;
+    margin-right: 15px; /* Espacio entre los enlaces */
 }

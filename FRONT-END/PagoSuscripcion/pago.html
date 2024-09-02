@@ -13,7 +13,7 @@
 <body>
   <header>
     <nav class="navbar navbar-expand-lg bg-body-tertiary" style="position: fixed;">
-      <a href="../home/index.html">
+      <a href="../home/index.html" class="fa-solid fa-arrow-left" style="font-size: 30px; color: black;">
         <img src="../home/img/KuenteCO.jpeg" width="170" class="navbar-brand" alt="Logo">
       </a>
     </nav>
@@ -80,7 +80,7 @@
       </form>
     </div>
     </section>
-        
+
       <!-- Optional JavaScript -->
       <!-- jQuery first, then Popper.js, then Bootstrap JS -->
       <script src="https://kit.fontawesome.com/b56e987958.js" crossorigin="anonymous"></script>
@@ -89,6 +89,41 @@
       <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
   </div>
     <script src="js/script.js"></script>
-</body>
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top border-bottom">
+      <div class="col-12 col-md-3 mb-3">
+        <h5 style="margin-left: 25px ;">Ayuda</h5>
+        <!-- Enlaces de ayuda en una sola línea -->
+        <ul class="list-inline">
+          <li class="list-inline-item"><a href="../Sobre_nosotros/nosotros.html" class="nav-link p-0 text-muted">Sobre nosotros</a></li><br>
+          <li class="list-inline-item"><a href="../Información_legal/legal.html" class="nav-link p-0 text-muted">Información legal</a></li><br>
+          <li class="list-inline-item"><a href="../Terminos_Condiciones/terminos.html" class="nav-link p-0 text-muted">Términos y condiciones</a></li><br>
+          <li class="list-inline-item"><a href="../Privacidad/privacidad.html" class="nav-link p-0 text-muted">Política de privacidad</a></li>
+        </ul>
+      </div>
+      <div class="col-md-5 offset-md-1 mb-3">
+        <form>
+          <h5>Suscríbete a nuestro boletín</h5>
+          <p>Recibe noticias sobre nuestras actualizaciones.</p>
+          <div class="d-flex flex-column flex-sm-row w-100 gap-2">
+            <input id="newsletter1" type="text" class="form-control" placeholder="Email aquí">
+            <a type="button" style="background-color: #890cac; color: white; margin-right: 150px; border-radius: 5px; border: transparent; padding: 5px;">Suscríbete</a>
+          </div>
+        </form>
+      </div>
+      <div class="col-12 col-md-2 mb-3">
+        <!-- Redes sociales alineadas horizontalmente -->
+        <ul class="nav justify-content-center list-inline">
+          <li class="list-inline-item"><a class="fa-brands fa-x-twitter" href="https://x.com/?lang=es" style="font-size: 40px; color: black; text-decoration: none;"></a></li>
+          <li class="list-inline-item"><a class="fa-brands fa-instagram" href="https://www.instagram.com" style="font-size: 40px; color: black; text-decoration: none;"></a></li>
+          <li class="list-inline-item"><a class="fa-brands fa-youtube" href="https://www.youtube.com" style="font-size: 40px; color: black; text-decoration: none;"></a></li>
+        </ul>
+      </div>
+      <div class="col-12 col-md-3 d-flex align-items-center">
+        <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
+          <svg class="bi" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
+        </a>
+      </div>
+      <span style="margin-right: 525px;">© 2024 KuenteCO, Inc. Todos los derechos reservados.</span>
+    </footer>
 </body>
 </html>

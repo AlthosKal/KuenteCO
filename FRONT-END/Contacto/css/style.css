@@ -161,9 +161,30 @@ textarea{
     border: none;
     outline: none;
     color: white;
-    /* font-size: 1rem; */
 }
 ::placeholder{
 color: white;
 font-size: 1rem;
+}
+footer {
+    background-color: white;
+    text-align: left;
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    text-align: left;
+    overflow-x: hidden;
+}
+
+/* Estilo para los enlaces de ayuda en el footer */
+.footer-links ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.footer-links a {
+    text-decoration: none;
+    color: #6c757d;
+    margin-right: 15px; /* Espacio entre los enlaces */
 }
