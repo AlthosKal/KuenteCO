@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,17 +9,20 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="shortcut icon" href="../home/img/KuenteCO.jpeg">
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
+
 <body onload="cargarApp()">
     <header>
         <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
-            <div class="container-fluid">
+            <div class="container">
                 <a href="../Home/index.html">
-                    <img class="navbar-brand logo" src="../Home/img/KuenteCO.jpeg" width="170" alt="KuenteCO">
+                    <img class="navbar-brand" src="../Home/img/KuenteCO.jpeg" width="170" alt="KuenteCO">
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
-                    <i class="fa-solid fa-bars"></i>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
+                    aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="fa-solid fa-bars" style="font-size: 40px;"></i>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarScroll">
                     <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll nav1">
@@ -36,104 +40,150 @@
             </div>
         </nav>
     </header>
-
-    <div class="cabecero">
-        <div class="presupuesto">
-            <div class="presupuesto_titulo">Presupuesto Disponible</div>
-            <div class="presupuesto_valor" id="presupuesto">+ 2,000.00</div>
-            <div class="presupuesto_ingreso limpiarEstilos">
-                <div class="presupuesto_ingreso--texto">Ingresos</div>
-                <div class="derecha">
-                    <div class="presupuesto_ingreso--valor" id="ingresos">+4,000.00</div>
-                    <div class="presupuesto_ingreso--porcentaje">&nbsp;</div>
+    <div class="fondo">
+        <div class="contenedor">
+            <div class="contenedorFondo">
+                <div class="cabecero">
+                    <div class="presupuesto">
+                        <div class="presupuesto_titulo">Presupuesto Disponible</div>
+                        <div class="presupuesto_valor" id="presupuesto">+ 2,000.00</div>
+                        <div class="presupuesto_ingreso limpiarEstilos">
+                            <div class="presupuesto_ingreso--texto">Ingresos</div>
+                            <div class="derecha">
+                                <div class="presupuesto_ingreso--valor" id="ingresos">+4,000.00</div>
+                                <div class="presupuesto_ingreso--porcentaje">&nbsp;</div>
+                            </div>
+                        </div>
+                        <div class="presupuesto_egreso limpiarEstilos">
+                            <div class="presupuesto_egreso--texto">Egresos</div>
+                            <div class="derecha limpiarEstilos">
+                                <div class="presupuesto_egreso--valor" id="egresos">- 1,900.00</div>
+                                <div class="presupuesto_egreso--porcentaje" id="porcentaje">45%</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="presupuesto_egreso limpiarEstilos">
-                <div class="presupuesto_egreso--texto">Egresos</div>
-                <div class="derecha limpiarEstilos">
-                    <div class="presupuesto_egreso--valor" id="egresos">- 1,900.00</div>
-                    <div class="presupuesto_egreso--porcentaje" id="porcentaje">45%</div>
+
+                <form id="forma" onsubmit="return false;">
+                    <div class="agregar">
+                        <div class="agregar_contenedor">
+                            <select class="agregar_tipo" id="tipo">
+                                <option value="ingreso" selected>+</option>
+                                <option value="egreso">-</option>
+                            </select>
+                            <input type="text" class="agregar_descripcion" placeholder="Agregar Descripción"
+                                id="descripcion">
+                            <input type="number" class="agregar_valor" placeholder="Valor" id="valor" step="any">
+                            <button class="agregar_btn" onclick="agregarDato()">
+                                <ion-icon name="checkmark-circle-outline"></ion-icon>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="contenedor limpiarEstilos">
+                <div class="ingreso">
+                    <h2 class="ingreso_titulo">Ingresos</h2>
+                    <div id="lista-ingresos">
+                        <div class="elemento limpiarEstilos">
+                            <div class="elemento_descripcion">Salario</div>
+                            <div class="derecha limpiarEstilos">
+                                <div class="elemento_valor">+ 2,200.00</div>
+                                <div class="elemento_eliminar">
+                                    <button class="elemento_eliminar--btn">
+                                        <ion-icon name="close-circle-outline"></ion-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="elemento limpiarEstilos">
+                            <div class="elemento_descripcion">Venta coche</div>
+                            <div class="derecha limpiarEstilos">
+                                <div class="elemento_valor">+ 1,500.00</div>
+                                <div class="elemento_eliminar">
+                                    <button class="elemento_eliminar--btn">
+                                        <ion-icon name="close-circle-outline"></ion-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="egreso">
+                    <h2 class="egreso_titulo">Egresos</h2>
+                    <div id="lista-egresos">
+                        <div class="elemento limpiarEstilos">
+                            <div class="elemento_descripcion">Renta departamento</div>
+                            <div class="derecha limpiarEstilos">
+                                <div class="elemento_valor">- 900.00</div>
+                                <div class="elemento_porcentaje">21%</div>
+                                <div class="elemento_eliminar">
+                                    <button class="elemento_eliminar--btn">
+                                        <ion-icon name="close-circle-outline"></ion-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="elemento limpiarEstilos">
+                            <div class="elemento_descripcion">Ropa</div>
+                            <div class="derecha limpiarEstilos">
+                                <div class="elemento_valor">- 400.00</div>
+                                <div class="elemento_porcentaje">10%</div>
+                                <div class="elemento_eliminar">
+                                    <button class="elemento_eliminar--btn">
+                                        <ion-icon name="close-circle-outline"></ion-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <form id="forma" onsubmit="return false;">
-        <div class="agregar">
-            <div class="agregar_contenedor">
-                <select class="agregar_tipo" id="tipo">
-                    <option value="ingreso" selected>+</option>
-                    <option value="egreso">-</option>
-                </select>
-                <input type="text" class="agregar_descripcion" placeholder="Agregar Descripción" id="descripcion">
-                <input type="number" class="agregar_valor" placeholder="Valor" id="valor" step="any">
-                <button class="agregar_btn" onclick="agregarDato()">
-                    <ion-icon name="checkmark-circle-outline"></ion-icon>
-                </button>
-            </div>
-        </div>
-    </form>
-
-    <div class="contenedor limpiarEstilos">
-        <div class="ingreso">
-            <h2 class="ingreso_titulo">Ingresos</h2>
-            <div id="lista-ingresos">
-                <div class="elemento limpiarEstilos">
-                    <div class="elemento_descripcion">Salario</div>
-                    <div class="derecha limpiarEstilos">
-                        <div class="elemento_valor">+ 2,200.00</div>
-                        <div class="elemento_eliminar">
-                            <button class="elemento_eliminar--btn">
-                                <ion-icon name="close-circle-outline"></ion-icon>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="elemento limpiarEstilos">
-                    <div class="elemento_descripcion">Venta coche</div>
-                    <div class="derecha limpiarEstilos">
-                        <div class="elemento_valor">+ 1,500.00</div>
-                        <div class="elemento_eliminar">
-                            <button class="elemento_eliminar--btn">
-                                <ion-icon name="close-circle-outline"></ion-icon>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="egreso">
-            <h2 class="egreso_titulo">Egresos</h2>
-            <div id="lista-egresos">
-                <div class="elemento limpiarEstilos">
-                    <div class="elemento_descripcion">Renta departamento</div>
-                    <div class="derecha limpiarEstilos">
-                        <div class="elemento_valor">- 900.00</div>
-                        <div class="elemento_porcentaje">21%</div>
-                        <div class="elemento_eliminar">
-                            <button class="elemento_eliminar--btn">
-                                <ion-icon name="close-circle-outline"></ion-icon>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="elemento limpiarEstilos">
-                    <div class="elemento_descripcion">Ropa</div>
-                    <div class="derecha limpiarEstilos">
-                        <div class="elemento_valor">- 400.00</div>
-                        <div class="elemento_porcentaje">10%</div>
-                        <div class="elemento_eliminar">
-                            <button class="elemento_eliminar--btn">
-                                <ion-icon name="close-circle-outline"></ion-icon>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
+    <footer class="bg-light py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>Ayuda</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="../Sobre_nosotros/nosotros.html" class="text-muted">Sobre nosotros</a></li>
+                        <li><a href="../Información_legal/legal.html" class="text-muted">Información legal</a></li>
+                        <li><a href="../Terminos_Condiciones/terminos.html" class="text-muted">Términos y condiciones</a></li>
+                        <li><a href="../Privacidad/privacidad.html" class="text-muted">Política de privacidad</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Suscríbete a nuestro boletín</h5>
+                    <p>Recibe noticias sobre nuestras actualizaciones.</p>
+                    <form>
+                        <div class="input-group mb-3">
+                            <input type="email" class="form-control" placeholder="Email aquí" aria-label="Email" aria-describedby="button-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button" id="button-addon2">Suscríbete</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-4">
+                    <h5>Síguenos</h5>
+                    <ul class="list-inline">
+                        <li class="list-inline-item"><a href="https://twitter.com" class="text-muted"><i class="fab fa-twitter fa-2x"></i></a></li>
+                        <li class="list-inline-item"><a href="https://instagram.com" class="text-muted"><i class="fab fa-instagram fa-2x"></i></a></li>
+                        <li class="list-inline-item"><a href="https://youtube.com" class="text-muted"><i class="fab fa-youtube fa-2x"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12 text-center">
+                    <span>© 2024 KuenteCO, Inc. Todos los derechos reservados.</span>
+                </div>
+            </div>
+        </div>
+    </footer>
     <!-- Scripts -->
     <script src="../Home/js/script.js"></script>
     <script src="js/Dato.js"></script>
@@ -145,44 +195,15 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top border-bottom">
-        <div class="col-12 col-md-3 mb-3">
-          <h5 style="margin-left: 25px ;">Ayuda</h5>
-          <!-- Enlaces de ayuda en una sola línea -->
-          <ul class="list-inline">
-            <li class="list-inline-item"><a href="../Sobre_nosotros/nosotros.html" class="nav-link p-0 text-muted">Sobre nosotros</a></li><br>
-            <li class="list-inline-item"><a href="../Información_legal/legal.html" class="nav-link p-0 text-muted">Información legal</a></li><br>
-            <li class="list-inline-item"><a href="../Terminos_Condiciones/terminos.html" class="nav-link p-0 text-muted">Términos y condiciones</a></li><br>
-            <li class="list-inline-item"><a href="../Privacidad/privacidad.html" class="nav-link p-0 text-muted">Política de privacidad</a></li>
-          </ul>
-        </div>
-        <div class="col-md-5 offset-md-1 mb-3">
-          <form>
-            <h5>Suscríbete a nuestro boletín</h5>
-            <p>Recibe noticias sobre nuestras actualizaciones.</p>
-            <div class="d-flex flex-column flex-sm-row w-100 gap-2">
-              <input id="newsletter1" type="text" class="form-control" placeholder="Email aquí">
-              <a type="button" style="background-color: #890cac; color: white; margin-right: 150px; border-radius: 5px; border: transparent; padding: 5px;">Suscríbete</a>
-            </div>
-          </form>
-        </div>
-        <div class="col-12 col-md-2 mb-3">
-          <!-- Redes sociales alineadas horizontalmente -->
-          <ul class="nav justify-content-center list-inline">
-            <li class="list-inline-item"><a class="fa-brands fa-x-twitter" href="https://x.com/?lang=es" style="font-size: 40px; color: black; text-decoration: none;"></a></li>
-            <li class="list-inline-item"><a class="fa-brands fa-instagram" href="https://www.instagram.com" style="font-size: 40px; color: black; text-decoration: none;"></a></li>
-            <li class="list-inline-item"><a class="fa-brands fa-youtube" href="https://www.youtube.com" style="font-size: 40px; color: black; text-decoration: none;"></a></li>
-          </ul>
-        </div>
-        <div class="col-12 col-md-3 d-flex align-items-center">
-          <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
-            <svg class="bi" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
-          </a>
-        </div>
-        <span style="margin-right: 525px;">© 2024 KuenteCO, Inc. Todos los derechos reservados.</span>
-      </footer>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
 </body>
+
 </html>
