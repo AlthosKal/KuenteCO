@@ -188,3 +188,7 @@ footer {
     color: #6c757d;
     margin-right: 15px; /* Espacio entre los enlaces */
 }
+
+header nav a{
+    text-decoration-line: none;
+}
