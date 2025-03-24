@@ -1,0 +1,38 @@
+services:
+  postgres-master:
+    image: yefff/image-master-kuenteco:1.0.0
+    container_name: MasterKuenteCO
+    environment:
+      POSTGRES_USER: master
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: KuenteCO
+    volumes:
+      - postgres-master-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres-network
+
+  postgres-replica:
+    image: yefff/image-slave-kuenteco:1.0.0
+    container_name: SlaveKuenteCO
+    environment:
+      POSTGRES_USER: slave
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: KuenteCO
+    volumes:
+      - postgres-replica-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - postgres-network
+    depends_on:
+      - postgres-master
+
+volumes:
+  postgres-master-data:
+  postgres-replica-data:
+
+networks:
+  postgres-network:
+    driver: bridge

@@ -1,0 +1,98 @@
+jwt:
+  secret: 8cf536674e152130d16292539da4b29e035afbe01e279bbbe9e274d71838594f
+  expiration: 7200
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: "info,health"
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        failure-rate-threshold: 50
+        sliding-window-size: 50
+        sliding-window-type: count_based
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 3s
+        permitted-number-of-calls-in-half-open-state: 5
+        register-health-indicator: true
+        record-exceptions:
+          - io.netty.handler.timeout.ReadTimeoutException
+          - java.lang.RuntimeException
+    instances:
+      api-catalog:
+        base-config: default
+
+  ratelimiter:
+    configs:
+      default:
+        limit-for-period: 100
+        limit-refresh-period: 1s
+        timeout-duration: 500ms
+    instances:
+      post-reservation:
+        base-config: default
+
+server:
+  port: 8080
+  compression:
+    enabled: true
+    min-response-size: 2KB
+    mime-types: application/json,application/xml,text/html,text/plain
+  tomcat:
+    threads:
+      max: 500
+      min-spare: 50
+    connection-timeout: 20000
+  servlet:
+    context-path: /api
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 5
+      idle-timeout: 20000
+      connection-timeout: 10000
+      max-lifetime: 1800000
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show-sql: true
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    open-in-view: false
+  sendgrid:
+    api-key: ${SENDGRID_API_KEY}
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.kuenteco.backend: DEBUG
+
+info:
+  application:
+    groupId: '@project.groupId@'
+    artifactId: '@project.artifactId@'
+    version: '@project.version@'

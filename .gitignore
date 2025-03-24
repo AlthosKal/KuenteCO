@@ -1,0 +1,97 @@
+# Ignorar archivos y carpetas específicas desde la raíz
+BACK-END/target/*.jar
+BACK-END/.env
+KuenteCO/BACK-END/.env
+KuenteCO/BACK-END/HELP.md
+KuenteCO/BACK-END/target/
+!KuenteCO/BACK-END/.mvn/wrapper/maven-wrapper.jar
+!KuenteCO/BACK-END/**/src/main/**/target/
+!KuenteCO/BACK-END/**/src/test/**/target/
+
+# Spring Tool Suite (STS)
+KuenteCO/BACK-END/.apt_generated
+KuenteCO/BACK-END/.classpath
+KuenteCO/BACK-END/.factorypath
+KuenteCO/BACK-END/.project
+KuenteCO/BACK-END/.settings/
+KuenteCO/BACK-END/.springBeans
+KuenteCO/BACK-END/.sts4-cache
+
+# IntelliJ IDEA
+KuenteCO/BACK-END/.idea/
+KuenteCO/BACK-END/*.iws
+KuenteCO/BACK-END/*.iml
+KuenteCO/BACK-END/*.ipr
+
+# NetBeans
+KuenteCO/BACK-END/nbproject/private/
+KuenteCO/BACK-END/nbbuild/
+KuenteCO/BACK-END/dist/
+KuenteCO/BACK-END/nbdist/
+KuenteCO/BACK-END/.nb-gradle/
+KuenteCO/BACK-END/build/
+!KuenteCO/BACK-END/**/src/main/**/build/
+!KuenteCO/BACK-END/**/src/test/**/build/
+
+# Visual Studio Code
+KuenteCO/BACK-END/.vscode/
+
+# Flutter/Dart/Pub related
+KuenteCO/FRONT-END/**/doc/api/
+KuenteCO/FRONT-END/**/ios/Flutter/.last_build_id
+KuenteCO/FRONT-END/.dart_tool/
+KuenteCO/FRONT-END/.flutter-plugins
+KuenteCO/FRONT-END/.flutter-plugins-dependencies
+KuenteCO/FRONT-END/.pub-cache/
+KuenteCO/FRONT-END/.pub/
+KuenteCO/FRONT-END/build/
+
+# Symbolication related
+KuenteCO/FRONT-END/app.*.symbols
+
+# Obfuscation related
+KuenteCO/FRONT-END/app.*.map.json
+
+# Android Studio build artifacts
+KuenteCO/FRONT-END/android/app/debug/
+KuenteCO/FRONT-END/android/app/profile/
+KuenteCO/FRONT-END/android/app/release/
+
+# Miscellaneous
+KuenteCO/FRONT-END/*.class
+KuenteCO/FRONT-END/*.log
+KuenteCO/FRONT-END/*.pyc
+KuenteCO/FRONT-END/*.swp
+KuenteCO/FRONT-END/.DS_Store
+KuenteCO/FRONT-END/.atom/
+KuenteCO/FRONT-END/.build/
+KuenteCO/FRONT-END/.buildlog/
+KuenteCO/FRONT-END/.history
+KuenteCO/FRONT-END/.svn/
+KuenteCO/FRONT-END/.swiftpm/
+KuenteCO/FRONT-END/migrate_working_dir/
+
+# IntelliJ related
+KuenteCO/FRONT-END/*.iml
+KuenteCO/FRONT-END/*.ipr
+KuenteCO/FRONT-END/*.iws
+KuenteCO/FRONT-END/.idea/
+
+# Ignorar archivos generados desde KuenteCO
+FRONT-END/.dart_tool/
+FRONT-END/build/
+FRONT-END/linux/flutter/
+FRONT-END/macos/Flutter/
+FRONT-END/windows/flutter/
+
+# Ignorar archivos específicos con problemas de LF/CRLF
+./DOM.txt
+.idea/
+FRONT-END/.idea/
+FRONT-END/.metadata
+FRONT-END/pubspec.lock
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+# KuenteCO/FRONT-END/.vscode/
