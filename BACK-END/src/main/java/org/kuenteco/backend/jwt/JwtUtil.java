@@ -4,10 +4,13 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.WebUtils;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -28,6 +31,17 @@ public class JwtUtil {
         return Jwts.builder().setSubject(mainUser.getUsername()).setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + expiration * 1000L))
                 .signWith(key, SignatureAlgorithm.HS256).compact();
+    }
+    public String resolveToken(HttpServletRequest request) {
+        // Primero intentar obtener de header Authorization (Bearer token)
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+
+        // Si no está en el header, intentar obtener de cookie
+        Cookie cookie = WebUtils.getCookie(request, "jwt");
+        return cookie != null ? cookie.getValue() : null;
     }
 
     public Boolean validateToken(String token, UserDetails details) {

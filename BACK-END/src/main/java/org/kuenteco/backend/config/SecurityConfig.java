@@ -31,7 +31,7 @@ public class SecurityConfig {
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults()).csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/v1/auth/login", "/v1/auth/register").permitAll()
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/v1/auth/login", "/v1/auth/register", "v1/auth/validate-verification-code", "v1/auth/activate-account").permitAll()
                         .requestMatchers("/v1/account/**").authenticated().anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtEntryPoint()))

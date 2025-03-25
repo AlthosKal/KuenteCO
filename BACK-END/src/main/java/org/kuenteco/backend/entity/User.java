@@ -31,11 +31,12 @@ public class User {
     private Role role;
 
     @Enumerated(EnumType.STRING)
-    private State account = State.ACTIVE;
+    private State accountState;
 
     public User(String email, String password, Role role) {
         this.email = email;
         this.password = password;
         this.role = role;
+        this.accountState = State.PENDING;
     }
 }

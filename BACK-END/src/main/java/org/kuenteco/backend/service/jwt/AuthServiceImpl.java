@@ -1,22 +1,17 @@
 package org.kuenteco.backend.service.jwt;
 
-// Imports de Java
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
-// Imports de librerías externas
-import com.sendgrid.Method;
-import com.sendgrid.Request;
-import com.sendgrid.Response;
-import com.sendgrid.SendGrid;
+import com.sendgrid.*;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
-
-// Imports de Spring Framework
 import jakarta.servlet.http.HttpServletResponse;
+import org.kuenteco.backend.dto.auth.*;
+import org.kuenteco.backend.entity.Role;
+import org.kuenteco.backend.entity.User;
+import org.kuenteco.backend.enums.RoleList;
+import org.kuenteco.backend.enums.State;
+import org.kuenteco.backend.jwt.JwtUtil;
+import org.kuenteco.backend.repository.RoleRepository;
 import org.kuenteco.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,14 +22,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-// Imports de tu proyecto
-import org.kuenteco.backend.dto.auth.NewUserDTO;
-import org.kuenteco.backend.dto.auth.VerificationCodeDTO;
-import org.kuenteco.backend.entity.Role;
-import org.kuenteco.backend.entity.User;
-import org.kuenteco.backend.enums.RoleList;
-import org.kuenteco.backend.jwt.JwtUtil;
-import org.kuenteco.backend.repository.RoleRepository;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -45,17 +39,20 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final CookieServiceImpl cookieService;
     private final UserRepository userRepository;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Value("${spring.sendgrid.api-key}")
     private String SENDGRID_API_KEY;
 
-    // Mapa temporal para almacenar códigos de verificación (en producción, usa una base de datos o caché)
-    private final Map<String, String> verificationCodes = new HashMap<>();
+    private final Map<String, String> verificationCodes = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     @Autowired
-    public AuthServiceImpl(UserServiceImpl userService, RoleRepository roleRepository, PasswordEncoder passwordEncoder,
-            JwtUtil jwtUtil, AuthenticationManagerBuilder authenticationManagerBuilder, CookieServiceImpl cookieService,
-            UserRepository userRepository) {
+    public AuthServiceImpl(UserServiceImpl userService, RoleRepository roleRepository,
+                           PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
+                           AuthenticationManagerBuilder authenticationManagerBuilder,
+                           CookieServiceImpl cookieService, UserRepository userRepository,
+                           TokenBlacklistService tokenBlacklistService) {
         this.userService = userService;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -63,11 +60,21 @@ public class AuthServiceImpl implements AuthService {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.cookieService = cookieService;
         this.userRepository = userRepository;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
+    @Override
     public String authenticate(String email, String password, HttpServletResponse response) {
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email,
-                password);
+        // Verificar si la cuenta está activa antes de autenticar
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getAccountState() != State.ACTIVE) {
+            throw new RuntimeException("Account not activated. Please verify your email");
+        }
+
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(email, password);
         Authentication authResult = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authResult);
 
@@ -76,34 +83,65 @@ public class AuthServiceImpl implements AuthService {
         return jwt;
     }
 
+    @Override
     public void registerUser(NewUserDTO newUserDTO) {
         if (userService.existsByUserName(newUserDTO.getEmail())) {
-            throw new IllegalArgumentException("User already exists");
+            throw new IllegalArgumentException("Email already exists");
         }
 
         Role roleUser = roleRepository.findByName(RoleList.ROLE_USER)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
-        User user = new User(newUserDTO.getEmail(), passwordEncoder.encode(newUserDTO.getPassword()), roleUser);
+
+        // Nuevo usuario se crea con estado PENDING
+        User user = new User(
+                newUserDTO.getEmail(),
+                passwordEncoder.encode(newUserDTO.getPassword()),
+                roleUser
+        );
+        user.setAccountState(State.PENDING);
+
         userService.saveUser(user);
+
+        // Enviar código de verificación automáticamente
+        SendVerificationCodeDTO verificationDTO = new SendVerificationCodeDTO();
+        verificationDTO.setEmail(newUserDTO.getEmail());
+        try {
+            sendVerificationEmail(verificationDTO, true);
+        } catch (IOException e) {
+            throw new RuntimeException("Error sending verification email", e);
+        }
     }
 
     @Override
-    public void sendVerificationEmail(VerificationCodeDTO verificationCodeDTO) throws IOException {
-        String email = verificationCodeDTO.getEmail();
+    public void sendVerificationEmail(SendVerificationCodeDTO sendVerificationCodeDTO, boolean isRegistration) throws IOException {
+        String email = sendVerificationCodeDTO.getEmail();
 
-        // Generar un código de verificación de 6 dígitos
+        if (isRegistration && !userRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("Email not registered");
+        }
+
         String code = String.format("%06d", new Random().nextInt(999999));
-        verificationCodes.put(email, code); // Almacenar el código temporalmente
+        verificationCodes.put(email, code);
 
-        // Configurar el correo electrónico
-        Email from = new Email("agudelocastanoyeferson270@gmail.com"); // Cambia por tu correo verificado en SendGrid
-        Email to = new Email(email);
-        String subject = "Código de verificación";
-        Content content = new Content("text/plain", "Tu código de verificación es: " + code);
+        // Programar la eliminación del código después de 15 minutos
+        scheduler.schedule(() -> verificationCodes.remove(email), 15, TimeUnit.MINUTES);
 
-        Mail mail = new Mail(from, subject, to, content);
+        Email from = new Email("agudelocastanoyeferson270@gmail.com");
+        String subject = isRegistration ?
+                "Verifica tu registro en KuenteCO" :
+                "Código de recuperación de contraseña";
 
-        // Enviar el correo usando SendGrid
+        String contentText = isRegistration ?
+                "Tu código de verificación para activar tu cuenta es: " + code :
+                "Tu código para recuperar tu contraseña es: " + code;
+
+        Mail mail = new Mail(
+                from,
+                subject,
+                new Email(email),
+                new Content("text/plain", contentText)
+        );
+
         SendGrid sg = new SendGrid(SENDGRID_API_KEY);
         Request request = new Request();
         try {
@@ -111,47 +149,64 @@ public class AuthServiceImpl implements AuthService {
             request.setEndpoint("mail/send");
             request.setBody(mail.build());
             Response response = sg.api(request);
-            System.out.println("Código de estado: " + response.getStatusCode());
-            System.out.println("Respuesta: " + response.getBody());
+
+            if (response.getStatusCode() < 200 || response.getStatusCode() >= 300) {
+                throw new IOException("Failed to send email: " + response.getBody());
+            }
         } catch (IOException ex) {
+            verificationCodes.remove(email);
             throw ex;
         }
     }
 
     @Override
-    public boolean validateVerificationCode(VerificationCodeDTO verificationCodeDTO) {
-        String email = verificationCodeDTO.getEmail();
-        String code = verificationCodeDTO.getCode();
-
-        // Verificar si el código coincide con el almacenado
-        return verificationCodes.getOrDefault(email, "").equals(code);
+    public boolean validateVerificationCode(String email, String code) {
+        String storedCode = verificationCodes.get(email);
+        return code != null && code.equals(storedCode);
     }
 
     @Override
-    public String validateChangePassword(VerificationCodeDTO verificationCodeDTO, String newPassword) {
-        // Validar el código de verificación
-        if (!validateVerificationCode(verificationCodeDTO)) {
-            throw new RuntimeException("Código de verificación inválido");
+    public void activateUser(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getAccountState() == State.ACTIVE) {
+            throw new RuntimeException("Account already activated");
         }
 
-        // Buscar al usuario por su correo electrónico
-        String email = verificationCodeDTO.getEmail();
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        user.setAccountState(State.ACTIVE);
+        userRepository.save(user);
 
-        // Cambiar la contraseña
-        return changePassword(user, newPassword);
+        // Eliminar el código después de usarlo
+        verificationCodes.remove(email);
     }
 
-    private String changePassword(User user, String newPassword) {
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userService.saveUser(user);
-        return "Contraseña cambiada con éxito";
-    }
+    @Override
+    public String changePasswordWithVerification(String email, String code, String newPassword) {
+        if (!validateVerificationCode(email, code)) {
+            throw new RuntimeException("Invalid verification code");
+        }
 
-    public String changePassword(String newPassword) {
-        User user = userService.getUserDetails();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         user.setPassword(passwordEncoder.encode(newPassword));
-        userService.saveUser(user);
+        userRepository.save(user);
+
+        verificationCodes.remove(email);
+
         return "Password changed successfully";
+    }
+
+    @Override
+    public void logout(String token, HttpServletResponse response) {
+        // 1. Invalidar el token
+        tokenBlacklistService.addToBlacklist(token);
+
+        // 2. Limpiar la cookie
+        cookieService.deleteCookie("jwt", response);
+
+        // 3. Limpiar el contexto de seguridad
+        SecurityContextHolder.clearContext();
     }
 }
