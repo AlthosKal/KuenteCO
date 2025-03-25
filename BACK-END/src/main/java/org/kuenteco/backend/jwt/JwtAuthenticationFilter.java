@@ -1,5 +1,6 @@
 package org.kuenteco.backend.jwt;
 
+import org.kuenteco.backend.service.jwt.TokenBlacklistService;
 import org.kuenteco.backend.service.jwt.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,18 +27,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtUtil jwtUtil;
     @Autowired
     private UserService userService;
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
 
         String email = null;
         String jwt = null;
         try {
             jwt = getJWT(request);
             if (jwt != null) {
+                // Verificar la expiración del JWT
+                if (tokenBlacklistService.isBlacklisted(jwt)) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token invalidado");
+                    return;
+                }
                 email = jwtUtil.extractEmail(jwt);
             }
 

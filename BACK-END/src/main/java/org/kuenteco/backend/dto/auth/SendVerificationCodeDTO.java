@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class VerificationCodeDTO {
+public class SendVerificationCodeDTO {
     @Email
     private String email;
-    private String code;
 }
