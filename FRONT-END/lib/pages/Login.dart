@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kuenteco/services/ApiService.dart';
 import 'package:kuenteco/widgets/ParticleAnimation.dart';
 import 'package:kuenteco/pages/Register.dart';
-import 'Verificacion.dart';
+import 'VerificacionC.dart';
 import 'dart:ui' as ui;
 
 class LoginPage extends StatefulWidget {

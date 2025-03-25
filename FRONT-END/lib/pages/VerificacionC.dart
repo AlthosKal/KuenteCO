@@ -70,7 +70,10 @@ class _VerificacionCodigoState extends State<VerificacionCodigo> {
     setState(() => _isLoading = true);
 
     try {
-      final response = await _apiService.solicitarCodigoVerificacion(email: widget.email);
+      final response = await _apiService.sendVerificationCode( // Changed from solicitarCodigoVerificacion
+        email: widget.email,
+        isRegistration: false,
+      );
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(response['message'] ?? 'Código enviado con éxito')),
@@ -93,7 +96,7 @@ class _VerificacionCodigoState extends State<VerificacionCodigo> {
     final code = _controllers.map((controller) => controller.text).join();
 
     try {
-      final response = await _apiService.validarCodigoVerificacion(
+      final response = await _apiService.validateVerificationCode( // Changed from validarCodigoVerificacion
         email: widget.email,
         code: code,
       );

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:ui' as ui;
 import 'dart:async';
-import 'Login.dart';
+import 'pages/Login.dart';
 import 'package:kuenteco/pages/Register.dart';
 import 'package:kuenteco/pages/Suscripciones.dart';
 import 'package:kuenteco/pages/Terminos.dart';

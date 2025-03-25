@@ -40,38 +40,46 @@ class _CambioCState extends State<CambioC> {
   }
 
   Future<void> _cambiarContrasena(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
-
-      try {
-        final response = await _apiService.cambiarContrasena(
-          nuevaContrasena: _newPasswordController.text,
-          confirmarContrasena: _confirmPasswordController.text,
-          codigoVerificacion: _verificationCodeController.text,
-        );
-
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Contraseña actualizada')),
-        );
-
-        if (response['status'] == 'success') {
-          // ignore: use_build_context_synchronously
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginPage()),
-                (route) => false,
-          );
-        }
-      } catch (e) {
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error de conexión: $e')),
-        );
-      } finally {
-        setState(() => _isLoading = false);
-      }
+    if (!_formKey.currentState!.validate()) return;
+    if (widget.email?.isEmpty ?? true) {
+      _showSnackBar(context, 'No se proporcionó un email válido');
+      return;
     }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await _apiService.changePassword(
+        email: widget.email!,
+        code: _verificationCodeController.text,
+        newPassword: _newPasswordController.text,
+        confirmNewPassword: _confirmPasswordController.text,
+      );
+
+      _showSnackBar(context, response['message'] ?? 'Contraseña actualizada');
+
+      if (response['status'] == 'success') {
+        _navigateToLogin(context);
+      }
+    } catch (e) {
+      _showSnackBar(context, 'Error de conexión: ${e.toString()}');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  void _navigateToLogin(BuildContext context) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+          (route) => false,
+    );
   }
 
   Widget _buildTextField({
@@ -105,14 +113,13 @@ class _CambioCState extends State<CambioC> {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    final double screenWidth = mediaQuery.size.width;
-    final bool isSmallScreen = screenWidth < 600;
+    final bool isSmallScreen = mediaQuery.size.width < 600;
     final containerWidth = isSmallScreen ? 360.0 : 400.0;
 
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(child: ParticleAnimation()), // Fondo con animación de partículas
+          const Positioned.fill(child: ParticleAnimation()),
           Center(
             child: SingleChildScrollView(
               physics: const ClampingScrollPhysics(),
