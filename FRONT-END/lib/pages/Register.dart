@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kuenteco/services/ApiService.dart';
 import 'package:kuenteco/widgets/ParticleAnimation.dart';
+import 'package:kuenteco/pages/VerificacionR.dart';
 import 'dart:ui' as ui;
 
 class RegisterPage extends StatefulWidget {
@@ -33,7 +34,13 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
       if (response['status'] == 'success') {
-        Navigator.pop(context);
+        // Navegar a la página de verificación en lugar de cerrar
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VerificacionR(email: _emailController.text),
+          ),
+        );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
