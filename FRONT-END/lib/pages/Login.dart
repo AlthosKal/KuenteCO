@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kuenteco/services/ApiService.dart';
 import 'package:kuenteco/widgets/ParticleAnimation.dart';
 import 'package:kuenteco/pages/Register.dart';
-import 'Verificacion.dart';
+import 'VerificacionC.dart';
 import 'dart:ui' as ui;
 
 class LoginPage extends StatefulWidget {
@@ -40,20 +40,52 @@ class _LoginPageState extends State<LoginPage> {
     try {
       final response = await _apiService.login(
         email: _emailController.text,
-        password: _passwordController.text, // Changed from 'contrasena' to 'password'
+        password: _passwordController.text,
       );
 
       if (_rememberPassword) {
-        // Guardar credenciales seguras
+        // Guardar credenciales seguras (implementar con shared_preferences)
       }
 
       if (response['status'] == 'success') {
         // Navegar a la pantalla principal
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        _showMessage(context, response['message'] ?? 'Error en el inicio de sesión');
       }
-
-      _showMessage(context, response['message']);
     } catch (e) {
-      _showMessage(context, 'Error de conexión: $e');
+      _showMessage(context, 'Error de conexión: ${e.toString()}');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _enviarCodigoRecuperacion(BuildContext context) async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty || !email.contains('@')) {
+      _showMessage(context, 'Por favor, ingresa un email válido para recuperar tu contraseña');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await _apiService.sendRecoveryCode(email: email);
+
+      if (response['status'] == 'success') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VerificacionCodigo(
+              email: email,
+            ),
+          ),
+        );
+      } else {
+        _showMessage(context, response['message'] ?? 'Error al enviar el código');
+      }
+    } catch (e) {
+      _showMessage(context, 'Error de conexión: ${e.toString()}');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -128,13 +160,13 @@ class _LoginPageState extends State<LoginPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4),
                 ),
-                fillColor: WidgetStateProperty.resolveWith<Color>((states) {  // Changed from WidgetStateProperty to MaterialStateProperty
-                  if (states.contains(WidgetState.selected)) {  // Changed from WidgetState to MaterialState
-                    return Colors.blue;
+                fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return primaryColor;
                   }
                   return whiteColor;
                 }),
-                checkColor: WidgetStateProperty.all(whiteColor),  // Changed from WidgetStateProperty to MaterialStateProperty
+                checkColor: WidgetStateProperty.all(whiteColor),
               ),
             ),
             child: Checkbox(
@@ -165,10 +197,19 @@ class _LoginPageState extends State<LoginPage> {
       color: whiteColor,
       child: InkWell(
         borderRadius: BorderRadius.circular(8),
-        onTap: () => _iniciarSesion(context),
+        onTap: _isLoading ? null : () => _iniciarSesion(context),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-          child: const Text(
+          child: _isLoading
+              ? const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+            ),
+          )
+              : const Text(
             'Iniciar sesión',
             style: TextStyle(
               color: Colors.black,
@@ -208,23 +249,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildForgotPasswordOption() {
     return GestureDetector(
-      onTap: () {
-        final email = _emailController.text.trim();
-        if (email.isEmpty || !email.contains('@')) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Por favor, ingresa un email válido para recuperar tu contraseña')),
-          );
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => VerificacionCodigo(
-                email: email,
-              ),
-            ),
-          );
-        }
-      },
+      onTap: _isLoading ? null : () => _enviarCodigoRecuperacion(context),
       child: const Text.rich(
         TextSpan(
           text: '¿Olvidaste tu contraseña? ',
@@ -301,7 +326,9 @@ class _LoginPageState extends State<LoginPage> {
                               obscureText: _obscurePassword,
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                                  _obscurePassword
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
                                   color: whiteColor,
                                 ),
                                 onPressed: () {
