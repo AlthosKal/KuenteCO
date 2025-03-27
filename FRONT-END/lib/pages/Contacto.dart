@@ -4,10 +4,12 @@ import 'package:kuenteco/widgets/footer.dart';
 
 class ContactoPage extends StatefulWidget {
   final Color backgroundColor;
+  final bool isLoggedIn;
 
   const ContactoPage({
     super.key,
     this.backgroundColor = const Color(0xFF890cac),
+    this.isLoggedIn = false,
   });
 
   @override
@@ -15,18 +17,14 @@ class ContactoPage extends StatefulWidget {
 }
 
 class _ContactoPageState extends State<ContactoPage> {
-  // Controladores para los campos de texto
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _asuntoController = TextEditingController();
   final TextEditingController _mensajeController = TextEditingController();
-
-  // Clave del formulario para validación
   final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    // Liberar los controladores al cerrar la página
     _nombreController.dispose();
     _emailController.dispose();
     _asuntoController.dispose();
@@ -36,7 +34,6 @@ class _ContactoPageState extends State<ContactoPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Obtener el tamaño de la pantalla para calcular proporciones
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -48,35 +45,29 @@ class _ContactoPageState extends State<ContactoPage> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF890cac), // Morado arriba
-              Colors.white,      // Blanco abajo
+              Color(0xFF890cac),
+              Colors.white,
             ],
           ),
         ),
         child: SafeArea(
           child: Column(
             children: [
-              // Usando el navbar reutilizable
-              const KuentecoNavbar(
+              KuentecoNavbar(
                 currentRoute: '/contacto',
+                isLoggedIn: widget.isLoggedIn,
               ),
-
-              // Contenido de la página de contacto
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      // Espacio superior adicional para posicionar más alto
                       SizedBox(height: screenSize.height * 0.05),
-
-                      // Contenedor principal con altura reducida
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 32.0),
                         child: Center(
                           child: ConstrainedBox(
                             constraints: BoxConstraints(
                               maxWidth: 800,
-                              // Altura del contenedor para hacerlo más pequeño
                               maxHeight: screenSize.height * 0.65,
                             ),
                             child: Container(
@@ -87,37 +78,33 @@ class _ContactoPageState extends State<ContactoPage> {
                                 border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
                               ),
                               child: Column(
-                                mainAxisSize: MainAxisSize.min, // Para que se ajuste al contenido
+                                mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Título y descripción
                                   Center(
                                     child: Column(
                                       children: [
                                         const Text(
                                           'Contáctanos',
                                           style: TextStyle(
-                                            fontSize: 28, // Reducido de 32
+                                            fontSize: 28,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.white,
                                           ),
                                         ),
-                                        const SizedBox(height: 12), // Reducido de 16
+                                        const SizedBox(height: 12),
                                         Text(
                                           'Estamos aquí para ayudarte. Completa el formulario y nos pondremos en contacto contigo lo antes posible.',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
-                                            fontSize: 14, // Reducido de 16
+                                            fontSize: 14,
                                             color: Colors.white.withOpacity(0.9),
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-
-                                  const SizedBox(height: 24), // Reducido de 40
-
-                                  // Formulario de contacto con tamaño reducido
+                                  const SizedBox(height: 24),
                                   Expanded(
                                     child: SingleChildScrollView(
                                       child: Form(
@@ -125,11 +112,9 @@ class _ContactoPageState extends State<ContactoPage> {
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            // Nombre y email en la misma fila
                                             Row(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                // Campo de nombre
                                                 Expanded(
                                                   child: _buildTextField(
                                                     controller: _nombreController,
@@ -143,10 +128,7 @@ class _ContactoPageState extends State<ContactoPage> {
                                                     },
                                                   ),
                                                 ),
-
                                                 const SizedBox(width: 16),
-
-                                                // Campo de email
                                                 Expanded(
                                                   child: _buildTextField(
                                                     controller: _emailController,
@@ -164,10 +146,7 @@ class _ContactoPageState extends State<ContactoPage> {
                                                 ),
                                               ],
                                             ),
-
-                                            const SizedBox(height: 16), // Reducido de 20
-
-                                            // Campo de asunto
+                                            const SizedBox(height: 16),
                                             _buildTextField(
                                               controller: _asuntoController,
                                               label: 'Asunto',
@@ -179,15 +158,12 @@ class _ContactoPageState extends State<ContactoPage> {
                                                 return null;
                                               },
                                             ),
-
-                                            const SizedBox(height: 16), // Reducido de 20
-
-                                            // Campo de mensaje con altura reducida
+                                            const SizedBox(height: 16),
                                             _buildTextField(
                                               controller: _mensajeController,
                                               label: 'Mensaje',
                                               icon: Icons.message,
-                                              maxLines: 3, // Reducido de 5
+                                              maxLines: 3,
                                               validator: (value) {
                                                 if (value == null || value.isEmpty) {
                                                   return 'Por favor ingresa tu mensaje';
@@ -195,15 +171,11 @@ class _ContactoPageState extends State<ContactoPage> {
                                                 return null;
                                               },
                                             ),
-
-                                            const SizedBox(height: 20), // Reducido de 24
-
-                                            // Botón de enviar
+                                            const SizedBox(height: 20),
                                             Center(
                                               child: ElevatedButton(
                                                 onPressed: () {
                                                   if (_formKey.currentState!.validate()) {
-                                                    // Mostrar mensaje de éxito
                                                     ScaffoldMessenger.of(context).showSnackBar(
                                                       const SnackBar(
                                                         content: Text('¡Mensaje enviado correctamente!'),
@@ -211,8 +183,6 @@ class _ContactoPageState extends State<ContactoPage> {
                                                         duration: Duration(seconds: 3),
                                                       ),
                                                     );
-
-                                                    // Limpiar formulario
                                                     _nombreController.clear();
                                                     _emailController.clear();
                                                     _asuntoController.clear();
@@ -236,32 +206,24 @@ class _ContactoPageState extends State<ContactoPage> {
                                                 ),
                                               ),
                                             ),
-
-                                            const SizedBox(height: 16), // Reducido de 40
-
-                                            // Sección de información de contacto compactada
+                                            const SizedBox(height: 16),
                                             Padding(
                                               padding: const EdgeInsets.symmetric(vertical: 8.0),
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                 children: [
-                                                  // Email
                                                   _buildCompactContactInfo(
                                                     icon: Icons.email,
                                                     info: 'soporte@kuenteco.com',
                                                     iconColor: const Color(0xFF890cac),
                                                     textColor: const Color(0xFF890cac),
                                                   ),
-
-                                                  // Teléfono
                                                   _buildCompactContactInfo(
                                                     icon: Icons.phone,
                                                     info: '+52 (123) 456-7890',
                                                     iconColor: const Color(0xFF890cac),
                                                     textColor: const Color(0xFF890cac),
                                                   ),
-
-                                                  // Horario de atención
                                                   _buildCompactContactInfo(
                                                     icon: Icons.access_time,
                                                     info: 'Lun-Vie: 9:00-18:00',
@@ -290,12 +252,10 @@ class _ContactoPageState extends State<ContactoPage> {
           ),
         ),
       ),
-      // Usando el Footer reutilizable
       bottomNavigationBar: const Footer(),
     );
   }
 
-  // Widget para campos de texto
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
@@ -334,7 +294,6 @@ class _ContactoPageState extends State<ContactoPage> {
     );
   }
 
-  // Widget compacto para información de contacto
   Widget _buildCompactContactInfo({
     required IconData icon,
     required String info,
@@ -343,11 +302,7 @@ class _ContactoPageState extends State<ContactoPage> {
   }) {
     return Row(
       children: [
-        Icon(
-          icon,
-          color: iconColor,
-          size: 18,
-        ),
+        Icon(icon, color: iconColor, size: 18),
         const SizedBox(width: 8),
         Text(
           info,
