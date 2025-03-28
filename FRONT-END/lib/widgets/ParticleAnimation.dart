@@ -146,7 +146,7 @@ class _ParticleAnimationState extends State<ParticleAnimation> with SingleTicker
           random.nextDouble() * _screenSize!.height,
         ),
         direction: _normalizedRandomDirection(),
-        speed: 0.1 + random.nextDouble() * 0.2,
+        speed: 0.1 + random.nextDouble() * 0.1,
         size: 25.0 + random.nextDouble() * 35.0,
         opacity: 0.3 + random.nextDouble() * 0.7,
       );

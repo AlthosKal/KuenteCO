@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kuenteco/services/ApiService.dart';
 import 'package:kuenteco/widgets/ParticleAnimation.dart';
 import 'package:kuenteco/pages/Register.dart';
+import 'InicioLog.dart';
 import 'VerificacionC.dart';
 import 'dart:ui' as ui;
 
@@ -32,6 +33,13 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  // Add this method to show messages
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
   Future<void> _iniciarSesion(BuildContext context) async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -48,7 +56,16 @@ class _LoginPageState extends State<LoginPage> {
       }
 
       if (response['status'] == 'success') {
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LoggedInHomePage(
+              title: 'Inicio',
+              userEmail: _emailController.text,
+            ),
+          ),
+              (route) => false, // Esto elimina todas las rutas anteriores
+        );
       } else {
         _showMessage(context, response['message'] ?? 'Error en el inicio de sesión');
       }
@@ -88,18 +105,14 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
-
   Widget _buildTextField({
     required TextEditingController controller,
     required String labelText,
     bool obscureText = false,
     Widget? suffixIcon,
     String? Function(String?)? validator,
+    TextInputAction? textInputAction,
+    void Function(String)? onFieldSubmitted,
   }) {
     return SizedBox(
       width: 320,
@@ -108,6 +121,8 @@ class _LoginPageState extends State<LoginPage> {
         obscureText: obscureText,
         cursorColor: whiteColor,
         style: const TextStyle(color: whiteColor),
+        textInputAction: textInputAction,
+        onFieldSubmitted: onFieldSubmitted,
         decoration: InputDecoration(
           border: InputBorder.none,
           labelText: labelText,
@@ -122,6 +137,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  // Add the build method that was missing
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -201,6 +217,8 @@ class _LoginPageState extends State<LoginPage> {
                               controller: _passwordController,
                               labelText: 'Contraseña',
                               obscureText: _obscurePassword,
+                              textInputAction: TextInputAction.done,
+                              onFieldSubmitted: (_) => _iniciarSesion(context),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   _obscurePassword ? Icons.visibility : Icons.visibility_off,
