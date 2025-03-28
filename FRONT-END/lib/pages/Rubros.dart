@@ -3,7 +3,7 @@ import 'package:tu_app/models/rubro.dart'; // Asume que tienes un modelo de Rubr
 import 'package:tu_app/views/crear_rubro_view.dart'; // Vista para crear rubros
 
 class RubrosView extends StatefulWidget {
-  const RubrosView({Key? key}) : super(key: key);
+  const RubrosView({super.key});
 
   @override
   _RubrosViewState createState() => _RubrosViewState();
