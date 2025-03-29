@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kuenteco/services/ApiService.dart';
 import 'package:kuenteco/widgets/ParticleAnimation.dart';
 import 'package:kuenteco/pages/Register.dart';
+import 'InicioLog.dart';
 import 'VerificacionC.dart';
 import 'dart:ui' as ui;
 
@@ -13,9 +14,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _apiService = ApiService();
+
   bool _obscurePassword = true;
   bool _rememberPassword = false;
   bool _isLoading = false;
@@ -23,13 +26,18 @@ class _LoginPageState extends State<LoginPage> {
   static const Color primaryColor = Color(0xFF890cac);
   static const Color whiteColor = Colors.white;
 
-  final ApiService _apiService = ApiService();
-
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  // Add this method to show messages
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   Future<void> _iniciarSesion(BuildContext context) async {
@@ -44,12 +52,20 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (_rememberPassword) {
-        // Guardar credenciales seguras (implementar con shared_preferences)
+        // Guardar credenciales (implementar con shared_preferences)
       }
 
       if (response['status'] == 'success') {
-        // Navegar a la pantalla principal
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LoggedInHomePage(
+              title: 'Inicio',
+              userEmail: _emailController.text,
+            ),
+          ),
+              (route) => false, // Esto elimina todas las rutas anteriores
+        );
       } else {
         _showMessage(context, response['message'] ?? 'Error en el inicio de sesión');
       }
@@ -60,10 +76,10 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> _enviarCodigoRecuperacion(BuildContext context) async {
+  Future<void> _enviarCodigoRecuperacion() async {
     final email = _emailController.text.trim();
     if (email.isEmpty || !email.contains('@')) {
-      _showMessage(context, 'Por favor, ingresa un email válido para recuperar tu contraseña');
+      _showMessage(context, 'Ingresa un email válido para recuperar tu contraseña');
       return;
     }
 
@@ -76,9 +92,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => VerificacionCodigo(
-              email: email,
-            ),
+            builder: (context) => VerificacionCodigo(email: email),
           ),
         );
       } else {
@@ -91,18 +105,14 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
-
   Widget _buildTextField({
     required TextEditingController controller,
     required String labelText,
     bool obscureText = false,
     Widget? suffixIcon,
     String? Function(String?)? validator,
+    TextInputAction? textInputAction,
+    void Function(String)? onFieldSubmitted,
   }) {
     return SizedBox(
       width: 320,
@@ -111,6 +121,8 @@ class _LoginPageState extends State<LoginPage> {
         obscureText: obscureText,
         cursorColor: whiteColor,
         style: const TextStyle(color: whiteColor),
+        textInputAction: textInputAction,
+        onFieldSubmitted: onFieldSubmitted,
         decoration: InputDecoration(
           border: InputBorder.none,
           labelText: labelText,
@@ -125,154 +137,11 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        IconButton(
-          icon: const Icon(Icons.arrow_back, color: whiteColor),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        const Expanded(
-          child: Text(
-            'Inicio de sesión',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: whiteColor,
-            ),
-          ),
-        ),
-        const SizedBox(width: 48),
-      ],
-    );
-  }
-
-  Widget _buildRememberPasswordOption() {
-    return SizedBox(
-      width: 320,
-      child: Row(
-        children: [
-          Theme(
-            data: ThemeData(
-              checkboxTheme: CheckboxThemeData(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                fillColor: WidgetStateProperty.resolveWith<Color>((states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return primaryColor;
-                  }
-                  return whiteColor;
-                }),
-                checkColor: WidgetStateProperty.all(whiteColor),
-              ),
-            ),
-            child: Checkbox(
-              value: _rememberPassword,
-              onChanged: (bool? value) {
-                setState(() {
-                  _rememberPassword = value ?? false;
-                });
-              },
-            ),
-          ),
-          const SizedBox(width: 8),
-          const Text(
-            'Recordar contraseña',
-            style: TextStyle(
-              color: whiteColor,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLoginButton(BuildContext context) {
-    return Material(
-      borderRadius: BorderRadius.circular(8),
-      color: whiteColor,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(8),
-        onTap: _isLoading ? null : () => _iniciarSesion(context),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-          child: _isLoading
-              ? const SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-            ),
-          )
-              : const Text(
-            'Iniciar sesión',
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRegisterOption() {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const RegisterPage()),
-        );
-      },
-      child: const Text.rich(
-        TextSpan(
-          text: '¿No tienes una cuenta? ',
-          style: TextStyle(color: whiteColor),
-          children: [
-            TextSpan(
-              text: 'Regístrate',
-              style: TextStyle(
-                color: whiteColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildForgotPasswordOption() {
-    return GestureDetector(
-      onTap: _isLoading ? null : () => _enviarCodigoRecuperacion(context),
-      child: const Text.rich(
-        TextSpan(
-          text: '¿Olvidaste tu contraseña? ',
-          style: TextStyle(color: whiteColor),
-          children: [
-            TextSpan(
-              text: 'Recupérala',
-              style: TextStyle(
-                color: whiteColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
+  // Add the build method that was missing
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final double screenWidth = mediaQuery.size.width;
-    final bool isSmallScreen = screenWidth < 600;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 600;
     final containerWidth = isSmallScreen ? 360.0 : 400.0;
 
     return Scaffold(
@@ -306,50 +175,172 @@ class _LoginPageState extends State<LoginPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            _buildHeader(),
+                          children: [
+                            // Header
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.arrow_back, color: whiteColor),
+                                  onPressed: () => Navigator.of(context).pop(),
+                                ),
+                                const Expanded(
+                                  child: Text(
+                                    'Inicio de sesión',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: whiteColor,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 48),
+                              ],
+                            ),
                             const SizedBox(height: 20),
+
+                            // Email Field
                             _buildTextField(
                               controller: _emailController,
                               labelText: 'Correo electrónico',
-                              validator: (value) =>
-                              value == null || value.isEmpty
+                              validator: (value) => value == null || value.isEmpty
                                   ? 'Por favor, ingresa tu email'
                                   : !value.contains('@')
                                   ? 'Ingresa un email válido'
                                   : null,
                             ),
                             const SizedBox(height: 20),
+
+                            // Password Field
                             _buildTextField(
                               controller: _passwordController,
                               labelText: 'Contraseña',
                               obscureText: _obscurePassword,
+                              textInputAction: TextInputAction.done,
+                              onFieldSubmitted: (_) => _iniciarSesion(context),
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
+                                  _obscurePassword ? Icons.visibility : Icons.visibility_off,
                                   color: whiteColor,
                                 ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
+                                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                               ),
-                              validator: (value) =>
-                              value == null || value.isEmpty
+                              validator: (value) => value == null || value.isEmpty
                                   ? 'Por favor, ingresa tu contraseña'
                                   : null,
                             ),
                             const SizedBox(height: 10),
-                            _buildRememberPasswordOption(),
+
+                            // Remember Password
+                            SizedBox(
+                              width: 320,
+                              child: Row(
+                                children: [
+                                  Theme(
+                                    data: ThemeData(
+                                      checkboxTheme: CheckboxThemeData(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        side: BorderSide(color: whiteColor),
+                                        fillColor: MaterialStateProperty.resolveWith<Color>((states) {
+                                          if (states.contains(MaterialState.selected)) {
+                                            return primaryColor;
+                                          }
+                                          return Colors.transparent;
+                                        }),
+                                        checkColor: MaterialStateProperty.all(whiteColor),
+                                      ),
+                                    ),
+                                    child: Checkbox(
+                                      value: _rememberPassword,
+                                      onChanged: (bool? value) => setState(() => _rememberPassword = value ?? false),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    'Recordar contraseña',
+                                    style: TextStyle(color: whiteColor, fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                            ),
                             const SizedBox(height: 20),
-                            _buildLoginButton(context),
+
+                            // Login Button
+                            Material(
+                              borderRadius: BorderRadius.circular(8),
+                              color: whiteColor,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(8),
+                                onTap: _isLoading ? null : () => _iniciarSesion(context),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                                  child: _isLoading
+                                      ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                                    ),
+                                  )
+                                      : const Text(
+                                    'Iniciar sesión',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
                             const SizedBox(height: 20),
-                            _buildRegisterOption(),
+
+                            // Register Option
+                            GestureDetector(
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const RegisterPage()),
+                              ),
+                              child: const Text.rich(
+                                TextSpan(
+                                  text: '¿No tienes una cuenta? ',
+                                  style: TextStyle(color: whiteColor),
+                                  children: [
+                                    TextSpan(
+                                      text: 'Regístrate',
+                                      style: TextStyle(
+                                        color: whiteColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                             const SizedBox(height: 20),
-                            _buildForgotPasswordOption(),
+
+                            // Forgot Password
+                            GestureDetector(
+                              onTap: _isLoading ? null : _enviarCodigoRecuperacion,
+                              child: const Text.rich(
+                                TextSpan(
+                                  text: '¿Olvidaste tu contraseña? ',
+                                  style: TextStyle(color: whiteColor),
+                                  children: [
+                                    TextSpan(
+                                      text: 'Recupérala',
+                                      style: TextStyle(
+                                        color: whiteColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -359,6 +350,8 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
+
+          // Loading Overlay
           if (_isLoading)
             Container(
               color: Colors.black.withOpacity(0.3),

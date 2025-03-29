@@ -8,6 +8,7 @@ class KuentecoNavbar extends StatelessWidget {
   final String logoPlaceholderText;
   final bool useDefaultLogoSize;
   final bool isLoggedIn;
+  final VoidCallback? onLogout;
 
   const KuentecoNavbar({
     super.key,
@@ -18,6 +19,7 @@ class KuentecoNavbar extends StatelessWidget {
     this.logoPlaceholderText = 'Logo no disponible',
     this.useDefaultLogoSize = true,
     required this.isLoggedIn,
+    this.onLogout,
   });
 
   @override
@@ -77,19 +79,28 @@ class KuentecoNavbar extends StatelessWidget {
   }
 
   List<Widget> _buildNavigationButtons(BuildContext context) {
-    return [
-      _buildButton(context, 'Inicio', '/'),
+    final buttons = [
+      _buildButton(context, 'Inicio', '/iniciolog'),
       const SizedBox(width: 20),
-      _buildButton(context, 'Suscripciones', '/suscripciones'),
-      const SizedBox(width: 20),
-      _buildButton(context, 'Contáctanos', '/contacto'),
+      _buildButton(context, 'Rubros', '/Rubros'),
     ];
+
+    if (isLoggedIn) {
+      buttons.addAll([
+        const SizedBox(width: 20),
+        _buildButton(context, 'Dashboard', '/dashboard'),
+      ]);
+    }
+
+    return buttons;
   }
 
   List<Widget> _buildAuthButtons(BuildContext context) {
     if (isLoggedIn) {
       return [
-        _buildButton(context, 'Mi Perfil', '/profile'),
+        _buildProfileButton(context),
+        const SizedBox(width: 12),
+        _buildLogoutButton(context),
       ];
     } else {
       return [
@@ -113,23 +124,64 @@ class KuentecoNavbar extends StatelessWidget {
     final double finalLogoWidth = logoWidth ?? defaultLogoWidth;
     final double finalLogoHeight = logoHeight ?? defaultLogoHeight;
 
-    return Image.asset(
-      logoPath,
-      width: finalLogoWidth,
-      height: useDefaultLogoSize ? null : finalLogoHeight,
-      fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) {
-        return SizedBox(
-          width: finalLogoWidth,
-          height: finalLogoHeight,
-          child: Center(
-            child: Text(
-              logoPlaceholderText,
-              style: const TextStyle(color: Colors.white),
+    return GestureDetector(
+      onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false),
+      child: Image.asset(
+        logoPath,
+        width: finalLogoWidth,
+        height: useDefaultLogoSize ? null : finalLogoHeight,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          return SizedBox(
+            width: finalLogoWidth,
+            height: finalLogoHeight,
+            child: Center(
+              child: Text(
+                logoPlaceholderText,
+                style: const TextStyle(color: Colors.white),
+              ),
             ),
-          ),
-        );
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildProfileButton(BuildContext context) {
+    return PopupMenuButton<String>(
+      child: CircleAvatar(
+        backgroundColor: Colors.white,
+        child: Icon(Icons.person, color: Theme.of(context).primaryColor),
+      ),
+      itemBuilder: (BuildContext context) => [
+        const PopupMenuItem<String>(
+          value: 'profile',
+          child: Text('Mi Perfil'),
+        ),
+        const PopupMenuItem<String>(
+          value: 'settings',
+          child: Text('Configuración'),
+        ),
+      ],
+      onSelected: (value) {
+        if (value == 'profile') {
+          Navigator.pushNamed(context, '/profile');
+        } else if (value == 'settings') {
+          Navigator.pushNamed(context, '/settings');
+        }
       },
+    );
+  }
+
+  Widget _buildLogoutButton(BuildContext context) {
+    return _buildButton(
+      context,
+      'Cerrar sesión',
+      '/logout',
+      backgroundColor: Colors.white,
+      textColor: const Color(0xFF890cac),
+      isLarge: true,
+      onPressed: onLogout,
     );
   }
 
@@ -140,18 +192,30 @@ class KuentecoNavbar extends StatelessWidget {
         Color? backgroundColor,
         Color? textColor,
         bool isLarge = false,
+        VoidCallback? onPressed,
       }) {
     final bool isActive = route == currentRoute;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => Navigator.pushNamedAndRemoveUntil(
-            context, route, (r) => route == '/' ? false : true),
+        onTap: onPressed ?? () {
+          if (route == '/logout') {
+            if (onLogout != null) onLogout!();
+          } else {
+            Navigator.pushNamedAndRemoveUntil(
+                context,
+                route,
+                    (r) => route == '/' ? false : true
+            );
+          }
+        },
         borderRadius: BorderRadius.circular(8),
         child: Padding(
           padding: EdgeInsets.symmetric(
-              horizontal: isLarge ? 20 : 16, vertical: isLarge ? 10 : 8),
+              horizontal: isLarge ? 20 : 16,
+              vertical: isLarge ? 10 : 8
+          ),
           child: Container(
             decoration: backgroundColor != null
                 ? BoxDecoration(

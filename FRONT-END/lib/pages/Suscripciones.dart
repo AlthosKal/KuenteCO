@@ -4,12 +4,14 @@ import 'package:kuenteco/widgets/footer.dart';
 
 class SuscripcionesPage extends StatefulWidget {
   final Color backgroundColor;
-  final double cardHeight; // Propiedad para controlar la altura
+  final double cardHeight;
+  final bool isLoggedIn;
 
   const SuscripcionesPage({
     super.key,
     this.backgroundColor = const Color(0xFF890cac),
-    this.cardHeight = 450, // Valor predeterminado para la altura
+    this.cardHeight = 450,
+    this.isLoggedIn = false,
   });
 
   @override
@@ -23,32 +25,28 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        // Mantener solo el degradado como fondo
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF890cac), // Morado arriba
-              Colors.white,      // Blanco abajo
+              Color(0xFF890cac),
+              Colors.white,
             ],
           ),
         ),
         child: SafeArea(
           child: Column(
             children: [
-              // Usando el navbar reutilizable
-              const KuentecoNavbar(
+              KuentecoNavbar(
                 currentRoute: '/suscripciones',
+                isLoggedIn: widget.isLoggedIn,
               ),
-
-              // Contenido de la página de suscripciones
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      // Suscripciones en horizontal
                       Expanded(
                         child: _buildHorizontalSubscriptionPlans(context),
                       ),
@@ -60,13 +58,11 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
           ),
         ),
       ),
-      // Usando el Footer reutilizable
       bottomNavigationBar: const Footer(),
     );
   }
 
   Widget _buildHorizontalSubscriptionPlans(BuildContext context) {
-    // Definir los planes
     final plans = [
       {
         'title': 'Plan Básico',
@@ -106,7 +102,6 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
       },
     ];
 
-    // Usar un Row envuelto en un SingleChildScrollView para permitir desplazamiento horizontal
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -116,13 +111,12 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
   }
 
   Widget _buildPlanCard(Map<String, dynamic> plan, BuildContext context) {
-    // Ancho fijo para cada tarjeta
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = screenWidth * 0.15; // Ancho de la pantalla
+    final cardWidth = screenWidth * 0.15;
 
     return Container(
       width: cardWidth,
-      height: widget.cardHeight, // Usar la altura configurable
+      height: widget.cardHeight,
       margin: const EdgeInsets.only(right: 16.0),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.3),
@@ -141,7 +135,6 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Título del plan
             Text(
               plan['title'] as String,
               style: const TextStyle(
@@ -157,10 +150,7 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
                 ],
               ),
             ),
-
             const SizedBox(height: 8),
-
-            // Descripción
             Text(
               plan['description'] as String,
               style: TextStyle(
@@ -168,10 +158,7 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
                 color: Colors.white.withOpacity(0.9),
               ),
             ),
-
             const SizedBox(height: 16),
-
-            // Características en un Expanded para que tomen el espacio disponible
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -204,10 +191,7 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
-
-            // Precio centrado arriba del botón
             Center(
               child: Text(
                 plan['price'] as String,
@@ -218,10 +202,7 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
                 ),
               ),
             ),
-
             const SizedBox(height: 8),
-
-            // Botón
             Center(
               child: ElevatedButton(
                 onPressed: plan['isAcquired'] as bool ? null : () {
@@ -233,7 +214,6 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  // Cambiar color solo para el botón adquirido
                   backgroundColor: (plan['isAcquired'] as bool) ? Colors.white : const Color(0xFF890cac),
                   foregroundColor: (plan['isAcquired'] as bool) ? const Color(0xFF890cac) : Colors.white,
                   shape: RoundedRectangleBorder(
