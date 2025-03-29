@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'dart:ui' as ui;
 import 'dart:async';
 
 // Pages
@@ -14,7 +13,7 @@ import 'package:kuenteco/pages/Contacto.dart';
 // Widgets
 import 'package:kuenteco/widgets/navbar.dart';
 import 'package:kuenteco/widgets/footer.dart';
-
+import 'package:kuenteco/widgets/background.dart';
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
   runZonedGuarded(() {
@@ -84,17 +83,16 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildBody() {
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      decoration: _buildBackgroundDecoration(),
+    return Background(
       child: SafeArea(
         child: Column(
           children: [
             _buildNavbar(),
             Expanded(
               child: Center(
-                child: _buildWelcomeCard(),
+                child: BlurredCard(
+                  child: _buildCardContent(),
+                ),
               ),
             ),
           ],
@@ -103,48 +101,10 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  BoxDecoration _buildBackgroundDecoration() {
-    return const BoxDecoration(
-      gradient: LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [Color(0xFF890cac), Colors.white],
-      ),
-    );
-  }
-
   Widget _buildNavbar() {
     return KuentecoNavbar(
       currentRoute: '/',
       isLoggedIn: isLoggedIn,
-    );
-  }
-
-  Widget _buildWelcomeCard() {
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: _buildCardDecoration(),
-          child: _buildCardContent(),
-        ),
-      ),
-    );
-  }
-
-  BoxDecoration _buildCardDecoration() {
-    return BoxDecoration(
-      color: Colors.white.withOpacity(0.3),
-      borderRadius: BorderRadius.circular(15),
-      boxShadow: [
-        BoxShadow(
-          color: const Color(0xFF890cac).withOpacity(0.2),
-          blurRadius: 8,
-          spreadRadius: 2,
-        ),
-      ],
     );
   }
 
