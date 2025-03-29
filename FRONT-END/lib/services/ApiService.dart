@@ -35,6 +35,7 @@ class ApiService {
         if (cookie.trim().startsWith('jwt=')) {
           return cookie.trim().substring(4);
         }
+
       }
     }
     return null;
@@ -42,6 +43,7 @@ class ApiService {
 
   // Métodos de autenticación
   Future<Map<String, dynamic>> login({required String email, required String password}) async {
+
     try {
       final response = await _client.post(
         Uri.parse('$baseUrl/v1/auth/login'),
@@ -51,7 +53,6 @@ class ApiService {
           'password': password
         }),
       );
-
       // Extraer el token de las cookies
       final token = _extractTokenFromCookies(response);
       if (token != null) {
@@ -100,6 +101,7 @@ class ApiService {
     }
   }
 
+
   Future<Map<String, dynamic>> validateVerificationCode({
     required String email,
     required String code
@@ -118,6 +120,7 @@ class ApiService {
       return _handleError(e);
     }
   }
+
 
   Future<Map<String, dynamic>> activateAccount({
     required String email,
@@ -208,7 +211,6 @@ class ApiService {
       'message': 'Connection error: ${e.toString()}',
     };
   }
-
   void dispose() {
     _client.close();
   }

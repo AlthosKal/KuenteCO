@@ -1,0 +1,24 @@
+master:
+  config:
+    activate:
+      on-profile: master
+  datasource:
+    url: ${SPRING_DATASOURCE_URL_MASTER}
+    username: ${SPRING_DATASOURCE_USERNAME_MASTER}
+    password: ${SPRING_DATASOURCE_PASSWORD_MASTER}
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 5
+      idle-timeout: 20000
+      connection-timeout: 10000
+      max-lifetime: 1800000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true

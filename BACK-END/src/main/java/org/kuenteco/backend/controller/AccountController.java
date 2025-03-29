@@ -5,7 +5,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.kuenteco.backend.dto.ApiMessage;
 import org.kuenteco.backend.dto.account.NewAccountDTO;
-import org.kuenteco.backend.entity.Account;
+import org.kuenteco.backend.entity.master.MasterAccount;
+import org.kuenteco.backend.entity.slave.SlaveAccount;
 import org.kuenteco.backend.service.account.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class AccountController {
     private final AccountService accountService;
 
     @GetMapping
-    public ResponseEntity<List<Account>> getAllAccounts() {
+    public ResponseEntity<List<SlaveAccount>> getAllAccounts() {
         return new ResponseEntity<>(accountService.getAccounts(), HttpStatus.OK);
     }
 
@@ -45,7 +46,7 @@ public class AccountController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiMessage> deleteAccount(Account account) {
+    public ResponseEntity<ApiMessage> deleteAccount(MasterAccount account) {
         try {
             accountService.deleteAccount(account);
             return ResponseEntity.status(HttpStatus.OK).body(new ApiMessage("Account deleted successfully"));
