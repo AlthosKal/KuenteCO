@@ -1,0 +1,21 @@
+slave:
+  config:
+    activate:
+      on-profile: slave
+  datasource:
+    url: ${SPRING_DATASOURCE_URL_SLAVE}
+    username: ${SPRING_DATASOURCE_USERNAME_SLAVE}
+    password: ${SPRING_DATASOURCE_PASSWORD_SLAVE}
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 5
+      idle-timeout: 20000
+      connection-timeout: 10000
+      max-lifetime: 1800000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true

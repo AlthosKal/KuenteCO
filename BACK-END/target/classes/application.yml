@@ -1,5 +1,5 @@
 jwt:
-  secret: 8cf536674e152130d16292539da4b29e035afbe01e279bbbe9e274d71838594f
+  secret: ${JWT_SECRET}
   expiration: 7200
 
 management:
@@ -33,8 +33,11 @@ resilience4j:
         record-exceptions:
           - io.netty.handler.timeout.ReadTimeoutException
           - java.lang.RuntimeException
+          - org.springframework.web.client.HttpServerErrorException
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
     instances:
-      api-catalog:
+      app-resilience-config:
         base-config: default
 
   ratelimiter:
@@ -44,7 +47,7 @@ resilience4j:
         limit-refresh-period: 1s
         timeout-duration: 500ms
     instances:
-      post-reservation:
+      post-insert:
         base-config: default
 
 server:
@@ -52,7 +55,7 @@ server:
   compression:
     enabled: true
     min-response-size: 2KB
-    mime-types: application/json,application/xml,text/html,text/plain
+    mime-types: application/json,application/xml,text/html,text/plain,text/css,application/javascript
   tomcat:
     threads:
       max: 500
@@ -60,36 +63,22 @@ server:
     connection-timeout: 20000
   servlet:
     context-path: /api
+
+
 spring:
-  datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    hikari:
-      maximum-pool-size: 50
-      minimum-idle: 5
-      idle-timeout: 20000
-      connection-timeout: 10000
-      max-lifetime: 1800000
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        show-sql: true
-        format_sql: true
-        jdbc:
-          lob:
-            non_contextual_creation: true
-    open-in-view: false
   sendgrid:
     api-key: ${SENDGRID_API_KEY}
+    email: ${EMAIL_SENDGRID}
+  profiles:
+    active: master,slave
+
 
 logging:
   level:
     org.springframework.security: DEBUG
     org.kuenteco.backend: DEBUG
+    com.zaxxer.hikari: DEBUG
+    org.hibernate.SQL: DEBUG
 
 info:
   application:

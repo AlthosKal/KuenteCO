@@ -32,6 +32,7 @@ public class JwtUtil {
                 .setExpiration(new Date(new Date().getTime() + expiration * 1000L))
                 .signWith(key, SignatureAlgorithm.HS256).compact();
     }
+
     public String resolveToken(HttpServletRequest request) {
         // Primero intentar obtener de header Authorization (Bearer token)
         String bearerToken = request.getHeader("Authorization");

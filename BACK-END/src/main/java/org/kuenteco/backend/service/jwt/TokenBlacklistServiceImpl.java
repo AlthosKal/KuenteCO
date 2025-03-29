@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class TokenBlacklistServiceImpl implements TokenBlacklistService{
+public class TokenBlacklistServiceImpl implements TokenBlacklistService {
     private final Set<String> blacklistedTokens = ConcurrentHashMap.newKeySet();
 
     public void addToBlacklist(String token) {

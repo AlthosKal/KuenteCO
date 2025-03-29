@@ -1,18 +1,27 @@
 package org.kuenteco.backend.service.jwt;
 
-import com.sendgrid.*;
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import jakarta.servlet.http.HttpServletResponse;
-import org.kuenteco.backend.dto.auth.*;
-import org.kuenteco.backend.entity.Role;
-import org.kuenteco.backend.entity.User;
+import org.kuenteco.backend.dto.auth.NewUserDTO;
+import org.kuenteco.backend.dto.auth.SendVerificationCodeDTO;
+import org.kuenteco.backend.entity.master.MasterRole;
+import org.kuenteco.backend.entity.master.MasterUser;
+import org.kuenteco.backend.entity.slave.SlaveRole;
+import org.kuenteco.backend.entity.slave.SlaveUser;
 import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.jwt.JwtUtil;
-import org.kuenteco.backend.repository.RoleRepository;
-import org.kuenteco.backend.repository.UserRepository;
+import org.kuenteco.backend.mapper.entity.RoleMapper;
+import org.kuenteco.backend.mapper.entity.UserMapper;
+import org.kuenteco.backend.repository.master.MasterRoleRepository;
+import org.kuenteco.backend.repository.slave.SlaveRoleRepository;
+import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +30,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Map;
@@ -32,49 +43,59 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class AuthServiceImpl implements AuthService {
-    private final UserServiceImpl userService;
-    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final CookieServiceImpl cookieService;
-    private final UserRepository userRepository;
+    private final UserService userService;
+    private final SlaveRoleRepository slaveRoleRepository;
+    private final SlaveUserRepository slaveUserRepository;
     private final TokenBlacklistService tokenBlacklistService;
+
+    @Autowired
+    private MasterRoleRepository masterRoleRepository;
+    private final UserMapper userMapper;
+    private final RoleMapper roleMapper;
 
     @Value("${spring.sendgrid.api-key}")
     private String SENDGRID_API_KEY;
+
+    @Value("${spring.sendgrid.email}")
+    private String EmailSendGrid;
 
     private final Map<String, String> verificationCodes = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     @Autowired
-    public AuthServiceImpl(UserServiceImpl userService, RoleRepository roleRepository,
-                           PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
-                           AuthenticationManagerBuilder authenticationManagerBuilder,
-                           CookieServiceImpl cookieService, UserRepository userRepository,
-                           TokenBlacklistService tokenBlacklistService) {
+    public AuthServiceImpl(UserService userService, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
+            AuthenticationManagerBuilder authenticationManagerBuilder, CookieServiceImpl cookieService,
+            TokenBlacklistService tokenBlacklistService, SlaveRoleRepository slaveRoleRepository,
+            SlaveUserRepository slaveUserRepository, UserMapper userMapper, RoleMapper roleMapper) {
         this.userService = userService;
-        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.cookieService = cookieService;
-        this.userRepository = userRepository;
         this.tokenBlacklistService = tokenBlacklistService;
+        this.slaveRoleRepository = slaveRoleRepository;
+        this.slaveUserRepository = slaveUserRepository;
+        this.userMapper = userMapper;
+        this.roleMapper = roleMapper;
     }
 
     @Override
     public String authenticate(String email, String password, HttpServletResponse response) {
         // Verificar si la cuenta está activa antes de autenticar
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        SlaveUser slaveUser = slaveUserRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        MasterUser user = userMapper.slaveToMaster(slaveUser);
         if (user.getAccountState() != State.ACTIVE) {
-            throw new RuntimeException("Account not activated. Please verify your email");
+            throw new RuntimeException("Account no activada. Por favor verifica tu correo");
         }
 
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(email, password);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email,
+                password);
         Authentication authResult = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authResult);
 
@@ -86,18 +107,23 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void registerUser(NewUserDTO newUserDTO) {
         if (userService.existsByUserName(newUserDTO.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new IllegalArgumentException("Datos Invalidos, correo incorrecto o ya existente");
         }
 
-        Role roleUser = roleRepository.findByName(RoleList.ROLE_USER)
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+        SlaveRole slaveRole = slaveRoleRepository.findByName(RoleList.ROLE_USER)
+                .orElseThrow(() -> new RuntimeException("Role no encontrado"));
+
+        MasterRole roleUser = roleMapper.slaveToMaster(slaveRole);
+
+        // Asegurar que el rol existe en la base de datos maestra
+        MasterRole masterRole = masterRoleRepository.findByName(RoleList.ROLE_USER)
+                .orElseGet(() -> masterRoleRepository.save(roleUser));
 
         // Nuevo usuario se crea con estado PENDING
-        User user = new User(
+        MasterUser user = new MasterUser(
                 newUserDTO.getEmail(),
                 passwordEncoder.encode(newUserDTO.getPassword()),
-                roleUser
-        );
+                masterRole);
         user.setAccountState(State.PENDING);
 
         userService.saveUser(user);
@@ -108,16 +134,17 @@ public class AuthServiceImpl implements AuthService {
         try {
             sendVerificationEmail(verificationDTO, true);
         } catch (IOException e) {
-            throw new RuntimeException("Error sending verification email", e);
+            throw new RuntimeException("Error enviando correo de verificación", e);
         }
     }
 
     @Override
-    public void sendVerificationEmail(SendVerificationCodeDTO sendVerificationCodeDTO, boolean isRegistration) throws IOException {
+    public void sendVerificationEmail(SendVerificationCodeDTO sendVerificationCodeDTO, boolean isRegistration)
+            throws IOException {
         String email = sendVerificationCodeDTO.getEmail();
 
-        if (isRegistration && !userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email not registered");
+        if (isRegistration && !slaveUserRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("Email no registrado");
         }
 
         String code = String.format("%06d", new Random().nextInt(999999));
@@ -126,21 +153,15 @@ public class AuthServiceImpl implements AuthService {
         // Programar la eliminación del código después de 15 minutos
         scheduler.schedule(() -> verificationCodes.remove(email), 15, TimeUnit.MINUTES);
 
-        Email from = new Email("agudelocastanoyeferson270@gmail.com");
-        String subject = isRegistration ?
-                "Verifica tu registro en KuenteCO" :
-                "Código de recuperación de contraseña";
+        scheduler.schedule(() -> userService.deletePendingEmail(email), 15, TimeUnit.MINUTES);
 
-        String contentText = isRegistration ?
-                "Tu código de verificación para activar tu cuenta es: " + code :
-                "Tu código para recuperar tu contraseña es: " + code;
+        Email from = new Email(EmailSendGrid);
+        String subject = isRegistration ? "Verifica tu registro en KuenteCO" : "Código de recuperación de contraseña";
 
-        Mail mail = new Mail(
-                from,
-                subject,
-                new Email(email),
-                new Content("text/plain", contentText)
-        );
+        String contentText = isRegistration ? "Tu código de verificación para activar tu cuenta es: " + code
+                : "Tu código para recuperar tu contraseña es: " + code;
+
+        Mail mail = new Mail(from, subject, new Email(email), new Content("text/plain", contentText));
 
         SendGrid sg = new SendGrid(SENDGRID_API_KEY);
         Request request = new Request();
@@ -151,7 +172,7 @@ public class AuthServiceImpl implements AuthService {
             Response response = sg.api(request);
 
             if (response.getStatusCode() < 200 || response.getStatusCode() >= 300) {
-                throw new IOException("Failed to send email: " + response.getBody());
+                throw new IOException("Error en el envio del correo: " + response.getBody());
             }
         } catch (IOException ex) {
             verificationCodes.remove(email);
@@ -165,17 +186,19 @@ public class AuthServiceImpl implements AuthService {
         return code != null && code.equals(storedCode);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public void activateUser(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        SlaveUser slaveUser = slaveUserRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        if (user.getAccountState() == State.ACTIVE) {
-            throw new RuntimeException("Account already activated");
+        if (slaveUser.getAccountState() == State.ACTIVE) {
+            throw new RuntimeException("Tu cuenta ha sido activada");
         }
 
+        MasterUser user = userMapper.slaveToMaster(slaveUser);
         user.setAccountState(State.ACTIVE);
-        userRepository.save(user);
+        userService.saveUser(user);
 
         // Eliminar el código después de usarlo
         verificationCodes.remove(email);
@@ -184,18 +207,19 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String changePasswordWithVerification(String email, String code, String newPassword) {
         if (!validateVerificationCode(email, code)) {
-            throw new RuntimeException("Invalid verification code");
+            throw new RuntimeException("Codigo de Verificación Invalido");
         }
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        SlaveUser slaveUser = slaveUserRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no Encontrado"));
 
+        MasterUser user = userMapper.slaveToMaster(slaveUser);
         user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
+        userService.saveUser(user);
 
         verificationCodes.remove(email);
 
-        return "Password changed successfully";
+        return "Contraseña actualizada correctamente";
     }
 
     @Override
