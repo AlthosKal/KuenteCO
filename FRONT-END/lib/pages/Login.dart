@@ -244,13 +244,13 @@ class _LoginPageState extends State<LoginPage> {
                                           borderRadius: BorderRadius.circular(4),
                                         ),
                                         side: BorderSide(color: whiteColor),
-                                        fillColor: MaterialStateProperty.resolveWith<Color>((states) {
-                                          if (states.contains(MaterialState.selected)) {
+                                        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+                                          if (states.contains(WidgetState.selected)) {
                                             return primaryColor;
                                           }
                                           return Colors.transparent;
                                         }),
-                                        checkColor: MaterialStateProperty.all(whiteColor),
+                                        checkColor: WidgetStateProperty.all(whiteColor),
                                       ),
                                     ),
                                     child: Checkbox(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tu_app/models/rubro.dart'; // Mismo modelo de Rubro
 
 class CrearRubroView extends StatefulWidget {
-  const CrearRubroView({Key? key}) : super(key: key);
+  const CrearRubroView({super.key});
 
   @override
   _CrearRubroViewState createState() => _CrearRubroViewState();
