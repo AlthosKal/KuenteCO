@@ -102,6 +102,7 @@ class KuentecoNavbar extends StatelessWidget {
           backgroundColor: Colors.white,
           textColor: const Color(0xFF890cac),
           isLarge: true,
+          width: 150, // Ajusta este valor según necesites
         ),
       ];
     }
@@ -140,6 +141,7 @@ class KuentecoNavbar extends StatelessWidget {
         Color? backgroundColor,
         Color? textColor,
         bool isLarge = false,
+        double? width, // Nuevo parámetro para el ancho
       }) {
     final bool isActive = route == currentRoute;
 
@@ -153,6 +155,7 @@ class KuentecoNavbar extends StatelessWidget {
           padding: EdgeInsets.symmetric(
               horizontal: isLarge ? 20 : 16, vertical: isLarge ? 10 : 8),
           child: Container(
+            width: width, // Aplicar el ancho si se proporciona
             decoration: backgroundColor != null
                 ? BoxDecoration(
               color: backgroundColor,
