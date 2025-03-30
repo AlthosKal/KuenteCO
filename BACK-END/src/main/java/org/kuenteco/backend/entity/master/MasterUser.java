@@ -18,9 +18,6 @@ public class MasterUser {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Version
-    private Long version;
-
     @NotBlank
     @Column(unique = true, nullable = false)
     private String email;
@@ -37,11 +34,14 @@ public class MasterUser {
     @Column(name = "account_state")
     private State accountState;
 
+    @Version
+    private Integer version;
+
     public MasterUser(String email, String password, MasterRole role) {
         this.email = email;
         this.password = password;
         this.role = role;
         this.accountState = State.PENDING;
-        this.version = 0L;
+        this.version = 0;
     }
 }

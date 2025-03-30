@@ -17,7 +17,7 @@ public class SlaveAccount {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "idUser", nullable = false)
+    @JoinColumn(name = "id_user", nullable = false)
     private SlaveUser slaveUser;
 
     private String name;

@@ -23,8 +23,13 @@ public class AccountController {
     private final AccountService accountService;
 
     @GetMapping
-    public ResponseEntity<List<SlaveAccount>> getAllAccounts() {
-        return new ResponseEntity<>(accountService.getAccounts(), HttpStatus.OK);
+    public Object getAllAccounts() {
+        try {
+            return new ResponseEntity<>(accountService.getAccounts(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiMessage(e.getMessage()),
+                    HttpStatus.NO_CONTENT);
+        }
     }
 
     @PostMapping("/register")

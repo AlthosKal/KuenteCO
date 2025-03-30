@@ -14,9 +14,6 @@ public class SlaveUser {
     @Id
     private String id;
 
-    @Version
-    private Long version;
-
     @NotBlank
     @Column(unique = true, nullable = false)
     private String email;
@@ -33,12 +30,14 @@ public class SlaveUser {
     @Column(name = "account_state")
     private State accountState;
 
+    @Version
+    private Integer version;
     public SlaveUser(String email, String password, SlaveRole slaveRole) {
         this.email = email;
         this.password = password;
         this.slaveRole = slaveRole;
         this.accountState = State.PENDING;
-        this.version = 0L;
+        this.version = 0;
     }
 
 }
