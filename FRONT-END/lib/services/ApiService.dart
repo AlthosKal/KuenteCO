@@ -35,6 +35,7 @@ class ApiService {
         if (cookie.trim().startsWith('jwt=')) {
           return cookie.trim().substring(4);
         }
+
       }
     }
     return null;
@@ -42,6 +43,7 @@ class ApiService {
 
   // Métodos de autenticación
   Future<Map<String, dynamic>> login({required String email, required String password}) async {
+
     try {
       final response = await _client.post(
         Uri.parse('$baseUrl/v1/auth/login'),
@@ -51,14 +53,13 @@ class ApiService {
           'password': password
         }),
       );
-
       // Extraer el token de las cookies
       final token = _extractTokenFromCookies(response);
       if (token != null) {
         _authToken = token;
       }
 
-      return _processResponse(response, 'Inicio de sesión exitoso');
+      return _processResponse(response, 'Login successful');
     } catch (e) {
       return _handleError(e);
     }
@@ -77,7 +78,7 @@ class ApiService {
           'password': password
         }),
       );
-      return _processResponse(response, 'Registro exitoso. Verifica tu email para activar la cuenta');
+      return _processResponse(response, 'Registration successful. Please verify your email');
     } catch (e) {
       return _handleError(e);
     }
@@ -94,11 +95,12 @@ class ApiService {
         headers: _jsonHeaders,
         body: json.encode({'email': email}),
       );
-      return _processResponse(response, 'Código de verificación enviado');
+      return _processResponse(response, 'Verification code sent');
     } catch (e) {
       return _handleError(e);
     }
   }
+
 
   Future<Map<String, dynamic>> validateVerificationCode({
     required String email,
@@ -113,11 +115,12 @@ class ApiService {
           'code': code
         }),
       );
-      return _processResponse(response, 'Código verificado correctamente');
+      return _processResponse(response, 'Code verified successfully');
     } catch (e) {
       return _handleError(e);
     }
   }
+
 
   Future<Map<String, dynamic>> activateAccount({
     required String email,
@@ -132,13 +135,26 @@ class ApiService {
           'code': code
         }),
       );
-      return _processResponse(response, 'Cuenta activada exitosamente');
+      return _processResponse(response, 'Account activated successfully');
     } catch (e) {
       return _handleError(e);
     }
   }
 
   // Métodos de recuperación de contraseña
+  Future<Map<String, dynamic>> sendRecoveryCode({required String email}) async {
+    try {
+      final response = await _client.post(
+        Uri.parse('$baseUrl/v1/auth/send-recovery-code'),
+        headers: _jsonHeaders,
+        body: json.encode({'email': email}),
+      );
+      return _processResponse(response, 'Recovery code sent successfully');
+    } catch (e) {
+      return _handleError(e);
+    }
+  }
+
   Future<Map<String, dynamic>> changePassword({
     required String email,
     required String code,
@@ -156,7 +172,7 @@ class ApiService {
           'confirmNewPassword': confirmNewPassword,
         }),
       );
-      return _processResponse(response, 'Contraseña cambiada exitosamente');
+      return _processResponse(response, 'Password changed successfully');
     } catch (e) {
       return _handleError(e);
     }
@@ -183,7 +199,7 @@ class ApiService {
     } catch (e) {
       return {
         'status': 'error',
-        'message': 'Error al procesar respuesta: $e',
+        'message': 'Error processing response: $e',
         'rawResponse': response.body,
       };
     }
@@ -192,10 +208,9 @@ class ApiService {
   Map<String, dynamic> _handleError(dynamic e) {
     return {
       'status': 'error',
-      'message': 'Error de conexión: ${e.toString()}',
+      'message': 'Connection error: ${e.toString()}',
     };
   }
-
   void dispose() {
     _client.close();
   }

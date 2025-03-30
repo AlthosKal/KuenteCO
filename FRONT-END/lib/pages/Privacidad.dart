@@ -3,7 +3,9 @@ import 'package:kuenteco/widgets/navbar.dart';
 import 'package:kuenteco/widgets/footer.dart';
 
 class PrivacidadPage extends StatelessWidget {
-  const PrivacidadPage({super.key});
+  final bool isLoggedIn;
+
+  const PrivacidadPage({super.key, this.isLoggedIn = false});
 
   Widget _buildSection(String title, String content) {
     return Padding(
@@ -50,17 +52,18 @@ class PrivacidadPage extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              primaryColor, // Morado arriba
-              whiteColor,   // Blanco abajo
+              primaryColor,
+              whiteColor,
             ],
           ),
         ),
         child: SafeArea(
           child: Column(
             children: [
-              // Usar el navbar reutilizable
-              const KuentecoNavbar(
+              // Usar el navbar reutilizable con el parámetro isLoggedIn
+              KuentecoNavbar(
                 currentRoute: '/privacidad',
+                isLoggedIn: isLoggedIn,
               ),
 
               // Contenido de la página de privacidad
@@ -70,10 +73,7 @@ class PrivacidadPage extends StatelessWidget {
                     return SingleChildScrollView(
                       child: Column(
                         children: [
-                          // Espacio superior para posicionar más alto
                           SizedBox(height: constraints.maxHeight * 0.05),
-
-                          // Contenedor principal
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 32.0),
                             child: Center(
@@ -98,7 +98,6 @@ class PrivacidadPage extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Título y fecha de actualización
                                     Center(
                                       child: Column(
                                         children: [
@@ -129,10 +128,7 @@ class PrivacidadPage extends StatelessWidget {
                                         ],
                                       ),
                                     ),
-
                                     const SizedBox(height: 24),
-
-                                    // Contenido de la política de privacidad
                                     Expanded(
                                       child: MediaQuery.removePadding(
                                         context: context,
@@ -164,8 +160,6 @@ class PrivacidadPage extends StatelessWidget {
                                               'Cambios en esta Política',
                                               'Podemos actualizar nuestra Política de Privacidad de vez en cuando. Le notificaremos cualquier cambio publicando la nueva Política de Privacidad en esta página.',
                                             ),
-
-                                            // Botón de aceptar
                                             Center(
                                               child: Padding(
                                                 padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
@@ -211,7 +205,6 @@ class PrivacidadPage extends StatelessWidget {
           ),
         ),
       ),
-      // Usando el Footer reutilizable
       bottomNavigationBar: const Footer(),
     );
   }

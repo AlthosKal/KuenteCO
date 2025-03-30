@@ -3,7 +3,9 @@ import 'package:kuenteco/widgets/navbar.dart';
 import 'package:kuenteco/widgets/footer.dart';
 
 class TerminosPage extends StatelessWidget {
-  const TerminosPage({super.key});
+  final bool isLoggedIn;
+
+  const TerminosPage({super.key, this.isLoggedIn = false});
 
   Widget _buildSection(String title, String content) {
     return Padding(
@@ -59,8 +61,9 @@ class TerminosPage extends StatelessWidget {
           child: Column(
             children: [
               // Usar el navbar reutilizable
-              const KuentecoNavbar(
+              KuentecoNavbar(
                 currentRoute: '/terminos',
+                isLoggedIn: isLoggedIn,
               ),
 
               // Contenido de la página de términos
