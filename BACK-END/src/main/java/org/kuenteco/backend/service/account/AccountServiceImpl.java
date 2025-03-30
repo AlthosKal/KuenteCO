@@ -13,6 +13,7 @@ import org.kuenteco.backend.exception.exceptions.AccountException;
 import org.kuenteco.backend.mapper.entity.AccountMapper;
 import org.kuenteco.backend.mapper.entity.UserMapper;
 import org.kuenteco.backend.repository.master.MasterAccountRepository;
+import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveAccountRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.kuenteco.backend.service.jwt.UserService;
@@ -35,31 +36,33 @@ public class AccountServiceImpl implements AccountService {
     private MasterSubscription masterSubscription;
     private UserMapper userMapper;
     private AccountMapper accountMapper;
+    private MasterUserRepository masterUserRepository;
 
     @Autowired
     public AccountServiceImpl(UserService userService, MasterAccountRepository masterAccountRepository,
                               SlaveAccountRepository slaveAccountRepository, SlaveUserRepository slaveUserRepository,
-                              UserMapper userMapper, AccountMapper accountMapper) {
+                              UserMapper userMapper, AccountMapper accountMapper, MasterUserRepository masterUserRepository) {
         this.userService = userService;
         this.masterAccountRepository = masterAccountRepository;
         this.slaveAccountRepository = slaveAccountRepository;
         this.slaveUserRepository = slaveUserRepository;
         this.userMapper = userMapper;
         this.accountMapper = accountMapper;
+        this.masterUserRepository = masterUserRepository;
     }
 
     public List<SlaveAccount> getAccounts() {
         // Obtener el usuario autenticado
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         SlaveUser user = slaveUserRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         // Obtener las cuentas del usuario
         List<SlaveAccount> slaveAccounts = slaveAccountRepository.findBySlaveUser(user);
 
         // Verificar si las cuentas están vacías o nulas
         if (slaveAccounts == null || slaveAccounts.isEmpty()) {
-            throw new IllegalStateException("Accounts not found");
+            throw new IllegalStateException("No hay cuentas existentes");
         }
 
         // Devolver las cuentas del usuario
@@ -68,15 +71,14 @@ public class AccountServiceImpl implements AccountService {
 
     public void registerAccount(NewAccountDTO newAccountDTO, String username) {
         // Obtener el usuario autenticado
-        SlaveUser slaveUser = slaveUserRepository.findByEmail(username)
-                .orElseThrow(() -> new AccountException(String.valueOf("User not found")));
+        MasterUser user = masterUserRepository.findByEmail(username)
+                .orElseThrow(() -> new AccountException(String.valueOf("Usuario no encontrado")));
 
         if (existsByAccountName(newAccountDTO.getName()) && masterSubscription.getState() == State.INACTIVE)
-            throw new AccountException(String.valueOf(new ApiMessage("You need pay one subscription")));
+            throw new AccountException(String.valueOf(new ApiMessage("Necesitas tener una cuenta con una subscripción activa")));
 
         if (existsByAccountName(newAccountDTO.getName()))
-            throw new AccountException(String.valueOf("Account already exists"));
-        MasterUser user = userMapper.slaveToMaster(slaveUser);
+            throw new AccountException(String.valueOf("Cuenta con este nombre ya existente"));
 
         MasterAccount account = new MasterAccount();
         account.setMasterUser(user);

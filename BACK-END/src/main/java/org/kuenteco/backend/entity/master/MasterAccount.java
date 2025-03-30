@@ -20,7 +20,7 @@ public class MasterAccount {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "idUser", nullable = false)
+    @JoinColumn(name = "id_user", nullable = false)
     private MasterUser masterUser;
 
     private String name;

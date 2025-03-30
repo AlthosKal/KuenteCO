@@ -1,15 +1,11 @@
 package org.kuenteco.backend.service.jwt;
 
-import com.sendgrid.Method;
-import com.sendgrid.Request;
-import com.sendgrid.Response;
-import com.sendgrid.SendGrid;
+import com.sendgrid.*;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import jakarta.servlet.http.HttpServletResponse;
-import org.kuenteco.backend.dto.auth.NewUserDTO;
-import org.kuenteco.backend.dto.auth.SendVerificationCodeDTO;
+import org.kuenteco.backend.dto.auth.*;
 import org.kuenteco.backend.entity.master.MasterRole;
 import org.kuenteco.backend.entity.master.MasterUser;
 import org.kuenteco.backend.entity.slave.SlaveRole;
@@ -20,21 +16,28 @@ import org.kuenteco.backend.jwt.JwtUtil;
 import org.kuenteco.backend.mapper.entity.RoleMapper;
 import org.kuenteco.backend.mapper.entity.UserMapper;
 import org.kuenteco.backend.repository.master.MasterRoleRepository;
+import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveRoleRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -51,6 +54,8 @@ public class AuthServiceImpl implements AuthService {
     private final SlaveRoleRepository slaveRoleRepository;
     private final SlaveUserRepository slaveUserRepository;
     private final TokenBlacklistService tokenBlacklistService;
+    private final TransactionTemplate masterTransactionTemplate;
+    private final MasterUserRepository masterUserRepository;
 
     @Autowired
     private MasterRoleRepository masterRoleRepository;
@@ -68,9 +73,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     public AuthServiceImpl(UserService userService, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
-            AuthenticationManagerBuilder authenticationManagerBuilder, CookieServiceImpl cookieService,
-            TokenBlacklistService tokenBlacklistService, SlaveRoleRepository slaveRoleRepository,
-            SlaveUserRepository slaveUserRepository, UserMapper userMapper, RoleMapper roleMapper) {
+                           AuthenticationManagerBuilder authenticationManagerBuilder, CookieServiceImpl cookieService,
+                           TokenBlacklistService tokenBlacklistService, SlaveRoleRepository slaveRoleRepository,
+                           SlaveUserRepository slaveUserRepository, UserMapper userMapper, RoleMapper roleMapper,
+                           MasterUserRepository masterUserRepository,
+                           @Qualifier("masterTransactionManager") PlatformTransactionManager masterTransactionManager) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
@@ -81,6 +88,12 @@ public class AuthServiceImpl implements AuthService {
         this.slaveUserRepository = slaveUserRepository;
         this.userMapper = userMapper;
         this.roleMapper = roleMapper;
+        this.masterUserRepository = masterUserRepository;
+
+        // Configuración de transacción con timeout apropiado
+        this.masterTransactionTemplate = new TransactionTemplate(masterTransactionManager);
+        this.masterTransactionTemplate.setTimeout(30); // 30 segundos
+        this.masterTransactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
 
     @Override
@@ -91,7 +104,7 @@ public class AuthServiceImpl implements AuthService {
 
         MasterUser user = userMapper.slaveToMaster(slaveUser);
         if (user.getAccountState() != State.ACTIVE) {
-            throw new RuntimeException("Account no activada. Por favor verifica tu correo");
+            throw new RuntimeException("Cuenta no activada. Por favor verifica tu correo");
         }
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email,
@@ -107,7 +120,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void registerUser(NewUserDTO newUserDTO) {
         if (userService.existsByUserName(newUserDTO.getEmail())) {
-            throw new IllegalArgumentException("Datos Invalidos, correo incorrecto o ya existente");
+            throw new IllegalArgumentException("Datos Inválidos, correo incorrecto o ya existente");
         }
 
         SlaveRole slaveRole = slaveRoleRepository.findByName(RoleList.ROLE_USER)
@@ -119,14 +132,24 @@ public class AuthServiceImpl implements AuthService {
         MasterRole masterRole = masterRoleRepository.findByName(RoleList.ROLE_USER)
                 .orElseGet(() -> masterRoleRepository.save(roleUser));
 
-        // Nuevo usuario se crea con estado PENDING
-        MasterUser user = new MasterUser(
-                newUserDTO.getEmail(),
-                passwordEncoder.encode(newUserDTO.getPassword()),
-                masterRole);
-        user.setAccountState(State.PENDING);
+        // Utilizar transacción explícita para guardar el usuario
+        masterTransactionTemplate.execute(status -> {
+            try {
+                // Nuevo usuario se crea con estado PENDING
+                MasterUser user = new MasterUser(
+                        newUserDTO.getEmail(),
+                        passwordEncoder.encode(newUserDTO.getPassword()),
+                        masterRole);
+                user.setAccountState(State.PENDING);
+                user.setVersion(0); // Inicializar versión para bloqueo optimista
 
-        userService.saveUser(user);
+                userService.saveUser(user);
+                return null;
+            } catch (Exception e) {
+                status.setRollbackOnly();
+                throw new RuntimeException("Error al registrar usuario", e);
+            }
+        });
 
         // Enviar código de verificación automáticamente
         SendVerificationCodeDTO verificationDTO = new SendVerificationCodeDTO();
@@ -172,7 +195,7 @@ public class AuthServiceImpl implements AuthService {
             Response response = sg.api(request);
 
             if (response.getStatusCode() < 200 || response.getStatusCode() >= 300) {
-                throw new IOException("Error en el envio del correo: " + response.getBody());
+                throw new IOException("Error en el envío del correo: " + response.getBody());
             }
         } catch (IOException ex) {
             verificationCodes.remove(email);
@@ -186,40 +209,80 @@ public class AuthServiceImpl implements AuthService {
         return code != null && code.equals(storedCode);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public void activateUser(String email) {
-        SlaveUser slaveUser = slaveUserRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        // Usar transacción explícita en lugar de anotación para mejor control
+        Boolean result = masterTransactionTemplate.execute(status -> {
+            try {
+                // Buscar directamente en la base de datos maestra, no en la esclava
+                Optional<MasterUser> masterUserOpt = masterUserRepository.findByEmail(email);
 
-        if (slaveUser.getAccountState() == State.ACTIVE) {
-            throw new RuntimeException("Tu cuenta ha sido activada");
+                if (masterUserOpt.isEmpty()) {
+                    throw new RuntimeException("Usuario no encontrado");
+                }
+
+                MasterUser masterUser = masterUserOpt.get();
+
+                // Verificar si la cuenta ya está activada
+                if (State.ACTIVE.equals(masterUser.getAccountState())) {
+                    return true; // Ya está activada, operación exitosa
+                }
+
+                // Activar la cuenta
+                masterUser.setAccountState(State.ACTIVE);
+                masterUserRepository.save(masterUser);
+
+                // Eliminar el código después de usarlo
+                verificationCodes.remove(email);
+
+                return true;
+            } catch (OptimisticLockingFailureException e) {
+                // Manejar específicamente fallos de bloqueo optimista
+                status.setRollbackOnly();
+                throw new RuntimeException("Error de concurrencia al activar la cuenta. Por favor, intente nuevamente.", e);
+            } catch (Exception e) {
+                status.setRollbackOnly();
+                throw new RuntimeException("Error al activar la cuenta: " + e.getMessage(), e);
+            }
+        });
+
+        if (result == null || !result) {
+            throw new RuntimeException("No se pudo activar la cuenta. Por favor, intente nuevamente.");
         }
-
-        MasterUser user = userMapper.slaveToMaster(slaveUser);
-        user.setAccountState(State.ACTIVE);
-        userService.saveUser(user);
-
-        // Eliminar el código después de usarlo
-        verificationCodes.remove(email);
     }
 
     @Override
     public String changePasswordWithVerification(String email, String code, String newPassword) {
         if (!validateVerificationCode(email, code)) {
-            throw new RuntimeException("Codigo de Verificación Invalido");
+            throw new RuntimeException("Código de Verificación Inválido");
         }
 
-        SlaveUser slaveUser = slaveUserRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuario no Encontrado"));
+        // Usar transacción para cambiar la contraseña
+        return masterTransactionTemplate.execute(status -> {
+            try {
+                // Buscar directamente en la base de datos maestra
+                Optional<MasterUser> masterUserOpt = masterUserRepository.findByEmail(email);
 
-        MasterUser user = userMapper.slaveToMaster(slaveUser);
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userService.saveUser(user);
+                if (masterUserOpt.isEmpty()) {
+                    throw new RuntimeException("Usuario no encontrado en la base de datos maestra");
+                }
 
-        verificationCodes.remove(email);
+                MasterUser masterUser = masterUserOpt.get();
+                masterUser.setPassword(passwordEncoder.encode(newPassword));
+                masterUserRepository.save(masterUser);
 
-        return "Contraseña actualizada correctamente";
+                // Eliminar el código después de usarlo
+                verificationCodes.remove(email);
+
+                return "Contraseña actualizada correctamente";
+            } catch (OptimisticLockingFailureException e) {
+                status.setRollbackOnly();
+                throw new RuntimeException("Error de concurrencia al cambiar la contraseña. Por favor, intente nuevamente.", e);
+            } catch (Exception e) {
+                status.setRollbackOnly();
+                throw new RuntimeException("Error al cambiar la contraseña: " + e.getMessage(), e);
+            }
+        });
     }
 
     @Override
