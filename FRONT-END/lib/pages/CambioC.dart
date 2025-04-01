@@ -71,6 +71,7 @@ class _CambioCState extends State<CambioC> {
         _navigateToLogin(context);
       }
     } catch (e) {
+
       _showSnackBar(context, 'Error al cambiar contraseña: ${e.toString()}');
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -97,6 +98,7 @@ class _CambioCState extends State<CambioC> {
   @override
   Widget build(BuildContext context) {
     final isSmallScreen = MediaQuery.of(context).size.width < 600;
+
     final containerWidth = isSmallScreen ? 360.0 : 400.0;
 
     return Scaffold(

@@ -6,7 +6,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.kuenteco.backend.dto.ApiMessage;
 import org.kuenteco.backend.dto.auth.*;
-import org.kuenteco.backend.entity.User;
+import org.kuenteco.backend.entity.slave.SlaveUser;
 import org.kuenteco.backend.jwt.JwtUtil;
 import org.kuenteco.backend.service.jwt.AuthService;
 import org.kuenteco.backend.service.jwt.UserService;
@@ -25,19 +25,14 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiMessage> login(@Valid @RequestBody LoginUserDTO loginUserDTO,
-                                            BindingResult bindingResult,
-                                            HttpServletResponse response) {
+    public ResponseEntity<ApiMessage> login(@Valid @RequestBody LoginUserDTO loginUserDTO, BindingResult bindingResult,
+            HttpServletResponse response) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new ApiMessage("Invalid data"));
         }
 
         try {
-            String token = authService.authenticate(
-                    loginUserDTO.getEmail(),
-                    loginUserDTO.getPassword(),
-                    response
-            );
+            String token = authService.authenticate(loginUserDTO.getEmail(), loginUserDTO.getPassword(), response);
             return ResponseEntity.ok(new ApiMessage("Login successful"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
@@ -45,17 +40,15 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiMessage> register(@Valid @RequestBody NewUserDTO newUserDTO,
-                                               BindingResult bindingResult) {
+    public ResponseEntity<ApiMessage> register(@Valid @RequestBody NewUserDTO newUserDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new ApiMessage("Invalid data"));
         }
 
         try {
             authService.registerUser(newUserDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                    new ApiMessage("Registration successful. Verification code sent to your email")
-            );
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ApiMessage("Registration successful. Verification code sent to your email"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
         }
@@ -77,8 +70,7 @@ public class AuthController {
     }
 
     @PostMapping("/validate-verification-code")
-    public ResponseEntity<ApiMessage> validateVerificationCode(
-            @Valid @RequestBody ValidateVerificationCodeDTO dto) {
+    public ResponseEntity<ApiMessage> validateVerificationCode(@Valid @RequestBody ValidateVerificationCodeDTO dto) {
         try {
             boolean isValid = authService.validateVerificationCode(dto.getEmail(), dto.getCode());
             if (isValid) {
@@ -91,8 +83,7 @@ public class AuthController {
     }
 
     @PostMapping("/activate-account")
-    public ResponseEntity<ApiMessage> activateAccount(
-            @Valid @RequestBody ValidateVerificationCodeDTO dto) {
+    public ResponseEntity<ApiMessage> activateAccount(@Valid @RequestBody ValidateVerificationCodeDTO dto) {
         try {
             // 1. Validar el código
             if (!authService.validateVerificationCode(dto.getEmail(), dto.getCode())) {
@@ -114,20 +105,18 @@ public class AuthController {
                 return ResponseEntity.badRequest().body(new ApiMessage("Passwords don't match"));
             }
 
-            String message = authService.changePasswordWithVerification(
-                    dto.getEmail(),
-                    dto.getCode(),
-                    dto.getNewPassword()
-            );
+            String message = authService.changePasswordWithVerification(dto.getEmail(), dto.getCode(),
+                    dto.getNewPassword());
             return ResponseEntity.ok(new ApiMessage(message));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
         }
     }
 
-    //Cerrar Sesión
+    // Cerrar Sesión
     @PostMapping("/logout")
-    public ResponseEntity<ApiMessage> logout(HttpServletRequest request, HttpServletResponse response, JwtUtil jwtUtil) {
+    public ResponseEntity<ApiMessage> logout(HttpServletRequest request, HttpServletResponse response,
+            JwtUtil jwtUtil) {
         try {
             // Obtener el token del request
             String token = jwtUtil.resolveToken(request);
@@ -148,8 +137,8 @@ public class AuthController {
     }
 
     @GetMapping("/user/details")
-    public ResponseEntity<User> getAuthenticatedUser() {
-        User user = userService.getUserDetails();
+    public ResponseEntity<SlaveUser> getAuthenticatedUser() {
+        SlaveUser user = userService.getUserDetails();
         return ResponseEntity.ok(user);
     }
 }

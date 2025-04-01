@@ -1,8 +1,11 @@
 package org.kuenteco.backend.service.jwt;
 
-import org.kuenteco.backend.entity.User;
-import org.kuenteco.backend.repository.UserRepository;
 import lombok.NoArgsConstructor;
+import org.kuenteco.backend.entity.master.MasterUser;
+import org.kuenteco.backend.entity.slave.SlaveUser;
+import org.kuenteco.backend.mapper.entity.UserMapper;
+import org.kuenteco.backend.repository.master.MasterUserRepository;
+import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,37 +18,55 @@ import java.util.Collections;
 @Service
 @NoArgsConstructor
 public class UserServiceImpl implements UserService {
-    private UserRepository userRepository;
+    private SlaveUserRepository slaveUserRepository;
+    private MasterUserRepository masterUserRepository;
+    private UserMapper userMapper;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserServiceImpl(SlaveUserRepository slaveUserRepository, MasterUserRepository masterUserRepository,
+            UserMapper userMapper) {
+        this.slaveUserRepository = slaveUserRepository;
+        this.masterUserRepository = masterUserRepository;
+        this.userMapper = userMapper;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        SlaveUser slaveUser = slaveUserRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
+        MasterUser user = userMapper.slaveToMaster(slaveUser);
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().getName().toString());
 
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
                 Collections.singleton(authority));
     }
 
-    public User findByUserName(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    @Override
+    public SlaveUser findByUserName(String email) {
+        SlaveUser slaveUser = slaveUserRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
+
+        return slaveUser = slaveUserRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
     }
 
     public boolean existsByUserName(String email) {
-        return userRepository.existsByEmail(email);
+        return slaveUserRepository.existsByEmail(email);
     }
 
-    public void saveUser(User user) {
-        userRepository.save(user);
+    public void saveUser(MasterUser user) {
+        masterUserRepository.save(user);
     }
 
-    public User getUserDetails() {
+    public void deteleUser(MasterUser masterUser){
+        masterUserRepository.deleteById(masterUser.getId());
+    }
+
+    public void deletePendingEmail(String email){
+            findByUserName(email);
+            masterUserRepository.removeMasterUserByEmail(email);
+    }
+    public SlaveUser getUserDetails() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         return findByUserName(email);
