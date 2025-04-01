@@ -14,6 +14,8 @@ import 'package:kuenteco/pages/Contacto.dart';
 import 'package:kuenteco/widgets/navbar.dart';
 import 'package:kuenteco/widgets/footer.dart';
 import 'package:kuenteco/widgets/background.dart';
+import 'package:kuenteco/widgets/theme.dart';
+
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
   runZonedGuarded(() {
@@ -31,25 +33,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Kuenteco',
-      theme: _buildAppTheme(),
+      theme: AppTheme.lightTheme, // Usamos el tema definido en theme.dart
       initialRoute: '/',
       routes: _buildAppRoutes(),
-    );
-  }
-
-  ThemeData _buildAppTheme() {
-    return ThemeData(
-      colorScheme: const ColorScheme(
-        primary: Color(0xFF890cac),
-        secondary: Color(0xFFba68c8),
-        surface: Colors.white,
-        error: Colors.red,
-        onPrimary: Colors.white,
-        onSecondary: Colors.black,
-        onSurface: Colors.black,
-        onError: Colors.white,
-        brightness: Brightness.light,
-      ),
     );
   }
 
@@ -83,16 +69,14 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildBody() {
-    return Background(
+    return Background( // Usamos el Background importado
       child: SafeArea(
         child: Column(
           children: [
             _buildNavbar(),
             Expanded(
               child: Center(
-                child: BlurredCard(
-                  child: _buildCardContent(),
-                ),
+                child: _buildMainContent(), // Eliminamos BlurredCard
               ),
             ),
           ],
@@ -105,6 +89,18 @@ class HomePage extends StatelessWidget {
     return KuentecoNavbar(
       currentRoute: '/',
       isLoggedIn: isLoggedIn,
+    );
+  }
+
+  Widget _buildMainContent() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: _buildCardContent(),
     );
   }
 
