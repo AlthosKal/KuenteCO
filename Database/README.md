@@ -33,7 +33,7 @@ docker exec -it MasterKuenteCO psql -U admin -d KuenteCO
 ```
 Ejecuta el siguiente comando SQL para crear el usuario de replicación:
 ```sql
-CREATE USER replication REPLICATION LOGIN ENCRYPTED PASSWORD 'example_password';
+CREATE USER replicator REPLICATION LOGIN ENCRYPTED PASSWORD 'example_password';
 ```
 
 ### **3. Modificación de Archivos de Configuración**
@@ -69,7 +69,7 @@ Se modificó los archivos de configuración de PostgreSQL en el nodo maestro:
    pg_basebackup -D /var/lib/postgresql/data \
      -h MasterKuenteCO -p 5432 \
      -X stream -c fast \
-     -U replication -W -R
+     -U replicator -W -R
    ```
 
 ---
