@@ -1,0 +1,1534 @@
+Password: 
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 17.4 (Debian 17.4-1.pgdg120+2)
+-- Dumped by pg_dump version 17.4 (Debian 17.4-1.pgdg120+2)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: pg_cron; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_cron WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION pg_cron; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pg_cron IS 'Job scheduler for PostgreSQL';
+
+
+--
+-- Name: http; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS http WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION http; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION http IS 'HTTP client for PostgreSQL, allows web page retrieval inside the database.';
+
+
+--
+-- Name: check_budget_limit(); Type: FUNCTION; Schema: public; Owner: master
+--
+
+CREATE FUNCTION public.check_budget_limit() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    v_assigned_amount NUMERIC; -- Monto asignado al presupuesto
+    v_total_spent NUMERIC;     -- Total gastado en la categoría
+BEGIN
+    -- Obtener el monto asignado al presupuesto
+    SELECT assigned_amount INTO v_assigned_amount
+    FROM Budget
+    WHERE id_category = NEW.idCategory;
+
+    -- Calcular el total gastado en la categoría
+    SELECT COALESCE(SUM(amount), 0) INTO v_total_spent
+    FROM Transaction
+    WHERE id_category = NEW.idCategory;
+
+    -- Verificar si se ha excedido el presupuesto
+    IF v_total_spent > v_assigned_amount THEN
+        -- Insertar una notificación
+        INSERT INTO Notification (id_account, date_send, content)
+        VALUES (
+            NEW.idAccount,
+            NOW(),
+            jsonb_build_object(
+                'message', 'Has excedido el presupuesto asignado para la categoría ' || (SELECT name FROM Category WHERE id = NEW.idCategory),
+                'type', 'budget_exceeded'
+            )
+        );
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.check_budget_limit() OWNER TO master;
+
+--
+-- Name: convert_currency(numeric, character varying, character varying); Type: FUNCTION; Schema: public; Owner: master
+--
+
+CREATE FUNCTION public.convert_currency(p_amount numeric, p_base_currency character varying, p_target_currency character varying) RETURNS numeric
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    v_rate NUMERIC;
+BEGIN
+    -- Obtener la tasa de cambio más reciente
+    SELECT rate INTO v_rate
+    FROM exchange_rate
+    WHERE base_currency = p_base_currency
+      AND target_currency = p_target_currency
+      AND last_updated = (SELECT MAX(last_updated) FROM exchange_rate);
+
+    -- Si no se encuentra la tasa de cambio, lanzar un error
+    IF v_rate IS NULL THEN
+        RAISE EXCEPTION 'Tasa de cambio no encontrada para % a %', p_base_currency, p_target_currency;
+    END IF;
+
+    -- Retornar la cantidad convertida
+    RETURN p_amount * v_rate;
+END;
+$$;
+
+
+ALTER FUNCTION public.convert_currency(p_amount numeric, p_base_currency character varying, p_target_currency character varying) OWNER TO master;
+
+--
+-- Name: log_audit_user_changes(); Type: FUNCTION; Schema: public; Owner: master
+--
+
+CREATE FUNCTION public.log_audit_user_changes() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    -- Registrar el cambio en una tabla de auditoría
+    INSERT INTO exchange_rate_logs (log_message, log_timestamp)
+    VALUES (
+        TG_OP || ' on KuenteCOUser: ' || NEW.id,
+        NOW()
+    );
+
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.log_audit_user_changes() OWNER TO master;
+
+--
+-- Name: send_debt_reminder(); Type: FUNCTION; Schema: public; Owner: master
+--
+
+CREATE FUNCTION public.send_debt_reminder() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    -- Verificar si la deuda está próxima a vencer (por ejemplo, en 3 días)
+    IF NEW.expirationDate <= NOW() + INTERVAL '3 days' THEN
+        -- Insertar una notificación
+        INSERT INTO Notification (id_account, date_send, content)
+        VALUES (
+            NEW.idAccount,
+            NOW(),
+            jsonb_build_object(
+                'message', 'Tu deuda "' || NEW.name || '" vence el ' || NEW.expirationDate || '. Por favor, realiza el pago.',
+                'type', 'debt_reminder'
+            )
+        );
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.send_debt_reminder() OWNER TO master;
+
+--
+-- Name: update_balance_on_transaction(); Type: FUNCTION; Schema: public; Owner: master
+--
+
+CREATE FUNCTION public.update_balance_on_transaction() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    -- Si es una inserción
+    IF TG_OP = 'INSERT' THEN
+        UPDATE Account
+        SET balance = balance + NEW.amount
+        WHERE id = NEW.idAccount;
+    END IF;
+
+    -- Si es una actualización
+    IF TG_OP = 'UPDATE' THEN
+        -- Revertir el saldo anterior
+        UPDATE Account
+        SET balance = balance - OLD.amount
+        WHERE id = OLD.idAccount;
+
+        -- Aplicar el nuevo saldo
+        UPDATE Account
+        SET balance = balance + NEW.amount
+        WHERE id = NEW.idAccount;
+    END IF;
+
+    -- Si es una eliminación
+    IF TG_OP = 'DELETE' THEN
+        UPDATE Account
+        SET balance = balance - OLD.amount
+        WHERE id = OLD.idAccount;
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.update_balance_on_transaction() OWNER TO master;
+
+--
+-- Name: update_exchange_rates(); Type: FUNCTION; Schema: public; Owner: master
+--
+
+CREATE FUNCTION public.update_exchange_rates() RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    api_url TEXT;
+    api_key TEXT := '1d3914b3aff44c30b1bb9bf4d8e302f0'; -- Reemplaza con tu API key de Open Exchange Rates
+    response RECORD; -- Cambiamos el tipo a RECORD para manejar la respuesta compuesta
+    response_body TEXT; -- Almacenará el cuerpo de la respuesta
+    response_json JSONB;
+    api_base_currency TEXT;
+    rates JSONB;
+    api_target_currency TEXT;
+    rate NUMERIC;
+BEGIN
+    -- Construir la URL de la API
+    api_url := 'https://openexchangerates.org/api/latest.json?app_id=' || api_key;
+
+    -- Hacer la solicitud HTTP a la API
+    response := http_get(api_url);
+
+    -- Extraer el cuerpo de la respuesta
+    response_body := response.content;
+
+    -- Verificar si la respuesta es nula o está vacía
+    IF response_body IS NULL OR response_body = '' THEN
+        INSERT INTO exchange_rate_logs (log_message)
+        VALUES ('Error: La respuesta de la API está vacía o es nula.');
+        RAISE EXCEPTION 'Error: La respuesta de la API está vacía o es nula.';
+    END IF;
+
+    -- Intentar convertir el cuerpo de la respuesta a JSON
+    BEGIN
+        response_json := response_body::JSONB;
+    EXCEPTION WHEN others THEN
+        INSERT INTO exchange_rate_logs (log_message)
+        VALUES ('Error: La respuesta de la API no es un JSON válido: ' || response_body);
+        RAISE EXCEPTION 'Error: La respuesta de la API no es un JSON válido: %', response_body;
+    END;
+
+    -- Verificar si la respuesta contiene un error
+    IF response_json->>'error' IS NOT NULL THEN
+        INSERT INTO exchange_rate_logs (log_message)
+        VALUES ('Error en la API: ' || response_json->>'error');
+        RAISE EXCEPTION 'Error en la API: %', response_json->>'error';
+    END IF;
+
+    -- Extraer la moneda base y las tasas de cambio
+    api_base_currency := response_json->>'base';
+    rates := response_json->'rates';
+
+    -- Verificar si las tasas de cambio están presentes
+    IF rates IS NULL THEN
+        INSERT INTO exchange_rate_logs (log_message)
+        VALUES ('Error: No se encontraron tasas de cambio en la respuesta de la API.');
+        RAISE EXCEPTION 'Error: No se encontraron tasas de cambio en la respuesta de la API.';
+    END IF;
+
+    -- Recorrer las tasas de cambio y actualizar la tabla
+    FOR api_target_currency, rate IN SELECT * FROM jsonb_each(rates) LOOP
+        -- Insertar o actualizar la tasa de cambio en la tabla
+        INSERT INTO exchange_rate (base_currency, target_currency, rate, last_updated)
+        VALUES (api_base_currency, api_target_currency, rate, now())
+        ON CONFLICT (base_currency, target_currency)
+        DO UPDATE SET rate = EXCLUDED.rate, last_updated = EXCLUDED.last_updated;
+    END LOOP;
+
+    -- Registrar éxito en la tabla de logs
+    INSERT INTO exchange_rate_logs (log_message)
+    VALUES ('Tasas de cambio actualizadas correctamente.');
+END;
+$$;
+
+
+ALTER FUNCTION public.update_exchange_rates() OWNER TO master;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: account; Type: TABLE; Schema: public; Owner: master
+--
+
+CREATE TABLE public.account (
+    id integer NOT NULL,
+    balance numeric(38,2),
+    currency character varying(255),
+    name character varying(255),
+    start_date timestamp(6) without time zone,
+    type character varying(255),
+    id_user character varying(255) NOT NULL,
+    CONSTRAINT account_type_check CHECK (((type)::text = ANY ((ARRAY['PERSONAL'::character varying, 'BUSINESS'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.account OWNER TO master;
+
+--
+-- Name: account_id_seq; Type: SEQUENCE; Schema: public; Owner: master
+--
+
+ALTER TABLE public.account ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.account_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: budget; Type: TABLE; Schema: public; Owner: master
+--
+
+CREATE TABLE public.budget (
+    id integer NOT NULL,
+    assigned_amount numeric(38,2),
+    description character varying(255),
+    finish_date timestamp(6) without time zone,
+    name character varying(255),
+    start_date timestamp(6) without time zone,
+    state character varying(255),
+    id_account integer,
+    id_category integer,
+    CONSTRAINT budget_state_check CHECK (((state)::text = ANY ((ARRAY['ACTIVE'::character varying, 'INACTIVE'::character varying, 'SUSPENDED'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.budget OWNER TO master;
+
+--
+-- Name: budget_id_seq; Type: SEQUENCE; Schema: public; Owner: master
+--
+
+ALTER TABLE public.budget ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.budget_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: category; Type: TABLE; Schema: public; Owner: master
+--
+
+CREATE TABLE public.category (
+    id integer NOT NULL,
+    assigned_budget double precision NOT NULL,
+    description jsonb,
+    finish_date timestamp(6) without time zone,
+    name character varying(255),
+    start_date timestamp(6) without time zone,
+    state character varying(255),
+    id_account integer,
+    CONSTRAINT category_state_check CHECK (((state)::text = ANY ((ARRAY['ACTIVE'::character varying, 'INACTIVE'::character varying, 'SUSPENDED'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.category OWNER TO master;
+
+--
+-- Name: category_id_seq; Type: SEQUENCE; Schema: public; Owner: master
+--
+
+ALTER TABLE public.category ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.category_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: debt; Type: TABLE; Schema: public; Owner: master
+--
+
+CREATE TABLE public.debt (
+    id integer NOT NULL,
+    expiration_date timestamp(6) without time zone,
+    name character varying(255),
+    pending_amount numeric(38,2),
+    start_date timestamp(6) without time zone,
+    state character varying(255),
+    total_amount numeric(38,2),
+    id_account integer,
+    CONSTRAINT debt_state_check CHECK (((state)::text = ANY ((ARRAY['ACTIVE'::character varying, 'PAID'::character varying, 'DEFEATED'::character varying, 'REFINANCED'::character varying, 'IN_MORATIUM'::character varying, 'CANCELLED'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.debt OWNER TO master;
+
+--
+-- Name: debt_id_seq; Type: SEQUENCE; Schema: public; Owner: master
+--
+
+ALTER TABLE public.debt ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.debt_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: exchange_rate; Type: TABLE; Schema: public; Owner: master
+--
+
+CREATE TABLE public.exchange_rate (
+    id integer NOT NULL,
+    base_currency character varying(255),
+    last_updated timestamp(6) without time zone,
+    rate numeric(38,2),
+    target_currency character varying(255)
+);
+
+
+ALTER TABLE public.exchange_rate OWNER TO master;
+
+--
+-- Name: exchange_rate_id_seq; Type: SEQUENCE; Schema: public; Owner: master
+--
+
+ALTER TABLE public.exchange_rate ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.exchange_rate_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: exchange_rate_logs; Type: TABLE; Schema: public; Owner: master
+--
+
+CREATE TABLE public.exchange_rate_logs (
+    id integer NOT NULL,
+    log_message text,
+    log_timestamp timestamp without time zone DEFAULT now()
+);
+
+
+ALTER TABLE public.exchange_rate_logs OWNER TO master;
+
+--
+-- Name: exchange_rate_logs_id_seq; Type: SEQUENCE; Schema: public; Owner: master
+--
+
+CREATE SEQUENCE public.exchange_rate_logs_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.exchange_rate_logs_id_seq OWNER TO master;
+
+--
+-- Name: exchange_rate_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: master
+--
+
+ALTER SEQUENCE public.exchange_rate_logs_id_seq OWNED BY public.exchange_rate_logs.id;
+
+
+--
+-- Name: investment; Type: TABLE; Schema: public; Owner: master
+--
+
+CREATE TABLE public.investment (
+    id integer NOT NULL,
+    initial_amount numeric(38,2),
+    profitability numeric(38,2),
+    start_date timestamp(6) without time zone,
+    state character varying(255),
+    type character varying(255),
+    id_account integer,
+    CONSTRAINT investment_state_check CHECK (((state)::text = ANY ((ARRAY['ACTIVE'::character varying, 'INACTIVE'::character varying, 'SUSPENDED'::character varying, 'FINALIZED'::character varying, 'CANCELED'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.investment OWNER TO master;
+
+--
+-- Name: investment_id_seq; Type: SEQUENCE; Schema: public; Owner: master
+--
+
+ALTER TABLE public.investment ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.investment_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: kuentecouser; Type: TABLE; Schema: public; Owner: master
+--
+
+CREATE TABLE public.kuentecouser (
+    id character varying(255) NOT NULL,
+    account character varying(255),
+    email character varying(255) NOT NULL,
+    password character varying(255) NOT NULL,
+    id_role integer NOT NULL,
+    account_state character varying(255),
+    CONSTRAINT kuentecouser_account_check CHECK (((account)::text = ANY ((ARRAY['ACTIVE'::character varying, 'INACTIVE'::character varying, 'SUSPENDED'::character varying])::text[]))),
+    CONSTRAINT kuentecouser_account_state_check CHECK (((account_state)::text = ANY ((ARRAY['PENDING'::character varying, 'ACTIVE'::character varying, 'INACTIVE'::character varying, 'SUSPENDED'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.kuentecouser OWNER TO master;
+
+--
+-- Name: notification; Type: TABLE; Schema: public; Owner: master
+--
+
+CREATE TABLE public.notification (
+    id integer NOT NULL,
+    content jsonb,
+    date_send timestamp(6) without time zone,
+    id_account integer
+);
+
+
+ALTER TABLE public.notification OWNER TO master;
+
+--
+-- Name: notification_id_seq; Type: SEQUENCE; Schema: public; Owner: master
+--
+
+ALTER TABLE public.notification ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.notification_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: pay_subscription; Type: TABLE; Schema: public; Owner: master
+--
+
+CREATE TABLE public.pay_subscription (
+    id integer NOT NULL,
+    amount numeric(38,2),
+    pay_date timestamp(6) without time zone,
+    details jsonb,
+    method character varying(255),
+    id_subscription integer
+);
+
+
+ALTER TABLE public.pay_subscription OWNER TO master;
+
+--
+-- Name: pay_subscription_id_seq; Type: SEQUENCE; Schema: public; Owner: master
+--
+
+ALTER TABLE public.pay_subscription ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.pay_subscription_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: payment_history; Type: TABLE; Schema: public; Owner: master
+--
+
+CREATE TABLE public.payment_history (
+    id integer NOT NULL,
+    details jsonb,
+    id_pay_subscription integer
+);
+
+
+ALTER TABLE public.payment_history OWNER TO master;
+
+--
+-- Name: payment_history_id_seq; Type: SEQUENCE; Schema: public; Owner: master
+--
+
+ALTER TABLE public.payment_history ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.payment_history_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: role; Type: TABLE; Schema: public; Owner: master
+--
+
+CREATE TABLE public.role (
+    id integer NOT NULL,
+    name smallint NOT NULL,
+    CONSTRAINT role_name_check CHECK (((name >= 0) AND (name <= 1)))
+);
+
+
+ALTER TABLE public.role OWNER TO master;
+
+--
+-- Name: role_id_seq; Type: SEQUENCE; Schema: public; Owner: master
+--
+
+ALTER TABLE public.role ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.role_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: subscription; Type: TABLE; Schema: public; Owner: master
+--
+
+CREATE TABLE public.subscription (
+    id integer NOT NULL,
+    expiration_date timestamp(6) without time zone,
+    start_date timestamp(6) without time zone,
+    state character varying(255),
+    type character varying(255),
+    id_account integer,
+    CONSTRAINT subscription_state_check CHECK (((state)::text = ANY ((ARRAY['ACTIVE'::character varying, 'INACTIVE'::character varying, 'SUSPENDED'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.subscription OWNER TO master;
+
+--
+-- Name: subscription_id_seq; Type: SEQUENCE; Schema: public; Owner: master
+--
+
+ALTER TABLE public.subscription ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.subscription_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: transaction; Type: TABLE; Schema: public; Owner: master
+--
+
+CREATE TABLE public.transaction (
+    id integer NOT NULL,
+    amount numeric(38,2),
+    description jsonb,
+    transaction_date timestamp(6) without time zone,
+    type character varying(255),
+    id_account integer,
+    id_category integer
+);
+
+
+ALTER TABLE public.transaction OWNER TO master;
+
+--
+-- Name: transaction_id_seq; Type: SEQUENCE; Schema: public; Owner: master
+--
+
+ALTER TABLE public.transaction ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.transaction_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: vw_budget_vs_actual; Type: VIEW; Schema: public; Owner: master
+--
+
+CREATE VIEW public.vw_budget_vs_actual AS
+ SELECT b.id AS budget_id,
+    b.name AS budget_name,
+    b.assigned_amount,
+    COALESCE(sum(t.amount), (0)::numeric) AS actual_spent,
+    (b.assigned_amount - COALESCE(sum(t.amount), (0)::numeric)) AS remaining_amount
+   FROM (public.budget b
+     LEFT JOIN public.transaction t ON ((b.id_category = t.id_category)))
+  GROUP BY b.id, b.name, b.assigned_amount;
+
+
+ALTER VIEW public.vw_budget_vs_actual OWNER TO master;
+
+--
+-- Name: vw_transactions_by_category; Type: VIEW; Schema: public; Owner: master
+--
+
+CREATE VIEW public.vw_transactions_by_category AS
+ SELECT c.name AS category_name,
+    sum(t.amount) AS total_amount,
+    count(t.id) AS transaction_count
+   FROM (public.transaction t
+     JOIN public.category c ON ((t.id_category = c.id)))
+  GROUP BY c.name;
+
+
+ALTER VIEW public.vw_transactions_by_category OWNER TO master;
+
+--
+-- Name: exchange_rate_logs id; Type: DEFAULT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.exchange_rate_logs ALTER COLUMN id SET DEFAULT nextval('public.exchange_rate_logs_id_seq'::regclass);
+
+
+--
+-- Data for Name: job; Type: TABLE DATA; Schema: cron; Owner: master
+--
+
+COPY cron.job (jobid, schedule, command, nodename, nodeport, database, username, active, jobname) FROM stdin;
+1	0 */2 * * *	 SELECT update_exchange_rates() 	localhost	5432	KuenteCO	master	t	update-change-rates
+\.
+
+
+--
+-- Data for Name: job_run_details; Type: TABLE DATA; Schema: cron; Owner: master
+--
+
+COPY cron.job_run_details (jobid, runid, job_pid, database, username, command, status, return_message, start_time, end_time) FROM stdin;
+1	20	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-28 00:00:00.000268+00	2025-03-28 00:00:00.011527+00
+1	1	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-21 22:00:00.000006+00	2025-03-21 22:00:00.010216+00
+1	2	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-22 00:00:00.000235+00	2025-03-22 00:00:00.008417+00
+1	3	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-22 02:00:00.000413+00	2025-03-22 02:00:00.011778+00
+1	21	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-28 02:00:00.001002+00	2025-03-28 02:00:00.009957+00
+1	4	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-22 16:00:00.000908+00	2025-03-22 16:00:00.014745+00
+1	5	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-22 18:00:00.001016+00	2025-03-22 18:00:00.012637+00
+1	6	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-22 20:00:00.000654+00	2025-03-22 20:00:00.010252+00
+1	22	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-28 04:00:00.001008+00	2025-03-28 04:00:00.010051+00
+1	7	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-23 02:00:00.000487+00	2025-03-23 02:00:00.012167+00
+1	8	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-23 18:00:00.000304+00	2025-03-23 18:00:00.013859+00
+1	9	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-24 04:00:00.000282+00	2025-03-24 04:00:00.009551+00
+1	23	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-28 16:00:00.000792+00	2025-03-28 16:00:00.011227+00
+1	10	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-24 14:00:00.000921+00	2025-03-24 14:00:00.011678+00
+1	11	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-24 22:00:00.000961+00	2025-03-24 22:00:00.013268+00
+1	12	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-25 02:00:00.000347+00	2025-03-25 02:00:00.009811+00
+1	24	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-28 18:00:00.000806+00	2025-03-28 18:00:00.009685+00
+1	13	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-25 04:00:00.001052+00	2025-03-25 04:00:00.011087+00
+1	14	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-25 22:00:00.000785+00	2025-03-25 22:00:00.012739+00
+1	15	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-26 04:00:00.000665+00	2025-03-26 04:00:00.015457+00
+1	25	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-29 02:00:00.000416+00	2025-03-29 02:00:00.010901+00
+1	16	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-26 18:00:00.000724+00	2025-03-26 18:00:00.005487+00
+1	17	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-27 02:00:00.000655+00	2025-03-27 02:00:00.015323+00
+1	18	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-27 18:00:00.000392+00	2025-03-27 18:00:00.012221+00
+1	19	\N	KuenteCO	master	 SELECT update_exchange_rates() 	failed	connection failed	2025-03-27 20:00:00.000888+00	2025-03-27 20:00:00.011163+00
+\.
+
+
+--
+-- Data for Name: account; Type: TABLE DATA; Schema: public; Owner: master
+--
+
+COPY public.account (id, balance, currency, name, start_date, type, id_user) FROM stdin;
+\.
+
+
+--
+-- Data for Name: budget; Type: TABLE DATA; Schema: public; Owner: master
+--
+
+COPY public.budget (id, assigned_amount, description, finish_date, name, start_date, state, id_account, id_category) FROM stdin;
+\.
+
+
+--
+-- Data for Name: category; Type: TABLE DATA; Schema: public; Owner: master
+--
+
+COPY public.category (id, assigned_budget, description, finish_date, name, start_date, state, id_account) FROM stdin;
+\.
+
+
+--
+-- Data for Name: debt; Type: TABLE DATA; Schema: public; Owner: master
+--
+
+COPY public.debt (id, expiration_date, name, pending_amount, start_date, state, total_amount, id_account) FROM stdin;
+\.
+
+
+--
+-- Data for Name: exchange_rate; Type: TABLE DATA; Schema: public; Owner: master
+--
+
+COPY public.exchange_rate (id, base_currency, last_updated, rate, target_currency) FROM stdin;
+1	USD	2025-03-10 18:26:26.78752	3.67	AED
+2	USD	2025-03-10 18:26:26.78752	73.00	AFN
+3	USD	2025-03-10 18:26:26.78752	91.38	ALL
+4	USD	2025-03-10 18:26:26.78752	396.18	AMD
+5	USD	2025-03-10 18:26:26.78752	1.80	ANG
+6	USD	2025-03-10 18:26:26.78752	914.50	AOA
+7	USD	2025-03-10 18:26:26.78752	1065.50	ARS
+8	USD	2025-03-10 18:26:26.78752	1.59	AUD
+9	USD	2025-03-10 18:26:26.78752	1.80	AWG
+10	USD	2025-03-10 18:26:26.78752	1.70	AZN
+11	USD	2025-03-10 18:26:26.78752	1.80	BAM
+12	USD	2025-03-10 18:26:26.78752	2.00	BBD
+13	USD	2025-03-10 18:26:26.78752	121.56	BDT
+14	USD	2025-03-10 18:26:26.78752	1.81	BGN
+15	USD	2025-03-10 18:26:26.78752	0.38	BHD
+16	USD	2025-03-10 18:26:26.78752	2913.50	BIF
+17	USD	2025-03-10 18:26:26.78752	1.00	BMD
+18	USD	2025-03-10 18:26:26.78752	1.33	BND
+19	USD	2025-03-10 18:26:26.78752	6.93	BOB
+20	USD	2025-03-10 18:26:26.78752	5.84	BRL
+21	USD	2025-03-10 18:26:26.78752	1.00	BSD
+22	USD	2025-03-10 18:26:26.78752	0.00	BTC
+23	USD	2025-03-10 18:26:26.78752	87.42	BTN
+24	USD	2025-03-10 18:26:26.78752	13.67	BWP
+25	USD	2025-03-10 18:26:26.78752	3.27	BYN
+26	USD	2025-03-10 18:26:26.78752	2.01	BZD
+27	USD	2025-03-10 18:26:26.78752	1.44	CAD
+28	USD	2025-03-10 18:26:26.78752	2875.00	CDF
+29	USD	2025-03-10 18:26:26.78752	0.88	CHF
+30	USD	2025-03-10 18:26:26.78752	0.02	CLF
+31	USD	2025-03-10 18:26:26.78752	942.04	CLP
+32	USD	2025-03-10 18:26:26.78752	7.26	CNH
+33	USD	2025-03-10 18:26:26.78752	7.26	CNY
+34	USD	2025-03-10 18:26:26.78752	4161.04	COP
+35	USD	2025-03-10 18:26:26.78752	504.23	CRC
+36	USD	2025-03-10 18:26:26.78752	1.00	CUC
+37	USD	2025-03-10 18:26:26.78752	25.75	CUP
+38	USD	2025-03-10 18:26:26.78752	102.15	CVE
+39	USD	2025-03-10 18:26:26.78752	23.09	CZK
+40	USD	2025-03-10 18:26:26.78752	177.50	DJF
+41	USD	2025-03-10 18:26:26.78752	6.89	DKK
+42	USD	2025-03-10 18:26:26.78752	62.58	DOP
+43	USD	2025-03-10 18:26:26.78752	133.63	DZD
+44	USD	2025-03-10 18:26:26.78752	50.60	EGP
+45	USD	2025-03-10 18:26:26.78752	15.00	ERN
+46	USD	2025-03-10 18:26:26.78752	129.00	ETB
+47	USD	2025-03-10 18:26:26.78752	0.92	EUR
+48	USD	2025-03-10 18:26:26.78752	2.30	FJD
+49	USD	2025-03-10 18:26:26.78752	0.78	FKP
+50	USD	2025-03-10 18:26:26.78752	0.78	GBP
+51	USD	2025-03-10 18:26:26.78752	2.78	GEL
+52	USD	2025-03-10 18:26:26.78752	0.78	GGP
+53	USD	2025-03-10 18:26:26.78752	15.50	GHS
+54	USD	2025-03-10 18:26:26.78752	0.78	GIP
+55	USD	2025-03-10 18:26:26.78752	72.00	GMD
+56	USD	2025-03-10 18:26:26.78752	8655.00	GNF
+57	USD	2025-03-10 18:26:26.78752	7.72	GTQ
+58	USD	2025-03-10 18:26:26.78752	209.30	GYD
+59	USD	2025-03-10 18:26:26.78752	7.77	HKD
+60	USD	2025-03-10 18:26:26.78752	25.75	HNL
+61	USD	2025-03-10 18:26:26.78752	6.95	HRK
+62	USD	2025-03-10 18:26:26.78752	131.21	HTG
+63	USD	2025-03-10 18:26:26.78752	369.04	HUF
+64	USD	2025-03-10 18:26:26.78752	16388.81	IDR
+65	USD	2025-03-10 18:26:26.78752	3.64	ILS
+66	USD	2025-03-10 18:26:26.78752	0.78	IMP
+67	USD	2025-03-10 18:26:26.78752	87.31	INR
+68	USD	2025-03-10 18:26:26.78752	1310.50	IQD
+69	USD	2025-03-10 18:26:26.78752	42100.00	IRR
+70	USD	2025-03-10 18:26:26.78752	135.46	ISK
+71	USD	2025-03-10 18:26:26.78752	0.78	JEP
+72	USD	2025-03-10 18:26:26.78752	157.23	JMD
+73	USD	2025-03-10 18:26:26.78752	0.71	JOD
+74	USD	2025-03-10 18:26:26.78752	147.19	JPY
+75	USD	2025-03-10 18:26:26.78752	129.15	KES
+76	USD	2025-03-10 18:26:26.78752	87.45	KGS
+77	USD	2025-03-10 18:26:26.78752	4010.00	KHR
+78	USD	2025-03-10 18:26:26.78752	455.05	KMF
+79	USD	2025-03-10 18:26:26.78752	900.00	KPW
+80	USD	2025-03-10 18:26:26.78752	1455.84	KRW
+81	USD	2025-03-10 18:26:26.78752	0.31	KWD
+82	USD	2025-03-10 18:26:26.78752	0.83	KYD
+83	USD	2025-03-10 18:26:26.78752	490.93	KZT
+84	USD	2025-03-10 18:26:26.78752	21565.00	LAK
+85	USD	2025-03-10 18:26:26.78752	89550.00	LBP
+86	USD	2025-03-10 18:26:26.78752	295.57	LKR
+87	USD	2025-03-10 18:26:26.78752	198.73	LRD
+88	USD	2025-03-10 18:26:26.78752	18.29	LSL
+89	USD	2025-03-10 18:26:26.78752	4.83	LYD
+90	USD	2025-03-10 18:26:26.78752	9.73	MAD
+91	USD	2025-03-10 18:26:26.78752	17.94	MDL
+92	USD	2025-03-10 18:26:26.78752	4700.00	MGA
+93	USD	2025-03-10 18:26:26.78752	56.82	MKD
+94	USD	2025-03-10 18:26:26.78752	2098.00	MMK
+95	USD	2025-03-10 18:26:26.78752	3398.00	MNT
+96	USD	2025-03-10 18:26:26.78752	8.00	MOP
+97	USD	2025-03-10 18:26:26.78752	39.95	MRU
+98	USD	2025-03-10 18:26:26.78752	45.15	MUR
+99	USD	2025-03-10 18:26:26.78752	15.41	MVR
+100	USD	2025-03-10 18:26:26.78752	1733.50	MWK
+101	USD	2025-03-10 18:26:26.78752	20.34	MXN
+102	USD	2025-03-10 18:26:26.78752	4.41	MYR
+103	USD	2025-03-10 18:26:26.78752	63.90	MZN
+104	USD	2025-03-10 18:26:26.78752	18.29	NAD
+105	USD	2025-03-10 18:26:26.78752	1525.00	NGN
+106	USD	2025-03-10 18:26:26.78752	36.76	NIO
+107	USD	2025-03-10 18:26:26.78752	10.78	NOK
+108	USD	2025-03-10 18:26:26.78752	139.88	NPR
+109	USD	2025-03-10 18:26:26.78752	1.75	NZD
+110	USD	2025-03-10 18:26:26.78752	0.39	OMR
+111	USD	2025-03-10 18:26:26.78752	1.00	PAB
+112	USD	2025-03-10 18:26:26.78752	3.66	PEN
+113	USD	2025-03-10 18:26:26.78752	4.01	PGK
+114	USD	2025-03-10 18:26:26.78752	57.45	PHP
+115	USD	2025-03-10 18:26:26.78752	280.17	PKR
+116	USD	2025-03-10 18:26:26.78752	3.88	PLN
+117	USD	2025-03-10 18:26:26.78752	7926.68	PYG
+118	USD	2025-03-10 18:26:26.78752	3.64	QAR
+119	USD	2025-03-10 18:26:26.78752	4.59	RON
+120	USD	2025-03-10 18:26:26.78752	108.14	RSD
+121	USD	2025-03-10 18:26:26.78752	87.50	RUB
+122	USD	2025-03-10 18:26:26.78752	1409.50	RWF
+123	USD	2025-03-10 18:26:26.78752	3.75	SAR
+124	USD	2025-03-10 18:26:26.78752	8.41	SBD
+125	USD	2025-03-10 18:26:26.78752	14.39	SCR
+126	USD	2025-03-10 18:26:26.78752	601.00	SDG
+127	USD	2025-03-10 18:26:26.78752	10.13	SEK
+128	USD	2025-03-10 18:26:26.78752	1.33	SGD
+129	USD	2025-03-10 18:26:26.78752	0.78	SHP
+130	USD	2025-03-10 18:26:26.78752	20969.50	SLL
+131	USD	2025-03-10 18:26:26.78752	571.50	SOS
+132	USD	2025-03-10 18:26:26.78752	35.85	SRD
+133	USD	2025-03-10 18:26:26.78752	130.26	SSP
+134	USD	2025-03-10 18:26:26.78752	22281.80	STD
+135	USD	2025-03-10 18:26:26.78752	23.05	STN
+136	USD	2025-03-10 18:26:26.78752	8.75	SVC
+137	USD	2025-03-10 18:26:26.78752	13002.00	SYP
+138	USD	2025-03-10 18:26:26.78752	18.29	SZL
+139	USD	2025-03-10 18:26:26.78752	33.94	THB
+140	USD	2025-03-10 18:26:26.78752	10.91	TJS
+141	USD	2025-03-10 18:26:26.78752	3.51	TMT
+142	USD	2025-03-10 18:26:26.78752	3.09	TND
+143	USD	2025-03-10 18:26:26.78752	2.41	TOP
+144	USD	2025-03-10 18:26:26.78752	36.56	TRY
+145	USD	2025-03-10 18:26:26.78752	6.80	TTD
+146	USD	2025-03-10 18:26:26.78752	32.90	TWD
+147	USD	2025-03-10 18:26:26.78752	2612.50	TZS
+148	USD	2025-03-10 18:26:26.78752	41.34	UAH
+149	USD	2025-03-10 18:26:26.78752	3671.43	UGX
+150	USD	2025-03-10 18:26:26.78752	1.00	USD
+151	USD	2025-03-10 18:26:26.78752	42.42	UYU
+152	USD	2025-03-10 18:26:26.78752	12960.00	UZS
+153	USD	2025-03-10 18:26:26.78752	65.13	VES
+154	USD	2025-03-10 18:26:26.78752	25526.48	VND
+155	USD	2025-03-10 18:26:26.78752	118.72	VUV
+156	USD	2025-03-10 18:26:26.78752	2.80	WST
+157	USD	2025-03-10 18:26:26.78752	605.69	XAF
+158	USD	2025-03-10 18:26:26.78752	0.03	XAG
+159	USD	2025-03-10 18:26:26.78752	0.00	XAU
+160	USD	2025-03-10 18:26:26.78752	2.70	XCD
+161	USD	2025-03-10 18:26:26.78752	0.75	XDR
+162	USD	2025-03-10 18:26:26.78752	605.69	XOF
+163	USD	2025-03-10 18:26:26.78752	0.00	XPD
+164	USD	2025-03-10 18:26:26.78752	110.19	XPF
+165	USD	2025-03-10 18:26:26.78752	0.00	XPT
+166	USD	2025-03-10 18:26:26.78752	246.85	YER
+167	USD	2025-03-10 18:26:26.78752	18.33	ZAR
+168	USD	2025-03-10 18:26:26.78752	28.59	ZMW
+169	USD	2025-03-10 18:26:26.78752	322.00	ZWL
+\.
+
+
+--
+-- Data for Name: exchange_rate_logs; Type: TABLE DATA; Schema: public; Owner: master
+--
+
+COPY public.exchange_rate_logs (id, log_message, log_timestamp) FROM stdin;
+1	Tasas de cambio actualizadas correctamente.	2025-03-10 18:26:13.472698
+2	Tasas de cambio actualizadas correctamente.	2025-03-10 18:26:26.78752
+3	INSERT on KuenteCOUser: 7c5071d1-68a2-4897-be2b-4271e6cae798	2025-03-21 16:41:43.287933
+4	INSERT on KuenteCOUser: bddcc5f0-ee5f-4c42-9428-8d18c6b34248	2025-03-21 18:40:39.502581
+5	INSERT on KuenteCOUser: 265f3c09-163c-49a1-88de-6c43ee5b9b49	2025-03-21 19:08:12.604643
+6	INSERT on KuenteCOUser: 95a0e0b5-5c5f-480c-bcc2-d9cd6279d3f7	2025-03-21 21:21:41.945148
+7	INSERT on KuenteCOUser: 7d0a8d13-c9ea-4f55-a510-683337a2b1c9	2025-03-24 00:11:21.720436
+8	INSERT on KuenteCOUser: bd2cfb87-37f7-4d13-a604-1c5b3c923462	2025-03-24 08:20:35.351514
+9	\N	2025-03-24 22:28:14.844575
+10	INSERT on KuenteCOUser: 7f816fd9-1fce-436f-b76d-2c80031a3afe	2025-03-24 19:22:05.588616
+11	INSERT on KuenteCOUser: 7fd87e68-c4f8-455d-a387-260c0917978a	2025-03-24 19:29:24.33614
+12	INSERT on KuenteCOUser: f058f3c0-6cbd-49e7-b24d-68cd1c2e8a38	2025-03-24 20:08:12.21033
+13	\N	2025-03-25 01:12:52.002637
+14	\N	2025-03-25 01:12:52.002637
+15	\N	2025-03-25 01:12:52.002637
+16	\N	2025-03-25 01:12:52.002637
+17	\N	2025-03-25 01:12:52.002637
+18	\N	2025-03-25 01:47:43.620637
+19	\N	2025-03-25 01:47:43.620637
+20	INSERT on KuenteCOUser: fa230129-66d0-41d7-ae4e-049c98cd9998	2025-03-24 20:47:54.57227
+21	\N	2025-03-25 01:59:17.723584
+22	INSERT on KuenteCOUser: 8696797e-e6db-4831-8e06-f90ea16782cc	2025-03-24 21:01:58.384601
+23	\N	2025-03-25 02:05:14.534393
+24	INSERT on KuenteCOUser: 72fa7fbd-2e6d-44d9-9842-fe34ae1f3108	2025-03-24 21:06:49.58668
+25	UPDATE on KuenteCOUser: 72fa7fbd-2e6d-44d9-9842-fe34ae1f3108	2025-03-24 21:07:18.90224
+26	INSERT on KuenteCOUser: 69d5472d-b70b-4e2f-8db5-84af04f3bc7c	2025-03-24 22:41:30.660297
+27	\N	2025-03-25 03:58:11.365806
+28	INSERT on KuenteCOUser: 252c91b1-c43a-42e6-aa4a-1d9d131a0bb6	2025-03-24 22:58:53.180145
+29	UPDATE on KuenteCOUser: 252c91b1-c43a-42e6-aa4a-1d9d131a0bb6	2025-03-24 22:59:31.354144
+30	\N	2025-03-26 02:25:39.664302
+31	INSERT on KuenteCOUser: b5d139d8-e663-4b10-9feb-255e6237f880	2025-03-25 21:33:12.206251
+32	UPDATE on KuenteCOUser: b5d139d8-e663-4b10-9feb-255e6237f880	2025-03-25 21:33:42.217385
+33	INSERT on KuenteCOUser: f53277a1-c424-47bb-bcd4-2afc44f131b1	2025-03-26 13:33:25.110704
+34	UPDATE on KuenteCOUser: f53277a1-c424-47bb-bcd4-2afc44f131b1	2025-03-26 13:34:08.482374
+35	INSERT on KuenteCOUser: 35622f04-9819-404e-b033-fdd6f7a1c8e4	2025-03-26 13:41:57.378124
+36	INSERT on KuenteCOUser: 5f644a6a-ccb3-4b7b-b505-9ec1abe49c75	2025-03-26 13:47:59.82021
+37	\N	2025-03-28 00:25:42.579357
+38	\N	2025-03-28 00:25:42.579357
+39	\N	2025-03-28 00:25:42.579357
+40	INSERT on KuenteCOUser: b970d1a1-f02e-4e2f-a62e-cbc6a8b47ba0	2025-03-28 12:29:32.849474
+41	\N	2025-03-28 18:08:39.691228
+42	INSERT on KuenteCOUser: 1a89dcd7-eecf-4003-a873-f304f7e3df58	2025-03-28 13:10:14.164039
+43	\N	2025-03-28 18:18:36.746748
+44	INSERT on KuenteCOUser: ea661346-f666-4fda-a30c-3f041b4a1d11	2025-03-28 13:19:12.901164
+45	\N	2025-03-28 18:21:58.610412
+46	INSERT on KuenteCOUser: f32e5b61-d2c1-474f-b847-6deb205f58e9	2025-03-28 14:08:37.255339
+47	\N	2025-03-28 20:50:00.629335
+48	INSERT on KuenteCOUser: 04f6c6e9-632c-4634-89e0-67e861735742	2025-03-28 15:51:03.084
+49	\N	2025-03-29 01:31:03.900262
+50	INSERT on KuenteCOUser: 86bf4acb-7537-4650-bbb4-44ae59315a0b	2025-03-28 20:35:11.634176
+51	\N	2025-03-29 01:45:31.123742
+52	INSERT on KuenteCOUser: 17eef587-7289-4a27-a317-fa0f37a682c0	2025-03-28 20:46:05.4984
+\.
+
+
+--
+-- Data for Name: investment; Type: TABLE DATA; Schema: public; Owner: master
+--
+
+COPY public.investment (id, initial_amount, profitability, start_date, state, type, id_account) FROM stdin;
+\.
+
+
+--
+-- Data for Name: kuentecouser; Type: TABLE DATA; Schema: public; Owner: master
+--
+
+COPY public.kuentecouser (id, account, email, password, id_role, account_state) FROM stdin;
+72fa7fbd-2e6d-44d9-9842-fe34ae1f3108	\N	alejandromolinaacosta11@gmail.com	$2a$10$AgkAty4qyq/4GNfd5mFo0OMbLzGL778ixawk3A5EhtCFif5LZF0ZK	0	ACTIVE
+252c91b1-c43a-42e6-aa4a-1d9d131a0bb6	\N	alej0skyp3@gmail.com	$2a$10$qOksIT3gzV3lmJfPg6EXVepdi91BWPWEeC2RFi88fVkW48z.7lLby	0	ACTIVE
+f53277a1-c424-47bb-bcd4-2afc44f131b1	\N	lacostaaguilar5@gmail.com	$2a$10$V/BNVLdWnC2Wud/BVxCdquF1yZ/NqVckY75biL9SNyalWuWP8iKOK	0	ACTIVE
+17eef587-7289-4a27-a317-fa0f37a682c0	\N	agudelocastanoyeferson270@gmail.com	$2a$10$9bTMEqlg4UZy.QkMkh38hek2oEO6r5oqe8TwrAR5fk5VYGBwoY6Da	0	PENDING
+\.
+
+
+--
+-- Data for Name: notification; Type: TABLE DATA; Schema: public; Owner: master
+--
+
+COPY public.notification (id, content, date_send, id_account) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pay_subscription; Type: TABLE DATA; Schema: public; Owner: master
+--
+
+COPY public.pay_subscription (id, amount, pay_date, details, method, id_subscription) FROM stdin;
+\.
+
+
+--
+-- Data for Name: payment_history; Type: TABLE DATA; Schema: public; Owner: master
+--
+
+COPY public.payment_history (id, details, id_pay_subscription) FROM stdin;
+\.
+
+
+--
+-- Data for Name: role; Type: TABLE DATA; Schema: public; Owner: master
+--
+
+COPY public.role (id, name) FROM stdin;
+0	0
+1	1
+\.
+
+
+--
+-- Data for Name: subscription; Type: TABLE DATA; Schema: public; Owner: master
+--
+
+COPY public.subscription (id, expiration_date, start_date, state, type, id_account) FROM stdin;
+\.
+
+
+--
+-- Data for Name: transaction; Type: TABLE DATA; Schema: public; Owner: master
+--
+
+COPY public.transaction (id, amount, description, transaction_date, type, id_account, id_category) FROM stdin;
+\.
+
+
+--
+-- Name: jobid_seq; Type: SEQUENCE SET; Schema: cron; Owner: master
+--
+
+SELECT pg_catalog.setval('cron.jobid_seq', 1, true);
+
+
+--
+-- Name: runid_seq; Type: SEQUENCE SET; Schema: cron; Owner: master
+--
+
+SELECT pg_catalog.setval('cron.runid_seq', 25, true);
+
+
+--
+-- Name: account_id_seq; Type: SEQUENCE SET; Schema: public; Owner: master
+--
+
+SELECT pg_catalog.setval('public.account_id_seq', 3, true);
+
+
+--
+-- Name: budget_id_seq; Type: SEQUENCE SET; Schema: public; Owner: master
+--
+
+SELECT pg_catalog.setval('public.budget_id_seq', 1, false);
+
+
+--
+-- Name: category_id_seq; Type: SEQUENCE SET; Schema: public; Owner: master
+--
+
+SELECT pg_catalog.setval('public.category_id_seq', 1, false);
+
+
+--
+-- Name: debt_id_seq; Type: SEQUENCE SET; Schema: public; Owner: master
+--
+
+SELECT pg_catalog.setval('public.debt_id_seq', 1, false);
+
+
+--
+-- Name: exchange_rate_id_seq; Type: SEQUENCE SET; Schema: public; Owner: master
+--
+
+SELECT pg_catalog.setval('public.exchange_rate_id_seq', 338, true);
+
+
+--
+-- Name: exchange_rate_logs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: master
+--
+
+SELECT pg_catalog.setval('public.exchange_rate_logs_id_seq', 52, true);
+
+
+--
+-- Name: investment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: master
+--
+
+SELECT pg_catalog.setval('public.investment_id_seq', 1, false);
+
+
+--
+-- Name: notification_id_seq; Type: SEQUENCE SET; Schema: public; Owner: master
+--
+
+SELECT pg_catalog.setval('public.notification_id_seq', 1, false);
+
+
+--
+-- Name: pay_subscription_id_seq; Type: SEQUENCE SET; Schema: public; Owner: master
+--
+
+SELECT pg_catalog.setval('public.pay_subscription_id_seq', 1, false);
+
+
+--
+-- Name: payment_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: master
+--
+
+SELECT pg_catalog.setval('public.payment_history_id_seq', 1, false);
+
+
+--
+-- Name: role_id_seq; Type: SEQUENCE SET; Schema: public; Owner: master
+--
+
+SELECT pg_catalog.setval('public.role_id_seq', 1, false);
+
+
+--
+-- Name: subscription_id_seq; Type: SEQUENCE SET; Schema: public; Owner: master
+--
+
+SELECT pg_catalog.setval('public.subscription_id_seq', 1, false);
+
+
+--
+-- Name: transaction_id_seq; Type: SEQUENCE SET; Schema: public; Owner: master
+--
+
+SELECT pg_catalog.setval('public.transaction_id_seq', 1, false);
+
+
+--
+-- Name: account account_pkey; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.account
+    ADD CONSTRAINT account_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: budget budget_pkey; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.budget
+    ADD CONSTRAINT budget_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: category category_pkey; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.category
+    ADD CONSTRAINT category_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: debt debt_pkey; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.debt
+    ADD CONSTRAINT debt_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: exchange_rate_logs exchange_rate_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.exchange_rate_logs
+    ADD CONSTRAINT exchange_rate_logs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: exchange_rate exchange_rate_pkey; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.exchange_rate
+    ADD CONSTRAINT exchange_rate_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: exchange_rate exchange_rate_unique; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.exchange_rate
+    ADD CONSTRAINT exchange_rate_unique UNIQUE (base_currency, target_currency);
+
+
+--
+-- Name: investment investment_pkey; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.investment
+    ADD CONSTRAINT investment_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: kuentecouser kuentecouser_pkey; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.kuentecouser
+    ADD CONSTRAINT kuentecouser_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: notification notification_pkey; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.notification
+    ADD CONSTRAINT notification_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pay_subscription pay_subscription_pkey; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.pay_subscription
+    ADD CONSTRAINT pay_subscription_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: payment_history payment_history_pkey; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.payment_history
+    ADD CONSTRAINT payment_history_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: role role_pkey; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.role
+    ADD CONSTRAINT role_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: subscription subscription_pkey; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.subscription
+    ADD CONSTRAINT subscription_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: transaction transaction_pkey; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.transaction
+    ADD CONSTRAINT transaction_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: kuentecouser uklltag847emv0e2oifpvw6l4ri; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.kuentecouser
+    ADD CONSTRAINT uklltag847emv0e2oifpvw6l4ri UNIQUE (email);
+
+
+--
+-- Name: pay_subscription ukqborkarwyf79596j3780j0x8d; Type: CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.pay_subscription
+    ADD CONSTRAINT ukqborkarwyf79596j3780j0x8d UNIQUE (id_subscription);
+
+
+--
+-- Name: transaction trg_check_budget_limit; Type: TRIGGER; Schema: public; Owner: master
+--
+
+CREATE TRIGGER trg_check_budget_limit AFTER INSERT OR UPDATE ON public.transaction FOR EACH ROW EXECUTE FUNCTION public.check_budget_limit();
+
+
+--
+-- Name: kuentecouser trg_log_audit_user_changes; Type: TRIGGER; Schema: public; Owner: master
+--
+
+CREATE TRIGGER trg_log_audit_user_changes AFTER INSERT OR DELETE OR UPDATE ON public.kuentecouser FOR EACH ROW EXECUTE FUNCTION public.log_audit_user_changes();
+
+
+--
+-- Name: debt trg_send_debt_reminder; Type: TRIGGER; Schema: public; Owner: master
+--
+
+CREATE TRIGGER trg_send_debt_reminder AFTER INSERT OR UPDATE ON public.debt FOR EACH ROW EXECUTE FUNCTION public.send_debt_reminder();
+
+
+--
+-- Name: transaction trg_update_balance_on_transaction; Type: TRIGGER; Schema: public; Owner: master
+--
+
+CREATE TRIGGER trg_update_balance_on_transaction AFTER INSERT OR DELETE OR UPDATE ON public.transaction FOR EACH ROW EXECUTE FUNCTION public.update_balance_on_transaction();
+
+
+--
+-- Name: notification fk10kjqa3c2i0d2j7gokgru42ul; Type: FK CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.notification
+    ADD CONSTRAINT fk10kjqa3c2i0d2j7gokgru42ul FOREIGN KEY (id_account) REFERENCES public.account(id);
+
+
+--
+-- Name: debt fk1ga55hm9wog60hja3pfuvnggg; Type: FK CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.debt
+    ADD CONSTRAINT fk1ga55hm9wog60hja3pfuvnggg FOREIGN KEY (id_account) REFERENCES public.account(id);
+
+
+--
+-- Name: budget fk7jq6lh5x4qo4jypsilxvsvilx; Type: FK CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.budget
+    ADD CONSTRAINT fk7jq6lh5x4qo4jypsilxvsvilx FOREIGN KEY (id_account) REFERENCES public.account(id);
+
+
+--
+-- Name: account fkbe1lm29t1uduyx8schuleimiu; Type: FK CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.account
+    ADD CONSTRAINT fkbe1lm29t1uduyx8schuleimiu FOREIGN KEY (id_user) REFERENCES public.kuentecouser(id);
+
+
+--
+-- Name: kuentecouser fkdon9ipl5er2qh2o2r89ns9iek; Type: FK CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.kuentecouser
+    ADD CONSTRAINT fkdon9ipl5er2qh2o2r89ns9iek FOREIGN KEY (id_role) REFERENCES public.role(id);
+
+
+--
+-- Name: investment fke5ap7yy0bs7m63m2y1l2ofik9; Type: FK CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.investment
+    ADD CONSTRAINT fke5ap7yy0bs7m63m2y1l2ofik9 FOREIGN KEY (id_account) REFERENCES public.account(id);
+
+
+--
+-- Name: pay_subscription fkeu16ps80ltd8ot53tn26bwwks; Type: FK CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.pay_subscription
+    ADD CONSTRAINT fkeu16ps80ltd8ot53tn26bwwks FOREIGN KEY (id_subscription) REFERENCES public.subscription(id);
+
+
+--
+-- Name: transaction fkhp000uknj257felelkrgv2k64; Type: FK CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.transaction
+    ADD CONSTRAINT fkhp000uknj257felelkrgv2k64 FOREIGN KEY (id_category) REFERENCES public.category(id);
+
+
+--
+-- Name: category fkidbfpcrt66hpkj2rjdoqpboqt; Type: FK CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.category
+    ADD CONSTRAINT fkidbfpcrt66hpkj2rjdoqpboqt FOREIGN KEY (id_account) REFERENCES public.account(id);
+
+
+--
+-- Name: subscription fkj6t70mdjjv92vddowrcdveep2; Type: FK CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.subscription
+    ADD CONSTRAINT fkj6t70mdjjv92vddowrcdveep2 FOREIGN KEY (id_account) REFERENCES public.account(id);
+
+
+--
+-- Name: budget fkp23sqyb2uww21t3cyub3360vh; Type: FK CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.budget
+    ADD CONSTRAINT fkp23sqyb2uww21t3cyub3360vh FOREIGN KEY (id_category) REFERENCES public.category(id);
+
+
+--
+-- Name: transaction fkqougs4kxpidm8i9514o13rfdk; Type: FK CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.transaction
+    ADD CONSTRAINT fkqougs4kxpidm8i9514o13rfdk FOREIGN KEY (id_account) REFERENCES public.account(id);
+
+
+--
+-- Name: payment_history fktercbdqh27qlb0ql3hitrf5tu; Type: FK CONSTRAINT; Schema: public; Owner: master
+--
+
+ALTER TABLE ONLY public.payment_history
+    ADD CONSTRAINT fktercbdqh27qlb0ql3hitrf5tu FOREIGN KEY (id_pay_subscription) REFERENCES public.pay_subscription(id);
+
+
+--
+-- Name: SCHEMA public; Type: ACL; Schema: -; Owner: pg_database_owner
+--
+
+GRANT USAGE ON SCHEMA public TO replicator;
+
+
+--
+-- Name: TABLE kuentecouser; Type: ACL; Schema: public; Owner: master
+--
+
+GRANT SELECT ON TABLE public.kuentecouser TO replicator;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: public; Owner: master
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE master IN SCHEMA public GRANT SELECT ON TABLES TO replicator;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

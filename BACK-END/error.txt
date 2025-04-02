@@ -1,0 +1,305 @@
+██╗  ██╗██╗   ██╗███████╗███╗   ██╗████████╗███████╗ ██████╗  █████╗
+██║ ██╔╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝██╔      ██╔══██╗
+█████╔╝ ██║   ██║█████╗  ██╔██╗ ██║   ██║   █████╗  ██║      ██║  ██║
+██╔═██╗ ██║   ██║██╔══╝  ██║╚██╗██║   ██║   ██╔══╝  ██║      ██║  ██║
+██║  ██╗╚██████╔╝███████╗██║ ╚████║   ██║   ███████╗╚██████║ ██████╔╝
+╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝ ╚═════╝ ╚═════╝
+
+
+2025-03-29T14:50:57.607-05:00  INFO 8286 --- [           main] o.kuenteco.backend.BackEndApplication    : Starting BackEndApplication using Java 17.0.14 with PID 8286 (/home/yeferson/KuenteCO/BACK-END/target/classes started by yeferson in /home/yeferson/KuenteCO/BACK-END)
+2025-03-29T14:50:57.608-05:00 DEBUG 8286 --- [           main] o.kuenteco.backend.BackEndApplication    : Running with Spring Boot v3.4.3, Spring v6.2.3
+2025-03-29T14:50:57.609-05:00  INFO 8286 --- [           main] o.kuenteco.backend.BackEndApplication    : The following 2 profiles are active: "master", "slave"
+2025-03-29T14:50:58.132-05:00  INFO 8286 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-03-29T14:50:58.236-05:00  INFO 8286 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 96 ms. Found 3 JPA repository interfaces.
+2025-03-29T14:50:58.236-05:00  INFO 8286 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-03-29T14:50:58.242-05:00  INFO 8286 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 5 ms. Found 3 JPA repository interfaces.
+2025-03-29T14:50:59.366-05:00  INFO 8286 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-03-29T14:50:59.374-05:00  INFO 8286 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-03-29T14:50:59.375-05:00  INFO 8286 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-03-29T14:50:59.408-05:00  INFO 8286 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2025-03-29T14:50:59.408-05:00  INFO 8286 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1765 ms
+2025-03-29T14:50:59.566-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : Driver class org.postgresql.Driver found in Thread context class loader TomcatEmbeddedWebappClassLoader
+  context: api
+  delegate: true
+----------> Parent Classloader:
+jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+
+2025-03-29T14:50:59.570-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : HikariPool-1 - configuration:
+2025-03-29T14:50:59.572-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : allowPoolSuspension.............false
+2025-03-29T14:50:59.573-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : autoCommit......................true
+2025-03-29T14:50:59.573-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : catalog.........................none
+2025-03-29T14:50:59.573-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : connectionInitSql...............none
+2025-03-29T14:50:59.573-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : connectionTestQuery.............none
+2025-03-29T14:50:59.573-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : connectionTimeout...............30000
+2025-03-29T14:50:59.573-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : dataSource......................none
+2025-03-29T14:50:59.573-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : dataSourceClassName.............none
+2025-03-29T14:50:59.573-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : dataSourceJNDI..................none
+2025-03-29T14:50:59.573-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : dataSourceProperties............{password=<masked>}
+2025-03-29T14:50:59.573-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : driverClassName................."org.postgresql.Driver"
+2025-03-29T14:50:59.573-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : exceptionOverrideClassName......none
+2025-03-29T14:50:59.574-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : healthCheckProperties...........{}
+2025-03-29T14:50:59.574-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : healthCheckRegistry.............none
+2025-03-29T14:50:59.574-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : idleTimeout.....................600000
+2025-03-29T14:50:59.574-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : initializationFailTimeout.......1
+2025-03-29T14:50:59.574-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : isolateInternalQueries..........false
+2025-03-29T14:50:59.574-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : jdbcUrl.........................jdbc:postgresql://172.18.0.3:5432/KuenteCO
+2025-03-29T14:50:59.574-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : keepaliveTime...................0
+2025-03-29T14:50:59.574-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : leakDetectionThreshold..........0
+2025-03-29T14:50:59.574-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : maxLifetime.....................1800000
+2025-03-29T14:50:59.574-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : maximumPoolSize.................10
+2025-03-29T14:50:59.574-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : metricRegistry..................none
+2025-03-29T14:50:59.574-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : metricsTrackerFactory...........none
+2025-03-29T14:50:59.574-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : minimumIdle.....................10
+2025-03-29T14:50:59.574-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : password........................<masked>
+2025-03-29T14:50:59.574-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : poolName........................"HikariPool-1"
+2025-03-29T14:50:59.574-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : readOnly........................false
+2025-03-29T14:50:59.575-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : registerMbeans..................false
+2025-03-29T14:50:59.575-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : scheduledExecutor...............none
+2025-03-29T14:50:59.575-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : schema..........................none
+2025-03-29T14:50:59.575-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : threadFactory...................internal
+2025-03-29T14:50:59.575-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : transactionIsolation............default
+2025-03-29T14:50:59.575-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : username........................"master"
+2025-03-29T14:50:59.575-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : validationTimeout...............5000
+2025-03-29T14:50:59.577-05:00  INFO 8286 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-03-29T14:50:59.712-05:00  INFO 8286 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5e46a125
+2025-03-29T14:50:59.713-05:00  INFO 8286 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-03-29T14:50:59.736-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : Driver class org.postgresql.Driver found in Thread context class loader TomcatEmbeddedWebappClassLoader
+  context: api
+  delegate: true
+----------> Parent Classloader:
+jdk.internal.loader.ClassLoaders$AppClassLoader@1dbd16a6
+
+2025-03-29T14:50:59.736-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : HikariPool-2 - configuration:
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : allowPoolSuspension.............false
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : autoCommit......................true
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : catalog.........................none
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : connectionInitSql...............none
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : connectionTestQuery.............none
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : connectionTimeout...............30000
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : dataSource......................none
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : dataSourceClassName.............none
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : dataSourceJNDI..................none
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : dataSourceProperties............{password=<masked>}
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : driverClassName................."org.postgresql.Driver"
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : exceptionOverrideClassName......none
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : healthCheckProperties...........{}
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : healthCheckRegistry.............none
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : idleTimeout.....................600000
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : initializationFailTimeout.......1
+2025-03-29T14:50:59.737-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : isolateInternalQueries..........false
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : jdbcUrl.........................jdbc:postgresql://172.18.0.2:5432/KuenteCO
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : keepaliveTime...................0
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : leakDetectionThreshold..........0
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : maxLifetime.....................1800000
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : maximumPoolSize.................10
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : metricRegistry..................none
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : metricsTrackerFactory...........none
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : minimumIdle.....................10
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : password........................<masked>
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : poolName........................"HikariPool-2"
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : readOnly........................false
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : registerMbeans..................false
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : scheduledExecutor...............none
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : schema..........................none
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : threadFactory...................internal
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : transactionIsolation............default
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : username........................"replicator"
+2025-03-29T14:50:59.738-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.HikariConfig           : validationTimeout...............5000
+2025-03-29T14:50:59.739-05:00  INFO 8286 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2025-03-29T14:50:59.769-05:00  INFO 8286 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection org.postgresql.jdbc.PgConnection@33399052
+2025-03-29T14:50:59.769-05:00  INFO 8286 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2025-03-29T14:50:59.780-05:00 ERROR 8286 --- [           main] o.s.b.web.embedded.tomcat.TomcatStarter  : Error starting Tomcat context. Exception: org.springframework.beans.factory.UnsatisfiedDependencyException. Message: Error creating bean with name 'securityConfig': Unsatisfied dependency expressed through field 'userDetailsService': Error creating bean with name 'userServiceImpl' defined in file [/home/yeferson/KuenteCO/BACK-END/target/classes/org/kuenteco/backend/service/jwt/UserServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'slaveUserRepository' defined in org.kuenteco.backend.repository.slave.SlaveUserRepository defined in @EnableJpaRepositories declared on SlaveDataSourceConfig: Cannot resolve reference to bean 'jpaSharedEM_slaveEntityManagerFactory' while setting bean property 'entityManager'
+2025-03-29T14:50:59.798-05:00  INFO 8286 --- [           main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2025-03-29T14:50:59.800-05:00  WARN 8286 --- [           main] o.a.c.loader.WebappClassLoaderBase       : The web application [api] appears to have started a thread named [HikariPool-1 housekeeper] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ java.base@17.0.14/jdk.internal.misc.Unsafe.park(Native Method)
+ java.base@17.0.14/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:252)
+ java.base@17.0.14/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:1679)
+ java.base@17.0.14/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1182)
+ java.base@17.0.14/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:899)
+ java.base@17.0.14/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1062)
+ java.base@17.0.14/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1122)
+ java.base@17.0.14/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+ java.base@17.0.14/java.lang.Thread.run(Thread.java:840)
+2025-03-29T14:50:59.801-05:00  WARN 8286 --- [           main] o.a.c.loader.WebappClassLoaderBase       : The web application [api] appears to have started a thread named [HikariPool-2 housekeeper] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ java.base@17.0.14/jdk.internal.misc.Unsafe.park(Native Method)
+ java.base@17.0.14/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:252)
+ java.base@17.0.14/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:1679)
+ java.base@17.0.14/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1182)
+ java.base@17.0.14/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:899)
+ java.base@17.0.14/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1062)
+ java.base@17.0.14/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1122)
+ java.base@17.0.14/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+ java.base@17.0.14/java.lang.Thread.run(Thread.java:840)
+2025-03-29T14:50:59.803-05:00  WARN 8286 --- [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Unable to start web server
+2025-03-29T14:50:59.804-05:00  INFO 8286 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
+2025-03-29T14:50:59.804-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Before shutdown stats (total=1, active=0, idle=1, waiting=0)
+2025-03-29T14:50:59.805-05:00 DEBUG 8286 --- [nnection closer] com.zaxxer.hikari.pool.PoolBase          : HikariPool-2 - Closing connection org.postgresql.jdbc.PgConnection@33399052: (connection evicted)
+2025-03-29T14:50:59.805-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - After shutdown stats (total=0, active=0, idle=0, waiting=0)
+2025-03-29T14:50:59.805-05:00  INFO 8286 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.
+2025-03-29T14:50:59.805-05:00  INFO 8286 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-03-29T14:50:59.805-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Before shutdown stats (total=1, active=0, idle=1, waiting=0)
+2025-03-29T14:50:59.806-05:00 DEBUG 8286 --- [nnection closer] com.zaxxer.hikari.pool.PoolBase          : HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@5e46a125: (connection evicted)
+2025-03-29T14:50:59.806-05:00 DEBUG 8286 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - After shutdown stats (total=0, active=0, idle=0, waiting=0)
+2025-03-29T14:50:59.806-05:00  INFO 8286 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-03-29T14:50:59.825-05:00  INFO 8286 --- [           main] .s.b.a.l.ConditionEvaluationReportLogger :
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-03-29T14:50:59.836-05:00 ERROR 8286 --- [           main] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.context.ApplicationContextException: Unable to start web server
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:170) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:621) ~[spring-context-6.2.3.jar:6.2.3]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.kuenteco.backend.BackEndApplication.main(BackEndApplication.java:30) ~[classes/:na]
+Caused by: org.springframework.boot.web.server.WebServerException: Unable to start embedded Tomcat
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.initialize(TomcatWebServer.java:147) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.<init>(TomcatWebServer.java:107) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory.getTomcatWebServer(TomcatServletWebServerFactory.java:520) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory.getWebServer(TomcatServletWebServerFactory.java:222) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.createWebServer(ServletWebServerApplicationContext.java:193) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:167) ~[spring-boot-3.4.3.jar:3.4.3]
+	... 8 common frames omitted
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'securityConfig': Unsatisfied dependency expressed through field 'userDetailsService': Error creating bean with name 'userServiceImpl' defined in file [/home/yeferson/KuenteCO/BACK-END/target/classes/org/kuenteco/backend/service/jwt/UserServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'slaveUserRepository' defined in org.kuenteco.backend.repository.slave.SlaveUserRepository defined in @EnableJpaRepositories declared on SlaveDataSourceConfig: Cannot resolve reference to bean 'jpaSharedEM_slaveEntityManagerFactory' while setting bean property 'entityManager'
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:788) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:768) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:146) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:509) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1445) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:346) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:413) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1361) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1191) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:563) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:346) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:207) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.getOrderedBeansOfType(ServletContextInitializerBeans.java:211) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:174) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:169) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAdaptableBeans(ServletContextInitializerBeans.java:154) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.<init>(ServletContextInitializerBeans.java:87) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.getServletContextInitializerBeans(ServletWebServerApplicationContext.java:271) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.selfInitialize(ServletWebServerApplicationContext.java:245) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.springframework.boot.web.embedded.tomcat.TomcatStarter.onStartup(TomcatStarter.java:52) ~[spring-boot-3.4.3.jar:3.4.3]
+	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:4467) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1203) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1193) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264) ~[na:na]
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145) ~[na:na]
+	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:749) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at org.apache.catalina.core.StandardHost.startInternal(StandardHost.java:772) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1203) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1193) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264) ~[na:na]
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145) ~[na:na]
+	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:749) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at org.apache.catalina.core.StandardEngine.startInternal(StandardEngine.java:203) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at org.apache.catalina.core.StandardService.startInternal(StandardService.java:415) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at org.apache.catalina.core.StandardServer.startInternal(StandardServer.java:870) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at org.apache.catalina.startup.Tomcat.start(Tomcat.java:437) ~[tomcat-embed-core-10.1.36.jar:10.1.36]
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.initialize(TomcatWebServer.java:128) ~[spring-boot-3.4.3.jar:3.4.3]
+	... 13 common frames omitted
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'userServiceImpl' defined in file [/home/yeferson/KuenteCO/BACK-END/target/classes/org/kuenteco/backend/service/jwt/UserServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'slaveUserRepository' defined in org.kuenteco.backend.repository.slave.SlaveUserRepository defined in @EnableJpaRepositories declared on SlaveDataSourceConfig: Cannot resolve reference to bean 'jpaSharedEM_slaveEntityManagerFactory' while setting bean property 'entityManager'
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1381) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1218) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:563) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:346) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1664) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1552) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:785) ~[spring-beans-6.2.3.jar:6.2.3]
+	... 64 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'slaveUserRepository' defined in org.kuenteco.backend.repository.slave.SlaveUserRepository defined in @EnableJpaRepositories declared on SlaveDataSourceConfig: Cannot resolve reference to bean 'jpaSharedEM_slaveEntityManagerFactory' while setting bean property 'entityManager'
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:377) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:135) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyPropertyValues(AbstractAutowireCapableBeanFactory.java:1711) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1460) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:346) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1606) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1552) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.2.3.jar:6.2.3]
+	... 77 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'jpaSharedEM_slaveEntityManagerFactory': Cannot resolve reference to bean 'slaveEntityManagerFactory' while setting constructor argument
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:377) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:135) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveConstructorArguments(ConstructorResolver.java:691) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:513) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1361) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1191) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:563) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:346) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:365) ~[spring-beans-6.2.3.jar:6.2.3]
+	... 90 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'slaveEntityManagerFactory' defined in class path resource [org/kuenteco/backend/config/database/SlaveDataSourceConfig.class]: Failed to instantiate [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean]: Factory method 'entityManagerFactory' threw exception with message: null
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:657) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:489) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1361) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1191) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:563) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:346) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:365) ~[spring-beans-6.2.3.jar:6.2.3]
+	... 102 common frames omitted
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean]: Factory method 'entityManagerFactory' threw exception with message: null
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:199) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiateWithFactoryMethod(SimpleInstantiationStrategy.java:88) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:168) ~[spring-beans-6.2.3.jar:6.2.3]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:653) ~[spring-beans-6.2.3.jar:6.2.3]
+	... 112 common frames omitted
+Caused by: java.lang.NullPointerException: null
+	at java.base/java.util.concurrent.ConcurrentHashMap.putVal(ConcurrentHashMap.java:1011) ~[na:na]
+	at java.base/java.util.concurrent.ConcurrentHashMap.put(ConcurrentHashMap.java:1006) ~[na:na]
+	at java.base/java.util.Properties.put(Properties.java:1304) ~[na:na]
+	at org.kuenteco.backend.config.database.SlaveDataSourceConfig.entityManagerFactory(SlaveDataSourceConfig.java:50) ~[classes/:na]
+	at org.kuenteco.backend.config.database.SlaveDataSourceConfig$$SpringCGLIB$$0.CGLIB$entityManagerFactory$0(<generated>) ~[classes/:na]
+	at org.kuenteco.backend.config.database.SlaveDataSourceConfig$$SpringCGLIB$$FastClass$$1.invoke(<generated>) ~[classes/:na]
+	at org.springframework.cglib.proxy.MethodProxy.invokeSuper(MethodProxy.java:258) ~[spring-core-6.2.3.jar:6.2.3]
+	at org.springframework.context.annotation.ConfigurationClassEnhancer$BeanMethodInterceptor.intercept(ConfigurationClassEnhancer.java:372) ~[spring-context-6.2.3.jar:6.2.3]
+	at org.kuenteco.backend.config.database.SlaveDataSourceConfig$$SpringCGLIB$$0.entityManagerFactory(<generated>) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:171) ~[spring-beans-6.2.3.jar:6.2.3]
+	... 115 common frames omitted
+
+
+Process finished with exit code 1

@@ -15,7 +15,6 @@ dependencies:
   flutter_dotenv: ^5.1.0
   postgres: ^3.5.4
 
-  tu_app: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -32,7 +31,8 @@ flutter:
   uses-material-design: true
   assets:
     - .env
-    - Img/Brand.jpeg
-    - Img/Logo.png
-    - Img/Logo 1.png
-    - Img/Logo 2.png
+    - assets/img/Background.png
+    - assets/img/Brand.jpeg
+    - assets/img/Logo.png
+    - assets/img/Logo 1.png
+    - assets/img/Logo 2.png
