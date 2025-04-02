@@ -35,7 +35,6 @@ class ApiService {
         if (cookie.trim().startsWith('jwt=')) {
           return cookie.trim().substring(4);
         }
-
       }
     }
     return null;
@@ -43,7 +42,6 @@ class ApiService {
 
   // Métodos de autenticación
   Future<Map<String, dynamic>> login({required String email, required String password}) async {
-
     try {
       final response = await _client.post(
         Uri.parse('$baseUrl/v1/auth/login'),
@@ -53,7 +51,7 @@ class ApiService {
           'password': password
         }),
       );
-      // Extraer el token de las cookies
+
       final token = _extractTokenFromCookies(response);
       if (token != null) {
         _authToken = token;
@@ -101,7 +99,6 @@ class ApiService {
     }
   }
 
-
   Future<Map<String, dynamic>> validateVerificationCode({
     required String email,
     required String code
@@ -120,7 +117,6 @@ class ApiService {
       return _handleError(e);
     }
   }
-
 
   Future<Map<String, dynamic>> activateAccount({
     required String email,
@@ -172,7 +168,17 @@ class ApiService {
           'confirmNewPassword': confirmNewPassword,
         }),
       );
-      return _processResponse(response, 'Password changed successfully');
+
+      final result = _processResponse(response, 'Password changed successfully');
+
+      if (result['status'] == 'error' && result['data'] != null && result['data'] is Map) {
+        final data = result['data'] as Map;
+        if (data.containsKey('error')) {
+          result['message'] = data['error'];
+        }
+      }
+
+      return result;
     } catch (e) {
       return _handleError(e);
     }
@@ -180,18 +186,28 @@ class ApiService {
 
   // Métodos auxiliares
   Map<String, dynamic> _processResponse(http.Response response, String successMessage) {
+    if (response.body.isEmpty) {
+      return {
+        'status': 'error',
+        'message': 'Empty response from server',
+        'statusCode': response.statusCode,
+      };
+    }
+
     try {
-      final data = json.decode(response.body);
+      final dynamic data = json.decode(response.body);
+
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return {
           'status': 'success',
-          'message': data['message'] ?? successMessage,
+          'message': data is Map ? (data['message'] ?? successMessage) : successMessage,
           'data': data,
         };
       } else {
         return {
           'status': 'error',
-          'message': data['message'] ?? 'Error (${response.statusCode})',
+          'message': data is Map ? (data['message'] ?? 'Error (${response.statusCode})')
+              : 'Error (${response.statusCode})',
           'statusCode': response.statusCode,
           'data': data,
         };
@@ -201,6 +217,7 @@ class ApiService {
         'status': 'error',
         'message': 'Error processing response: $e',
         'rawResponse': response.body,
+        'statusCode': response.statusCode,
       };
     }
   }
@@ -211,6 +228,7 @@ class ApiService {
       'message': 'Connection error: ${e.toString()}',
     };
   }
+
   void dispose() {
     _client.close();
   }

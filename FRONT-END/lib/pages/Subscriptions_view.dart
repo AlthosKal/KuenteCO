@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:kuenteco/widgets/navbar.dart';
-import 'package:kuenteco/widgets/footer.dart';
+import 'package:kuenteco/widgets/Navbar_guest_widget.dart';
+import 'package:kuenteco/widgets/Footer_widget.dart';
+import 'package:kuenteco/widgets/Background_widget.dart';
 
 class SuscripcionesPage extends StatefulWidget {
-  final Color backgroundColor;
-  final double cardHeight;
   final bool isLoggedIn;
 
   const SuscripcionesPage({
     super.key,
-    this.backgroundColor = const Color(0xFF890cac),
-    this.cardHeight = 450,
     this.isLoggedIn = false,
   });
 
@@ -21,48 +18,39 @@ class SuscripcionesPage extends StatefulWidget {
 class _SuscripcionesPageState extends State<SuscripcionesPage> {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF890cac),
-              Colors.white,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              KuentecoNavbar(
-                currentRoute: '/suscripciones',
-                isLoggedIn: widget.isLoggedIn,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: _buildHorizontalSubscriptionPlans(context),
-                      ),
-                    ],
-                  ),
+      body: Background(
+        child: Column(
+          children: [
+            KuentecoNavbar(
+              currentRoute: '/suscripciones',
+              isLoggedIn: widget.isLoggedIn,
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: _buildHorizontalSubscriptionPlans(context),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+            const Footer(),
+          ],
         ),
       ),
-      bottomNavigationBar: const Footer(),
     );
   }
 
   Widget _buildHorizontalSubscriptionPlans(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final plans = [
       {
         'title': 'Plan Básico',
@@ -72,8 +60,8 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
           'Algunas funciones poseen limitaciones y límites en la cantidad de rubros que se pueden crear(4).',
         ],
         'price': 'Gratis',
-        'buttonText': 'Adquirido',
-        'isAcquired': true,
+        'buttonText': 'Suscribirse',
+        'isAcquired': false,
       },
       {
         'title': 'Plan Estándar',
@@ -83,7 +71,7 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
           'Mayor cantidad de rubros disponibles (hasta 10)',
           'Acceso a reportes personalizados',
         ],
-        'price': 'Gratis',
+        'price': '14.900 COP',
         'buttonText': 'Suscribirse',
         'isAcquired': false,
       },
@@ -96,7 +84,7 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
           'Acceso a múltiples usuarios con permisos personalizados',
           'Soporte prioritario',
         ],
-        'price': 'Gratis',
+        'price': '29.900 COP',
         'buttonText': 'Suscribirse',
         'isAcquired': false,
       },
@@ -111,20 +99,22 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
   }
 
   Widget _buildPlanCard(Map<String, dynamic> plan, BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final screenWidth = MediaQuery.of(context).size.width;
     final cardWidth = screenWidth * 0.15;
 
     return Container(
       width: cardWidth,
-      height: widget.cardHeight,
+      height: 450,
       margin: const EdgeInsets.only(right: 16.0),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.3),
+        color: colorScheme.surface.withOpacity(0.3),
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+        border: Border.all(color: colorScheme.surface.withOpacity(0.3), width: 1),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF890cac).withOpacity(0.2),
+            color: colorScheme.primary.withOpacity(0.2),
             blurRadius: 8,
             spreadRadius: 2,
           ),
@@ -137,25 +127,15 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
           children: [
             Text(
               plan['title'] as String,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                shadows: [
-                  Shadow(
-                    color: Colors.black12,
-                    offset: Offset(1, 1),
-                    blurRadius: 2,
-                  ),
-                ],
+              style: theme.textTheme.headlineMedium?.copyWith(
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               plan['description'] as String,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white.withOpacity(0.9),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurface.withOpacity(0.9),
               ),
             ),
             const SizedBox(height: 16),
@@ -168,20 +148,18 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           '• ',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Expanded(
                           child: Text(
                             feature,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.white,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: colorScheme.onSurface,
                             ),
                           ),
                         ),
@@ -195,10 +173,9 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
             Center(
               child: Text(
                 plan['price'] as String,
-                style: const TextStyle(
+                style: theme.textTheme.headlineMedium?.copyWith(
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF890cac),
+                  color: colorScheme.primary,
                 ),
               ),
             ),
@@ -209,13 +186,17 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Suscripción a ${plan['title']} seleccionada'),
-                      backgroundColor: const Color(0xFF890cac),
+                      backgroundColor: colorScheme.primary,
                     ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: (plan['isAcquired'] as bool) ? Colors.white : const Color(0xFF890cac),
-                  foregroundColor: (plan['isAcquired'] as bool) ? const Color(0xFF890cac) : Colors.white,
+                  backgroundColor: (plan['isAcquired'] as bool)
+                      ? colorScheme.surface
+                      : colorScheme.primary,
+                  foregroundColor: (plan['isAcquired'] as bool)
+                      ? colorScheme.primary
+                      : colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),

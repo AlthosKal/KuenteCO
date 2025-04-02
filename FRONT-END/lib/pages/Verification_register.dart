@@ -1,28 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:kuenteco/services/ApiService.dart';
-import 'package:kuenteco/widgets/ParticleAnimation.dart';
+import 'package:kuenteco/services/Api_service.dart';
+import 'package:kuenteco/widgets/Particle_animation_widget.dart';
+import 'package:kuenteco/pages/Login_view.dart';
 import 'dart:ui' as ui;
 import 'dart:async';
-import 'CambioC.dart';
 
-class VerificacionCodigo extends StatefulWidget {
+class VerificacionR extends StatefulWidget {
   final String email;
 
-  const VerificacionCodigo({
+  const VerificacionR({
     super.key,
     required this.email,
   });
 
   @override
-  State<VerificacionCodigo> createState() => _VerificacionCodigoState();
+  State<VerificacionR> createState() => _VerificacionRState();
 }
 
-class _VerificacionCodigoState extends State<VerificacionCodigo> {
+class _VerificacionRState extends State<VerificacionR> {
   final List<TextEditingController> _controllers = List.generate(6, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
   bool _isLoading = false;
-  int _tiempoRestante = 120; // 2 minutos en segundos
+  bool _isResending = false;
+  int _tiempoRestante = 120;
   late Timer _timer;
 
   final ApiService _apiService = ApiService();
@@ -34,6 +35,14 @@ class _VerificacionCodigoState extends State<VerificacionCodigo> {
   void initState() {
     super.initState();
     _iniciarTemporizador();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Código enviado a ${widget.email}'),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    });
   }
 
   @override
@@ -67,59 +76,70 @@ class _VerificacionCodigoState extends State<VerificacionCodigo> {
   }
 
   Future<void> _reenviarCodigo() async {
-    setState(() => _isLoading = true);
+    if (_isResending) return;
+    setState(() => _isResending = true);
 
     try {
       final response = await _apiService.sendVerificationCode( // Changed from solicitarCodigoVerificacion
         email: widget.email,
-        isRegistration: false,
+        isRegistration: true, // Set to true for registration flow
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response['message'] ?? 'Código enviado con éxito')),
+        SnackBar(content: Text(response['message'] ?? 'Código reenviado')),
       );
 
-      setState(() => _tiempoRestante = 120);
+      setState(() {
+        _tiempoRestante = 120;
+        _isResending = false;
+      });
       _iniciarTemporizador();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al enviar el código: $e')),
       );
-    } finally {
-      setState(() => _isLoading = false);
+      setState(() => _isResending = false);
     }
   }
 
-  Future<void> _enviarCodigoAlBackend() async {
+  Future<void> _verificarCodigo() async {
+    final code = _controllers.map((controller) => controller.text).join();
+    if (code.length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ingresa el código completo')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
-    final code = _controllers.map((controller) => controller.text).join();
-
     try {
-      final response = await _apiService.validateVerificationCode( // Changed from validarCodigoVerificacion
+      // 1. Validar el código primero
+      final validationResponse = await _apiService.validateVerificationCode(
         email: widget.email,
         code: code,
       );
 
-      if (response['status'] == 'success') {
-        final String? tokenRecuperacion = response['data']?['token'];
-
-        // Navegar a la pantalla de cambio de contraseña
-        // ignore: use_build_context_synchronously
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CambioC(
-              token: tokenRecuperacion,
-              email: widget.email,
-            ),
-          ),
+      if (validationResponse['status'] == 'success') {
+        // 2. Activar la cuenta
+        final activationResponse = await _apiService.activateAccount(
+          email: widget.email,
+          code: code,
         );
+
+        if (activationResponse['status'] == 'success') {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginPage()),
+                (route) => false,
+          );
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Cuenta activada exitosamente')),
+          );
+        }
       } else {
-        // Mostrar mensaje de error si el código no es válido
-        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Código inválido')),
+          SnackBar(content: Text(validationResponse['message'] ?? 'Código inválido')),
         );
       }
     } catch (e) {
@@ -136,6 +156,9 @@ class _VerificacionCodigoState extends State<VerificacionCodigo> {
       _focusNodes[index + 1].requestFocus();
     } else if (value.isEmpty && index > 0) {
       _focusNodes[index - 1].requestFocus();
+    }
+    if (index == 5 && value.isNotEmpty) {
+      _verificarCodigo();
     }
   }
 
@@ -210,7 +233,7 @@ class _VerificacionCodigoState extends State<VerificacionCodigo> {
                               ),
                               const Expanded(
                                 child: Text(
-                                  'Verificación de Código',
+                                  'Verificar Registro',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 24,
@@ -276,7 +299,16 @@ class _VerificacionCodigoState extends State<VerificacionCodigo> {
                           const SizedBox(height: 10),
                           TextButton(
                             onPressed: _tiempoRestante == 0 ? _reenviarCodigo : null,
-                            child: Text(
+                            child: _isResending
+                                ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: whiteColor,
+                              ),
+                            )
+                                : Text(
                               'Reenviar código',
                               style: TextStyle(
                                 color: _tiempoRestante == 0 ? whiteColor : whiteColor.withOpacity(0.5),
@@ -292,11 +324,11 @@ class _VerificacionCodigoState extends State<VerificacionCodigo> {
                             color: whiteColor,
                             child: InkWell(
                               borderRadius: BorderRadius.circular(8),
-                              onTap: _enviarCodigoAlBackend,
+                              onTap: _verificarCodigo,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                                 child: const Text(
-                                  'Verificar Código',
+                                  'VERIFICAR REGISTRO',
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold,
