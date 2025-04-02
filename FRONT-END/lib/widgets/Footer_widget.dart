@@ -5,13 +5,12 @@ class Footer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 100,
-      color: Colors.white,
+    return Align(
+      alignment: Alignment.bottomCenter,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min, // Importante para que no ocupe todo el alto
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -20,7 +19,7 @@ class Footer extends StatelessWidget {
                   onPressed: () => Navigator.pushNamed(context, '/terminos'),
                   child: const Text(
                     'Términos y Condiciones',
-                    style: TextStyle(color: Color(0xFF890cac)),
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -28,7 +27,7 @@ class Footer extends StatelessWidget {
                   onPressed: () => Navigator.pushNamed(context, '/privacidad'),
                   child: const Text(
                     'Política de Privacidad',
-                    style: TextStyle(color: Color(0xFF890cac)),
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ],
@@ -36,7 +35,7 @@ class Footer extends StatelessWidget {
             const SizedBox(height: 10),
             const Text(
               '© 2025 Kuenteco. Todos los derechos reservados.',
-              style: TextStyle(color: Color(0xFF890cac)),
+              style: TextStyle(color: Colors.white),
             ),
           ],
         ),

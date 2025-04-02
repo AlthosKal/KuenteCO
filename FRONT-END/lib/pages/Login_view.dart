@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:kuenteco/services/ApiService.dart';
-import 'package:kuenteco/widgets/ParticleAnimation.dart';
-import 'package:kuenteco/pages/Register.dart';
-import 'InicioLog.dart';
-import 'VerificacionC.dart';
+import 'package:kuenteco/services/Api_service.dart';
+import 'package:kuenteco/widgets/Particle_animation_widget.dart';
+import 'package:kuenteco/pages/Register_view.dart';
+import 'Logged_home_view.dart';
+import 'Recovery_password_view.dart';
 import 'dart:ui' as ui;
 
 class LoginPage extends StatefulWidget {
@@ -33,7 +33,6 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  // Add this method to show messages
   void _showMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
@@ -64,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
               userEmail: _emailController.text,
             ),
           ),
-              (route) => false, // Esto elimina todas las rutas anteriores
+              (route) => false,
         );
       } else {
         _showMessage(context, response['message'] ?? 'Error en el inicio de sesión');
@@ -77,32 +76,12 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _enviarCodigoRecuperacion() async {
-    final email = _emailController.text.trim();
-    if (email.isEmpty || !email.contains('@')) {
-      _showMessage(context, 'Ingresa un email válido para recuperar tu contraseña');
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    try {
-      final response = await _apiService.sendRecoveryCode(email: email);
-
-      if (response['status'] == 'success') {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => VerificacionCodigo(email: email),
-          ),
-        );
-      } else {
-        _showMessage(context, response['message'] ?? 'Error al enviar el código');
-      }
-    } catch (e) {
-      _showMessage(context, 'Error de conexión: ${e.toString()}');
-    } finally {
-      setState(() => _isLoading = false);
-    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const PasswordRecoveryScreen(),
+      ),
+    );
   }
 
   Widget _buildTextField({
@@ -137,7 +116,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // Add the build method that was missing
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;

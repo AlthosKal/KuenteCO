@@ -103,7 +103,7 @@ class _ParticleAnimationState extends State<ParticleAnimation> with SingleTicker
 
   Future<void> _loadParticleImage() async {
     try {
-      final ByteData data = await rootBundle.load('Img/Logo.png');
+      final ByteData data = await rootBundle.load('assets/img/Logo.png');
       final Uint8List bytes = data.buffer.asUint8List();
       final ui.Codec codec = await ui.instantiateImageCodec(bytes);
       final ui.FrameInfo fi = await codec.getNextFrame();

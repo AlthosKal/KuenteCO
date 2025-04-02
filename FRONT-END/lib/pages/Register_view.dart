@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kuenteco/services/ApiService.dart';
-import 'package:kuenteco/widgets/ParticleAnimation.dart';
-import 'package:kuenteco/pages/VerificacionR.dart';
+import 'package:kuenteco/services/Api_service.dart';
+import 'package:kuenteco/widgets/Particle_animation_widget.dart';
+import 'package:kuenteco/pages/Verification_register.dart';
 import 'dart:ui' as ui;
 
 class RegisterPage extends StatefulWidget {
