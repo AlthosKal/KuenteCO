@@ -17,7 +17,7 @@ public class SlavePaySubscription {
     private Integer id;
 
     @OneToOne
-    @JoinColumn(name = "idSubscription")
+    @JoinColumn(name = "id_subscription")
     private SlaveSubscription slaveSubscription;
 
     private BigDecimal amount;

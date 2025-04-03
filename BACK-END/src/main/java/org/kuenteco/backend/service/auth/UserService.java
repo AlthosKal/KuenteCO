@@ -1,4 +1,4 @@
-package org.kuenteco.backend.service.jwt;
+package org.kuenteco.backend.service.auth;
 
 import org.kuenteco.backend.entity.master.MasterUser;
 import org.kuenteco.backend.entity.slave.SlaveUser;
@@ -15,8 +15,7 @@ public interface UserService extends UserDetailsService {
 
     void saveUser(MasterUser user);
 
-    void deteleUser(MasterUser masterUser);
-
     void deletePendingEmail(String email);
+
     SlaveUser getUserDetails();
 }

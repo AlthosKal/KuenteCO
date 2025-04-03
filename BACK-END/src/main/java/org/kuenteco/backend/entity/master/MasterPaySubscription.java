@@ -20,7 +20,7 @@ public class MasterPaySubscription {
     private Integer id;
 
     @OneToOne
-    @JoinColumn(name = "idSubscription")
+    @JoinColumn(name = "id_subscription")
     private MasterSubscription masterSubscription;
 
     private BigDecimal amount;

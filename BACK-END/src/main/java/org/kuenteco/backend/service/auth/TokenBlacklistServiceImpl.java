@@ -1,4 +1,4 @@
-package org.kuenteco.backend.service.jwt;
+package org.kuenteco.backend.service.auth;
 
 import org.springframework.stereotype.Service;
 
