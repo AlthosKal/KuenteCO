@@ -8,6 +8,7 @@ import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import jakarta.servlet.http.HttpServletResponse;
+import org.kuenteco.backend.controller.AuthController;
 import org.kuenteco.backend.dto.auth.NewUserDTO;
 import org.kuenteco.backend.dto.auth.SendVerificationCodeDTO;
 import org.kuenteco.backend.entity.master.MasterRole;
@@ -23,6 +24,8 @@ import org.kuenteco.backend.repository.master.MasterRoleRepository;
 import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveRoleRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -72,6 +75,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final Map<String, String> verificationCodes = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+    private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
 
     @Autowired
     public AuthServiceImpl(UserService userService, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
@@ -174,6 +179,7 @@ public class AuthServiceImpl implements AuthService {
 
         String code = String.format("%06d", new Random().nextInt(999999));
         verificationCodes.put(email, code);
+        log.info("Código de verificacion: " + code);
 
         // Programar la eliminación del código después de 15 minutos
         scheduler.schedule(() -> verificationCodes.remove(email), 15, TimeUnit.MINUTES);
