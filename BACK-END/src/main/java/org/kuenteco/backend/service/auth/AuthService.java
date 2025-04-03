@@ -1,4 +1,4 @@
-package org.kuenteco.backend.service.jwt;
+package org.kuenteco.backend.service.auth;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.kuenteco.backend.dto.auth.NewUserDTO;

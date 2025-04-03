@@ -1,5 +1,22 @@
 package org.kuenteco.backend.entity.slave.extra;
 
-public class PayMethodInfo extends org.kuenteco.backend.entity.master.extra.PayMethodInfo {
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
+public class PayMethodInfo {
+    @Column(name = "method")
+    private String method;
+
+    @Column(name = "card_last_four", length = 4)
+    private String cardLastFour;
+
+    @Column(name = "payment_email")
+    private String paymentEmail;
 }

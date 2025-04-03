@@ -1,4 +1,4 @@
-package org.kuenteco.backend.service.jwt;
+package org.kuenteco.backend.service.auth;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CookieServiceImpl implements CookieService {
 
+    @Override
     public void addHttpOnlyCookie(String name, String value, int maxAge, HttpServletResponse response) {
         Cookie cookie = new Cookie(name, value);
         cookie.setHttpOnly(true);
@@ -17,6 +18,7 @@ public class CookieServiceImpl implements CookieService {
         response.addCookie(cookie);
     }
 
+    @Override
     public void deleteCookie(String name, HttpServletResponse response) {
         Cookie cookie = new Cookie(name, null);
         cookie.setHttpOnly(true);

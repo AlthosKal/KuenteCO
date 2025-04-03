@@ -1,8 +1,9 @@
-package org.kuenteco.backend.service.jwt;
+package org.kuenteco.backend.service.auth;
 
 import lombok.NoArgsConstructor;
 import org.kuenteco.backend.entity.master.MasterUser;
 import org.kuenteco.backend.entity.slave.SlaveUser;
+import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.mapper.entity.UserMapper;
 import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
@@ -58,14 +59,16 @@ public class UserServiceImpl implements UserService {
         masterUserRepository.save(user);
     }
 
-    public void deteleUser(MasterUser masterUser){
+    public void deteleUser(MasterUser masterUser) {
         masterUserRepository.deleteById(masterUser.getId());
     }
 
-    public void deletePendingEmail(String email){
-            findByUserName(email);
+    public void deletePendingEmail(String email) {
+        MasterUser user = new MasterUser();
+        if (user.getAccountState() == State.PENDING)
             masterUserRepository.removeMasterUserByEmail(email);
     }
+
     public SlaveUser getUserDetails() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 

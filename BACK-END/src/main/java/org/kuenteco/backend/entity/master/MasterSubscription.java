@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.kuenteco.backend.enums.State;
+import org.kuenteco.backend.enums.SubscriptionType;
 
 import java.sql.Timestamp;
 
@@ -19,15 +20,15 @@ public class MasterSubscription {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "idAccount")
+    @JoinColumn(name = "id_account")
     private MasterAccount masterAccount;
 
-    private String type;
+    private SubscriptionType type;
 
     private Timestamp startDate;
 
     private Timestamp expirationDate;
 
     @Enumerated(EnumType.STRING)
-    private State state = State.INACTIVE;
+    private State state;
 }

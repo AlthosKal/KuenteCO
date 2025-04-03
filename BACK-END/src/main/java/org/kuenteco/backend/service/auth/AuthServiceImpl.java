@@ -1,11 +1,15 @@
-package org.kuenteco.backend.service.jwt;
+package org.kuenteco.backend.service.auth;
 
-import com.sendgrid.*;
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import jakarta.servlet.http.HttpServletResponse;
-import org.kuenteco.backend.dto.auth.*;
+import org.kuenteco.backend.dto.auth.NewUserDTO;
+import org.kuenteco.backend.dto.auth.SendVerificationCodeDTO;
 import org.kuenteco.backend.entity.master.MasterRole;
 import org.kuenteco.backend.entity.master.MasterUser;
 import org.kuenteco.backend.entity.slave.SlaveRole;
@@ -31,8 +35,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.IOException;
@@ -49,7 +51,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final CookieServiceImpl cookieService;
+    private final CookieService cookieService;
     private final UserService userService;
     private final SlaveRoleRepository slaveRoleRepository;
     private final SlaveUserRepository slaveUserRepository;
@@ -73,11 +75,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     public AuthServiceImpl(UserService userService, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
-                           AuthenticationManagerBuilder authenticationManagerBuilder, CookieServiceImpl cookieService,
-                           TokenBlacklistService tokenBlacklistService, SlaveRoleRepository slaveRoleRepository,
-                           SlaveUserRepository slaveUserRepository, UserMapper userMapper, RoleMapper roleMapper,
-                           MasterUserRepository masterUserRepository,
-                           @Qualifier("masterTransactionManager") PlatformTransactionManager masterTransactionManager) {
+            AuthenticationManagerBuilder authenticationManagerBuilder, CookieService cookieService,
+            TokenBlacklistService tokenBlacklistService, SlaveRoleRepository slaveRoleRepository,
+            SlaveUserRepository slaveUserRepository, UserMapper userMapper, RoleMapper roleMapper,
+            MasterUserRepository masterUserRepository,
+            @Qualifier("masterTransactionManager") PlatformTransactionManager masterTransactionManager) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
@@ -114,7 +116,8 @@ public class AuthServiceImpl implements AuthService {
 
         String jwt = jwtUtil.generateToken(authResult);
         cookieService.addHttpOnlyCookie("jwt", jwt, 7 * 24 * 60 * 60, response);
-        return jwt;
+
+        return slaveUser.getSlaveRole().getName().toString();
     }
 
     @Override
@@ -138,8 +141,7 @@ public class AuthServiceImpl implements AuthService {
                 // Nuevo usuario se crea con estado PENDING
                 MasterUser user = new MasterUser(
                         newUserDTO.getEmail(),
-                        passwordEncoder.encode(newUserDTO.getPassword()),
-                        masterRole);
+                        passwordEncoder.encode(newUserDTO.getPassword()), masterRole);
                 user.setAccountState(State.PENDING);
                 user.setVersion(0); // Inicializar versión para bloqueo optimista
 
@@ -239,7 +241,8 @@ public class AuthServiceImpl implements AuthService {
             } catch (OptimisticLockingFailureException e) {
                 // Manejar específicamente fallos de bloqueo optimista
                 status.setRollbackOnly();
-                throw new RuntimeException("Error de concurrencia al activar la cuenta. Por favor, intente nuevamente.", e);
+                throw new RuntimeException("Error de concurrencia al activar la cuenta. Por favor, intente nuevamente.",
+                        e);
             } catch (Exception e) {
                 status.setRollbackOnly();
                 throw new RuntimeException("Error al activar la cuenta: " + e.getMessage(), e);
@@ -253,10 +256,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String changePasswordWithVerification(String email, String code, String newPassword) {
-        if (!validateVerificationCode(email, code)) {
-            throw new RuntimeException("Código de Verificación Inválido");
-        }
-
         // Usar transacción para cambiar la contraseña
         return masterTransactionTemplate.execute(status -> {
             try {
@@ -264,10 +263,21 @@ public class AuthServiceImpl implements AuthService {
                 Optional<MasterUser> masterUserOpt = masterUserRepository.findByEmail(email);
 
                 if (masterUserOpt.isEmpty()) {
-                    throw new RuntimeException("Usuario no encontrado en la base de datos maestra");
+                    throw new RuntimeException("Usuario no encontrado");
                 }
 
                 MasterUser masterUser = masterUserOpt.get();
+
+                // Verificar que la cuenta esté activa
+                if (masterUser.getAccountState() != State.ACTIVE) {
+                    throw new RuntimeException("La cuenta no está activa");
+                }
+
+                // Comprobar política de contraseñas mínimas
+                if (newPassword.length() < 6) {
+                    throw new RuntimeException("La contraseña debe tener al menos 6 caracteres");
+                }
+
                 masterUser.setPassword(passwordEncoder.encode(newPassword));
                 masterUserRepository.save(masterUser);
 
@@ -277,7 +287,8 @@ public class AuthServiceImpl implements AuthService {
                 return "Contraseña actualizada correctamente";
             } catch (OptimisticLockingFailureException e) {
                 status.setRollbackOnly();
-                throw new RuntimeException("Error de concurrencia al cambiar la contraseña. Por favor, intente nuevamente.", e);
+                throw new RuntimeException(
+                        "Error de concurrencia al cambiar la contraseña. Por favor, intente nuevamente.", e);
             } catch (Exception e) {
                 status.setRollbackOnly();
                 throw new RuntimeException("Error al cambiar la contraseña: " + e.getMessage(), e);

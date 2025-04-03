@@ -17,7 +17,7 @@ public class MasterPaymentHistory {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "idPaySubscription")
+    @JoinColumn(name = "id_pay_subscription")
     private MasterPaySubscription masterPaySubscription;
 
     @Column(columnDefinition = "JSONB")

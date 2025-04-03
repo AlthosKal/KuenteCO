@@ -66,6 +66,9 @@ server:
 
 
 spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
   sendgrid:
     api-key: ${SENDGRID_API_KEY}
     email: ${EMAIL_SENDGRID}
