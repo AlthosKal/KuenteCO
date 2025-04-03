@@ -6,7 +6,6 @@ import 'package:kuenteco/widgets/Background_widget.dart';
 // Colores principales
 const kPrimaryPurple = Color(0xFF890cac);
 const kLightPurple = Color(0xFFEDE7F6);
-const kContactPurple = Color(0xFFE1BEE7);
 
 class ContactoPage extends StatefulWidget {
   final bool isLoggedIn;
@@ -103,7 +102,7 @@ class _ContactoPageState extends State<ContactoPage> {
         Text(
           'Contáctanos',
           style: theme.textTheme.headlineMedium?.copyWith(
-            color: kPrimaryPurple,
+            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -112,7 +111,7 @@ class _ContactoPageState extends State<ContactoPage> {
           'Estamos aquí para ayudarte. Completa el formulario y nos pondremos en contacto contigo lo antes posible.',
           textAlign: TextAlign.center,
           style: theme.textTheme.bodyLarge?.copyWith(
-            color: kPrimaryPurple.withOpacity(0.9),
+            color: Colors.white.withOpacity(0.9),
           ),
         ),
       ],
@@ -233,12 +232,12 @@ class _ContactoPageState extends State<ContactoPage> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: Color(0xFF4A148C), size: 20),
+            Icon(icon, color: Colors.white, size: 20),
             const SizedBox(width: 8),
             Text(
               text,
               style: TextStyle(
-                color: Color(0xFF4A148C),
+                color: Colors.white,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -267,18 +266,18 @@ class _ContactoPageState extends State<ContactoPage> {
         }
         return null;
       },
-      style: TextStyle(color: kPrimaryPurple),
+      style: TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: kPrimaryPurple.withOpacity(0.7)),
-        prefixIcon: Icon(icon, color: kPrimaryPurple),
+        labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+        prefixIcon: Icon(icon, color: Colors.white),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: kPrimaryPurple.withOpacity(0.5)),
+          borderSide: BorderSide(color: Colors.white.withOpacity(0.5)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: kPrimaryPurple, width: 2),
+          borderSide: BorderSide(color: Colors.white, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),

@@ -31,7 +31,6 @@ flutter:
   uses-material-design: true
   assets:
     - .env
-    - assets/img/Background.png
     - assets/img/Brand.jpeg
     - assets/img/Logo.png
     - assets/img/Logo 1.png

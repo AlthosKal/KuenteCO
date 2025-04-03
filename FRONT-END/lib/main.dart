@@ -34,8 +34,6 @@ class KuentecoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Kuenteco',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
       initialRoute: '/',
       routes: _appRoutes,
     );
@@ -99,7 +97,7 @@ class HomePage extends StatelessWidget {
           Text(
             'Bienvenido a Kuenteco',
             style: theme.textTheme.headlineMedium?.copyWith(
-              color: Color(0xFF890cac),
+              color: Colors.white,
               shadows: [
                 Shadow(
                   color: Colors.black.withOpacity(0.3),
@@ -116,7 +114,7 @@ class HomePage extends StatelessWidget {
                 'nuestra plataforma está diseñada para ayudarte a alcanzar tus metas financieras de manera sencilla y efectiva.',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyLarge?.copyWith(
-              color: Color(0xFF890cac),
+              color: Colors.white,
             ),
           ),
         ],
