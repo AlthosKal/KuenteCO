@@ -3,6 +3,10 @@ import 'package:kuenteco/widgets/Navbar_guest_widget.dart';
 import 'package:kuenteco/widgets/Footer_widget.dart';
 import 'package:kuenteco/widgets/Background_widget.dart';
 
+// Colores principales
+const kPrimaryPurple = Color(0xFF890cac);
+const kLightPurple = Color(0xFFEDE7F6);
+
 class SuscripcionesPage extends StatefulWidget {
   final bool isLoggedIn;
 
@@ -18,8 +22,6 @@ class SuscripcionesPage extends StatefulWidget {
 class _SuscripcionesPageState extends State<SuscripcionesPage> {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       body: Background(
         child: Column(
@@ -30,14 +32,8 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: _buildHorizontalSubscriptionPlans(context),
-                    ),
-                  ],
-                ),
+                padding: const EdgeInsets.only(top: 8.0, left: 16.0, right: 16.0, bottom: 16.0),
+                child: _buildHorizontalSubscriptionPlans(context),
               ),
             ),
             const Footer(),
@@ -48,8 +44,8 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
   }
 
   Widget _buildHorizontalSubscriptionPlans(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardWidth = screenWidth * 0.15; // Ancho original (30% del ancho de pantalla)
 
     final plans = [
       {
@@ -93,73 +89,81 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
-        children: plans.map((plan) => _buildPlanCard(plan, context)).toList(),
+        children: [
+          const SizedBox(width: 20),
+          ...plans.map((plan) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: _buildPlanCard(plan, cardWidth),
+          )).toList(),
+          const SizedBox(width: 20),
+        ],
       ),
     );
   }
 
-  Widget _buildPlanCard(Map<String, dynamic> plan, BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = screenWidth * 0.15;
-
+  Widget _buildPlanCard(Map<String, dynamic> plan, double cardWidth) {
     return Container(
-      width: cardWidth,
-      height: 450,
-      margin: const EdgeInsets.only(right: 16.0),
+      width: cardWidth, // Usando el ancho original calculado
+      height: 480,
       decoration: BoxDecoration(
-        color: colorScheme.surface.withOpacity(0.3),
+        color: kLightPurple.withOpacity(0.5),
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: colorScheme.surface.withOpacity(0.3), width: 1),
+        border: Border.all(color: kPrimaryPurple.withOpacity(0.3), width: 1),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.primary.withOpacity(0.2),
+            color: kPrimaryPurple.withOpacity(0.2),
             blurRadius: 8,
             spreadRadius: 2,
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               plan['title'] as String,
-              style: theme.textTheme.headlineMedium?.copyWith(
-                color: colorScheme.onSurface,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               plan['description'] as String,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: colorScheme.onSurface.withOpacity(0.9),
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.white.withOpacity(0.9),
               ),
             ),
+            const SizedBox(height: 16),
+            const Divider(color: Colors.white30),
             const SizedBox(height: 16),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: (plan['features'] as List<String>).map((feature) => Padding(
-                    padding: const EdgeInsets.only(bottom: 6.0),
+                    padding: const EdgeInsets.only(bottom: 8.0),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           '• ',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onSurface,
+                          style: TextStyle(
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
                         ),
                         Expanded(
                           child: Text(
                             feature,
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: colorScheme.onSurface,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
                             ),
                           ),
                         ),
@@ -173,38 +177,41 @@ class _SuscripcionesPageState extends State<SuscripcionesPage> {
             Center(
               child: Text(
                 plan['price'] as String,
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontSize: 18,
-                  color: colorScheme.primary,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: kPrimaryPurple,
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
             Center(
               child: ElevatedButton(
                 onPressed: plan['isAcquired'] as bool ? null : () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Suscripción a ${plan['title']} seleccionada'),
-                      backgroundColor: colorScheme.primary,
+                      backgroundColor: kPrimaryPurple,
                     ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: (plan['isAcquired'] as bool)
-                      ? colorScheme.surface
-                      : colorScheme.primary,
+                      ? Colors.grey
+                      : kPrimaryPurple,
                   foregroundColor: (plan['isAcquired'] as bool)
-                      ? colorScheme.primary
-                      : colorScheme.onPrimary,
+                      ? Colors.black
+                      : Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                 ),
                 child: Text(
                   plan['buttonText'] as String,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
+                    fontSize: 16,
                   ),
                 ),
               ),

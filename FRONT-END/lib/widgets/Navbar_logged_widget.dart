@@ -66,21 +66,21 @@ class KuentecoNavbar extends StatelessWidget {
         context,
         'Inicio',
         '/loggedIn',
-        textColor: const Color(0xFFEDE7F6),
+        textColor: Colors.white,
       ),
       const SizedBox(width: 20),
       _buildButton(
         context,
         'Rubros',
         '/pages/Category_view.dart',
-        textColor: const Color(0xFF890cac),
+        textColor: Colors.white,
       ),
       const SizedBox(width: 20),
       _buildButton(
         context,
         'Dashboard',
         '/dashboard',
-        textColor: const Color(0xFF890cac),
+        textColor: Colors.white,
       ),
     ];
   }
