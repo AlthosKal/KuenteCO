@@ -12,13 +12,10 @@ import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.exception.exceptions.AccountException;
 import org.kuenteco.backend.mapper.dto.AccountDetailMapper;
 import org.kuenteco.backend.mapper.dto.NewAccountMapper;
-import org.kuenteco.backend.mapper.entity.AccountMapper;
-import org.kuenteco.backend.mapper.entity.UserMapper;
 import org.kuenteco.backend.repository.master.MasterAccountRepository;
 import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveAccountRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
-import org.kuenteco.backend.service.auth.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -47,7 +44,7 @@ public class AccountServiceImpl implements AccountService {
 
         // Verificar si las cuentas están vacías o nulas
         if (slaveAccount == null || slaveAccount.isEmpty()) {
-            throw new IllegalStateException("No hay cuentas existentes");
+            throw new IllegalStateException("No tienes cuentas registradas");
         }
 
         // Devolver las cuentas del usuario

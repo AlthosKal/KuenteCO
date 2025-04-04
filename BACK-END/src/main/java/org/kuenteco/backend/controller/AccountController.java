@@ -24,7 +24,9 @@ public class AccountController {
         try {
             return new ResponseEntity<>(accountService.getAccounts(), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ApiMessage(e.getMessage()), HttpStatus.NO_CONTENT);
+            return ResponseEntity.ok(new ApiMessage(e.getMessage()));
+        }catch (Throwable e){
+            return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
         }
     }
 
@@ -41,8 +43,7 @@ public class AccountController {
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new ApiMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ApiMessage("Se produjo un error" + e.getMessage()),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.internalServerError().body(new ApiMessage(e.getMessage()));
         }
     }
 
