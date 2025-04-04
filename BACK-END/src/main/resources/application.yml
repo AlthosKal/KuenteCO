@@ -66,9 +66,15 @@ server:
 
 
 spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
   sendgrid:
     api-key: ${SENDGRID_API_KEY}
     email: ${EMAIL_SENDGRID}
+    functions:
+      verify-email: ${VERIFICATION_EMAIL}
+      reset-password: ${RESET_PASSWORD}
   profiles:
     active: master,slave
 
