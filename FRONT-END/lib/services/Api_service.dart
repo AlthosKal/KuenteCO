@@ -3,7 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl = dotenv.get('API_URL', fallback: 'http://localhost:8080/api');
+  final String baseUrl = dotenv.get('API_URL');
   final http.Client _client = http.Client();
   String? _authToken;
 

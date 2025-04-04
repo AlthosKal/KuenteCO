@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kuenteco/services/Api_service.dart';
 import 'package:kuenteco/widgets/Particle_animation_widget.dart';
 import 'package:kuenteco/pages/Register_view.dart';
-import 'Logged_home_view.dart';
+import 'package:kuenteco/pages/logged_home_view.dart';
 import 'Recovery_password_view.dart';
 import 'dart:ui' as ui;
 
