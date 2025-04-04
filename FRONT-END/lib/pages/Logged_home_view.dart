@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kuenteco/widgets/Navbar_logged_widget.dart';
 import 'package:kuenteco/widgets/Footer_widget.dart';
 import 'package:kuenteco/widgets/Background_widget.dart';
+import 'Profiles_view.dart'; // Make sure this import path is correct
 
 class LoggedInHomePage extends StatelessWidget {
   final String title;
@@ -138,7 +139,7 @@ class LoggedInHomePage extends StatelessWidget {
 
   Widget _buildDashboardButton(BuildContext context, ColorScheme colorScheme) {
     return ElevatedButton(
-      onPressed: () => _navigateToDashboard(context),
+      onPressed: () => _navigateToProfiles(context),
       style: ElevatedButton.styleFrom(
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
@@ -148,7 +149,7 @@ class LoggedInHomePage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
       ),
       child: const Text(
-        'Ir a mi Dashboard',
+        'Ver perfiles',
         style: TextStyle(
           fontSize: 16,
         ),
@@ -156,19 +157,18 @@ class LoggedInHomePage extends StatelessWidget {
     );
   }
 
-  void _navigateToDashboard(BuildContext context) {
-    Navigator.pushNamed(context, '/dashboard');
-  }
-}
-
-class InicioLog extends StatelessWidget {
-  const InicioLog({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Página de Inicio')),
-      body: const Center(child: Text('Contenido principal')),
-    );
+  void _navigateToProfiles(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AccountSelectionScreen(),
+      ),
+    ).then((selectedAccount) {
+      if (selectedAccount != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Perfil seleccionado: ${selectedAccount.name}')),
+        );
+      }
+    });
   }
 }
