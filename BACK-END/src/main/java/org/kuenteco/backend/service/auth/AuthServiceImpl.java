@@ -68,7 +68,6 @@
         private final RoleMapper roleMapper;
 
         //SendGrid
-
         @Value("${spring.sendgrid.api-key}")
         private String SENDGRID_API_KEY;
 
