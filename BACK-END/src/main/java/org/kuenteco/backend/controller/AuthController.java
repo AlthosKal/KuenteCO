@@ -149,8 +149,12 @@ public class AuthController {
     }
 
     @GetMapping("/user/details")
-    public ResponseEntity<SlaveUser> getAuthenticatedUser() {
-        SlaveUser user = userService.getUserDetails();
-        return ResponseEntity.ok(user);
+    public Object getAuthenticatedUser() {
+        try{
+            SlaveUser user = userService.getUserDetails();
+            return ResponseEntity.ok(user);
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
+        }
     }
 }
