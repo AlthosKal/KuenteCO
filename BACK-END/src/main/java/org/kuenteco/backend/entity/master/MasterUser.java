@@ -1,5 +1,6 @@
 package org.kuenteco.backend.entity.master;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ public class MasterUser {
     private String email;
 
     @NotBlank
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 

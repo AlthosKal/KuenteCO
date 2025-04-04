@@ -14,7 +14,7 @@ public class SlavePaymentHistory {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "idPaySubscription")
+    @JoinColumn(name = "id_pay_subscription")
     private SlavePaySubscription slavePaySubscription;
 
     @Column(columnDefinition = "JSONB")

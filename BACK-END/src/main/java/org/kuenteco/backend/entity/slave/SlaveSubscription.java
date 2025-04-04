@@ -16,7 +16,7 @@ public class SlaveSubscription {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "idAccount")
+    @JoinColumn(name = "id_account")
     private SlaveAccount slaveAccount;
 
     private String type;
@@ -26,5 +26,5 @@ public class SlaveSubscription {
     private Timestamp expirationDate;
 
     @Enumerated(EnumType.STRING)
-    private State state = State.INACTIVE;
+    private State state;
 }

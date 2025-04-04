@@ -1,5 +1,6 @@
 package org.kuenteco.backend.entity.slave;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class SlaveUser {
     private String email;
 
     @NotBlank
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
@@ -32,6 +34,7 @@ public class SlaveUser {
 
     @Version
     private Integer version;
+
     public SlaveUser(String email, String password, SlaveRole slaveRole) {
         this.email = email;
         this.password = password;

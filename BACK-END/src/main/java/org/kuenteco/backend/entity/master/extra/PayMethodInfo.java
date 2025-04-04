@@ -14,6 +14,9 @@ public class PayMethodInfo {
     @Column(name = "method")
     private String method;
 
-    @Column(columnDefinition = "JSONB")
-    private DescriptionPaymentHistory details;
+    @Column(name = "card_last_four", length = 4)
+    private String cardLastFour;
+
+    @Column(name = "payment_email")
+    private String paymentEmail;
 }

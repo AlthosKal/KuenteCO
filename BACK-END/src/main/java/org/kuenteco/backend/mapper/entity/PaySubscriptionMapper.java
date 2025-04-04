@@ -4,6 +4,7 @@ import org.kuenteco.backend.entity.master.MasterPaySubscription;
 import org.kuenteco.backend.entity.master.MasterSubscription;
 import org.kuenteco.backend.entity.slave.SlavePaySubscription;
 import org.kuenteco.backend.entity.slave.SlaveSubscription;
+import org.kuenteco.backend.enums.SubscriptionType;
 import org.kuenteco.backend.mapper.entity.extra.ExtraClassesMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -28,7 +29,7 @@ public interface PaySubscriptionMapper {
         }
 
         MasterSubscription masterSubscription = new MasterSubscription();
-        masterSubscription.setType(slaveSubscription.getType());
+        masterSubscription.setType(SubscriptionType.valueOf(slaveSubscription.getType()));
         masterSubscription.setState(slaveSubscription.getState());
         masterSubscription.setStartDate(slaveSubscription.getStartDate());
         masterSubscription.setExpirationDate(slaveSubscription.getExpirationDate());
@@ -43,7 +44,7 @@ public interface PaySubscriptionMapper {
         }
 
         SlaveSubscription slaveSubscription = new SlaveSubscription();
-        slaveSubscription.setType(masterSubscription.getType());
+        slaveSubscription.setType(String.valueOf(masterSubscription.getType()));
         slaveSubscription.setState(masterSubscription.getState());
         slaveSubscription.setStartDate(masterSubscription.getStartDate());
         slaveSubscription.setExpirationDate(masterSubscription.getExpirationDate());

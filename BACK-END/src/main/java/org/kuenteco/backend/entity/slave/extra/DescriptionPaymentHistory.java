@@ -1,4 +1,18 @@
 package org.kuenteco.backend.entity.slave.extra;
 
-public class DescriptionPaymentHistory extends org.kuenteco.backend.entity.master.extra.DescriptionPaymentHistory {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class DescriptionPaymentHistory implements Serializable {
+    private String typeSubscription;
+    private String paymentMethod;
+    private BigDecimal amount;
+    private String date;
 }
