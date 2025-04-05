@@ -20,21 +20,24 @@ public class MasterBudget {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "idAccount")
+    @JoinColumn(name = "id_account")
     private MasterAccount masterAccount;
 
     @ManyToOne
-    @JoinColumn(name = "idCategory")
+    @JoinColumn(name = "id_category")
     private MasterCategory masterCategory;
 
     private String name;
 
     private String description;
 
+    @Column(name = "assigned_amount")
     private BigDecimal assignedAmount;
 
+    @Column(name = "start_date")
     private Timestamp startDate;
 
+    @Column(name = "finish_date")
     private Timestamp finishDate;
 
     @Enumerated(EnumType.STRING)

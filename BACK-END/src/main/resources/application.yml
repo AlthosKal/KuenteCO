@@ -1,6 +1,6 @@
 jwt:
   secret: ${JWT_SECRET}
-  expiration: 7200
+  expiration: 86400
 
 management:
   endpoint:
@@ -66,9 +66,6 @@ server:
 
 
 spring:
-  jpa:
-    hibernate:
-      ddl-auto: update
   sendgrid:
     api-key: ${SENDGRID_API_KEY}
     email: ${EMAIL_SENDGRID}

@@ -17,6 +17,9 @@ public class SlaveUser {
 
     @NotBlank
     @Column(unique = true, nullable = false)
+    private String name;
+    @NotBlank
+    @Column(unique = true, nullable = false)
     private String email;
 
     @NotBlank
@@ -35,7 +38,8 @@ public class SlaveUser {
     @Version
     private Integer version;
 
-    public SlaveUser(String email, String password, SlaveRole slaveRole) {
+    public SlaveUser(String name ,String email, String password, SlaveRole slaveRole) {
+        this.name = name;
         this.email = email;
         this.password = password;
         this.slaveRole = slaveRole;

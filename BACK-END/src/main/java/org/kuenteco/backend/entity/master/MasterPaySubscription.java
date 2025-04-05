@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.kuenteco.backend.entity.master.extra.PayMethodInfo;
+import org.kuenteco.backend.entity.master.extra.MasterPayMethodInfo;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -25,9 +25,10 @@ public class MasterPaySubscription {
 
     private BigDecimal amount;
 
+    @Column(name = "pay_date")
     private Timestamp payDate;
 
     @Embedded
     @Column(columnDefinition = "pay_method_info")
-    private PayMethodInfo payMethod;
+    private MasterPayMethodInfo payMethod;
 }

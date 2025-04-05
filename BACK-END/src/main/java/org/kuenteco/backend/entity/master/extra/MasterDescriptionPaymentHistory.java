@@ -5,12 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContentNotification implements Serializable {
-    private String title;
-    private String body;
+public class MasterDescriptionPaymentHistory implements Serializable {
+    private String typeSubscription;
+    private String paymentMethod;
+    private BigDecimal amount;
     private String date;
 }

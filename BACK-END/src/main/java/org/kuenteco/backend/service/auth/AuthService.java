@@ -7,7 +7,7 @@ import org.kuenteco.backend.dto.auth.SendVerificationCodeDTO;
 import java.io.IOException;
 
 public interface AuthService {
-    String authenticate(String username, String password, HttpServletResponse response);
+    String authenticate(String nameOrEmail, String password, HttpServletResponse response);
 
     void registerUser(NewUserDTO newUserDTO);
 

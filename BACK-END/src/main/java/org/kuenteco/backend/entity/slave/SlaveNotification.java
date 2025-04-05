@@ -3,7 +3,8 @@ package org.kuenteco.backend.entity.slave;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.kuenteco.backend.entity.slave.extra.ContentNotification;
+import org.kuenteco.backend.entity.master.MasterAccount;
+import org.kuenteco.backend.entity.slave.extra.SlaveContentNotification;
 
 import java.sql.Timestamp;
 
@@ -16,11 +17,12 @@ public class SlaveNotification {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "idAccount")
-    private SlaveAccount slaveAccount;
+    @JoinColumn(name = "id_account")
+    private SlaveAccount masterAccount;
 
+    @Column(name = "date_send")
     private Timestamp dateSend;
 
     @Column(columnDefinition = "JSONB")
-    private ContentNotification content;
+    private SlaveContentNotification content;
 }

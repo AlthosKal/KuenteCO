@@ -12,17 +12,20 @@ import java.sql.Timestamp;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "ExchangeRate")
-public class ExchangeRate {
+@Table(name = "exchange_rate")
+public class MasterExchangeRate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "base_currency")
     private String baseCurrency;
 
+    @Column(name = "target_currency")
     private String targetCurrency;
 
     private BigDecimal rate;
 
+    @Column(name = "last_updated")
     private Timestamp lastUpdated;
 }

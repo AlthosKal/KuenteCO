@@ -17,15 +17,17 @@ public class SlaveInvestment {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "idAccount")
+    @JoinColumn(name = "id_account")
     private SlaveAccount slaveAccount;
 
     private String type;
 
+    @Column(name = "initial_amount")
     private BigDecimal initialAmount;
 
     private BigDecimal profitability;
 
+    @Column(name = "start_date")
     private Timestamp startDate;
 
     @Enumerated(EnumType.STRING)

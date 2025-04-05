@@ -32,9 +32,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        SlaveUser slaveUser = slaveUserRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
+    public UserDetails loadUserByUsername(String nameOrEmail) throws UsernameNotFoundException {
+        SlaveUser slaveUser;
+        boolean isEmail = nameOrEmail.contains("@");
+
+        if (isEmail) {
+            slaveUser = slaveUserRepository.findByEmail(nameOrEmail)
+                    .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
+        } else {
+            slaveUser = slaveUserRepository.findByName(nameOrEmail)
+                    .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
+        }
+
         MasterUser user = userMapper.slaveToMaster(slaveUser);
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().getName().toString());
 
@@ -43,36 +52,48 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public SlaveUser findByUserName(String email) {
-        SlaveUser slaveUser = slaveUserRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
+    public SlaveUser findByNameOrEmail(String nameOrEmail) {
+        boolean isEmail = nameOrEmail.contains("@");
 
-        return slaveUser = slaveUserRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
+        if (isEmail) {
+            return slaveUserRepository.findByEmail(nameOrEmail)
+                    .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
+        } else {
+            return slaveUserRepository.findByName(nameOrEmail)
+                    .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
+        }
     }
 
-    public boolean existsByUserName(String email) {
+    @Override
+    public boolean existsByUserName(String name) {
+        return slaveUserRepository.existsByName(name);
+    }
+
+    @Override
+    public boolean existsByUserEmail(String email){
         return slaveUserRepository.existsByEmail(email);
     }
 
+    @Override
     public void saveUser(MasterUser user) {
         masterUserRepository.save(user);
     }
 
-    public void deteleUser(MasterUser masterUser) {
-        masterUserRepository.deleteById(masterUser.getId());
-    }
-
+    @Override
     public void deletePendingEmail(String email) {
         MasterUser user = new MasterUser();
         if (user.getAccountState() == State.PENDING)
             masterUserRepository.removeMasterUserByEmail(email);
     }
 
+    @Override
     public SlaveUser getUserDetails() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        String nameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        return findByUserName(email);
+        return findByNameOrEmail(nameOrEmail);
     }
 
+    public void deteleUser(MasterUser masterUser) {
+        masterUserRepository.deleteById(masterUser.getId());
+    }
 }

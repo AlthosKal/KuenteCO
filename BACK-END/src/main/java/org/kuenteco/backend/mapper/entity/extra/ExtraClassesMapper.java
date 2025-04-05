@@ -1,26 +1,28 @@
 package org.kuenteco.backend.mapper.entity.extra;
 
+import org.kuenteco.backend.entity.master.extra.*;
+import org.kuenteco.backend.entity.slave.extra.*;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface ExtraClassesMapper {
     // Mapeo automático para DescriptionPaymentHistory
-    org.kuenteco.backend.entity.master.extra.DescriptionPaymentHistory map(
-            org.kuenteco.backend.entity.slave.extra.DescriptionPaymentHistory source);
+    MasterDescriptionPaymentHistory map(
+            SlaveDescriptionPaymentHistory source);
 
     // Mapeo automático para DescriptionTransaction
-    org.kuenteco.backend.entity.master.extra.DescriptionTransaction map(
-            org.kuenteco.backend.entity.slave.extra.DescriptionTransaction source);
+    MasterDescriptionTransaction map(
+            SlaveDescriptionTransaction source);
 
     // Mapeo automático para ContentNotification
-    org.kuenteco.backend.entity.master.extra.ContentNotification map(
-            org.kuenteco.backend.entity.slave.extra.ContentNotification source);
+    MasterContentNotification map(
+            SlaveContentNotification source);
 
     // Mapeo automático para DescriptionCategory
-    org.kuenteco.backend.entity.master.extra.DescriptionCategory map(
-            org.kuenteco.backend.entity.slave.extra.DescriptionCategory source);
+    MasterDescriptionCategory map(
+            SlaveDescriptionCategory source);
 
     // Mapeo automático para PayMethodInfo
-    org.kuenteco.backend.entity.master.extra.PayMethodInfo map(
-            org.kuenteco.backend.entity.slave.extra.PayMethodInfo source);
+    MasterPayMethodInfo map(
+            SlavePayMethodInfo source);
 }

@@ -7,15 +7,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public interface UserService extends UserDetailsService {
-    UserDetails loadUserByUsername(String email) throws UsernameNotFoundException;
-
-    SlaveUser findByUserName(String email);
-
-    boolean existsByUserName(String email);
-
+    UserDetails loadUserByUsername(String nameOrEmail) throws UsernameNotFoundException;
+    SlaveUser findByNameOrEmail(String nameOrEmail);
+    boolean existsByUserName(String name);
+    boolean existsByUserEmail(String email);
     void saveUser(MasterUser user);
-
     void deletePendingEmail(String email);
-
     SlaveUser getUserDetails();
 }

@@ -9,8 +9,8 @@ import org.kuenteco.backend.entity.master.MasterAccount;
 import org.kuenteco.backend.entity.master.MasterPaySubscription;
 import org.kuenteco.backend.entity.master.MasterPaymentHistory;
 import org.kuenteco.backend.entity.master.MasterSubscription;
-import org.kuenteco.backend.entity.master.extra.DescriptionPaymentHistory;
-import org.kuenteco.backend.entity.master.extra.PayMethodInfo;
+import org.kuenteco.backend.entity.master.extra.MasterDescriptionPaymentHistory;
+import org.kuenteco.backend.entity.master.extra.MasterPayMethodInfo;
 import org.kuenteco.backend.entity.slave.SlavePaySubscription;
 import org.kuenteco.backend.entity.slave.SlaveSubscription;
 import org.kuenteco.backend.enums.State;
@@ -92,7 +92,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         paySubscription.setPayDate(now);
 
         // Inicializar el método de pago
-        PayMethodInfo payMethodInfo = new PayMethodInfo();
+        MasterPayMethodInfo payMethodInfo = new MasterPayMethodInfo();
         // Configurar payMethodInfo según sea necesario
         paySubscription.setPayMethod(payMethodInfo);
 
@@ -156,7 +156,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             MasterPaymentHistory history = new MasterPaymentHistory();
             history.setMasterPaySubscription(paySubscription);
 
-            DescriptionPaymentHistory details = new DescriptionPaymentHistory();
+            MasterDescriptionPaymentHistory details = new MasterDescriptionPaymentHistory();
             details.setTypeSubscription("Cambio de " + previousType + " a " + subscription.getType());
             details.setPaymentMethod(paySubscription.getPayMethod() != null ?
                     paySubscription.getPayMethod().toString() : "N/A");

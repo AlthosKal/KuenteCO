@@ -23,10 +23,13 @@ public class MasterSubscription {
     @JoinColumn(name = "id_account")
     private MasterAccount masterAccount;
 
+    @Column(columnDefinition = "VARCHAR(10)")
     private SubscriptionType type;
 
+    @Column(name = "start_date")
     private Timestamp startDate;
 
+    @Column(name = "expiration_date")
     private Timestamp expirationDate;
 
     @Enumerated(EnumType.STRING)

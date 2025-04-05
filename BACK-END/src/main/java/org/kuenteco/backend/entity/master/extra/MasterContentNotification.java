@@ -9,9 +9,8 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DescriptionTransaction implements Serializable {
-    private String contentTitle;
-    private String description;
-    private String typeTransaction;
-    private String contentDetails;
+public class MasterContentNotification implements Serializable {
+    private String title;
+    private String body;
+    private String date;
 }

@@ -1,0 +1,31 @@
+package org.kuenteco.backend.entity.slave.extra;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+
+@Data
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "exchange_rate")
+public class SlaveExchangeRate {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "base_currency")
+    private String baseCurrency;
+
+    @Column(name = "target_currency")
+    private String targetCurrency;
+
+    private BigDecimal rate;
+
+    @Column(name = "last_updated")
+    private Timestamp lastUpdated;
+}

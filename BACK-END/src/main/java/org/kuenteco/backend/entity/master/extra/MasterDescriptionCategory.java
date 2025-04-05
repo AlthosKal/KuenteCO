@@ -10,9 +10,10 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DescriptionPaymentHistory implements Serializable {
-    private String typeSubscription;
-    private String paymentMethod;
-    private BigDecimal amount;
-    private String date;
+public class MasterDescriptionCategory implements Serializable {
+    private String name;
+    private BigDecimal assignedBudget;
+    private String startDate;
+    private String finishDate;
+    private String state;
 }

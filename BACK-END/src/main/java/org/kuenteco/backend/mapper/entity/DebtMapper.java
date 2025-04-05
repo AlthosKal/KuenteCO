@@ -8,10 +8,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", uses = AccountMapper.class)
 public interface DebtMapper {
 
-    @Mapping(source = "slaveAccount", target = "masterAccount")
     @Mapping(target = "id", ignore = true)
     MasterDebt slaveToMaster(SlaveDebt slaveDebt);
 
-    @Mapping(source = "masterAccount", target = "slaveAccount")
     SlaveDebt masterToSlave(MasterDebt masterDebt);
 }

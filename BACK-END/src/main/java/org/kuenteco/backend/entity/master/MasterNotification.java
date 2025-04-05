@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.kuenteco.backend.entity.master.extra.ContentNotification;
+import org.kuenteco.backend.entity.master.extra.MasterContentNotification;
 
 import java.sql.Timestamp;
 
@@ -19,11 +19,12 @@ public class MasterNotification {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "idAccount")
+    @JoinColumn(name = "id_account")
     private MasterAccount masterAccount;
 
+    @Column(name = "date_send")
     private Timestamp dateSend;
 
     @Column(columnDefinition = "JSONB")
-    private ContentNotification content;
+    private MasterContentNotification content;
 }

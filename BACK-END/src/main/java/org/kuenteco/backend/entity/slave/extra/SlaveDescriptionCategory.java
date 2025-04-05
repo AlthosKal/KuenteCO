@@ -1,4 +1,4 @@
-package org.kuenteco.backend.entity.master.extra;
+package org.kuenteco.backend.entity.slave.extra;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,10 +10,11 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DescriptionCategory implements Serializable {
+public class SlaveDescriptionCategory implements Serializable {
     private String name;
     private BigDecimal assignedBudget;
     private String startDate;
     private String finishDate;
     private String state;
 }
+

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.kuenteco.backend.entity.master.extra.DescriptionPaymentHistory;
+import org.kuenteco.backend.entity.master.extra.MasterDescriptionPaymentHistory;
 
 @Data
 @Entity
@@ -21,5 +21,5 @@ public class MasterPaymentHistory {
     private MasterPaySubscription masterPaySubscription;
 
     @Column(columnDefinition = "JSONB")
-    private DescriptionPaymentHistory details;
+    private MasterDescriptionPaymentHistory details;
 }

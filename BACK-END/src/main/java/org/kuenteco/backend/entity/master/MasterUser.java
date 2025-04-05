@@ -16,8 +16,13 @@ import org.kuenteco.backend.enums.State;
 public class MasterUser {
 
     @Id
+    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    @NotBlank
+    @Column(unique = true, nullable = false)
+    private String name;
 
     @NotBlank
     @Column(unique = true, nullable = false)
@@ -39,7 +44,8 @@ public class MasterUser {
     @Version
     private Integer version;
 
-    public MasterUser(String email, String password, MasterRole role) {
+    public MasterUser(String name ,String email, String password, MasterRole role) {
+        this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;

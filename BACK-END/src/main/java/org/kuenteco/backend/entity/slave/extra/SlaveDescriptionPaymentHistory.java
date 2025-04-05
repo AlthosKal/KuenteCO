@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DescriptionPaymentHistory implements Serializable {
+public class SlaveDescriptionPaymentHistory implements Serializable {
     private String typeSubscription;
     private String paymentMethod;
     private BigDecimal amount;
