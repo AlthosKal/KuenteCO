@@ -20,17 +20,21 @@ public class MasterDebt {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "idAccount")
+    @JoinColumn(name = "id_account")
     private MasterAccount masterAccount;
 
     private String name;
 
+    @Column(name = "total_amount")
     private BigDecimal totalAmount;
 
+    @Column(name = "pending_amount")
     private BigDecimal pendingAmount;
 
+    @Column(name = "start_date")
     private Timestamp startDate;
 
+    @Column(name = "expiration_date")
     private Timestamp expirationDate;
 
     @Enumerated(EnumType.STRING)

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.kuenteco.backend.entity.master.extra.DescriptionTransaction;
+import org.kuenteco.backend.entity.master.extra.MasterDescriptionTransaction;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -20,19 +20,20 @@ public class MasterTransaction {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "idAccount")
+    @JoinColumn(name = "id_account")
     private MasterAccount masterAccount;
 
     @ManyToOne
-    @JoinColumn(name = "idCategory")
+    @JoinColumn(name = "id_category")
     private MasterCategory masterCategory;
 
     private String type;
 
     private BigDecimal amount;
 
+    @Column(name = "transaction_date")
     private Timestamp transactionDate;
 
     @Column(columnDefinition = "JSONB")
-    private DescriptionTransaction description;
+    private MasterDescriptionTransaction description;
 }

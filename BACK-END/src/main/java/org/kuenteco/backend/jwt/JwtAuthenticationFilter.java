@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String email = null;
+        String nameOrEmail = null;
         String jwt = null;
         try {
             jwt = getJWT(request);
@@ -46,11 +46,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token invalidado");
                     return;
                 }
-                email = jwtUtil.extractEmail(jwt);
+                nameOrEmail = jwtUtil.extractEmail(jwt);
             }
 
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userService.loadUserByUsername(email);
+            if (nameOrEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userService.loadUserByUsername(nameOrEmail);
 
                 if (jwtUtil.validateToken(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(

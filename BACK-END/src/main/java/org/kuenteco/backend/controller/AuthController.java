@@ -35,7 +35,7 @@ public class AuthController {
         }
 
         try {
-            String token = authService.authenticate(loginUserDTO.getEmail(), loginUserDTO.getPassword(), response);
+            String role = authService.authenticate(loginUserDTO.getNameOrEmail(), loginUserDTO.getPassword(), response);
             return ResponseEntity.ok(new ApiMessage("Inicio de sesión exitoso"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
@@ -79,7 +79,7 @@ public class AuthController {
             if (isValid) {
                 return ResponseEntity.ok(new ApiMessage("Código de verificación valido"));
             }
-            return ResponseEntity.badRequest().body(new ApiMessage("Código de verificación valido"));
+            return ResponseEntity.badRequest().body(new ApiMessage("Código de verificación invalido"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
         }

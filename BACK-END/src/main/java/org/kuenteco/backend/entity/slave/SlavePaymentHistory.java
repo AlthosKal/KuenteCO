@@ -3,7 +3,7 @@ package org.kuenteco.backend.entity.slave;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.kuenteco.backend.entity.slave.extra.DescriptionPaymentHistory;
+import org.kuenteco.backend.entity.slave.extra.SlaveDescriptionPaymentHistory;
 
 @Data
 @Entity
@@ -18,5 +18,5 @@ public class SlavePaymentHistory {
     private SlavePaySubscription slavePaySubscription;
 
     @Column(columnDefinition = "JSONB")
-    private DescriptionPaymentHistory details;
+    private SlaveDescriptionPaymentHistory details;
 }

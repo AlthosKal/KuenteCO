@@ -21,9 +21,12 @@ public class SlaveSubscription {
 
     private String type;
 
+    @Column(name = "start_date")
     private Timestamp startDate;
 
+    @Column(name = "expiration_date")
     private Timestamp expirationDate;
+
 
     @Enumerated(EnumType.STRING)
     private State state;

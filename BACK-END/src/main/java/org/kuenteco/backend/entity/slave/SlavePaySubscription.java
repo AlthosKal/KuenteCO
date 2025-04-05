@@ -3,7 +3,7 @@ package org.kuenteco.backend.entity.slave;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.kuenteco.backend.entity.slave.extra.PayMethodInfo;
+import org.kuenteco.backend.entity.slave.extra.SlavePayMethodInfo;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -22,9 +22,10 @@ public class SlavePaySubscription {
 
     private BigDecimal amount;
 
+    @Column(name = "pay_date")
     private Timestamp payDate;
 
     @Embedded
     @Column(columnDefinition = "pay_method_info")
-    private PayMethodInfo payMethod;
+    private SlavePayMethodInfo payMethod;
 }

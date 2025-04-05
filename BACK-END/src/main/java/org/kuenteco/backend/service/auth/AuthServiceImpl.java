@@ -111,17 +111,29 @@
         }
 
         @Override
-        public String authenticate(String email, String password, HttpServletResponse response) {
+        public String authenticate(String nameOrEmail, String password, HttpServletResponse response) {
             // Verificar si la cuenta está activa antes de autenticar
-            SlaveUser slaveUser = slaveUserRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            // Determinar si es un email o nombre de usuario
+            boolean isEmail = nameOrEmail.contains("@");
+
+            SlaveUser slaveUser;
+            if (isEmail) {
+                slaveUser = slaveUserRepository.findByEmail(nameOrEmail)
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            } else {
+                slaveUser = slaveUserRepository.findByName(nameOrEmail)
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            }
 
             MasterUser user = userMapper.slaveToMaster(slaveUser);
             if (user.getAccountState() != State.ACTIVE) {
                 throw new RuntimeException("Cuenta no activada. Por favor verifica tu correo");
             }
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email,
+            // Usar el email para la autenticación de Spring Security
+            String emailForAuth = slaveUser.getEmail();
+
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(emailForAuth,
                     password);
             Authentication authResult = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authResult);
@@ -134,9 +146,14 @@
 
         @Override
         public void registerUser(NewUserDTO newUserDTO) {
-            if (userService.existsByUserName(newUserDTO.getEmail())) {
-                throw new IllegalArgumentException("Datos Inválidos, correo incorrecto o ya existente");
+            if (userService.existsByUserName(newUserDTO.getName())) {
+                throw new IllegalArgumentException("Datos Inválidos, nombre con caracteres no permitidos o ya existente");
             }
+            if (userService.existsByUserEmail(newUserDTO.getEmail())) {
+                throw new IllegalArgumentException("Datos Inválidos, correo con caracteres no permitidos o ya existente");
+            }
+
+            log.info("Intentando registrar nuevo usuario: {}", newUserDTO.getEmail());
 
             SlaveRole slaveRole = slaveRoleRepository.findByName(RoleList.ROLE_USER)
                     .orElseThrow(() -> new RuntimeException("Role no encontrado"));
@@ -152,6 +169,7 @@
                 try {
                     // Nuevo usuario se crea con estado PENDING
                     MasterUser user = new MasterUser(
+                            newUserDTO.getName(),
                             newUserDTO.getEmail(),
                             passwordEncoder.encode(newUserDTO.getPassword()), masterRole);
                     user.setAccountState(State.PENDING);

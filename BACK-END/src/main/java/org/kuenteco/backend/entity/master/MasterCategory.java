@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.kuenteco.backend.entity.master.extra.DescriptionCategory;
+import org.kuenteco.backend.entity.master.extra.MasterDescriptionCategory;
 import org.kuenteco.backend.enums.State;
 
 import java.sql.Timestamp;
@@ -20,18 +20,21 @@ public class MasterCategory {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "idAccount")
+    @JoinColumn(name = "id_account")
     private MasterAccount masterAccount;
 
     private String name;
 
     @Column(columnDefinition = "JSONB")
-    private DescriptionCategory description;
+    private MasterDescriptionCategory description;
 
+    @Column(name = "assigned_budget")
     private double assignedBudget;
 
+    @Column(name = "start_date")
     private Timestamp startDate;
 
+    @Column(name = "finish_date")
     private Timestamp finishDate;
 
     @Enumerated(EnumType.STRING)

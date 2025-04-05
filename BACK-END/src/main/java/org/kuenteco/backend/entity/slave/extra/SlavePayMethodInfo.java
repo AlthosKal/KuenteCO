@@ -1,4 +1,4 @@
-package org.kuenteco.backend.entity.master.extra;
+package org.kuenteco.backend.entity.slave.extra;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
-public class PayMethodInfo {
+public class SlavePayMethodInfo {
     @Column(name = "method")
     private String method;
 

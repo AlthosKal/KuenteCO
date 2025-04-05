@@ -1,4 +1,4 @@
-master:
+spring:
   config:
     activate:
       on-profile: master
@@ -13,7 +13,6 @@ master:
       idle-timeout: 20000
       connection-timeout: 10000
       max-lifetime: 1800000
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -25,6 +24,7 @@ master:
         jdbc:
           lob:
             non_contextual_creation: true
+    open-in-view: false
 
 logging:
   level:

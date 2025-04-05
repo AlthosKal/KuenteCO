@@ -42,8 +42,6 @@ public class SlaveDataSourceConfig {
         em.setJpaVendorAdapter(vendorAdapter);
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.show-sql", environment.getProperty("slave.jpa.properties.hibernate.show_sql"));
-
         em.setJpaPropertyMap(properties);
 
         return em;
