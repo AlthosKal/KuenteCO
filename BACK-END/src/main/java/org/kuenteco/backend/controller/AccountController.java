@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import org.kuenteco.backend.dto.ApiMessage;
 import org.kuenteco.backend.dto.account.NewAccountDTO;
 import org.kuenteco.backend.dto.image.ImageDTO;
-import org.kuenteco.backend.entity.master.MasterAccount;
+import org.kuenteco.backend.entity.Account;
 import org.kuenteco.backend.jwt.JwtUtil;
 import org.kuenteco.backend.repository.master.MasterAccountRepository;
 import org.kuenteco.backend.service.account.AccountService;
@@ -55,7 +55,7 @@ public class AccountController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiMessage> deleteAccount(MasterAccount account) {
+    public ResponseEntity<ApiMessage> deleteAccount(Account account) {
         try {
             accountService.deleteAccount(account);
             return ResponseEntity.status(HttpStatus.OK).body(new ApiMessage("Cuenta eliminada correctamente"));
@@ -78,11 +78,11 @@ public class AccountController {
             String username = jwtUtil.extractEmail(jwtToken);
 
             // Buscar la cuenta y verificar que pertenezca al usuario
-            MasterAccount account = masterAccountRepository.findById(accountId)
+            Account account = masterAccountRepository.findById(accountId)
                     .orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
 
             // Verificar que la cuenta pertenece al usuario autenticado
-            if (!account.getMasterUser().getName().equals(username)) {
+            if (!account.getUser().getName().equals(username)) {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
 
@@ -105,11 +105,11 @@ public class AccountController {
             String username = jwtUtil.extractEmail(jwtToken);
 
             // Buscar la cuenta y verificar que pertenezca al usuario
-            MasterAccount account = masterAccountRepository.findById(accountId)
+            Account account = masterAccountRepository.findById(accountId)
                     .orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
 
             // Verificar que la cuenta pertenece al usuario autenticado
-            if (!account.getMasterUser().getName().equals(username)) {
+            if (!account.getUser().getName().equals(username)) {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
 
@@ -131,11 +131,11 @@ public class AccountController {
             String username = jwtUtil.extractEmail(jwtToken);
 
             // Buscar la cuenta y verificar que pertenezca al usuario
-            MasterAccount account = masterAccountRepository.findById(accountId)
+            Account account = masterAccountRepository.findById(accountId)
                     .orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
 
             // Verificar que la cuenta pertenece al usuario autenticado
-            if (!account.getMasterUser().getName().equals(username)) {
+            if (!account.getUser().getName().equals(username)) {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
 

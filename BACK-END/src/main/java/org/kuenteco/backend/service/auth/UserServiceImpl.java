@@ -1,11 +1,7 @@
 package org.kuenteco.backend.service.auth;
 
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.kuenteco.backend.entity.master.MasterUser;
-import org.kuenteco.backend.entity.slave.SlaveUser;
+import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.State;
-import org.kuenteco.backend.mapper.entity.UserMapper;
 import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,29 +17,25 @@ import java.util.Collections;
 public class UserServiceImpl implements UserService {
     private final SlaveUserRepository slaveUserRepository;
     private final MasterUserRepository masterUserRepository;
-    private final UserMapper userMapper;
 
     @Autowired
-    public UserServiceImpl(SlaveUserRepository slaveUserRepository, MasterUserRepository masterUserRepository, UserMapper userMapper) {
+    public UserServiceImpl(SlaveUserRepository slaveUserRepository, MasterUserRepository masterUserRepository) {
         this.slaveUserRepository = slaveUserRepository;
         this.masterUserRepository = masterUserRepository;
-        this.userMapper = userMapper;
     }
 
     @Override
     public UserDetails loadUserByUsername(String nameOrEmail) throws UsernameNotFoundException {
-        SlaveUser slaveUser;
+        User user;
         boolean isEmail = nameOrEmail.contains("@");
 
         if (isEmail) {
-            slaveUser = slaveUserRepository.findByEmail(nameOrEmail)
+            user = slaveUserRepository.findByEmail(nameOrEmail)
                     .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
         } else {
-            slaveUser = slaveUserRepository.findByName(nameOrEmail)
+            user = slaveUserRepository.findByName(nameOrEmail)
                     .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
         }
-
-        MasterUser user = userMapper.slaveToMaster(slaveUser);
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().getName().toString());
 
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
@@ -52,9 +44,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException {
-        SlaveUser slaveUser = slaveUserRepository.findByEmail(email)
+        User user = slaveUserRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
-        MasterUser user = userMapper.slaveToMaster(slaveUser);
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().getName().toString());
 
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
@@ -62,19 +53,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public SlaveUser findByUserName(String name) {
+    public User findByUserName(String name) {
         return slaveUserRepository.findByName(name)
                 .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
     }
 
     @Override
-    public SlaveUser findByEmail(String email) {
+    public User findByEmail(String email) {
         return slaveUserRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
     }
 
     @Override
-    public SlaveUser findByNameOrEmail(String nameOrEmail) {
+    public User findByNameOrEmail(String nameOrEmail) {
         boolean isEmail = nameOrEmail.contains("@");
 
         if (isEmail) {
@@ -97,25 +88,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveUser(MasterUser user) {
+    public void saveUser(User user) {
         masterUserRepository.save(user);
     }
 
     @Override
     public void deletePendingEmail(String email) {
-        MasterUser user = new MasterUser();
+        User user = new User();
         if (user.getAccountState() == State.PENDING)
-            masterUserRepository.removeMasterUserByEmail(email);
+            masterUserRepository.removeUserByEmail(email);
     }
 
     @Override
-    public SlaveUser getUserDetails() {
+    public User getUserDetails() {
         String nameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
         return findByNameOrEmail(nameOrEmail);
     }
 
-    public void deteleUser(MasterUser masterUser) {
+    public void deteleUser(User masterUser) {
         masterUserRepository.deleteById(masterUser.getId());
     }
 }

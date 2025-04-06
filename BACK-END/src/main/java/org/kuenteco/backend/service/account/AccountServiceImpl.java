@@ -5,17 +5,15 @@ import lombok.RequiredArgsConstructor;
 import org.kuenteco.backend.dto.account.AccountDetailDTO;
 import org.kuenteco.backend.dto.account.NewAccountDTO;
 import org.kuenteco.backend.dto.image.ImageDTO;
-import org.kuenteco.backend.entity.master.MasterAccount;
-import org.kuenteco.backend.entity.master.MasterSubscription;
-import org.kuenteco.backend.entity.master.MasterUser;
-import org.kuenteco.backend.entity.master.extra.MasterImage;
-import org.kuenteco.backend.entity.slave.SlaveAccount;
-import org.kuenteco.backend.entity.slave.SlaveUser;
+import org.kuenteco.backend.entity.Account;
+import org.kuenteco.backend.entity.Subscription;
+import org.kuenteco.backend.entity.User;
+import org.kuenteco.backend.entity.extra.Image;
 import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.exception.exceptions.AccountException;
-import org.kuenteco.backend.mapper.dto.AccountDetailMapper;
-import org.kuenteco.backend.mapper.dto.ImageMapper;
-import org.kuenteco.backend.mapper.dto.NewAccountMapper;
+import org.kuenteco.backend.mapper.AccountDetailMapper;
+import org.kuenteco.backend.mapper.ImageMapper;
+import org.kuenteco.backend.mapper.NewAccountMapper;
 import org.kuenteco.backend.repository.master.MasterAccountRepository;
 import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveAccountRepository;
@@ -36,7 +34,7 @@ public class AccountServiceImpl implements AccountService {
     private final SlaveAccountRepository slaveAccountRepository;
     private final SlaveUserRepository slaveUserRepository;
     private final ImageService imageService;
-    private MasterSubscription masterSubscription;
+    private Subscription masterSubscription;
     private final NewAccountMapper newAccountMapper;
     private final ImageMapper imageMapper;
     private final MasterUserRepository masterUserRepository;
@@ -45,23 +43,23 @@ public class AccountServiceImpl implements AccountService {
     public List<AccountDetailDTO> getAccounts() {
         // Obtener el usuario autenticado
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        SlaveUser user = slaveUserRepository.findByEmail(authentication.getName())
+        User user = slaveUserRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         // Obtener las cuentas del usuario
-        List<SlaveAccount> slaveAccount = slaveAccountRepository.findBySlaveUser(user);
+        List<Account> account = slaveAccountRepository.findByUser(user);
 
         // Verificar si las cuentas están vacías o nulas
-        if (slaveAccount == null || slaveAccount.isEmpty()) {
+        if (account == null || account.isEmpty()) {
             throw new IllegalStateException("No tienes cuentas registradas");
         }
 
         // Devolver las cuentas del usuario
-        return accountDetailMapper.toDto(slaveAccount);
+        return accountDetailMapper.toDto(account);
     }
 
     public void registerAccount(NewAccountDTO newAccountDTO, String username) {
-        MasterUser user = masterUserRepository.findByEmail(username)
+        User user = masterUserRepository.findByEmail(username)
                 .orElseThrow(() -> new AccountException("Usuario no encontrado"));
 
         if (existsByAccountName(newAccountDTO.getName()) && masterSubscription.getState() == State.INACTIVE)
@@ -70,8 +68,8 @@ public class AccountServiceImpl implements AccountService {
         if (existsByAccountName(newAccountDTO.getName()))
             throw new AccountException("Cuenta con este nombre ya existente");
 
-        MasterAccount account = newAccountMapper.toMasterAccount(newAccountDTO);
-        account.setMasterUser(user);
+        Account account = newAccountMapper.toAccount(newAccountDTO);
+        account.setUser(user);
 
         masterAccountRepository.save(account);
     }
@@ -80,24 +78,24 @@ public class AccountServiceImpl implements AccountService {
         return slaveAccountRepository.existsByName(name);
     }
 
-    public void deleteAccount(MasterAccount account) {
+    public void deleteAccount(Account account) {
         masterAccountRepository.delete(account);
     }
 
     @Override
-    public ImageDTO saveImage(MultipartFile image, MasterAccount masterAccount, HttpServletResponse response) {
+    public ImageDTO saveImage(MultipartFile image, Account masterAccount, HttpServletResponse response) {
         try {
             // Verificar si ya tiene una imagen previa
-            if (masterAccount.getMasterImage() != null) {
+            if (masterAccount.getUser() != null) {
                 throw new RuntimeException("La cuenta ya tiene una imagen asociada. Utilice updateImage para actualizarla.");
             }
 
             // Subir la nueva imagen
-            MasterImage masterImage = imageService.uploadImage(image);
-            masterAccount.setMasterImage(masterImage);
+            Image newImage = imageService.uploadImage(image);
+            masterAccount.setImage(newImage);
             masterAccountRepository.save(masterAccount);
 
-            return imageMapper.toDTO(masterImage);
+            return imageMapper.toDTO(newImage);
         } catch (IOException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             throw new RuntimeException("Error al guardar la imagen de la cuenta: " + e.getMessage());
@@ -105,22 +103,22 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public ImageDTO updateImage(MultipartFile image, MasterAccount masterAccount, HttpServletResponse response) {
+    public ImageDTO updateImage(MultipartFile image, Account account, HttpServletResponse response) {
         try {
             // Verificar si tiene imagen para actualizar
-            if (masterAccount.getMasterImage() == null) {
+            if (account.getImage() == null) {
                 throw new RuntimeException("La cuenta no tiene una imagen para actualizar.");
             }
 
             // Eliminar la imagen anterior
-            imageService.deleteImage(masterAccount.getMasterImage());
+            imageService.deleteImage(account.getImage());
 
             // Subir la nueva imagen
-            MasterImage masterImage = imageService.uploadImage(image);
-            masterAccount.setMasterImage(masterImage);
-            masterAccountRepository.save(masterAccount);
+            Image newImage = imageService.uploadImage(image);
+            account.setImage(newImage);
+            masterAccountRepository.save(account);
 
-            return imageMapper.toDTO(masterImage);
+            return imageMapper.toDTO(newImage);
         } catch (IOException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             throw new RuntimeException("Error al actualizar la imagen de la cuenta: " + e.getMessage());
@@ -128,17 +126,17 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void deleteImage(MasterAccount masterAccount, HttpServletResponse response) {
+    public void deleteImage(Account account, HttpServletResponse response) {
         try {
             // Verificar si tiene imagen para eliminar
-            if (masterAccount.getMasterImage() == null) {
+            if (account.getImage() == null) {
                 throw new RuntimeException("La cuenta no tiene una imagen para eliminar.");
             }
 
             // Eliminar la imagen
-            MasterImage imageToDelete = masterAccount.getMasterImage();
-            masterAccount.setMasterImage(null);
-            masterAccountRepository.save(masterAccount);
+            Image imageToDelete = account.getImage();
+            account.setImage(null);
+            masterAccountRepository.save(account);
 
             imageService.deleteImage(imageToDelete);
 

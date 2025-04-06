@@ -1,11 +1,11 @@
 package org.kuenteco.backend.service.image;
 
-import org.kuenteco.backend.entity.master.extra.MasterImage;
+import org.kuenteco.backend.entity.extra.Image;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
 public interface ImageService {
-    MasterImage uploadImage(MultipartFile file) throws IOException;
-    void deleteImage(MasterImage image) throws IOException;
+    Image uploadImage(MultipartFile file) throws IOException;
+    void deleteImage(Image image) throws IOException;
 }

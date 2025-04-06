@@ -19,7 +19,9 @@ import java.util.Map;
 @Primary
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = "org.kuenteco.backend.repository.master", entityManagerFactoryRef = "masterEntityManagerFactory", transactionManagerRef = "masterTransactionManager")
+@EnableJpaRepositories(basePackages = "org.kuenteco.backend.repository.master",
+        entityManagerFactoryRef = "masterEntityManagerFactory",
+        transactionManagerRef = "masterTransactionManager")
 public class MasterDataSourceConfig {
     @Autowired
     private Environment environment;
@@ -39,7 +41,7 @@ public class MasterDataSourceConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
-        em.setPackagesToScan("org.kuenteco.backend.entity.master");
+        em.setPackagesToScan("org.kuenteco.backend.entity");
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         vendorAdapter.setGenerateDdl(true); // Importante para permitir a Hibernate generar DDL

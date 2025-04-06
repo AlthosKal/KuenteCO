@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.kuenteco.backend.dto.ApiMessage;
 import org.kuenteco.backend.dto.subscription.AddSubscriptionDTO;
 import org.kuenteco.backend.dto.subscription.UpdateSubscriptionDTO;
-import org.kuenteco.backend.entity.master.MasterSubscription;
+import org.kuenteco.backend.entity.Subscription;
 import org.kuenteco.backend.service.subscription.SubscriptionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +55,7 @@ public class SubscriptionController {
     }
 
     @DeleteMapping("/{id}/delete")
-    public ResponseEntity<ApiMessage> cancelSubscription(MasterSubscription subscription) {
+    public ResponseEntity<ApiMessage> cancelSubscription(Subscription subscription) {
         try {
             subscriptionService.cancelSubscription(subscription);
             return ResponseEntity.status(HttpStatus.OK).body(new ApiMessage("Subscripción cancelada correctamente"));

@@ -17,7 +17,7 @@ public class DatabaseConfig {
     @Primary
     public EntityManagerFactoryBuilder entityManagerFactoryBuilder() {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-        vendorAdapter.setGenerateDdl(false);
+        vendorAdapter.setGenerateDdl(true);
         return new EntityManagerFactoryBuilder(vendorAdapter, new HashMap<>(), null);
     }
 }
