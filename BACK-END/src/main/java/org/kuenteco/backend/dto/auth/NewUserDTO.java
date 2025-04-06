@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.kuenteco.backend.dto.image.ImageDTO;
 
 @Data
 @AllArgsConstructor

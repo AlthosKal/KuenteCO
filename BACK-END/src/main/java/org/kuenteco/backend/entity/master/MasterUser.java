@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.kuenteco.backend.entity.master.extra.MasterImage;
 import org.kuenteco.backend.enums.State;
 
 @Data
@@ -43,6 +44,10 @@ public class MasterUser {
 
     @Version
     private Integer version;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_image", referencedColumnName = "id")
+    private MasterImage masterImage;
 
     public MasterUser(String name ,String email, String password, MasterRole role) {
         this.name = name;

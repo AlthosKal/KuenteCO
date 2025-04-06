@@ -6,6 +6,7 @@ slave:
     url: ${SPRING_DATASOURCE_URL_SLAVE}
     username: ${SPRING_DATASOURCE_USERNAME_SLAVE}
     password: ${SPRING_DATASOURCE_PASSWORD_SLAVE}
+    driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 50
       minimum-idle: 5

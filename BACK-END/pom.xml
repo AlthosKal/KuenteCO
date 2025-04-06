@@ -165,12 +165,25 @@
             <version>${jansi.version}</version>
         </dependency>
 
+        <!--Dotenv para la inyección de credenciales -->
         <dependency>
             <groupId>io.github.cdimascio</groupId>
             <artifactId>dotenv-java</artifactId>
             <version>2.3.2</version>
         </dependency>
 
+        <!--API de Cloudinary-->
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-core</artifactId>
+            <version>1.32.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http44</artifactId>
+            <version>1.32.0</version>
+        </dependency>
     </dependencies>
 
     <!-- Sección de configuración de construcción del proyecto -->
