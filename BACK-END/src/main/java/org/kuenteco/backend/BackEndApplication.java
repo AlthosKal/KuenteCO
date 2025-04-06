@@ -13,6 +13,8 @@ public class BackEndApplication {
         // API de SenGrid
         System.setProperty("SENDGRID_API_KEY", dotenv.get("SENDGRID_API_KEY"));
         System.setProperty("EMAIL_SENDGRID", dotenv.get("EMAIL_SENDGRID"));
+        System.setProperty("VERIFICATION_EMAIL", dotenv.get("VERIFICATION_EMAIL"));
+        System.setProperty("RESET_PASSWORD", dotenv.get("RESET_PASSWORD"));
 
         // Secret de Jwt
         System.setProperty("JWT_SECRET", dotenv.get("JWT_SECRET"));

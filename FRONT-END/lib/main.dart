@@ -1,30 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'dart:async';
+import 'package:kuenteco/presentation/pages/home/Home_guest_view.dart';
+import 'package:provider/provider.dart';
+import 'package:dio/dio.dart';
 
-// Pages
-import 'package:kuenteco/pages/Login_view.dart';
-import 'package:kuenteco/pages/Register_view.dart';
-import 'package:kuenteco/pages/Subscriptions_view.dart';
-import 'package:kuenteco/pages/Terms_view.dart';
-import 'package:kuenteco/pages/Privacy_view.dart';
-import 'package:kuenteco/pages/Contact_view.dart';
-import 'package:kuenteco/pages/Category_view.dart';
+// Infrastructure
+import 'package:kuenteco/infrastructure/datasources/remote/Auth_api_service.dart';
+import 'package:kuenteco/infrastructure/repositories/Auth_repository.dart';
+import 'package:kuenteco/infrastructure/repositories/Auth_repository_impl.dart';
 
-// Widgets
-import 'package:kuenteco/widgets/Navbar_guest_widget.dart';
-import 'package:kuenteco/widgets/Footer_widget.dart';
-import 'package:kuenteco/widgets/Background_widget.dart';
-import 'package:kuenteco/widgets/Theme_widget.dart';
+// Presentation
+import 'package:kuenteco/presentation/pages/auth/Login_view.dart';
+import 'package:kuenteco/presentation/pages/auth/Register_view.dart';
+import 'package:kuenteco/presentation/pages/account/Subscriptions_view.dart';
+import 'package:kuenteco/presentation/pages/legal/Terms_view.dart';
+import 'package:kuenteco/presentation/pages/legal/Privacy_view.dart';
+import 'package:kuenteco/presentation/pages/contact/Contact_view.dart';
+import 'package:kuenteco/presentation/pages/category/Category_view.dart';
+import 'package:kuenteco/presentation/pages/home/Logged_home_view.dart';
 
 void main() async {
-  await _initializeApp();
-  runApp(const KuentecoApp());
-}
-
-Future<void> _initializeApp() async {
+  Future<void> _initializeApp() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await dotenv.load(fileName: ".env");
+  }
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
+
+  final authApiService = AuthApiService();
+  final authRepository = AuthRepositoryImpl(authApiService);
+
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<AuthRepository>(create: (_) => authRepository),
+      ],
+      child: const KuentecoApp(),
+    ),
+  );
 }
 
 class KuentecoApp extends StatelessWidget {
@@ -34,93 +47,19 @@ class KuentecoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Kuenteco',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      debugShowCheckedModeBanner: false,
       initialRoute: '/',
-      routes: _appRoutes,
-    );
-  }
-
-  Map<String, WidgetBuilder> get _appRoutes => {
-    '/': (context) => const HomePage(title: 'Kuenteco', isLoggedIn: false),
-    '/login': (context) => const LoginPage(),
-    '/register': (context) => const RegisterPage(),
-    '/suscripciones': (context) => const SuscripcionesPage(),
-    '/terminos': (context) => const TerminosPage(),
-    '/privacidad': (context) => const PrivacidadPage(),
-    '/contacto': (context) => const ContactoPage(),
-    '/home': (context) => const HomePage(title: 'Kuenteco', isLoggedIn: true),
-    '/h': (context) => const HomePage(title: 'Kuenteco', isLoggedIn: true),
-    '/rubros': (context) => const RubrosView(),
-  };
-}
-
-class HomePage extends StatelessWidget {
-  final String title;
-  final bool isLoggedIn;
-
-  const HomePage({super.key, required this.title, required this.isLoggedIn});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Background(
-        child: Column(
-          children: [
-            KuentecoNavbar(
-              currentRoute: '/',
-              isLoggedIn: isLoggedIn,
-            ),
-            Expanded(
-              child: Center(
-                child: _buildMainContent(context),
-              ),
-            ),
-            const Footer(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMainContent(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Color(0xFFEDE7F6).withOpacity(0.5),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Bienvenido a Kuenteco',
-            style: theme.textTheme.headlineMedium?.copyWith(
-              color: Color(0xFF890cac),
-              shadows: [
-                Shadow(
-                  color: Colors.black.withOpacity(0.3),
-                  offset: const Offset(1, 1),
-                  blurRadius: 2,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 15),
-          Text(
-            'Ofrecemos las herramientas necesarias para que tomes el control de tus finanzas personales.\n'
-                'Desde la creación de presupuestos hasta el seguimiento de tus gastos e inversiones,\n'
-                'nuestra plataforma está diseñada para ayudarte a alcanzar tus metas financieras de manera sencilla y efectiva.',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: Color(0xFF890cac),
-            ),
-          ),
-        ],
-      ),
+      routes: {
+        '/': (context) => const HomeGuestPage(title: 'Inicio'),
+        'home': (context) => const LoggedInHomePage(title: 'Iniciado'),
+        '/login': (context) => const LoginView(),
+        '/register': (context) => const RegisterPage(),
+        '/suscripciones': (context) => const SubscriptionsView(),
+        '/terminos': (context) => const TerminosPage(),
+        '/privacidad': (context) => const PrivacyPage(),
+        '/contacto': (context) => const ContactPage(),
+        '/rubros': (context) => const CategoryPage(),
+      },
     );
   }
 }
