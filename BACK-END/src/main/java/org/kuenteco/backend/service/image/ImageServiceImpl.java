@@ -1,7 +1,7 @@
 package org.kuenteco.backend.service.image;
 
 import lombok.RequiredArgsConstructor;
-import org.kuenteco.backend.entity.master.extra.MasterImage;
+import org.kuenteco.backend.entity.extra.Image;
 import org.kuenteco.backend.repository.master.MasterImageRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,16 +16,16 @@ public class ImageServiceImpl implements ImageService{
     private final MasterImageRepository masterImageRepository;
 
     @Override
-    public MasterImage uploadImage(MultipartFile file) throws IOException {
+    public Image uploadImage(MultipartFile file) throws IOException {
         Map uploadResult = cloudinaryService.upload(file);
         String imageUrl = (String) uploadResult.get("url");
         String imageId = (String) uploadResult.get("public_id");
-        MasterImage masterImage = new MasterImage(file.getOriginalFilename(), imageUrl, imageId);
+        Image masterImage = new Image(file.getOriginalFilename(), imageUrl, imageId);
         return masterImageRepository.save(masterImage);
     }
 
     @Override
-    public void deleteImage(MasterImage masterImage) throws IOException {
+    public void deleteImage(Image masterImage) throws IOException {
         cloudinaryService.delete(masterImage.getId_image());
         masterImageRepository.deleteById(masterImage.getId());
     }

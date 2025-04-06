@@ -1,6 +1,6 @@
 package org.kuenteco.backend.repository.master;
 
-import org.kuenteco.backend.entity.master.MasterRole;
+import org.kuenteco.backend.entity.Role;
 import org.kuenteco.backend.enums.RoleList;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @Repository
 @Transactional(transactionManager = "masterTransactionManager")
-public interface MasterRoleRepository extends JpaRepository<MasterRole, Integer> {
-    Optional<MasterRole> findByName(RoleList name);
+public interface MasterRoleRepository extends JpaRepository<Role, Integer> {
+    Optional<Role> findByName(RoleList name);
 }

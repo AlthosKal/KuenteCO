@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import org.kuenteco.backend.dto.ApiMessage;
 import org.kuenteco.backend.dto.auth.*;
 import org.kuenteco.backend.dto.image.ImageDTO;
-import org.kuenteco.backend.entity.slave.SlaveUser;
+import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.jwt.JwtUtil;
 import org.kuenteco.backend.service.auth.AuthService;
 import org.kuenteco.backend.service.auth.UserService;
@@ -192,7 +192,7 @@ public class AuthController {
     @GetMapping("/user/details")
     public Object getAuthenticatedUser() {
         try{
-            SlaveUser user = userService.getUserDetails();
+            User user = userService.getUserDetails();
             return ResponseEntity.ok(user);
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));

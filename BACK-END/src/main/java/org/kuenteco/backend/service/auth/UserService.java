@@ -1,20 +1,19 @@
 package org.kuenteco.backend.service.auth;
 
-import org.kuenteco.backend.entity.master.MasterUser;
-import org.kuenteco.backend.entity.slave.SlaveUser;
+import org.kuenteco.backend.entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public interface UserService extends UserDetailsService {
     UserDetails loadUserByEmail(String email) throws UsernameNotFoundException;
-    SlaveUser findByUserName(String name);
-    SlaveUser findByEmail(String email);
-    SlaveUser findByNameOrEmail(String nameOrEmail);
+    User findByUserName(String name);
+    User findByEmail(String email);
+    User findByNameOrEmail(String nameOrEmail);
     boolean existsByUserName(String name);
     boolean existsByUserEmail(String email);
-    void saveUser(MasterUser user);
+    void saveUser(User user);
     void deletePendingEmail(String email);
-    SlaveUser getUserDetails();
-    void deteleUser(MasterUser masterUser);
+    User getUserDetails();
+    void deteleUser(User user);
 }
