@@ -75,13 +75,13 @@ spring:
   profiles:
     active: master,slave
 
-
 logging:
   level:
     org.springframework.security: DEBUG
     org.kuenteco.backend: DEBUG
     com.zaxxer.hikari: DEBUG
     org.hibernate.SQL: DEBUG
+    org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR
 
 info:
   application:

@@ -31,4 +31,8 @@ public class SlaveAccount {
 
     @Column(name = "start_date")
     private Timestamp startDate;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_image", referencedColumnName = "id")
+    private SlaveImage slaveImage;
 }

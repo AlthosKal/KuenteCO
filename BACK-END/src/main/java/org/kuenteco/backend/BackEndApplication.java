@@ -10,12 +10,17 @@ public class BackEndApplication {
     public static void main(String[] args) {
         // Cargar variables de entorno desde .env
         Dotenv dotenv = Dotenv.load();
+
         // API de SenGrid
         System.setProperty("SENDGRID_API_KEY", dotenv.get("SENDGRID_API_KEY"));
         System.setProperty("EMAIL_SENDGRID", dotenv.get("EMAIL_SENDGRID"));
         System.setProperty("VERIFICATION_EMAIL", dotenv.get("VERIFICATION_EMAIL"));
         System.setProperty("RESET_PASSWORD", dotenv.get("RESET_PASSWORD"));
 
+        //API de Cloudinary
+        System.setProperty("CLOUDINARY_NAME", dotenv.get("CLOUDINARY_NAME"));
+        System.setProperty("CLOUDINARY_API_KEY", dotenv.get("CLOUDINARY_API_KEY"));
+        System.setProperty("CLOUDINARY_API_SECRET", dotenv.get("CLOUDINARY_API_SECRET"));
         // Secret de Jwt
         System.setProperty("JWT_SECRET", dotenv.get("JWT_SECRET"));
 

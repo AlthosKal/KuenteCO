@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.kuenteco.backend.dto.ApiMessage;
 import org.kuenteco.backend.dto.auth.*;
+import org.kuenteco.backend.dto.image.ImageDTO;
 import org.kuenteco.backend.entity.slave.SlaveUser;
 import org.kuenteco.backend.jwt.JwtUtil;
 import org.kuenteco.backend.service.auth.AuthService;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -143,9 +145,48 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/check-auth")
-    public ResponseEntity<String> checkAuth() {
-        return ResponseEntity.ok().body("autenticado");
+    @PostMapping("/user/image/add")
+    public ResponseEntity<ImageDTO> uploadProfileImage(
+            @RequestParam("image") MultipartFile image,
+            @RequestHeader("Authorization") String token,
+            HttpServletResponse response) {
+        try {
+            // Extraer el token Bearer
+            String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+            ImageDTO imageDTO = authService.saveImage(image, jwtToken, response);
+            return new ResponseEntity<>(imageDTO, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/user/image/update")
+    public ResponseEntity<ImageDTO> updateProfileImage(
+            @RequestParam("image") MultipartFile image,
+            @RequestHeader("Authorization") String token,
+            HttpServletResponse response) {
+        try {
+            // Extraer el token Bearer
+            String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+            ImageDTO imageDTO = authService.updateImage(image, jwtToken, response);
+            return new ResponseEntity<>(imageDTO, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteProfileImage(
+            @RequestHeader("Authorization") String token,
+            HttpServletResponse response) {
+        try {
+            // Extraer el token Bearer
+            String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+            authService.deleteImage(jwtToken, response);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/user/details")

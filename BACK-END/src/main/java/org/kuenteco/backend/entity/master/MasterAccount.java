@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.kuenteco.backend.entity.master.extra.MasterImage;
 import org.kuenteco.backend.enums.AccountType;
 
 import java.math.BigDecimal;
@@ -35,4 +36,7 @@ public class MasterAccount {
     @Column(name = "start_date")
     private Timestamp startDate;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_image", referencedColumnName = "id")
+    private MasterImage masterImage;
 }

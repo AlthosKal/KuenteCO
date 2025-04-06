@@ -38,6 +38,10 @@ public class SlaveUser {
     @Version
     private Integer version;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_image", referencedColumnName = "id")
+    private SlaveImage slaveImage;
+
     public SlaveUser(String name ,String email, String password, SlaveRole slaveRole) {
         this.name = name;
         this.email = email;

@@ -1,6 +1,7 @@
 package org.kuenteco.backend.service.auth;
 
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.kuenteco.backend.entity.master.MasterUser;
 import org.kuenteco.backend.entity.slave.SlaveUser;
 import org.kuenteco.backend.enums.State;
@@ -17,15 +18,13 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 
 @Service
-@NoArgsConstructor
 public class UserServiceImpl implements UserService {
-    private SlaveUserRepository slaveUserRepository;
-    private MasterUserRepository masterUserRepository;
-    private UserMapper userMapper;
+    private final SlaveUserRepository slaveUserRepository;
+    private final MasterUserRepository masterUserRepository;
+    private final UserMapper userMapper;
 
     @Autowired
-    public UserServiceImpl(SlaveUserRepository slaveUserRepository, MasterUserRepository masterUserRepository,
-            UserMapper userMapper) {
+    public UserServiceImpl(SlaveUserRepository slaveUserRepository, MasterUserRepository masterUserRepository, UserMapper userMapper) {
         this.slaveUserRepository = slaveUserRepository;
         this.masterUserRepository = masterUserRepository;
         this.userMapper = userMapper;
@@ -49,6 +48,29 @@ public class UserServiceImpl implements UserService {
 
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
                 Collections.singleton(authority));
+    }
+
+    @Override
+    public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException {
+        SlaveUser slaveUser = slaveUserRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
+        MasterUser user = userMapper.slaveToMaster(slaveUser);
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().getName().toString());
+
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
+                Collections.singleton(authority));
+    }
+
+    @Override
+    public SlaveUser findByUserName(String name) {
+        return slaveUserRepository.findByName(name)
+                .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
+    }
+
+    @Override
+    public SlaveUser findByEmail(String email) {
+        return slaveUserRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
     }
 
     @Override
