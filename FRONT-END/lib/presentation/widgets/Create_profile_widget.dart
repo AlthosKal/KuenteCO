@@ -9,11 +9,11 @@ class CreateProfileWidget extends StatefulWidget {
   final String baseUrl;
 
   const CreateProfileWidget({
-    Key? key,
+    super.key,
     required this.onAccountCreated,
     required this.authToken,
     required this.baseUrl,
-  }) : super(key: key);
+  });
 
   @override
   State<CreateProfileWidget> createState() => _CreateProfileWidgetState();

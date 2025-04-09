@@ -120,7 +120,7 @@ class _VerificacionRState extends State<VerificacionR> {
 
     try {
       // 1. Verificar el código
-      final verificationResponse = await _authApiService.ValidateVerificationCode(
+      final verificationResponse = await _authApiService.validateVerificationCode(
         email: widget.email,
         code: code,
       );

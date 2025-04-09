@@ -13,5 +13,4 @@ import java.math.BigDecimal;
 public class AccountDetailDTO {
     private String name;
     private AccountType type;
-    private BigDecimal balance;
 }

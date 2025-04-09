@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kuenteco/infrastructure/repositories/Auth_repository.dart';
 
 class KuentecoNavbar extends StatelessWidget {
   final String currentRoute;
@@ -8,6 +9,7 @@ class KuentecoNavbar extends StatelessWidget {
   final String logoPlaceholderText;
   final bool useDefaultLogoSize;
   final VoidCallback onLogout;
+  final AuthRepository authRepository;
 
   const KuentecoNavbar({
     super.key,
@@ -18,6 +20,7 @@ class KuentecoNavbar extends StatelessWidget {
     this.logoPlaceholderText = 'Logo no disponible',
     this.useDefaultLogoSize = true,
     required this.onLogout,
+    required this.authRepository,
   });
 
   @override
@@ -133,27 +136,53 @@ class KuentecoNavbar extends StatelessWidget {
     );
   }
 
-  void _handleMenuSelection(BuildContext context, String value) {
+  Future<void> _handleMenuSelection(BuildContext context, String value) async {
     switch (value) {
       case 'logout':
-        onLogout();
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/login',
-              (route) => false,
-        );
+        try {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+
+          await authRepository.logout();
+
+          if (context.mounted) Navigator.of(context).pop();
+          onLogout();
+
+          if (context.mounted) {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/login',
+                  (route) => false,
+            );
+          }
+        } catch (e) {
+          if (context.mounted) Navigator.of(context).pop();
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error al cerrar sesión: ${e.toString()}'),
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
+        }
         break;
       case 'account':
-        Navigator.pushNamed(context, '/account');
+        if (context.mounted) Navigator.pushNamed(context, '/account');
         break;
       case 'add_profile':
-        Navigator.pushNamed(context, '/add-profile');
+        if (context.mounted) Navigator.pushNamed(context, '/add-profile');
         break;
       case 'subscription':
-        Navigator.pushNamed(context, '/subscription');
+        if (context.mounted) Navigator.pushNamed(context, '/subscription');
         break;
       case 'contact':
-        Navigator.pushNamed(context, '/contact');
+        if (context.mounted) Navigator.pushNamed(context, '/contact');
         break;
     }
   }

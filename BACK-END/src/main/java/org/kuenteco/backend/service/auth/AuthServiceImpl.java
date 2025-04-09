@@ -150,7 +150,7 @@
 
 
             // Asegurar que el rol existe en la base de datos maestra
-            Role masterRole = masterRoleRepository.findByName(RoleList.ROLE_USER)
+            Role masterRole = slaveRoleRepository.findByName(RoleList.ROLE_USER)
                     .orElseGet(() -> masterRoleRepository.save(roleUser));
 
             // Utilizar transacción explícita para guardar el usuario
@@ -258,7 +258,7 @@
             Boolean result = masterTransactionTemplate.execute(status -> {
                 try {
                     // Buscar directamente en la base de datos maestra, no en la esclava
-                    Optional<User> masterUserOpt = masterUserRepository.findByEmail(email);
+                    Optional<User> masterUserOpt = slaveUserRepository.findByEmail(email);
 
                     if (masterUserOpt.isEmpty()) {
                         throw new RuntimeException("Usuario no encontrado");
@@ -301,7 +301,7 @@
             return masterTransactionTemplate.execute(status -> {
                 try {
                     // Buscar directamente en la base de datos maestra
-                    Optional<User> masterUserOpt = masterUserRepository.findByEmail(email);
+                    Optional<User> masterUserOpt = slaveUserRepository.findByEmail(email);
 
                     if (masterUserOpt.isEmpty()) {
                         throw new RuntimeException("Usuario no encontrado");
@@ -353,7 +353,7 @@
         public ImageDTO saveImage(MultipartFile image, String token, HttpServletResponse response) {
             try {
                 String username = jwtUtil.extractEmail(token);
-                User user = masterUserRepository.findByName(username)
+                User user = slaveUserRepository.findByName(username)
                         .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
                 // Verificar si ya tiene una imagen previa
@@ -377,7 +377,7 @@
         public ImageDTO updateImage(MultipartFile image, String token, HttpServletResponse response) {
             try {
                 String username = jwtUtil.extractEmail(token);
-                User user = masterUserRepository.findByName(username)
+                User user = slaveUserRepository.findByName(username)
                         .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
                 // Verificar si tiene imagen para actualizar
@@ -404,7 +404,7 @@
         public void deleteImage(String token, HttpServletResponse response) {
             try {
                 String username = jwtUtil.extractEmail(token);
-                User user = masterUserRepository.findByName(username)
+                User user = slaveUserRepository.findByName(username)
                         .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
                 // Verificar si tiene imagen para eliminar

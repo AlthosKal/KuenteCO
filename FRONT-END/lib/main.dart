@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:kuenteco/presentation/pages/home/Home_guest_view.dart';
 import 'package:provider/provider.dart';
-import 'package:dio/dio.dart';
-
 // Infrastructure
 import 'package:kuenteco/infrastructure/datasources/remote/Auth_api_service.dart';
 import 'package:kuenteco/infrastructure/repositories/Auth_repository.dart';
 import 'package:kuenteco/infrastructure/repositories/Auth_repository_impl.dart';
-
 // Presentation
 import 'package:kuenteco/presentation/pages/auth/Login_view.dart';
 import 'package:kuenteco/presentation/pages/auth/Register_view.dart';
@@ -20,28 +17,28 @@ import 'package:kuenteco/presentation/pages/category/Category_view.dart';
 import 'package:kuenteco/presentation/pages/home/Logged_home_view.dart';
 
 void main() async {
-  Future<void> _initializeApp() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    await dotenv.load(fileName: ".env");
-  }
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-
-  final authApiService = AuthApiService();
-  final authRepository = AuthRepositoryImpl(authApiService);
-
+  // 1. Crea las instancias necesarias
+  final AuthApiService apiService = AuthApiService();
+  final AuthRepository repository = AuthRepositoryImpl(apiService);
+  // 2. Configura el MultiProvider
   runApp(
     MultiProvider(
       providers: [
-        Provider<AuthRepository>(create: (_) => authRepository),
+        Provider<AuthRepository>(create: (_) => repository),
       ],
-      child: const KuentecoApp(),
+      child: KuentecoApp(authRepository: repository), // Pasa la instancia correctamente
     ),
   );
 }
 
 class KuentecoApp extends StatelessWidget {
-  const KuentecoApp({super.key});
+  final AuthRepository authRepository;
+  const KuentecoApp({
+    super.key,
+    required this.authRepository, // Correctamente declarado como requerido
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +48,11 @@ class KuentecoApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const HomeGuestPage(title: 'Inicio'),
-        'home': (context) => const LoggedInHomePage(title: 'Iniciado'),
+        // Añadimos el authRepository requerido al LoggedInHomePage
+        '/home': (context) => LoggedInHomePage(
+          title: 'Iniciado',
+          authRepository: authRepository,
+        ),
         '/login': (context) => const LoginView(),
         '/register': (context) => const RegisterPage(),
         '/suscripciones': (context) => const SubscriptionsView(),

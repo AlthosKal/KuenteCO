@@ -17,5 +17,6 @@ public class Role {
     private Integer id;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private RoleList name;
 }

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.kuenteco.backend.entity.extra.DescriptionCategory;
 import org.kuenteco.backend.enums.State;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Data
@@ -23,13 +24,17 @@ public class Category {
     @JoinColumn(name = "id_account")
     private Account account;
 
+    @ManyToOne
+    @JoinColumn(name = "id_asset")
+    private Asset asset;
+
     private String name;
 
     @Column(columnDefinition = "JSONB")
     private DescriptionCategory description;
 
     @Column(name = "assigned_budget")
-    private double assignedBudget;
+    private BigDecimal assignedBudget;
 
     @Column(name = "start_date")
     private Timestamp startDate;

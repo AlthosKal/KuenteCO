@@ -1,5 +1,5 @@
-import 'package:kuenteco/domain/entities/account.dart';
-import 'package:kuenteco/infrastructure/models/account_model.dart';
+import 'package:kuenteco/domain/entities/Account.dart';
+import 'package:kuenteco/infrastructure/models/Account_model.dart';
 
 extension AccountModelMapper on AccountModel {
   Account toEntity() {

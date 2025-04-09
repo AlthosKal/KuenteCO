@@ -169,7 +169,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildFullNameField() {
     return _buildTextField(
       controller: _fullNameController,
-      labelText: 'Nombre completo',
+      labelText: 'Nombre de usuario',
       validator: (value) {
         if (value?.isEmpty ?? true) return 'Por favor, ingresa tu nombre';
         return null;
