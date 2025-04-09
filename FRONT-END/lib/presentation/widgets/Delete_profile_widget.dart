@@ -8,10 +8,10 @@ class DeleteProfileWidget extends StatelessWidget {
   final VoidCallback onDeleteConfirmed;
 
   const DeleteProfileWidget({
-    Key? key,
+    super.key,
     required this.account,
     required this.onDeleteConfirmed,
-  }) : super(key: key);
+  });
 
   Future<void> _deleteAccount(BuildContext context) async {
     try {

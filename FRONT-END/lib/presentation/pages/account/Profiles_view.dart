@@ -27,7 +27,7 @@ class Account {
 }
 
 class AccountSelectionScreen extends StatefulWidget {
-  const AccountSelectionScreen({Key? key}) : super(key: key);
+  const AccountSelectionScreen({super.key});
 
   @override
   State<AccountSelectionScreen> createState() => _AccountSelectionScreenState();
@@ -197,7 +197,7 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
 }
 
 class CreateAccountScreen extends StatefulWidget {
-  const CreateAccountScreen({Key? key}) : super(key: key);
+  const CreateAccountScreen({super.key});
 
   @override
   State<CreateAccountScreen> createState() => _CreateAccountScreenState();
@@ -331,7 +331,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
 // Ejemplo de uso en la aplicación principal
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {

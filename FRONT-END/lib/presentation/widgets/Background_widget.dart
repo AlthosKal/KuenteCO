@@ -40,7 +40,7 @@ class _BackgroundState extends State<Background> {
   Future<void> _resolveImage() async {
     try {
       final config = createLocalImageConfiguration(context);
-      await _imageProvider.resolve(config);
+      _imageProvider.resolve(config);
       if (mounted) {
         setState(() {
           _imageError = false;

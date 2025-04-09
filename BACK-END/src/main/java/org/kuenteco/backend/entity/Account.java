@@ -29,10 +29,6 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private AccountType type;
 
-    private BigDecimal balance = BigDecimal.ZERO;
-
-    private String currency;
-
     @Column(name = "start_date")
     private Timestamp startDate;
 

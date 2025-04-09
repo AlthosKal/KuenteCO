@@ -48,7 +48,7 @@ class _SubscriptionsViewState extends State<SubscriptionsView> {
           ...SubscriptionConstants.plans.map((plan) => Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: _buildPlanCard(plan, cardWidth),
-          )).toList(),
+          )),
           const SizedBox(width: 20),
         ],
       ),

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.kuenteco.backend.entity.extra.DescriptionTransaction;
+import org.kuenteco.backend.entity.extra.ExchangeRate;
+import org.kuenteco.backend.enums.TransactionType;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -27,7 +29,8 @@ public class Transaction {
     @JoinColumn(name = "id_category")
     private Category category;
 
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private TransactionType type;
 
     private BigDecimal amount;
 
@@ -36,4 +39,16 @@ public class Transaction {
 
     @Column(columnDefinition = "JSONB")
     private DescriptionTransaction description;
+
+    @ManyToOne
+    @JoinColumn(name = "id_debt")
+    private Debt relatedDebt; // Para pagos de deuda
+
+    @ManyToOne
+    @JoinColumn(name = "id_goal")
+    private Goal relatedGoal; // Para contribuciones a metas
+
+    @ManyToOne
+    @JoinColumn(name = "id_exchange_rate")
+    private ExchangeRate exchangeRate;
 }

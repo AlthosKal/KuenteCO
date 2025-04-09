@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:kuenteco/infrastructure/datasources/remote/Auth_api_service.dart';
 import 'package:kuenteco/presentation/widgets/Particle_animation_widget.dart';
@@ -114,7 +113,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final response = await _authApiService.ValidateVerificationCode(
+      final response = await _authApiService.validateVerificationCode(
         email: _email!,
         code: code,
       );
@@ -150,6 +149,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
         email: _email!,
         code: code,
         newPassword: _newPasswordController.text,
+        confirmNewPassword: _confirmPasswordController.text, // ✅ CORRECTO
       );
 
       _showSuccessSnackBar(response['message'] ?? 'Contraseña cambiada con éxito');
