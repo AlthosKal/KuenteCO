@@ -17,13 +17,18 @@ class AuthApiService {
 
   Map<String, String> get _authHeaders => {
     'Content-Type': 'application/json',
-    if (_authToken != null) 'Authorization': 'Bearer $_authToken',
+    'Accept': 'application/json',
+    if (_authToken != null && _authToken!.isNotEmpty) 'Authorization': 'Bearer $_authToken',
   };
 
   // ==================== TOKEN ====================
-  void setToken(String token) => _authToken = token;
+  void setToken(String? token) {
+    _authToken = token;
+    print('[DEBUG] Token establecido en AuthApiService: $_authToken');
+  }
+
   String? getToken() => _authToken;
-  bool get isLoggedIn => _authToken != null;
+  bool get isLoggedIn => _authToken != null && _authToken!.isNotEmpty;
 
   String? _extractTokenFromCookies(http.Response response) {
     final cookieHeader = response.headers['set-cookie'];
@@ -88,19 +93,32 @@ class AuthApiService {
           'password': password,
         }),
       );
+      final data = jsonDecode(response.body);
+      print('[DEBUG] Estructura completa de la respuesta: $data');
+      print('[DEBUG] Respuesta completa del backend: ${response.body}');
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return {
-          'status': 'success',
-          'token': data['token'],
-        };
+        if (data['token'] != null) {
+          _authToken = data['token'];
+          print('[DEBUG] Token extraído del cuerpo: $_authToken');
+          return {
+            'status': 'success',
+            'token': data['token'],
+          };
+        }
       }
 
+      // Como respaldo, intentar extraer token de cookies
       final token = _extractTokenFromCookies(response);
-      if (token != null) _authToken = token;
+      if (token != null) {
+        _authToken = token;
+        print('[DEBUG] Token extraído de cookies: $_authToken');
+      }
 
       return _processResponse(response, 'Login successful');
     } catch (e) {
+      print('[ERROR] Error en login: $e');
       return {'status': 'error', 'message': 'Login error: $e'};
     }
   }
@@ -330,16 +348,24 @@ class AuthApiService {
 
   // ==================== CUENTAS ====================
   Future<Map<String, dynamic>> getAllAccounts() async {
-    try {
+    if (_authToken == null || _authToken!.isEmpty) {
+      print('[ERROR] getAllAccounts: Token no disponible');
+      return {'status': 'error', 'message': 'Token no disponible'};
+    }
 
-      print('[DEBUG] Token en memoria: $_authToken'); // 👈
+    print('[DEBUG] Token en getAllAccounts: $_authToken');
+    print('[DEBUG] Headers en getAllAccounts: $_authHeaders');
+
+    try {
       final response = await _client.get(
         Uri.parse('$baseUrl/v1/account'),
         headers: _authHeaders,
       );
 
+      print('[DEBUG] getAllAccounts response: ${response.statusCode} - ${response.body}');
       return _processResponse(response, 'Accounts retrieved successfully');
     } catch (e) {
+      print('[ERROR] Error en getAllAccounts: $e');
       return {'status': 'error', 'message': 'Error retrieving accounts: $e'};
     }
   }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../domain/entities/Account.dart';
+import 'package:kuenteco/domain/dto/New_Account_DTO.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class DeleteProfileWidget extends StatelessWidget {
-  final Account account;
+  final NewAccountDTO account;
   final VoidCallback onDeleteConfirmed;
 
   const DeleteProfileWidget({
@@ -16,7 +16,7 @@ class DeleteProfileWidget extends StatelessWidget {
   Future<void> _deleteAccount(BuildContext context) async {
     try {
       final response = await http.delete(
-        Uri.parse('http://localhost:8080/api/v1/account/${account.id}'),
+        Uri.parse('http://localhost:8080/api/v1/account/'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer your-token-here',

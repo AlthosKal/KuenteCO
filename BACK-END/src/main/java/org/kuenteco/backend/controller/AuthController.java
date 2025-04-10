@@ -30,15 +30,15 @@ public class AuthController {
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping("/login")
-    public ResponseEntity<ApiMessage> login(@Valid @RequestBody LoginUserDTO loginUserDTO, BindingResult bindingResult,
-            HttpServletResponse response) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginUserDTO loginUserDTO, BindingResult bindingResult,
+                                   HttpServletResponse response) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new ApiMessage("Datos Invalidos"));
         }
 
         try {
-            String role = authService.authenticate(loginUserDTO.getNameOrEmail(), loginUserDTO.getPassword(), response);
-            return ResponseEntity.ok(new ApiMessage("Inicio de sesión exitoso"));
+            TokenResponseDTO tokenResponseDTO = authService.authenticate(loginUserDTO.getNameOrEmail(), loginUserDTO.getPassword(), response);
+            return ResponseEntity.ok(tokenResponseDTO);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
         }

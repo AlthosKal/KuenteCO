@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kuenteco/core/constants/App_colors.dart';
 import 'package:kuenteco/domain/constants/Subscription_constants.dart';
-import 'package:kuenteco/domain/entities/Subscription_plan.dart';
+import 'package:kuenteco/domain/dto/Subscription_plan.dart';
 import 'package:kuenteco/presentation/widgets/Background_widget.dart';
 import 'package:kuenteco/presentation/widgets/Footer_widget.dart';
 import 'package:kuenteco/presentation/widgets/Navbar_guest_widget.dart';

@@ -5,27 +5,38 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthRepositoryImpl implements AuthRepository {
   final AuthApiService _apiService;
 
-  AuthRepositoryImpl(this._apiService);
+  AuthRepositoryImpl(this._apiService){
+    _loadToken();
+  }
 
   // =================== TOKEN MANAGEMENT ===================
 
   Future<void> _saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('authToken', token);
+    print('[DEBUG] Token guardado en SharedPreferences: $token');
   }
 
-  Future<void> _loadToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('authToken');
-    if (token != null) _apiService.setToken(token); // ⬅️ CARGA EN MEMORIA
+  Future<String?> _loadToken() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('authToken');
+      print('[DEBUG] Token cargado desde SharedPreferences: $token');
+      if (token != null && token.isNotEmpty) {
+        _apiService.setToken(token);
+        return token;
+      }
+      return null;
+    } catch (e) {
+      print('[ERROR] Error al cargar token: $e');
+      return null;
+    }
   }
-
-
 
   Future<void> _clearToken() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('authToken');
-    _apiService.setToken('');
+    _apiService.setToken(null);
   }
 
   // =================== AUTH ===================
@@ -42,18 +53,35 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     if (response['status'] == 'success') {
-      final token = response['token'];
-      if (token != null) {
-        await _saveToken(token);           // ✅ persistente
-        _apiService.setToken(token);       // ✅ ¡esto es lo que falta!
-        print('[DEBUG] Token seteado en memoria: $token'); // opcional para confirmar
+      // La respuesta podría tener el token directamente en 'token'
+      // o dentro de la estructura 'data'
+      String? token = response['token'];
+
+      // Si no está en 'token', intentar buscarlo en 'data'
+      if (token == null && response['data'] is Map) {
+        token = response['data']['token'];
       }
 
-  } else {
+      // Si se encontró un token válido, guardarlo
+      if (token != null && token.isNotEmpty) {
+        await _saveToken(token);
+        _apiService.setToken(token);
+        print('[DEBUG] Login exitoso - Token guardado: $token');
+      } else {
+        // Verificar si el servicio ya tiene un token válido (en caso de extraerse de cookies)
+        token = _apiService.getToken();
+        if (token != null && token.isNotEmpty) {
+          await _saveToken(token);
+          print('[DEBUG] Login exitoso - Token extraído de cookies: $token');
+        } else {
+          print('[WARNING] Login exitoso pero no se recibió token');
+          throw Exception('No se recibió token de autenticación');
+        }
+      }
+    } else {
       throw Exception(response['message'] ?? 'Login failed');
     }
   }
-
 
   @override
   Future<void> logout() async {
@@ -65,29 +93,51 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<bool> checkAuth() async {
-    await _loadToken();
-    return await _apiService.checkAuth();
+  Future<bool> isLoggedIn() async {
+    final token = await _loadToken();
+    return token != null && token.isNotEmpty;
   }
 
   @override
-  Future<bool> isLoggedIn() async {
-    await _loadToken();
-    return _apiService.getToken() != null;
+  Future<bool> checkAuth() async {
+    // Ya que mencionaste que este endpoint fue retirado,
+    // simplemente verificamos si hay un token válido
+    final token = await _loadToken();
+    return token != null && token.isNotEmpty;
   }
 
   @override
   Future<Map<String, dynamic>> getAllAccounts() async {
-    await _loadToken();
+    // Asegurar que el token esté cargado antes de hacer la petición
+    final token = await _loadToken();
+
+    if (token == null || token.isEmpty) {
+      print('[ERROR] getAllAccounts: No hay token válido disponible');
+      return {
+        'accounts': [],
+        'status': 'error',
+        'message': 'No hay sesión activa'
+      };
+    }
+
     final response = await _apiService.getAllAccounts();
 
     if (response['status'] == 'success') {
       return {
-        'accounts': response['data'], // <- Aquí lo adaptamos al frontend
+        'accounts': response['data'],
         'status': 'success',
       };
     } else {
-      throw Exception(response['message'] ?? 'Error al obtener detalles del usuario');
+      // Si recibimos un 401, podríamos intentar re-autenticar aquí
+      if (response['statusCode'] == 401) {
+        print('[WARNING] Token inválido o expirado');
+      }
+
+      return {
+        'accounts': [],
+        'status': 'error',
+        'message': response['message'] ?? 'Error al obtener cuentas'
+      };
     }
   }
 

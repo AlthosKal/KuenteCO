@@ -10,6 +10,7 @@
     import jakarta.servlet.http.HttpServletResponse;
     import org.kuenteco.backend.dto.auth.NewUserDTO;
     import org.kuenteco.backend.dto.auth.SendVerificationCodeDTO;
+    import org.kuenteco.backend.dto.auth.TokenResponseDTO;
     import org.kuenteco.backend.dto.image.ImageDTO;
     import org.kuenteco.backend.entity.Role;
     import org.kuenteco.backend.entity.User;
@@ -112,7 +113,7 @@
         }
 
         @Override
-        public String authenticate(String nameOrEmail, String password, HttpServletResponse response) {
+        public TokenResponseDTO authenticate(String nameOrEmail, String password, HttpServletResponse response) {
             // Verificar si la cuenta está activa antes de autenticar
             // Determinar si es un email o nombre de usuario
             User user = userService.findByNameOrEmail(nameOrEmail);
@@ -131,7 +132,7 @@
             String jwt = jwtUtil.generateToken(authResult);
             cookieService.addHttpOnlyCookie("jwt", jwt, 7 * 24 * 60 * 60, response);
 
-            return user.getRole().getName().toString();
+            return new TokenResponseDTO(jwt, user.getRole().getName().toString());
         }
 
         @Override
