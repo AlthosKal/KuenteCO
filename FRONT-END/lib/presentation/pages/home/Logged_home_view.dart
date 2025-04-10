@@ -7,8 +7,7 @@ import 'package:kuenteco/infrastructure/repositories/Auth_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../../domain/entities/Account.dart';
-import '../../../infrastructure/models/Account_model.dart';
+import '../../../domain/dto/AccountDetailDTO.dart';
 
 class LoggedInHomePage extends StatelessWidget {
   final String title;
@@ -49,7 +48,7 @@ class AccountSelectionScreen extends StatefulWidget {
 
 class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
   // Variables de estado
-  List<Account> accounts = [];
+  List<AccountDetailDTO> accounts = [];
   bool isLoading = true;
   String errorMessage = '';
   String? _authToken;
@@ -116,7 +115,7 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
   void _handleSuccessfulResponse(dynamic responseData) {
     if (responseData is List) {
       setState(() {
-        accounts = responseData.map((json) => AccountModel.fromJson(json) as Account).toList();
+        accounts = responseData.map((json) => AccountDetailDTO.fromJson(json) as AccountDetailDTO).toList();
         isLoading = false;
       });
     } else if (responseData is Map && responseData.containsKey('message')) {
@@ -210,7 +209,7 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
     }
   }
 
-  void _selectAccount(BuildContext context, Account account) {
+  void _selectAccount(BuildContext context, AccountDetailDTO account) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Perfil seleccionado: ${account.name}')),
     );
@@ -417,7 +416,7 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
     );
   }
 
-  Widget _buildAccountCard(Account account, BuildContext context) {
+  Widget _buildAccountCard(AccountDetailDTO account, BuildContext context) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -436,22 +435,10 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
                 children: [
                   CircleAvatar(
                     backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                    child: account.image.isNotEmpty
-                        ? ClipRRect(
+                    child:
+                         ClipRRect(
                       borderRadius: BorderRadius.circular(20),
-                      child: Image.network(account.image),
-                    )
-                        : Text(
-                      account.name[0].toUpperCase(),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red.shade300),
-                    onPressed: () => _showDeleteConfirmation(account.id as String),
+                         )
                   ),
                 ],
               ),
@@ -463,12 +450,6 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
                 ),
               ),
               const SizedBox(height: 5),
-              Text(
-                account.description,
-                style: Theme.of(context).textTheme.bodySmall,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
               const Spacer(),
               Align(
                 alignment: Alignment.bottomRight,

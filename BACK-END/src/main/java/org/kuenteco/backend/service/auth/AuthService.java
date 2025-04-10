@@ -3,6 +3,7 @@ package org.kuenteco.backend.service.auth;
 import jakarta.servlet.http.HttpServletResponse;
 import org.kuenteco.backend.dto.auth.NewUserDTO;
 import org.kuenteco.backend.dto.auth.SendVerificationCodeDTO;
+import org.kuenteco.backend.dto.auth.TokenResponseDTO;
 import org.kuenteco.backend.dto.image.ImageDTO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,7 +11,7 @@ import java.io.IOException;
 
 public interface AuthService {
     //Metodos para registro e inicio de sesión
-    String authenticate(String nameOrEmail, String password, HttpServletResponse response);
+    TokenResponseDTO authenticate(String nameOrEmail, String password, HttpServletResponse response);
 
     void registerUser(NewUserDTO newUserDTO);
 
