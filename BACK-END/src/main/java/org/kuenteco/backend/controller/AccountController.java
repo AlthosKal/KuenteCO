@@ -9,6 +9,7 @@ import org.kuenteco.backend.dto.image.ImageDTO;
 import org.kuenteco.backend.entity.Account;
 import org.kuenteco.backend.jwt.JwtUtil;
 import org.kuenteco.backend.repository.master.MasterAccountRepository;
+import org.kuenteco.backend.repository.slave.SlaveAccountRepository;
 import org.kuenteco.backend.service.account.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/v1/account")
 @AllArgsConstructor
@@ -24,6 +28,7 @@ public class AccountController {
 
     private final AccountService accountService;
     private final MasterAccountRepository masterAccountRepository;
+    private final SlaveAccountRepository slaveAccountRepository;
     private final JwtUtil jwtUtil;
 
     @GetMapping
@@ -55,9 +60,10 @@ public class AccountController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiMessage> deleteAccount(Account account) {
+    public ResponseEntity<ApiMessage> deleteAccount(Account account) throws IOException {
         try {
-            accountService.deleteAccount(account);
+                accountService.deleteAccount(account);
+
             return ResponseEntity.status(HttpStatus.OK).body(new ApiMessage("Cuenta eliminada correctamente"));
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new ApiMessage(e.getMessage()), HttpStatus.BAD_REQUEST);

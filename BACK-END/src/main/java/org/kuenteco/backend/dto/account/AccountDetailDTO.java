@@ -9,6 +9,7 @@ import org.kuenteco.backend.enums.AccountType;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccountDetailDTO {
+    private Integer id;
     private String name;
     private AccountType type;
 }
