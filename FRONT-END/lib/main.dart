@@ -14,6 +14,7 @@ import 'package:kuenteco/presentation/pages/home/Home_guest_view.dart';
 import 'package:kuenteco/presentation/pages/home/Logged_home_view.dart';
 import 'package:kuenteco/presentation/pages/legal/Privacy_view.dart';
 import 'package:kuenteco/presentation/pages/legal/Terms_view.dart';
+import 'package:kuenteco/presentation/pages/home/Account_home_view.dart'; // asegúrate de que este sea el path correcto
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -35,9 +36,10 @@ void main() async {
 
 class KuentecoApp extends StatelessWidget {
   final AuthRepository authRepository;
+
   const KuentecoApp({
     super.key,
-    required this.authRepository, // Correctamente declarado como requerido
+    required this.authRepository,
   });
 
   @override
@@ -48,7 +50,6 @@ class KuentecoApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const HomeGuestPage(title: 'Inicio'),
-        // Añadimos el authRepository requerido al LoggedInHomePage
         '/home': (context) => LoggedInHomePage(
           title: 'Iniciado',
           authRepository: authRepository,
@@ -60,6 +61,12 @@ class KuentecoApp extends StatelessWidget {
         '/privacidad': (context) => const PrivacyPage(),
         '/contacto': (context) => const ContactPage(),
         '/rubros': (context) => const CategoryPage(),
+        '/logged_home': (context) => LoggedInHomePage(title: 'Inicio', authRepository: authRepository,),
+        '/Category_view': (context) => const CategoryPage(),
+        '/Account_home_view': (context) => AccountHomeView(authRepository: authRepository, onLogout: () {
+            Navigator.pushReplacementNamed(context, '/login');
+          },
+        ),
       },
     );
   }

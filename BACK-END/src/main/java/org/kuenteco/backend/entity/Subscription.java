@@ -23,7 +23,7 @@ public class Subscription {
     @JoinColumn(name = "id_account")
     private Account account;
 
-    @Column(columnDefinition = "VARCHAR(10)")
+    @Enumerated(EnumType.STRING)
     private SubscriptionType type;
 
     @Column(name = "start_date")
