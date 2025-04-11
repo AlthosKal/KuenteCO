@@ -8,6 +8,11 @@ class AuthFormField extends StatelessWidget {
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
 
+  // 🔹 Nuevas propiedades para navegación entre campos
+  final FocusNode? focusNode;
+  final TextInputAction? textInputAction;
+  final void Function(String)? onFieldSubmitted;
+
   const AuthFormField({
     super.key,
     required this.controller,
@@ -16,6 +21,9 @@ class AuthFormField extends StatelessWidget {
     this.suffixIcon,
     this.validator,
     this.keyboardType,
+    this.focusNode,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -28,6 +36,9 @@ class AuthFormField extends StatelessWidget {
         keyboardType: keyboardType,
         cursorColor: Colors.white,
         style: const TextStyle(color: Colors.white),
+        focusNode: focusNode,
+        textInputAction: textInputAction,
+        onFieldSubmitted: onFieldSubmitted,
         decoration: InputDecoration(
           labelText: label,
           labelStyle: const TextStyle(color: Colors.white),

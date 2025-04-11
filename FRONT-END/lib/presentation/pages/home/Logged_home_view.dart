@@ -1,12 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:kuenteco/presentation/widgets/Navbar_logged_widget.dart';
-import 'package:kuenteco/presentation/widgets/Footer_widget.dart';
+import 'package:http/http.dart' as http;
+import 'package:kuenteco/infrastructure/repositories/Auth_repository.dart';
 import 'package:kuenteco/presentation/widgets/Background_widget.dart';
 import 'package:kuenteco/presentation/widgets/Create_profile_widget.dart';
-import 'package:kuenteco/infrastructure/repositories/Auth_repository.dart';
+import 'package:kuenteco/presentation/widgets/Delete_profile_widget.dart';
+import 'package:kuenteco/presentation/widgets/Footer_widget.dart';
+import 'package:kuenteco/presentation/widgets/Navbar_logged_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+
 import '../../../domain/dto/AccountDetailDTO.dart';
 
 class LoggedInHomePage extends StatelessWidget {
@@ -134,21 +137,6 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
     });
   }
 
-  void _handleUnauthorizedResponse() {
-    setState(() {
-      errorMessage = 'Sesión expirada. Por favor inicie sesión nuevamente.';
-      isLoading = false;
-    });
-    _handleLogout();
-  }
-
-  void _handleErrorResponse(dynamic responseData, int statusCode) {
-    setState(() {
-      errorMessage = responseData['message'] ?? 'Error al cargar perfiles: $statusCode';
-      isLoading = false;
-    });
-  }
-
   void _handleFetchError(dynamic error) {
     setState(() {
       errorMessage = 'Error de conexión: $error';
@@ -184,77 +172,35 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
       context: context,
       builder: (context) => CreateProfileWidget(
         onAccountCreated: _fetchAccounts,
+
         authToken: _authToken!,
         baseUrl: _baseUrl.replaceAll('/v1/account', ''),
+        authRepository: widget.authRepository,
       ),
     );
   }
 
-  Future<void> _deleteAccount(String accountId) async {
-    try {
-      final response = await http.delete(
-        Uri.parse('$_baseUrl/$accountId'),
-        headers: _buildHeaders(),
-      );
+  void _showDeleteAccountDialog() {
+    if (_authToken == null || accounts.isEmpty) return;
 
-      if (response.statusCode == 200) {
-        _showSuccessMessage('Perfil eliminado correctamente');
-        await _fetchAccounts();
-      } else {
-        final errorData = json.decode(response.body);
-        _showErrorMessage(errorData['message'] ?? 'Error al eliminar el perfil');
-      }
-    } catch (e) {
-      _showErrorMessage('Error de conexión: $e');
-    }
+    final accountToDelete = accounts.first; // Aquí puedes ajustar cuál cuenta eliminar, o dejarlo abierto a UI futura.
+
+    showDialog(
+      context: context,
+      builder: (context) => DeleteProfileWidget(
+        accountId: accountToDelete.id,
+        accountName: accountToDelete.name,
+        authToken: _authToken!,
+        baseUrl: _baseUrl.replaceAll('/v1/account', ''),
+        authRepository: widget.authRepository,
+        onDeleteConfirmed: _fetchAccounts,
+      ),
+    );
   }
 
   void _selectAccount(BuildContext context, AccountDetailDTO account) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Perfil seleccionado: ${account.name}')),
-    );
-  }
-
-  // Métodos de UI helpers
-  Map<String, String> _buildHeaders() {
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $_authToken',
-    };
-  }
-
-  void _showSuccessMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
-
-  void _showErrorMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
-
-  void _showDeleteConfirmation(String accountId) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirmar eliminación'),
-        content: const Text('¿Estás seguro de que quieres eliminar este perfil?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _deleteAccount(accountId);
-            },
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
     );
   }
 
@@ -362,17 +308,29 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
     return Center(
       child: Column(
         children: [
-          Text(
-            'Selecciona tu perfil',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
+        Text(
+        'Selecciona tu perfil',
+        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      const SizedBox(height: 8),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
           IconButton(
             icon: const Icon(Icons.add, color: Colors.white),
+            tooltip: 'Crear perfil',
             onPressed: _showCreateAccountDialog,
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.white),
+            tooltip: 'Eliminar perfil',
+            onPressed: _showDeleteAccountDialog,
+              ),
+            ],
           ),
         ],
       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kuenteco/presentation/widgets/Background_widget.dart';
-import 'package:kuenteco/presentation/widgets/Navbar_guest_widget.dart';
 import 'package:kuenteco/presentation/widgets/Footer_widget.dart';
+import 'package:kuenteco/presentation/widgets/Navbar_guest_widget.dart';
 
 class PrivacyPage extends StatelessWidget {
   const PrivacyPage({super.key});

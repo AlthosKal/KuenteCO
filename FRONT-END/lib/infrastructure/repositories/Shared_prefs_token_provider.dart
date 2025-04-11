@@ -1,5 +1,5 @@
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:kuenteco/core/constants/Token_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefsTokenProvider implements TokenProvider {
   final SharedPreferences prefs;

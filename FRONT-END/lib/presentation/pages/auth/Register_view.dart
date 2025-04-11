@@ -17,6 +17,13 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
   final TextEditingController _fullNameController = TextEditingController();
+
+  // FocusNodes para cada campo de texto
+  final FocusNode _fullNameFocus = FocusNode();
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
+  final FocusNode _confirmPasswordFocus = FocusNode();
+
   bool _obscurePassword = true;
   bool _isLoading = false;
 
@@ -28,6 +35,11 @@ class _RegisterPageState extends State<RegisterPage> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _fullNameController.dispose();
+    // Dispose de los FocusNodes
+    _fullNameFocus.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
+    _confirmPasswordFocus.dispose();
     super.dispose();
   }
 
@@ -169,6 +181,8 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildFullNameField() {
     return _buildTextField(
       controller: _fullNameController,
+      focusNode: _fullNameFocus,
+      nextFocusNode: _emailFocus,
       labelText: 'Nombre de usuario',
       validator: (value) {
         if (value?.isEmpty ?? true) return 'Por favor, ingresa tu nombre';
@@ -180,6 +194,8 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildEmailField() {
     return _buildTextField(
       controller: _emailController,
+      focusNode: _emailFocus,
+      nextFocusNode: _passwordFocus,
       labelText: 'Correo electrónico',
       validator: (value) {
         if (value?.isEmpty ?? true) return 'Por favor, ingresa tu correo';
@@ -192,6 +208,8 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildPasswordField() {
     return _buildTextField(
       controller: _passwordController,
+      focusNode: _passwordFocus,
+      nextFocusNode: _confirmPasswordFocus,
       labelText: 'Contraseña',
       obscureText: _obscurePassword,
       suffixIcon: IconButton(
@@ -212,8 +230,11 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildConfirmPasswordField() {
     return _buildTextField(
       controller: _confirmPasswordController,
+      focusNode: _confirmPasswordFocus,
       labelText: 'Confirmar contraseña',
       obscureText: true,
+      isLastField: true,
+      onFieldSubmitted: (_) => _registerUser(context),
       validator: (value) {
         if (value?.isEmpty ?? true) return 'Confirma tu contraseña';
         if (value != _passwordController.text) return 'Las contraseñas no coinciden';
@@ -225,17 +246,30 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildTextField({
     required TextEditingController controller,
     required String labelText,
+    FocusNode? focusNode,
+    FocusNode? nextFocusNode,
     bool obscureText = false,
     Widget? suffixIcon,
+    bool isLastField = false,
+    void Function(String)? onFieldSubmitted,
     String? Function(String?)? validator,
   }) {
     return SizedBox(
       width: 320,
       child: TextFormField(
         controller: controller,
+        focusNode: focusNode,
         obscureText: obscureText,
         cursorColor: Colors.white,
         style: const TextStyle(color: Colors.white),
+        textInputAction: isLastField ? TextInputAction.done : TextInputAction.next,
+        onFieldSubmitted: (value) {
+          if (isLastField) {
+            _registerUser(context);
+          } else if (nextFocusNode != null) {
+            FocusScope.of(context).requestFocus(nextFocusNode);
+          }
+        },
         decoration: InputDecoration(
           border: InputBorder.none,
           labelText: labelText,

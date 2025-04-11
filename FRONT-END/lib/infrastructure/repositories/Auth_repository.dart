@@ -1,3 +1,5 @@
+import 'package:kuenteco/domain/dto/Account_type.dart';
+
 abstract class AuthRepository {
   Future<void> register(
       String email,
@@ -20,7 +22,6 @@ abstract class AuthRepository {
 
   Future<void> logout();
 
-
   Future<void> updateAccountImage({
     required int accountId,
     required dynamic imageFile,
@@ -33,4 +34,12 @@ abstract class AuthRepository {
   Future<bool> checkAuth();
 
   Future<Map<String, dynamic>> getAllAccounts();
+
+  Future<Map<String, dynamic>> registerAccount({
+    required String name,
+    required AccountType type,
+  });
+  Future<void> deleteAccount({
+    required int id,
+  });
 }

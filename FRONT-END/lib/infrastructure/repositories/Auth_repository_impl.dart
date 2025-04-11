@@ -1,3 +1,4 @@
+import 'package:kuenteco/domain/dto/Account_type.dart';
 import 'package:kuenteco/infrastructure/datasources/remote/Auth_api_service.dart';
 import 'package:kuenteco/infrastructure/repositories/Auth_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -141,6 +142,67 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  @override
+  Future<Map<String, dynamic>> registerAccount({
+    required String name,
+    required AccountType type,
+  }) async {
+
+    final token = await _loadToken();
+
+    if (token == null || token.isEmpty) {
+      print('[ERROR] registerAccount: No hay token válido disponible');
+      return {
+        'status': 'error',
+        'message': 'No hay sesión activa',
+      };
+    }
+
+    _apiService.setToken(token);
+
+    final response = await _apiService.registerAccount(
+      name: name,
+      type: type,
+    );
+
+    if (response['status'] == 'success') {
+      print('[DEBUG] Registro de cuenta exitoso');
+    } else {
+      if (response['statusCode'] == 401) {
+        print('[WARNING] Token inválido o expirado');
+      } else {
+        print('[ERROR] Registro de cuenta fallido: ${response['message']}');
+      }
+
+      return {
+        'status': 'error',
+        'message': response['message'] ?? 'Error al registrar cuenta',
+      };
+    }
+
+    return response;
+  }
+
+  @override
+  Future<void> deleteAccount({
+    required int id,
+  }) async {
+    final token = await _loadToken();
+
+    if (token == null || token.isEmpty) {
+      print('[ERROR] deleteAccount: No hay token válido disponible');
+      throw Exception('No hay sesión activa');
+    }
+
+    _apiService.setToken(token);
+
+    final response = await _apiService.deleteAccount(id: id);
+
+    if (response['status'] != 'success') {
+      throw Exception(response['message'] ?? 'Error al eliminar cuenta');
+    }
+  }
+
 
   // =================== REGISTER ===================
 
@@ -222,7 +284,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   // =================== PROFILE ===================
 
-  @override
+  /* @override
   Future<void> updateProfile(Map<String, dynamic> userData) async {
     await _loadToken();
     final response = await _apiService.updateProfile(userData: userData);
@@ -231,7 +293,7 @@ class AuthRepositoryImpl implements AuthRepository {
       throw Exception(response['message'] ?? 'Error al actualizar el perfil');
     }
   }
-
+*/
   @override
   Future<void> updateAccountImage({
     required int accountId,

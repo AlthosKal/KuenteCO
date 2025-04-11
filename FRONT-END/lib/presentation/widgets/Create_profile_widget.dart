@@ -1,18 +1,22 @@
-import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'dart:ui' as ui;
-import 'package:http/http.dart' as http;
+
+import 'package:flutter/material.dart';
+import 'package:kuenteco/domain/dto/Account_type.dart';
+import 'package:kuenteco/infrastructure/repositories/Auth_repository.dart';
 
 class CreateProfileWidget extends StatefulWidget {
   final VoidCallback onAccountCreated;
   final String authToken;
   final String baseUrl;
+  final AuthRepository authRepository;
+
+
 
   const CreateProfileWidget({
     super.key,
     required this.onAccountCreated,
     required this.authToken,
-    required this.baseUrl,
+    required this.baseUrl, required this.authRepository,
   });
 
   @override
@@ -22,14 +26,13 @@ class CreateProfileWidget extends StatefulWidget {
 class _CreateProfileWidgetState extends State<CreateProfileWidget> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  AccountType _selectedType = AccountType.PERSONAL;
   bool _isSubmitting = false;
   String _errorMessage = '';
 
   @override
   void dispose() {
     _nameController.dispose();
-    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -42,25 +45,18 @@ class _CreateProfileWidgetState extends State<CreateProfileWidget> {
     });
 
     try {
-      final response = await http.post(
-        Uri.parse('${widget.baseUrl}/account/register'), // Eliminé el /api/v1 duplicado
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${widget.authToken}',
-        },
-        body: json.encode({
-          'name': _nameController.text.trim(),
-          'description': _descriptionController.text.trim(),
-        }),
+      final response = await widget.authRepository.registerAccount(
+        name: _nameController.text.trim(),
+        type: _selectedType,
       );
 
-      if (response.statusCode == 201) {
+      if (response['status'] == 'success') {
         _handleSuccess();
       } else {
-        _handleError(response);
+        _handleError(response['message'] ?? 'Error al crear perfil');
       }
     } catch (e) {
-      _handleException(e);
+      _handleError('Error: ${e.toString()}');
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);
@@ -70,32 +66,21 @@ class _CreateProfileWidgetState extends State<CreateProfileWidget> {
 
   void _handleSuccess() {
     widget.onAccountCreated();
-    Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Perfil creado correctamente'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
-  void _handleError(http.Response response) {
-    try {
-      final errorData = json.decode(response.body);
-      setState(() {
-        _errorMessage = errorData['message'] ?? 'Error al crear el perfil (${response.statusCode})';
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Error ${response.statusCode}: ${response.reasonPhrase}';
-      });
+    if (mounted) {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Perfil creado correctamente'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 
-  void _handleException(dynamic e) {
-    setState(() {
-      _errorMessage = 'Error de conexión: ${e.toString()}';
-    });
+  void _handleError(String message) {
+    if (mounted) {
+      setState(() => _errorMessage = message);
+    }
   }
 
   @override
@@ -114,7 +99,7 @@ class _CreateProfileWidgetState extends State<CreateProfileWidget> {
             borderRadius: BorderRadius.circular(15.0),
             boxShadow: [
               BoxShadow(
-                color: theme.primaryColor.withOpacity(0.2),
+                color: theme.colorScheme.primary.withOpacity(0.2),
                 blurRadius: 6,
                 spreadRadius: 1,
               ),
@@ -125,14 +110,106 @@ class _CreateProfileWidgetState extends State<CreateProfileWidget> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildHeader(),
-                if (_errorMessage.isNotEmpty) _buildErrorText(),
+                const Text(
+                  'Crear Nuevo Perfil',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                if (_errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Text(
+                      _errorMessage,
+                      style: const TextStyle(color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 const SizedBox(height: 16),
-                _buildNameField(),
+                TextFormField(
+                  controller: _nameController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Nombre del Perfil',
+                    labelStyle: const TextStyle(color: Colors.white),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.white),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  validator: (value) =>
+                      value?.isEmpty ?? true ? 'Ingresa un nombre' : null,
+                ),
                 const SizedBox(height: 16),
-                _buildDescriptionField(),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<AccountType>(
+                      value: _selectedType,
+                      dropdownColor: Colors.black.withOpacity(0.8),
+                      isExpanded: true,
+                      icon: const Icon(Icons.arrow_drop_down,
+                          color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
+                      hint: const Text(
+                        'Selecciona el tipo de cuenta',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      items: AccountType.values.map((AccountType type) {
+                        return DropdownMenuItem<AccountType>(
+                          value: type,
+                          child: Text(
+                            _getAccountTypeDisplayName(type),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (AccountType? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            _selectedType = newValue;
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 24),
-                _buildSubmitButton(),
+                ElevatedButton(
+                  onPressed: _isSubmitting ? null : _submitForm,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 14, horizontal: 40),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.black,
+                          ),
+                        )
+                      : const Text(
+                          'CREAR PERFIL',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                ),
               ],
             ),
           ),
@@ -141,94 +218,14 @@ class _CreateProfileWidgetState extends State<CreateProfileWidget> {
     );
   }
 
-  Widget _buildHeader() {
-    return const Text(
-      'Crear Nuevo Perfil',
-      style: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-      ),
-      textAlign: TextAlign.center,
-    );
-  }
-
-  Widget _buildErrorText() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Text(
-        _errorMessage,
-        style: const TextStyle(color: Colors.red),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-
-  Widget _buildNameField() {
-    return TextFormField(
-      controller: _nameController,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: 'Nombre del Perfil',
-        labelStyle: const TextStyle(color: Colors.white),
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.white),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-      validator: (value) =>
-      value?.isEmpty ?? true ? 'Ingresa un nombre' : null,
-    );
-  }
-
-  Widget _buildDescriptionField() {
-    return TextFormField(
-      controller: _descriptionController,
-      maxLines: 3,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: 'Descripción',
-        labelStyle: const TextStyle(color: Colors.white),
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.white),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-      validator: (value) =>
-      value?.isEmpty ?? true ? 'Ingresa una descripción' : null,
-    );
-  }
-
-  Widget _buildSubmitButton() {
-    return ElevatedButton(
-      onPressed: _isSubmitting ? null : _submitForm,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 40),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-      child: _isSubmitting
-          ? const SizedBox(
-        width: 20,
-        height: 20,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          color: Colors.black,
-        ),
-      )
-          : const Text(
-        'CREAR PERFIL',
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-    );
+  String _getAccountTypeDisplayName(AccountType type) {
+    switch (type) {
+      case AccountType.PERSONAL:
+        return 'Personal';
+      case AccountType.BUSINESS:
+        return 'Negocio';
+      default:
+        return 'Personal';
+    }
   }
 }
