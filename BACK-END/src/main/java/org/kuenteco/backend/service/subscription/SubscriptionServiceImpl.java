@@ -30,9 +30,9 @@ import java.util.Calendar;
 @Service
 @RequiredArgsConstructor
 public class SubscriptionServiceImpl implements SubscriptionService {
-    //Mappers
+    // Mappers
     private final SubscriptionDetailMapper subscriptionDetailMapper;
-    //Repositorios maestros
+    // Repositorios maestros
     private final MasterAccountRepository masterAccountRepository;
     private final MasterSubscriptionRepository masterSubscriptionRepository;
     private final MasterPaySubscriptionRepository masterPaySubscriptionRepository;
@@ -44,8 +44,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public SubscriptionDetailDTO getSubscriptions(Integer subscriptionId) {
         // Obtener la suscripción de la base de datos
-        Subscription subscription = slaveSubscriptionRepository.findById(subscriptionId)
-                .orElseThrow(() -> new EntityNotFoundException("Subscripción no encontrada con el id: " + subscriptionId));
+        Subscription subscription = slaveSubscriptionRepository.findById(subscriptionId).orElseThrow(
+                () -> new EntityNotFoundException("Subscripción no encontrada con el id: " + subscriptionId));
 
         // Obtener el pago relacionado (puede ser null si no existe)
         PaySubscription paySubscription = slavePaySubscriptionRepository.findBySubscriptionId(subscriptionId)
@@ -107,7 +107,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public void updateSubscription(UpdateSubscriptionDTO updateSubscriptionDTO, Integer subscriptionId, Integer accountId) throws IOException {
+    public void updateSubscription(UpdateSubscriptionDTO updateSubscriptionDTO, Integer subscriptionId,
+            Integer accountId) throws IOException {
         // Validar entrada
         if (updateSubscriptionDTO == null) {
             throw new IllegalArgumentException("Campos requeridos, no pueden ser nulos");
@@ -117,8 +118,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
 
         // Obtener la suscripción de la base de datos
-        Subscription subscription = masterSubscriptionRepository.findById(subscriptionId)
-                .orElseThrow(() -> new EntityNotFoundException("Subscripción no encotrada con el id: " + subscriptionId));
+        Subscription subscription = masterSubscriptionRepository.findById(subscriptionId).orElseThrow(
+                () -> new EntityNotFoundException("Subscripción no encotrada con el id: " + subscriptionId));
 
         // Validar que la suscripción esté activa
         if (subscription.getState() != State.ACTIVE) {
@@ -147,17 +148,16 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         masterSubscriptionRepository.save(subscription);
     }
 
-    private void registerSubscriptionChange(Subscription subscription,
-                                            PaySubscription paySubscription,
-                                            SubscriptionType previousType) {
+    private void registerSubscriptionChange(Subscription subscription, PaySubscription paySubscription,
+            SubscriptionType previousType) {
         if (paySubscription != null) {
             PaymentHistory history = new PaymentHistory();
             history.setPaySubscription(paySubscription);
 
             DescriptionPaymentHistory details = new DescriptionPaymentHistory();
             details.setTypeSubscription("Cambio de " + previousType + " a " + subscription.getType());
-            details.setPaymentMethod(paySubscription.getPayMethod() != null ?
-                    paySubscription.getPayMethod().toString() : "N/A");
+            details.setPaymentMethod(
+                    paySubscription.getPayMethod() != null ? paySubscription.getPayMethod().toString() : "N/A");
             details.setAmount(paySubscription.getAmount());
             details.setDate(new Timestamp(System.currentTimeMillis()).toString());
 
@@ -169,14 +169,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private Integer getCurrentPaySubscriptionId(Integer masterAccountId) {
         // Obtener la suscripción activa del usuario
         Subscription activeSubscription = masterSubscriptionRepository
-                .findByAccount_IdAndState(masterAccountId, State.ACTIVE)
-                .orElseThrow(() -> new AccountException(
+                .findByAccount_IdAndState(masterAccountId, State.ACTIVE).orElseThrow(() -> new AccountException(
                         "No active subscription found for account with id: " + masterAccountId));
 
         // Obtener el pago relacionado
         return masterPaySubscriptionRepository.findBySubscriptionId(activeSubscription.getId())
-                .map(PaySubscription::getId)
-                .orElseThrow(() -> new AccountException(
+                .map(PaySubscription::getId).orElseThrow(() -> new AccountException(
                         "No payment found for active subscription with id: " + activeSubscription.getId()));
     }
 

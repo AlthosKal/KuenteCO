@@ -31,13 +31,14 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginUserDTO loginUserDTO, BindingResult bindingResult,
-                                   HttpServletResponse response) {
+            HttpServletResponse response) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new ApiMessage("Datos Invalidos"));
         }
 
         try {
-            TokenResponseDTO tokenResponseDTO = authService.authenticate(loginUserDTO.getNameOrEmail(), loginUserDTO.getPassword(), response);
+            TokenResponseDTO tokenResponseDTO = authService.authenticate(loginUserDTO.getNameOrEmail(),
+                    loginUserDTO.getPassword(), response);
             return ResponseEntity.ok(tokenResponseDTO);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
@@ -146,10 +147,8 @@ public class AuthController {
     }
 
     @PostMapping("/user/image/add")
-    public ResponseEntity<ImageDTO> uploadProfileImage(
-            @RequestParam("image") MultipartFile image,
-            @RequestHeader("Authorization") String token,
-            HttpServletResponse response) {
+    public ResponseEntity<ImageDTO> uploadProfileImage(@RequestParam("image") MultipartFile image,
+            @RequestHeader("Authorization") String token, HttpServletResponse response) {
         try {
             // Extraer el token Bearer
             String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
@@ -161,10 +160,8 @@ public class AuthController {
     }
 
     @PutMapping("/user/image/update")
-    public ResponseEntity<ImageDTO> updateProfileImage(
-            @RequestParam("image") MultipartFile image,
-            @RequestHeader("Authorization") String token,
-            HttpServletResponse response) {
+    public ResponseEntity<ImageDTO> updateProfileImage(@RequestParam("image") MultipartFile image,
+            @RequestHeader("Authorization") String token, HttpServletResponse response) {
         try {
             // Extraer el token Bearer
             String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
@@ -176,8 +173,7 @@ public class AuthController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteProfileImage(
-            @RequestHeader("Authorization") String token,
+    public ResponseEntity<Void> deleteProfileImage(@RequestHeader("Authorization") String token,
             HttpServletResponse response) {
         try {
             // Extraer el token Bearer
@@ -191,10 +187,10 @@ public class AuthController {
 
     @GetMapping("/user/details")
     public Object getAuthenticatedUser() {
-        try{
+        try {
             User user = userService.getUserDetails();
             return ResponseEntity.ok(user);
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
         }
     }

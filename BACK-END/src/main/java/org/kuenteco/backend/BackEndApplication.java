@@ -17,7 +17,7 @@ public class BackEndApplication {
         System.setProperty("VERIFICATION_EMAIL", dotenv.get("VERIFICATION_EMAIL"));
         System.setProperty("RESET_PASSWORD", dotenv.get("RESET_PASSWORD"));
 
-        //API de Cloudinary
+        // API de Cloudinary
         System.setProperty("CLOUDINARY_NAME", dotenv.get("CLOUDINARY_NAME"));
         System.setProperty("CLOUDINARY_API_KEY", dotenv.get("CLOUDINARY_API_KEY"));
         System.setProperty("CLOUDINARY_API_SECRET", dotenv.get("CLOUDINARY_API_SECRET"));

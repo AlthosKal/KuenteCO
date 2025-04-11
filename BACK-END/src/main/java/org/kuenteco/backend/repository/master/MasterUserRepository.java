@@ -12,6 +12,7 @@ import java.util.Optional;
 @Transactional(transactionManager = "masterTransactionManager")
 public interface MasterUserRepository extends JpaRepository<User, String> {
     Optional<User> findByName(@NotBlank String name);
+
     Optional<User> findByEmail(String email);
 
     void removeUserByEmail(@NotBlank String email);

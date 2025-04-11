@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/budgets")
+@RequestMapping("/v1/budgets")
 @RequiredArgsConstructor
 public class BudgetController {
 
@@ -29,8 +29,7 @@ public class BudgetController {
     }
 
     @PutMapping("/total/{accountId}")
-    public ResponseEntity<BudgetResponseDTO> updateTotalBudget(
-            @PathVariable Integer accountId,
+    public ResponseEntity<BudgetResponseDTO> updateTotalBudget(@PathVariable Integer accountId,
             @RequestBody Map<String, Object> request) {
         BigDecimal totalBudget = new BigDecimal(request.get("totalBudget").toString());
 
@@ -39,8 +38,7 @@ public class BudgetController {
     }
 
     @PutMapping("/remaining/{accountId}")
-    public ResponseEntity<BudgetResponseDTO> updateRemainingBudget(
-            @PathVariable Integer accountId,
+    public ResponseEntity<BudgetResponseDTO> updateRemainingBudget(@PathVariable Integer accountId,
             @RequestBody Map<String, Object> request) {
         BigDecimal remainingBudget = new BigDecimal(request.get("remainingBudget").toString());
 

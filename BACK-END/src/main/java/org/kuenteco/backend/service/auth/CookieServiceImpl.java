@@ -9,7 +9,7 @@ public class CookieServiceImpl implements CookieService {
 
     @Override
     public void addHttpOnlyCookie(String nameOrEmail, String value, int maxAge, HttpServletResponse response) {
-        Cookie cookie = new Cookie(nameOrEmail  , value);
+        Cookie cookie = new Cookie(nameOrEmail, value);
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setPath("/");

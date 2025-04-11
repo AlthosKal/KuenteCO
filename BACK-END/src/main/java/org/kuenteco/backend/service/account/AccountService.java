@@ -18,6 +18,8 @@ public interface AccountService {
     void deleteAccount(Account account) throws IOException;
 
     ImageDTO saveImage(MultipartFile image, Account masterAccount, HttpServletResponse response);
+
     ImageDTO updateImage(MultipartFile image, Account masterAccount, HttpServletResponse response);
+
     void deleteImage(Account masterAccount, HttpServletResponse response);
 }

@@ -17,11 +17,13 @@ public interface SlaveTransactionRepository extends JpaRepository<Transaction, I
     List<Transaction> findByAccountId(@Param("accountId") Integer accountId);
 
     @Query("SELECT t FROM Transaction t WHERE t.account.id = :accountId AND t.type = :type")
-    List<Transaction> findByAccountIdAndType(@Param("accountId") Integer accountId, @Param("type") TransactionType type);
+    List<Transaction> findByAccountIdAndType(@Param("accountId") Integer accountId,
+            @Param("type") TransactionType type);
 
     @Query("SELECT t FROM Transaction t WHERE t.category.id = :categoryId")
     List<Transaction> findByCategoryId(@Param("categoryId") Integer categoryId);
 
     @Query("SELECT t FROM Transaction t WHERE t.category.id = :categoryId AND t.type = :type")
-    List<Transaction> findByCategoryIdAndType(@Param("categoryId") Integer categoryId, @Param("type") TransactionType type);
+    List<Transaction> findByCategoryIdAndType(@Param("categoryId") Integer categoryId,
+            @Param("type") TransactionType type);
 }

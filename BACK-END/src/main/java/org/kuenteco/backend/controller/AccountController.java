@@ -32,7 +32,7 @@ public class AccountController {
             return new ResponseEntity<>(accountService.getAccounts(), HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.ok(new ApiMessage(e.getMessage()));
-        }catch (Throwable e){
+        } catch (Throwable e) {
             return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
         }
     }
@@ -67,10 +67,8 @@ public class AccountController {
     }
 
     @PostMapping("image/add")
-    public ResponseEntity<ImageDTO> uploadAccountImage(
-            @PathVariable("accountId") Integer accountId,
-            @RequestParam("image") MultipartFile image,
-            @RequestHeader("Authorization") String token,
+    public ResponseEntity<ImageDTO> uploadAccountImage(@PathVariable("accountId") Integer accountId,
+            @RequestParam("image") MultipartFile image, @RequestHeader("Authorization") String token,
             HttpServletResponse response) {
         try {
             // Extraer el token Bearer
@@ -94,10 +92,8 @@ public class AccountController {
     }
 
     @PutMapping("/image/update")
-    public ResponseEntity<ImageDTO> updateAccountImage(
-            @PathVariable("accountId") Integer accountId,
-            @RequestParam("image") MultipartFile image,
-            @RequestHeader("Authorization") String token,
+    public ResponseEntity<ImageDTO> updateAccountImage(@PathVariable("accountId") Integer accountId,
+            @RequestParam("image") MultipartFile image, @RequestHeader("Authorization") String token,
             HttpServletResponse response) {
         try {
             // Extraer el token Bearer
@@ -121,10 +117,8 @@ public class AccountController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteAccountImage(
-            @PathVariable("accountId") Integer accountId,
-            @RequestHeader("Authorization") String token,
-            HttpServletResponse response) {
+    public ResponseEntity<Void> deleteAccountImage(@PathVariable("accountId") Integer accountId,
+            @RequestHeader("Authorization") String token, HttpServletResponse response) {
         try {
             // Extraer el token Bearer
             String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;

@@ -16,7 +16,7 @@ public class CategoryRequestDTO {
     private Integer accountId;
     private Integer assetId;
     private String name;
-    private DescriptionCategory description;
+    private String description;
     private BigDecimal assignedBudget;
     private Timestamp startDate;
     private Timestamp finishDate;

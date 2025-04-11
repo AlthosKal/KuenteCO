@@ -17,8 +17,8 @@ public interface BudgetMapper {
     default void calculateUsedPercentage(Budget budget, @MappingTarget BudgetResponseDTO responseDTO) {
         if (budget.getTotalBudget() != null && budget.getTotalBudget().compareTo(java.math.BigDecimal.ZERO) > 0) {
             java.math.BigDecimal used = budget.getTotalBudget().subtract(budget.getRemainingBudget());
-            responseDTO.setUsedPercentage(used.multiply(new java.math.BigDecimal("100"))
-                    .divide(budget.getTotalBudget(), 2, java.math.BigDecimal.ROUND_HALF_UP));
+            responseDTO.setUsedPercentage(used.multiply(new java.math.BigDecimal("100")).divide(budget.getTotalBudget(),
+                    2, java.math.BigDecimal.ROUND_HALF_UP));
         } else {
             responseDTO.setUsedPercentage(java.math.BigDecimal.ZERO);
         }

@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/categories")
+@RequestMapping("/v1/category")
 @RequiredArgsConstructor
 public class CategoryController {
 
@@ -27,31 +27,20 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<CategoryResponseDTO> createCategory(@RequestBody CategoryRequestDTO requestDTO) {
-        Category createdCategory = categoryService.createCategory(
-                requestDTO.getAccountId(),
-                requestDTO.getAssetId(),
-                requestDTO.getName(),
-                requestDTO.getDescription(),
-                requestDTO.getAssignedBudget(),
-                requestDTO.getStartDate(),
-                requestDTO.getFinishDate());
+        Category createdCategory = categoryService.createCategory(requestDTO.getAccountId(), requestDTO.getAssetId(),
+                requestDTO.getName(), requestDTO.getDescription(), requestDTO.getAssignedBudget(),
+                requestDTO.getStartDate(), requestDTO.getFinishDate());
 
         return new ResponseEntity<>(categoryMapper.toResponseDTO(createdCategory), HttpStatus.CREATED);
     }
 
     @PutMapping("/{categoryId}")
-    public ResponseEntity<CategoryResponseDTO> updateCategory(
-            @PathVariable Integer categoryId,
+    public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Integer categoryId,
             @RequestBody CategoryRequestDTO requestDTO) {
 
-        Category updatedCategory = categoryService.updateCategory(
-                categoryId,
-                requestDTO.getName(),
-                requestDTO.getDescription(),
-                requestDTO.getAssignedBudget(),
-                requestDTO.getStartDate(),
-                requestDTO.getFinishDate(),
-                State.valueOf(requestDTO.getState().toString()));
+        Category updatedCategory = categoryService.updateCategory(categoryId, requestDTO.getName(),
+                requestDTO.getDescription(), requestDTO.getAssignedBudget(), requestDTO.getStartDate(),
+                requestDTO.getFinishDate(), State.valueOf(requestDTO.getState().toString()));
 
         return ResponseEntity.ok(categoryMapper.toResponseDTO(updatedCategory));
     }
@@ -66,15 +55,13 @@ public class CategoryController {
     @GetMapping("/account/{accountId}")
     public ResponseEntity<List<CategoryResponseDTO>> getCategoriesByAccountId(@PathVariable Integer accountId) {
         List<Category> categories = categoryService.getCategoriesByAccountId(accountId);
-        List<CategoryResponseDTO> responseDTOs = categories.stream()
-                .map(categoryMapper::toResponseDTO)
+        List<CategoryResponseDTO> responseDTOs = categories.stream().map(categoryMapper::toResponseDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(responseDTOs);
     }
 
     @PutMapping("/{categoryId}/assign-budget")
-    public ResponseEntity<CategoryResponseDTO> assignBudgetToCategory(
-            @PathVariable Integer categoryId,
+    public ResponseEntity<CategoryResponseDTO> assignBudgetToCategory(@PathVariable Integer categoryId,
             @RequestBody Map<String, Object> request) {
         BigDecimal amount = new BigDecimal(request.get("amount").toString());
 
@@ -83,8 +70,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{categoryId}/change-state")
-    public ResponseEntity<CategoryResponseDTO> changeState(
-            @PathVariable Integer categoryId,
+    public ResponseEntity<CategoryResponseDTO> changeState(@PathVariable Integer categoryId,
             @RequestBody Map<String, Object> request) {
         State state = State.valueOf((String) request.get("state"));
 

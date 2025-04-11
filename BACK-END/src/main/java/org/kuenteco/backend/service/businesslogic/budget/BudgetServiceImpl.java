@@ -58,8 +58,8 @@ public class BudgetServiceImpl implements BudgetService {
     @Override
     @Transactional
     public Budget updateTotalBudget(Integer idAccount, BigDecimal newTotalBudget) {
-        Budget budget = slaveBudgetRepository.findByAccountId(idAccount)
-                .orElseThrow(() -> new RuntimeException("Presupuesto no encontrado para la cuenta con ID: " + idAccount));
+        Budget budget = slaveBudgetRepository.findByAccountId(idAccount).orElseThrow(
+                () -> new RuntimeException("Presupuesto no encontrado para la cuenta con ID: " + idAccount));
 
         BigDecimal difference = newTotalBudget.subtract(budget.getTotalBudget());
 
@@ -73,8 +73,8 @@ public class BudgetServiceImpl implements BudgetService {
     @Override
     @Transactional
     public Budget updateRemainingBudget(Integer idAccount, BigDecimal remainingBudget) {
-        Budget budget = slaveBudgetRepository.findByAccountId(idAccount)
-                .orElseThrow(() -> new RuntimeException("Presupuesto no encontrado para la cuenta con ID: " + idAccount));
+        Budget budget = slaveBudgetRepository.findByAccountId(idAccount).orElseThrow(
+                () -> new RuntimeException("Presupuesto no encontrado para la cuenta con ID: " + idAccount));
 
         budget.setRemainingBudget(remainingBudget);
         return masterBudgetRepository.save(budget);
@@ -88,14 +88,12 @@ public class BudgetServiceImpl implements BudgetService {
     @Override
     @Transactional
     public Budget recalculateRemainingBudget(Integer idAccount) {
-        Budget budget = slaveBudgetRepository.findByAccountId(idAccount)
-                .orElseThrow(() -> new RuntimeException("Presupuesto no encontrado para la cuenta con ID: " + idAccount));
+        Budget budget = slaveBudgetRepository.findByAccountId(idAccount).orElseThrow(
+                () -> new RuntimeException("Presupuesto no encontrado para la cuenta con ID: " + idAccount));
 
         // Sumar todos los presupuestos asignados a categorías
         List<Category> categories = masterCategoryRepository.findByAccountId(idAccount);
-        BigDecimal totalAssigned = categories.stream()
-                .map(Category::getAssignedBudget)
-                .filter(bd -> bd != null)
+        BigDecimal totalAssigned = categories.stream().map(Category::getAssignedBudget).filter(bd -> bd != null)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // Calcular presupuesto restante
@@ -108,30 +106,21 @@ public class BudgetServiceImpl implements BudgetService {
     @Override
     public BalanceDTO getFinancialBalance(Integer idAccount) {
         // Obtener el presupuesto
-        Budget budget = slaveBudgetRepository.findByAccountId(idAccount)
-                .orElse(new Budget());
+        Budget budget = slaveBudgetRepository.findByAccountId(idAccount).orElse(new Budget());
 
         // Calcular activos totales
         BigDecimal totalAssets = slaveTransactionRepository.findByAccountIdAndType(idAccount, TransactionType.INCOME)
-                .stream()
-                .map(Transaction::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .stream().map(Transaction::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // Calcular deudas totales
         BigDecimal totalDebts = slaveTransactionRepository.findByAccountIdAndType(idAccount, TransactionType.EXPENSE)
-                .stream()
-                .map(Transaction::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .stream().map(Transaction::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // Calcular patrimonio (activos - deudas)
         BigDecimal equity = totalAssets.subtract(totalDebts);
 
-        return new BalanceDTO(
-                totalAssets,
-                totalDebts,
-                equity,
+        return new BalanceDTO(totalAssets, totalDebts, equity,
                 budget.getTotalBudget() != null ? budget.getTotalBudget() : BigDecimal.ZERO,
-                budget.getRemainingBudget() != null ? budget.getRemainingBudget() : BigDecimal.ZERO
-        );
+                budget.getRemainingBudget() != null ? budget.getRemainingBudget() : BigDecimal.ZERO);
     }
 }
