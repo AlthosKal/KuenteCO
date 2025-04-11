@@ -30,7 +30,7 @@ public class Category {
 
     private String name;
 
-    //@Column(columnDefinition = "jsonb")
+    // @Column(columnDefinition = "jsonb")
     private String description;
 
     @Column(name = "assigned_budget")

@@ -62,7 +62,7 @@ public class AccountController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiMessage> deleteAccount(Account account) throws IOException {
         try {
-                accountService.deleteAccount(account);
+            accountService.deleteAccount(account);
 
             return ResponseEntity.status(HttpStatus.OK).body(new ApiMessage("Cuenta eliminada correctamente"));
         } catch (IllegalArgumentException e) {

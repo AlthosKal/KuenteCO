@@ -18,6 +18,8 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     operationsSorter: method
+    tagsSorter: alpha
+    version: 5.2.0
 
 resilience4j:
   circuitbreaker:

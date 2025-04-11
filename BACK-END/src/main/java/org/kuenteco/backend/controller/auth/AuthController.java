@@ -1,4 +1,4 @@
-package org.kuenteco.backend.controller;
+package org.kuenteco.backend.controller.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import org.kuenteco.backend.dto.ApiMessage;
 import org.kuenteco.backend.dto.auth.*;
 import org.kuenteco.backend.dto.image.ImageDTO;
-import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.jwt.JwtUtil;
 import org.kuenteco.backend.service.auth.AuthService;
 import org.kuenteco.backend.service.auth.UserService;
@@ -24,7 +23,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/v1/auth")
 @AllArgsConstructor
-public class AuthController {
+public class AuthController implements AuthResource {
     private final UserService userService;
     private final AuthService authService;
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
@@ -188,8 +187,8 @@ public class AuthController {
     @GetMapping("/user/details")
     public Object getAuthenticatedUser() {
         try {
-            User user = userService.getUserDetails();
-            return ResponseEntity.ok(user);
+            UserDetailDTO userDetailDTO = userService.getUserDetailsDTO();
+            return ResponseEntity.ok(userDetailDTO);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
         }

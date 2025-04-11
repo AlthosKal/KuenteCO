@@ -87,8 +87,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public Category updateCategory(Integer idCategory, String name, String description,
-            BigDecimal assignedBudget, Timestamp startDate, Timestamp finishDate, State state) {
+    public Category updateCategory(Integer idCategory, String name, String description, BigDecimal assignedBudget,
+            Timestamp startDate, Timestamp finishDate, State state) {
         Category category = masterCategoryRepository.findById(idCategory)
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada con ID: " + idCategory));
 

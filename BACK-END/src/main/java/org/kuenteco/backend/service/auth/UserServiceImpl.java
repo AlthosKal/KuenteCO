@@ -1,7 +1,9 @@
 package org.kuenteco.backend.service.auth;
 
+import org.kuenteco.backend.dto.auth.UserDetailDTO;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.State;
+import org.kuenteco.backend.mapper.UserDetailMapper;
 import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +20,14 @@ public class UserServiceImpl implements UserService {
     private final SlaveUserRepository slaveUserRepository;
     private final MasterUserRepository masterUserRepository;
 
+    private UserDetailMapper userDetailMapper;
+
     @Autowired
-    public UserServiceImpl(SlaveUserRepository slaveUserRepository, MasterUserRepository masterUserRepository) {
+    public UserServiceImpl(SlaveUserRepository slaveUserRepository, MasterUserRepository masterUserRepository,
+            UserDetailMapper userDetailMapper) {
         this.slaveUserRepository = slaveUserRepository;
         this.masterUserRepository = masterUserRepository;
+        this.userDetailMapper = userDetailMapper;
     }
 
     @Override
@@ -98,11 +104,16 @@ public class UserServiceImpl implements UserService {
             masterUserRepository.removeUserByEmail(email);
     }
 
-    @Override
     public User getUserDetails() {
         String nameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
         return findByNameOrEmail(nameOrEmail);
+    }
+
+    @Override
+    public UserDetailDTO getUserDetailsDTO() {
+        User user = getUserDetails();
+        return userDetailMapper.toDto(user);
     }
 
     public void deteleUser(User masterUser) {
