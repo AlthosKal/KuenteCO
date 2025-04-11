@@ -26,10 +26,9 @@ class KuentecoNavbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
-    final EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0);
 
-    return Container(
-      padding: padding,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
       child: isSmallScreen ? _buildMobileLayout(context) : _buildDesktopLayout(context),
     );
   }
@@ -63,49 +62,28 @@ class KuentecoNavbar extends StatelessWidget {
     ],
   );
 
-  List<Widget> _buildNavigationButtons(BuildContext context) {
-    return [
-      _buildButton(
-        context,
-        'Inicio',
-        '/home',
-        textColor: Colors.white,
-      ),
-      const SizedBox(width: 20),
-      _buildButton(
-        context,
-        'Rubros',
-        '/categories',
-        textColor: Colors.white,
-      ),
-      const SizedBox(width: 20),
-      _buildButton(
-        context,
-        'Dashboard',
-        '/dashboard',
-        textColor: Colors.white,
-      ),
-    ];
-  }
+  List<Widget> _buildNavigationButtons(BuildContext context) => [
+    _buildButton(context, 'Inicio', '/logged_home_view.dart'),
+    const SizedBox(width: 20),
+    _buildButton(context, 'Rubros', '/Category_view'),
+    const SizedBox(width: 20),
+    _buildButton(context, 'Presupuestos', '/Account_home_view'),
+  ];
 
   Widget _buildLogo(BuildContext context, bool isSmallScreen) {
-    final double defaultLogoWidth = isSmallScreen ? 220 : 250;
-    final double defaultLogoHeight = isSmallScreen ? 55 : 62.5;
-    final double width = logoWidth ?? defaultLogoWidth;
-    final double height = logoHeight ?? defaultLogoHeight;
+    final double defaultWidth = isSmallScreen ? 220.0 : 250.0;
+    final double defaultHeight = isSmallScreen ? 55.0 : 62.5;
+    final double width = logoWidth ?? defaultWidth;
+    final double height = useDefaultLogoSize ? defaultHeight : (logoHeight ?? defaultHeight);
 
     return GestureDetector(
-      onTap: () => Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/home',
-            (route) => false,
-      ),
+      onTap: () => _navigateToRoute(context, '/home'),
       child: Image.asset(
         logoPath,
         width: width,
         height: useDefaultLogoSize ? null : height,
         fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) => SizedBox(
+        errorBuilder: (_, __, ___) => SizedBox(
           width: width,
           height: height,
           child: Center(
@@ -143,9 +121,7 @@ class KuentecoNavbar extends StatelessWidget {
           showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (context) => const Center(
-              child: CircularProgressIndicator(),
-            ),
+            builder: (context) => const Center(child: CircularProgressIndicator()),
           );
 
           await authRepository.logout();
@@ -173,16 +149,16 @@ class KuentecoNavbar extends StatelessWidget {
         }
         break;
       case 'account':
-        if (context.mounted) Navigator.pushNamed(context, '/account');
+        _navigateToRoute(context, '/account');
         break;
       case 'add_profile':
-        if (context.mounted) Navigator.pushNamed(context, '/add-profile');
+        _navigateToRoute(context, '/add-profile');
         break;
       case 'subscription':
-        if (context.mounted) Navigator.pushNamed(context, '/subscription');
+        _navigateToRoute(context, '/subscription');
         break;
       case 'contact':
-        if (context.mounted) Navigator.pushNamed(context, '/contact');
+        _navigateToRoute(context, '/contact');
         break;
     }
   }
@@ -191,12 +167,10 @@ class KuentecoNavbar extends StatelessWidget {
       BuildContext context,
       String text,
       String route, {
-        Color? textColor,
+        Color textColor = Colors.white,
         bool isLarge = false,
       }) {
     final bool isActive = currentRoute == route;
-    final horizontalPadding = isLarge ? 20.0 : 16.0;
-    final verticalPadding = isLarge ? 10.0 : 8.0;
 
     return Material(
       color: Colors.transparent,
@@ -205,8 +179,8 @@ class KuentecoNavbar extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         child: Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: horizontalPadding,
-            vertical: verticalPadding,
+            horizontal: isLarge ? 20 : 16,
+            vertical: isLarge ? 10 : 8,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -214,7 +188,7 @@ class KuentecoNavbar extends StatelessWidget {
               Text(
                 text,
                 style: TextStyle(
-                  color: textColor ?? Colors.white,
+                  color: textColor,
                   fontSize: isLarge ? 17 : 16,
                   fontWeight: isActive ? FontWeight.w900 : FontWeight.bold,
                 ),
@@ -225,7 +199,7 @@ class KuentecoNavbar extends StatelessWidget {
                   height: 3,
                   width: 20,
                   decoration: BoxDecoration(
-                    color: (textColor ?? Colors.white).withOpacity(0.7),
+                    color: textColor.withOpacity(0.7),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -238,11 +212,6 @@ class KuentecoNavbar extends StatelessWidget {
 
   void _navigateToRoute(BuildContext context, String route) {
     if (route == currentRoute) return;
-
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      route,
-          (route) => false,
-    );
+    Navigator.pushNamedAndRemoveUntil(context, route, (r) => false);
   }
 }

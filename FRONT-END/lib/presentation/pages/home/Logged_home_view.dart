@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:kuenteco/infrastructure/repositories/Auth_repository.dart';
 import 'package:kuenteco/presentation/widgets/Background_widget.dart';
 import 'package:kuenteco/presentation/widgets/Create_profile_widget.dart';
@@ -9,7 +6,6 @@ import 'package:kuenteco/presentation/widgets/Delete_profile_widget.dart';
 import 'package:kuenteco/presentation/widgets/Footer_widget.dart';
 import 'package:kuenteco/presentation/widgets/Navbar_logged_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../domain/dto/AccountDetailDTO.dart';
 
 class LoggedInHomePage extends StatelessWidget {
