@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class ImageServiceImpl implements ImageService{
+public class ImageServiceImpl implements ImageService {
     private final CloudinaryService cloudinaryService;
     private final MasterImageRepository masterImageRepository;
 

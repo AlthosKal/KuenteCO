@@ -30,11 +30,10 @@ public abstract class CategoryMapper {
     protected void calculateBudgetStatistics(Category category, @MappingTarget CategoryResponseDTO responseDTO) {
         if (category.getId() != null) {
             // Calcular presupuesto usado
-            List<Transaction> expenses = transactionRepository.findByCategoryIdAndType(
-                    category.getId(), TransactionType.EXPENSE);
-            BigDecimal usedBudget = expenses.stream()
-                    .map(Transaction::getAmount)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            List<Transaction> expenses = transactionRepository.findByCategoryIdAndType(category.getId(),
+                    TransactionType.EXPENSE);
+            BigDecimal usedBudget = expenses.stream().map(Transaction::getAmount).reduce(BigDecimal.ZERO,
+                    BigDecimal::add);
 
             responseDTO.setUsedBudget(usedBudget);
             responseDTO.setRemainingBudget(category.getAssignedBudget().subtract(usedBudget));

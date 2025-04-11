@@ -1,6 +1,5 @@
 package org.kuenteco.backend.repository.slave;
 
-
 import org.kuenteco.backend.entity.extra.Image;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -34,8 +34,7 @@ public class SecurityConfig {
                 .requestMatchers("/v1/auth/login", "/v1/auth/register", "/v1/auth/validate-verification-code",
                         "/v1/auth/send-verification-code", "/v1/auth/activate-account", "/v1/auth/change-password")
                 .permitAll().requestMatchers("/v1/account/**").authenticated().anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults())
-                .authenticationProvider(authenticationProvider())
+                .httpBasic(Customizer.withDefaults()).authenticationProvider(authenticationProvider())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtEntryPoint()))
                 .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();

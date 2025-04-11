@@ -87,7 +87,8 @@ public class AccountServiceImpl implements AccountService {
         try {
             // Verificar si ya tiene una imagen previa
             if (masterAccount.getUser() != null) {
-                throw new RuntimeException("La cuenta ya tiene una imagen asociada. Utilice updateImage para actualizarla.");
+                throw new RuntimeException(
+                        "La cuenta ya tiene una imagen asociada. Utilice updateImage para actualizarla.");
             }
 
             // Subir la nueva imagen

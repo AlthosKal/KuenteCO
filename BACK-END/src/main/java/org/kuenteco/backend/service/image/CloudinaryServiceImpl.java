@@ -13,12 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-
 @Service
-public class CloudinaryServiceImpl implements CloudinaryService{
+public class CloudinaryServiceImpl implements CloudinaryService {
     private final Cloudinary cloudinary;
 
-    public CloudinaryServiceImpl(){
+    public CloudinaryServiceImpl() {
         Map<String, Object> valuesMap = new HashMap<>();
         valuesMap.put("cloud_name", System.getenv("CLOUDINARY_NAME"));
         valuesMap.put("cloud_api_key", System.getenv("CLOUDINARY_API_KEY"));
@@ -30,7 +29,7 @@ public class CloudinaryServiceImpl implements CloudinaryService{
     public Map upload(MultipartFile multipartFile) throws IOException {
         File file = convert(multipartFile);
         Map result = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
-        if(!Files.deleteIfExists(file.toPath())){
+        if (!Files.deleteIfExists(file.toPath())) {
             throw new IOException("Failed to delete temporary file: " + file.getAbsolutePath());
         }
         return result;
@@ -41,7 +40,7 @@ public class CloudinaryServiceImpl implements CloudinaryService{
         return cloudinary.uploader().destroy(id, ObjectUtils.emptyMap());
     }
 
-    private File convert(MultipartFile multipartFile) throws IOException{
+    private File convert(MultipartFile multipartFile) throws IOException {
         File file = new File(Objects.requireNonNull(multipartFile.getOriginalFilename()));
         FileOutputStream fo = new FileOutputStream(file);
         fo.write(multipartFile.getBytes());

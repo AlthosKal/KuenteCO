@@ -19,4 +19,3 @@ public interface SlaveUserRepository extends JpaRepository<User, String> {
 
     boolean existsByName(@NotBlank String name);
 }
-

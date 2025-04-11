@@ -12,7 +12,8 @@ public interface SubscriptionService {
 
     void addSubscription(AddSubscriptionDTO addSubscriptionDTO, Integer accountId) throws IOException;
 
-    void updateSubscription(UpdateSubscriptionDTO updateSubscriptionDTO, Integer subscriptionId, Integer accountId) throws IOException;
+    void updateSubscription(UpdateSubscriptionDTO updateSubscriptionDTO, Integer subscriptionId, Integer accountId)
+            throws IOException;
 
     void cancelSubscription(Subscription subscription) throws IOException;
 

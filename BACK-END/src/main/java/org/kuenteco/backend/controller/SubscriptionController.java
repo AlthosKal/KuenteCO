@@ -26,22 +26,23 @@ public class SubscriptionController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ApiMessage> addSubscription(@RequestBody AddSubscriptionDTO addSubscriptionDTO, Integer accountId) {
+    public ResponseEntity<ApiMessage> addSubscription(@RequestBody AddSubscriptionDTO addSubscriptionDTO,
+            Integer accountId) {
         try {
             subscriptionService.addSubscription(addSubscriptionDTO, accountId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiMessage("Subscripción agregada correctamente"));
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ApiMessage("Subscripción agregada correctamente"));
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new ApiMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ApiMessage("Se produjo un error" + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ApiMessage("Se produjo un error" + e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/{subscriptionId}/update")
-    public ResponseEntity<String> updateSubscription(
-            @PathVariable Integer subscriptionId,
-            @RequestParam Integer masterAccountId,
-            @RequestBody UpdateSubscriptionDTO updateSubscriptionDTO) {
+    public ResponseEntity<String> updateSubscription(@PathVariable Integer subscriptionId,
+            @RequestParam Integer masterAccountId, @RequestBody UpdateSubscriptionDTO updateSubscriptionDTO) {
         try {
             subscriptionService.updateSubscription(updateSubscriptionDTO, subscriptionId, masterAccountId);
             return ResponseEntity.ok("Subscripción actualizada correctamente");
@@ -65,7 +66,4 @@ public class SubscriptionController {
             return new ResponseEntity<>(new ApiMessage("Se produjo un error"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    }
-
-
-
+}

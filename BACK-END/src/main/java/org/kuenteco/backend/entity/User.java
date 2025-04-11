@@ -49,7 +49,7 @@ public class User {
     @JoinColumn(name = "id_image", referencedColumnName = "id")
     private Image masterImage;
 
-    public User(String name , String email, String password, Role role) {
+    public User(String name, String email, String password, Role role) {
         this.name = name;
         this.email = email;
         this.password = password;

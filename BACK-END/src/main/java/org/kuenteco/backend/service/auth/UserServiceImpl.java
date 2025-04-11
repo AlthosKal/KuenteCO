@@ -54,8 +54,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUserName(String name) {
-        return slaveUserRepository.findByName(name)
-                .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
+        return slaveUserRepository.findByName(name).orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
     }
 
     @Override
@@ -83,7 +82,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean existsByUserEmail(String email){
+    public boolean existsByUserEmail(String email) {
         return slaveUserRepository.existsByEmail(email);
     }
 

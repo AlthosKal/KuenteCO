@@ -16,12 +16,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
+
 @Primary
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = "org.kuenteco.backend.repository.master",
-        entityManagerFactoryRef = "masterEntityManagerFactory",
-        transactionManagerRef = "masterTransactionManager")
+@EnableJpaRepositories(basePackages = "org.kuenteco.backend.repository.master", entityManagerFactoryRef = "masterEntityManagerFactory", transactionManagerRef = "masterTransactionManager")
 public class MasterDataSourceConfig {
     @Autowired
     private Environment environment;
