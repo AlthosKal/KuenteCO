@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -74,10 +75,12 @@ public class AccountServiceImpl implements AccountService {
         masterAccountRepository.save(account);
     }
 
+
     public boolean existsByAccountName(String name) {
         return slaveAccountRepository.existsByName(name);
     }
 
+    @Override
     public void deleteAccount(Account account) {
         masterAccountRepository.delete(account);
     }
