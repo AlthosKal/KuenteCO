@@ -5,25 +5,25 @@
     import com.sendgrid.Response;
     import com.sendgrid.SendGrid;
     import com.sendgrid.helpers.mail.Mail;
-    import com.sendgrid.helpers.mail.objects.Content;
     import com.sendgrid.helpers.mail.objects.Email;
     import com.sendgrid.helpers.mail.objects.Personalization;
     import jakarta.servlet.http.HttpServletResponse;
     import org.kuenteco.backend.dto.auth.NewUserDTO;
     import org.kuenteco.backend.dto.auth.SendVerificationCodeDTO;
-    import org.kuenteco.backend.entity.master.MasterRole;
-    import org.kuenteco.backend.entity.master.MasterUser;
-    import org.kuenteco.backend.entity.slave.SlaveRole;
-    import org.kuenteco.backend.entity.slave.SlaveUser;
+    import org.kuenteco.backend.dto.auth.TokenResponseDTO;
+    import org.kuenteco.backend.dto.image.ImageDTO;
+    import org.kuenteco.backend.entity.Role;
+    import org.kuenteco.backend.entity.User;
+    import org.kuenteco.backend.entity.extra.Image;
     import org.kuenteco.backend.enums.RoleList;
     import org.kuenteco.backend.enums.State;
     import org.kuenteco.backend.jwt.JwtUtil;
-    import org.kuenteco.backend.mapper.entity.RoleMapper;
-    import org.kuenteco.backend.mapper.entity.UserMapper;
+    import org.kuenteco.backend.mapper.ImageMapper;
     import org.kuenteco.backend.repository.master.MasterRoleRepository;
     import org.kuenteco.backend.repository.master.MasterUserRepository;
     import org.kuenteco.backend.repository.slave.SlaveRoleRepository;
     import org.kuenteco.backend.repository.slave.SlaveUserRepository;
+    import org.kuenteco.backend.service.image.ImageService;
     import org.slf4j.Logger;
     import org.slf4j.LoggerFactory;
     import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +39,7 @@
     import org.springframework.transaction.PlatformTransactionManager;
     import org.springframework.transaction.TransactionDefinition;
     import org.springframework.transaction.support.TransactionTemplate;
+    import org.springframework.web.multipart.MultipartFile;
 
     import java.io.IOException;
     import java.util.Map;
@@ -56,16 +57,14 @@
         private final AuthenticationManagerBuilder authenticationManagerBuilder;
         private final CookieService cookieService;
         private final UserService userService;
+        private final ImageService imageService;
         private final SlaveRoleRepository slaveRoleRepository;
         private final SlaveUserRepository slaveUserRepository;
         private final TokenBlacklistService tokenBlacklistService;
         private final TransactionTemplate masterTransactionTemplate;
         private final MasterUserRepository masterUserRepository;
-
-        @Autowired
-        private MasterRoleRepository masterRoleRepository;
-        private final UserMapper userMapper;
-        private final RoleMapper roleMapper;
+        private final MasterRoleRepository masterRoleRepository;
+        private final ImageMapper imageMapper;
 
         //SendGrid
         @Value("${spring.sendgrid.api-key}")
@@ -89,20 +88,23 @@
         public AuthServiceImpl(UserService userService, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
                 AuthenticationManagerBuilder authenticationManagerBuilder, CookieService cookieService,
                 TokenBlacklistService tokenBlacklistService, SlaveRoleRepository slaveRoleRepository,
-                SlaveUserRepository slaveUserRepository, UserMapper userMapper, RoleMapper roleMapper,
-                MasterUserRepository masterUserRepository,
-                @Qualifier("masterTransactionManager") PlatformTransactionManager masterTransactionManager) {
+                SlaveUserRepository slaveUserRepository,
+                MasterUserRepository masterUserRepository, MasterRoleRepository masterRoleRepository,
+                @Qualifier("masterTransactionManager") PlatformTransactionManager masterTransactionManager,
+                               ImageService imageService, ImageMapper imageMapper) {
             this.userService = userService;
             this.passwordEncoder = passwordEncoder;
             this.jwtUtil = jwtUtil;
             this.authenticationManagerBuilder = authenticationManagerBuilder;
             this.cookieService = cookieService;
             this.tokenBlacklistService = tokenBlacklistService;
+            this.masterRoleRepository = masterRoleRepository;
             this.slaveRoleRepository = slaveRoleRepository;
             this.slaveUserRepository = slaveUserRepository;
-            this.userMapper = userMapper;
-            this.roleMapper = roleMapper;
             this.masterUserRepository = masterUserRepository;
+            this.imageService = imageService;
+            this.imageMapper = imageMapper;
+
 
             // Configuración de transacción con timeout apropiado
             this.masterTransactionTemplate = new TransactionTemplate(masterTransactionManager);
@@ -111,17 +113,18 @@
         }
 
         @Override
-        public String authenticate(String email, String password, HttpServletResponse response) {
+        public TokenResponseDTO authenticate(String nameOrEmail, String password, HttpServletResponse response) {
             // Verificar si la cuenta está activa antes de autenticar
-            SlaveUser slaveUser = slaveUserRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-            MasterUser user = userMapper.slaveToMaster(slaveUser);
+            // Determinar si es un email o nombre de usuario
+            User user = userService.findByNameOrEmail(nameOrEmail);
             if (user.getAccountState() != State.ACTIVE) {
                 throw new RuntimeException("Cuenta no activada. Por favor verifica tu correo");
             }
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email,
+            // Usar el email para la autenticación de Spring Security
+            String emailForAuth = user.getEmail();
+
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(emailForAuth,
                     password);
             Authentication authResult = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authResult);
@@ -129,29 +132,34 @@
             String jwt = jwtUtil.generateToken(authResult);
             cookieService.addHttpOnlyCookie("jwt", jwt, 7 * 24 * 60 * 60, response);
 
-            return slaveUser.getSlaveRole().getName().toString();
+            return new TokenResponseDTO(jwt, user.getRole().getName().toString());
         }
 
         @Override
         public void registerUser(NewUserDTO newUserDTO) {
-            if (userService.existsByUserName(newUserDTO.getEmail())) {
-                throw new IllegalArgumentException("Datos Inválidos, correo incorrecto o ya existente");
+            if (userService.existsByUserName(newUserDTO.getName())) {
+                throw new IllegalArgumentException("Datos Inválidos, nombre con caracteres no permitidos o ya existente");
+            }
+            if (userService.existsByUserEmail(newUserDTO.getEmail())) {
+                throw new IllegalArgumentException("Datos Inválidos, correo con caracteres no permitidos o ya existente");
             }
 
-            SlaveRole slaveRole = slaveRoleRepository.findByName(RoleList.ROLE_USER)
+            log.info("Intentando registrar nuevo usuario: {}", newUserDTO.getEmail());
+
+            Role roleUser = slaveRoleRepository.findByName(RoleList.ROLE_USER)
                     .orElseThrow(() -> new RuntimeException("Role no encontrado"));
 
-            MasterRole roleUser = roleMapper.slaveToMaster(slaveRole);
 
             // Asegurar que el rol existe en la base de datos maestra
-            MasterRole masterRole = masterRoleRepository.findByName(RoleList.ROLE_USER)
+            Role masterRole = slaveRoleRepository.findByName(RoleList.ROLE_USER)
                     .orElseGet(() -> masterRoleRepository.save(roleUser));
 
             // Utilizar transacción explícita para guardar el usuario
             masterTransactionTemplate.execute(status -> {
                 try {
                     // Nuevo usuario se crea con estado PENDING
-                    MasterUser user = new MasterUser(
+                    User user = new User(
+                            newUserDTO.getName(),
                             newUserDTO.getEmail(),
                             passwordEncoder.encode(newUserDTO.getPassword()), masterRole);
                     user.setAccountState(State.PENDING);
@@ -251,13 +259,13 @@
             Boolean result = masterTransactionTemplate.execute(status -> {
                 try {
                     // Buscar directamente en la base de datos maestra, no en la esclava
-                    Optional<MasterUser> masterUserOpt = masterUserRepository.findByEmail(email);
+                    Optional<User> masterUserOpt = slaveUserRepository.findByEmail(email);
 
                     if (masterUserOpt.isEmpty()) {
                         throw new RuntimeException("Usuario no encontrado");
                     }
 
-                    MasterUser masterUser = masterUserOpt.get();
+                    User masterUser = masterUserOpt.get();
 
                     // Verificar si la cuenta ya está activada
                     if (State.ACTIVE.equals(masterUser.getAccountState())) {
@@ -294,13 +302,13 @@
             return masterTransactionTemplate.execute(status -> {
                 try {
                     // Buscar directamente en la base de datos maestra
-                    Optional<MasterUser> masterUserOpt = masterUserRepository.findByEmail(email);
+                    Optional<User> masterUserOpt = slaveUserRepository.findByEmail(email);
 
                     if (masterUserOpt.isEmpty()) {
                         throw new RuntimeException("Usuario no encontrado");
                     }
 
-                    MasterUser masterUser = masterUserOpt.get();
+                    User masterUser = masterUserOpt.get();
 
                     // Verificar que la cuenta esté activa
                     if (masterUser.getAccountState() != State.ACTIVE) {
@@ -340,5 +348,82 @@
 
             // 3. Limpiar el contexto de seguridad
             SecurityContextHolder.clearContext();
+        }
+
+        @Override
+        public ImageDTO saveImage(MultipartFile image, String token, HttpServletResponse response) {
+            try {
+                String username = jwtUtil.extractEmail(token);
+                User user = slaveUserRepository.findByName(username)
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+                // Verificar si ya tiene una imagen previa
+                if (user.getMasterImage() != null) {
+                    throw new RuntimeException("El usuario ya tiene una imagen de perfil. Utilice updateImage para actualizarla.");
+                }
+
+                // Subir la nueva imagen
+                Image masterImage = imageService.uploadImage(image);
+                user.setMasterImage(masterImage);
+                masterUserRepository.save(user);
+
+                return imageMapper.toDTO(masterImage);
+            } catch (IOException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                throw new RuntimeException("Error al guardar la imagen: " + e.getMessage());
+            }
+        }
+
+        @Override
+        public ImageDTO updateImage(MultipartFile image, String token, HttpServletResponse response) {
+            try {
+                String username = jwtUtil.extractEmail(token);
+                User user = slaveUserRepository.findByName(username)
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+                // Verificar si tiene imagen para actualizar
+                if (user.getMasterImage() == null) {
+                    throw new RuntimeException("El usuario no tiene una imagen de perfil para actualizar.");
+                }
+
+                // Eliminar la imagen anterior
+                imageService.deleteImage(user.getMasterImage());
+
+                // Subir la nueva imagen
+                Image masterImage = imageService.uploadImage(image);
+                user.setMasterImage(masterImage);
+                masterUserRepository.save(user);
+
+                return imageMapper.toDTO(masterImage);
+            } catch (IOException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                throw new RuntimeException("Error al actualizar la imagen: " + e.getMessage());
+            }
+        }
+
+        @Override
+        public void deleteImage(String token, HttpServletResponse response) {
+            try {
+                String username = jwtUtil.extractEmail(token);
+                User user = slaveUserRepository.findByName(username)
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+                // Verificar si tiene imagen para eliminar
+                if (user.getMasterImage() == null) {
+                    throw new RuntimeException("El usuario no tiene una imagen de perfil para eliminar.");
+                }
+
+                // Eliminar la imagen
+                Image imageToDelete = user.getMasterImage();
+                user.setMasterImage(null);
+                masterUserRepository.save(user);
+
+                imageService.deleteImage(imageToDelete);
+
+                response.setStatus(HttpServletResponse.SC_OK);
+            } catch (IOException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                throw new RuntimeException("Error al eliminar la imagen: " + e.getMessage());
+            }
         }
     }

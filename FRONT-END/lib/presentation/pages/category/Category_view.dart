@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:kuenteco/domain/entities/Category_model.dart';
-import 'Create_category_view.dart';
+import 'package:kuenteco/domain/dto/Category_model.dart';
 import 'package:kuenteco/presentation/widgets/Background_widget.dart';
+
+import 'Create_category_view.dart';
 
 class CategoryPage extends StatefulWidget {
   const CategoryPage({super.key});

@@ -36,14 +36,14 @@ public class SlaveDataSourceConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
-        em.setPackagesToScan("org.kuenteco.backend.entity.slave");
+        em.setPackagesToScan("org.kuenteco.backend.entity");
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.show-sql", environment.getProperty("slave.jpa.properties.hibernate.show_sql"));
-
+        // Configuración explicita del read-only
+        properties.put("hibernate.connection.read_only", "true");
         em.setJpaPropertyMap(properties);
 
         return em;

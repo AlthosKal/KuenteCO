@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
+
+import 'package:flutter/material.dart';
 import 'package:kuenteco/core/constants/App_colors.dart';
 
 class AuthUtils {

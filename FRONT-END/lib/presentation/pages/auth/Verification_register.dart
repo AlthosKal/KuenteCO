@@ -1,9 +1,10 @@
+import 'dart:async';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:kuenteco/infrastructure/datasources/remote/Auth_api_service.dart';
-import 'package:kuenteco/presentation/widgets/Particle_animation_widget.dart';
 import 'package:kuenteco/presentation/pages/auth/Login_view.dart';
-import 'dart:ui' as ui;
-import 'dart:async';
+import 'package:kuenteco/presentation/widgets/Particle_animation_widget.dart';
 
 class VerificacionR extends StatefulWidget {
   final String email;
@@ -120,7 +121,7 @@ class _VerificacionRState extends State<VerificacionR> {
 
     try {
       // 1. Verificar el código
-      final verificationResponse = await _authApiService.ValidateVerificationCode(
+      final verificationResponse = await _authApiService.validateVerificationCode(
         email: widget.email,
         code: code,
       );

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 public class CookieServiceImpl implements CookieService {
 
     @Override
-    public void addHttpOnlyCookie(String name, String value, int maxAge, HttpServletResponse response) {
-        Cookie cookie = new Cookie(name, value);
+    public void addHttpOnlyCookie(String nameOrEmail, String value, int maxAge, HttpServletResponse response) {
+        Cookie cookie = new Cookie(nameOrEmail  , value);
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setPath("/");

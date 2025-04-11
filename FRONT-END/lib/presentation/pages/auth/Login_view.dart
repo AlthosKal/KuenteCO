@@ -17,17 +17,20 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _nameOrEmailController = TextEditingController();
   final _passwordController = TextEditingController();
-
+  final _emailFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
   bool _obscurePassword = true;
   bool _rememberPassword = false;
   bool _isLoading = false;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _nameOrEmailController.dispose();
     _passwordController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
@@ -38,37 +41,53 @@ class _LoginViewState extends State<LoginView> {
 
     try {
       final authRepo = Provider.of<AuthRepository>(context, listen: false);
-      final user = await authRepo.login(
-        email: _emailController.text,
+
+      /// Ejecuta login y guarda token internamente
+      await authRepo.login(
+        nameOrEmail: _nameOrEmailController.text,
         password: _passwordController.text,
       );
 
-      if (_rememberPassword) {
-        // Guardar credenciales en almacenamiento local
-      }
+      /// Forzar carga del token a memoria para uso inmediato
+      await authRepo.checkAuth(); // 🔐 clave para que _authToken esté seteado
 
+      if (!mounted) return;
+
+      /// Redirige a la pantalla principal
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => LoggedInHomePage(title: 'Inicio',),
+          builder: (context) => LoggedInHomePage(
+            title: 'Inicio',
+            userEmail: _nameOrEmailController.text.contains('@')
+                ? _nameOrEmailController.text
+                : null,
+            authRepository: authRepo,
+          ),
         ),
             (route) => false,
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
+        SnackBar(
+          content: Text('Error de inicio de sesión: ${e.toString()}'),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 600;
-    final containerWidth = isSmallScreen ? 360.0 : 400.0;
+    final isSmallScreen = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
       body: Stack(
@@ -78,7 +97,7 @@ class _LoginViewState extends State<LoginView> {
             child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: _buildLoginForm(theme, containerWidth),
+                child: _buildLoginForm(theme, isSmallScreen),
               ),
             ),
           ),
@@ -88,12 +107,12 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Widget _buildLoginForm(ThemeData theme, double width) {
+  Widget _buildLoginForm(ThemeData theme, bool isSmallScreen) {
     return ClipRect(
       child: BackdropFilter(
         filter: ui.ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
         child: Container(
-          width: width,
+          width: isSmallScreen ? 360.0 : 400.0,
           padding: const EdgeInsets.all(20.0),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.3),
@@ -109,29 +128,14 @@ class _LoginViewState extends State<LoginView> {
           child: Form(
             key: _formKey,
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                _buildHeader(theme),
+                _buildHeader(),
                 const SizedBox(height: 20),
-                AuthFormField(
-                  controller: _emailController,
-                  label: 'Correo electrónico',
-                  validator: _validateEmail,
-                ),
+                _buildNameOrEmailField(),
                 const SizedBox(height: 20),
-                AuthFormField(
-                  controller: _passwordController,
-                  label: 'Contraseña',
-                  obscureText: _obscurePassword,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                      color: Colors.white,
-                    ),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                  ),
-                  validator: _validatePassword,
-                ),
-                _buildRememberMeCheckbox(theme),
+                _buildPasswordField(),
+                _buildRememberMeCheckbox(),
                 const SizedBox(height: 20),
                 _buildLoginButton(theme),
                 const SizedBox(height: 20),
@@ -146,7 +150,7 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Widget _buildHeader(ThemeData theme) {
+  Widget _buildHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -164,12 +168,54 @@ class _LoginViewState extends State<LoginView> {
             ),
           ),
         ),
-        const SizedBox(width: 48),
+        const SizedBox(width: 48), // Balancear el espacio del back button
       ],
     );
   }
 
-  Widget _buildRememberMeCheckbox(ThemeData theme) {
+  Widget _buildNameOrEmailField() {
+    return AuthFormField(
+      controller: _nameOrEmailController,
+      focusNode: _emailFocusNode,
+      textInputAction: TextInputAction.next,
+      label: 'Correo electrónico o nombre de usuario',
+      onFieldSubmitted: (_) {
+        FocusScope.of(context).requestFocus(_passwordFocusNode);
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Ingresa tu email o nombre de usuario';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return AuthFormField(
+      controller: _passwordController,
+      focusNode: _passwordFocusNode,
+      obscureText: _obscurePassword,
+      textInputAction: TextInputAction.done,
+      onFieldSubmitted: (_) => _handleLogin(context),
+      label: 'Contraseña',
+      suffixIcon: IconButton(
+        icon: Icon(
+          _obscurePassword ? Icons.visibility : Icons.visibility_off,
+          color: Colors.white,
+        ),
+        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) return 'Ingresa tu contraseña';
+        if (value.length < 6) return 'Mínimo 6 caracteres';
+        return null;
+      },
+    );
+  }
+
+
+  Widget _buildRememberMeCheckbox() {
     return SizedBox(
       width: 320,
       child: Row(
@@ -179,7 +225,7 @@ class _LoginViewState extends State<LoginView> {
             onChanged: (value) => setState(() => _rememberPassword = value ?? false),
             fillColor: MaterialStateProperty.resolveWith<Color>((states) {
               if (states.contains(MaterialState.selected)) {
-                return theme.primaryColor;
+                return Theme.of(context).primaryColor;
               }
               return Colors.transparent;
             }),
@@ -204,6 +250,7 @@ class _LoginViewState extends State<LoginView> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
+        elevation: 2,
       ),
       child: _isLoading
           ? const SizedBox(
@@ -274,17 +321,5 @@ class _LoginViewState extends State<LoginView> {
         ),
       ),
     );
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) return 'Ingresa tu email';
-    if (!value.contains('@')) return 'Email inválido';
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) return 'Ingresa tu contraseña';
-    if (value.length < 6) return 'Mínimo 6 caracteres';
-    return null;
   }
 }

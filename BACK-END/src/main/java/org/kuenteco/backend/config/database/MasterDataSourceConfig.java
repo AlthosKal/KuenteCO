@@ -16,10 +16,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
-
+@Primary
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = "org.kuenteco.backend.repository.master", entityManagerFactoryRef = "masterEntityManagerFactory", transactionManagerRef = "masterTransactionManager")
+@EnableJpaRepositories(basePackages = "org.kuenteco.backend.repository.master",
+        entityManagerFactoryRef = "masterEntityManagerFactory",
+        transactionManagerRef = "masterTransactionManager")
 public class MasterDataSourceConfig {
     @Autowired
     private Environment environment;
@@ -28,9 +30,9 @@ public class MasterDataSourceConfig {
     @Bean(name = "masterDataSource")
     public DataSource dataSource() {
         DriverManagerDataSource masterDataSource = new DriverManagerDataSource();
-        masterDataSource.setUrl(environment.getProperty("master.datasource.url"));
-        masterDataSource.setUsername(environment.getProperty("master.datasource.username"));
-        masterDataSource.setPassword(environment.getProperty("master.datasource.password"));
+        masterDataSource.setUrl(environment.getProperty("spring.datasource.url"));
+        masterDataSource.setUsername(environment.getProperty("spring.datasource.username"));
+        masterDataSource.setPassword(environment.getProperty("spring.datasource.password"));
         return masterDataSource;
     }
 
@@ -39,13 +41,17 @@ public class MasterDataSourceConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
-        em.setPackagesToScan("org.kuenteco.backend.entity.master");
+        em.setPackagesToScan("org.kuenteco.backend.entity");
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+        vendorAdapter.setGenerateDdl(true); // Importante para permitir a Hibernate generar DDL
         em.setJpaVendorAdapter(vendorAdapter);
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.show-sql", environment.getProperty("master.jpa.properties.hibernate.show_sql"));
+        properties.put("hibernate.show-sql", environment.getProperty("spring.jpa.properties.hibernate.show_sql"));
+        properties.put("hibernate.hbm2ddl.auto", environment.getProperty("spring.jpa.hibernate.ddl-auto", "update"));
+        properties.put("hibernate.dialect", environment.getProperty("spring.jpa.properties.hibernate.dialect"));
+        properties.put("hibernate.format_sql", environment.getProperty("spring.jpa.properties.hibernate.format_sql"));
 
         em.setJpaPropertyMap(properties);
 

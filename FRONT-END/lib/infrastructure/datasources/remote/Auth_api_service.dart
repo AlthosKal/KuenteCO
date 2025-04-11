@@ -1,34 +1,36 @@
 import 'dart:convert';
-import 'package:dio/src/dio.dart';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:kuenteco/domain/dto/Account_type.dart';
 
 class AuthApiService {
-  // ==================== CONSTANTES Y PROPIEDADES ====================
+  // ==================== PROPIEDADES ====================
   final String baseUrl = dotenv.get('API_URL');
   final http.Client _client = http.Client();
   String? _authToken;
 
-  // ==================== GETTERS Y SETTERS ====================
-  void setToken(String token) => _authToken = token;
-  String? getToken() => _authToken;
-  bool get isLoggedIn => _authToken != null;
-
-  // ==================== CONFIGURACIÓN DE HEADERS ====================
+  // ==================== HEADERS ====================
   Map<String, String> get _jsonHeaders => {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
 
-  Map<String, String> get _authHeaders {
-    final headers = {..._jsonHeaders};
-    if (_authToken != null) {
-      headers['Authorization'] = 'Bearer $_authToken';
-    }
-    return headers;
+  Map<String, String> get _authHeaders => {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    if (_authToken != null && _authToken!.isNotEmpty) 'Authorization': 'Bearer $_authToken',
+  };
+
+  // ==================== TOKEN ====================
+  void setToken(String? token) {
+    _authToken = token;
+    print('[DEBUG] Token establecido en AuthApiService: $_authToken');
   }
 
-  // ==================== MÉTODOS PRIVADOS AUXILIARES ====================
+  String? getToken() => _authToken;
+  bool get isLoggedIn => _authToken != null && _authToken!.isNotEmpty;
+
   String? _extractTokenFromCookies(http.Response response) {
     final cookieHeader = response.headers['set-cookie'];
     if (cookieHeader != null) {
@@ -42,6 +44,7 @@ class AuthApiService {
     return null;
   }
 
+  // ==================== RESPUESTA ====================
   Map<String, dynamic> _processResponse(http.Response response, String successMessage) {
     if (response.body.isEmpty) {
       return {
@@ -52,7 +55,7 @@ class AuthApiService {
     }
 
     try {
-      final dynamic data = json.decode(response.body);
+      final data = json.decode(response.body);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return {
           'status': 'success',
@@ -62,9 +65,7 @@ class AuthApiService {
       } else {
         return {
           'status': 'error',
-          'message': data is Map
-              ? (data['message'] ?? 'Error (${response.statusCode})')
-              : 'Error (${response.statusCode})',
+          'message': data is Map ? (data['message'] ?? 'Error (${response.statusCode})') : 'Error',
           'statusCode': response.statusCode,
           'data': data,
         };
@@ -72,73 +73,16 @@ class AuthApiService {
     } catch (e) {
       return {
         'status': 'error',
-        'message': 'Error processing response: $e',
+        'message': 'Error parsing response: $e',
         'rawResponse': response.body,
         'statusCode': response.statusCode,
       };
     }
   }
 
-  // ==================== REGISTRO DE USUARIO ====================
-  Future<Map<String, dynamic>> register({
-    required String email,
-    required String password,
-    required String confirmPassword,
-    required String name,
-    Map<String, dynamic>? additionalData,
-  }) async {
-    try {
-      final response = await _client.post(
-        Uri.parse('$baseUrl/v1/auth/register'),
-        headers: _jsonHeaders,
-        body: json.encode({
-          'email': email,
-          'password': password,
-          'confirmPassword': confirmPassword,
-          'name': name,
-          ...?additionalData,
-        }),
-      );
-
-      final token = _extractTokenFromCookies(response);
-      if (token != null) _authToken = token;
-
-      return _processResponse(response, 'Registration successful');
-    } catch (e) {
-      return {
-        'status': 'error',
-        'message': 'Error during registration: ${e.toString()}',
-      };
-    }
-  }
-
-  // ==================== ACTIVACIÓN DE CUENTA ====================
-  Future<Map<String, dynamic>> activateAccount({
-    required String email,
-    required String code,
-  }) async {
-    try {
-      final response = await _client.post(
-        Uri.parse('$baseUrl/v1/auth/activate-account'),
-        headers: _jsonHeaders,
-        body: json.encode({
-          'email': email,
-          'code': code,
-        }),
-      );
-
-      return _processResponse(response, 'Account activated successfully');
-    } catch (e) {
-      return {
-        'status': 'error',
-        'message': 'Error activating account: ${e.toString()}',
-      };
-    }
-  }
-
-  // ==================== AUTENTICACIÓN BÁSICA ====================
+  // ==================== AUTENTICACIÓN ====================
   Future<Map<String, dynamic>> login({
-    required String email,
+    required String nameOrEmail,
     required String password,
   }) async {
     try {
@@ -146,84 +90,88 @@ class AuthApiService {
         Uri.parse('$baseUrl/v1/auth/login'),
         headers: _jsonHeaders,
         body: json.encode({
-          'email': email,
+          'nameOrEmail': nameOrEmail,
           'password': password,
         }),
       );
+      final data = jsonDecode(response.body);
+      print('[DEBUG] Estructura completa de la respuesta: $data');
+      print('[DEBUG] Respuesta completa del backend: ${response.body}');
 
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['token'] != null) {
+          _authToken = data['token'];
+          print('[DEBUG] Token extraído del cuerpo: $_authToken');
+          return {
+            'status': 'success',
+            'token': data['token'],
+          };
+        }
+      }
+
+      // Como respaldo, intentar extraer token de cookies
       final token = _extractTokenFromCookies(response);
-      if (token != null) _authToken = token;
+      if (token != null) {
+        _authToken = token;
+        print('[DEBUG] Token extraído de cookies: $_authToken');
+      }
 
       return _processResponse(response, 'Login successful');
     } catch (e) {
-      return {
-        'status': 'error',
-        'message': 'Error en login: ${e.toString()}',
-      };
+      print('[ERROR] Error en login: $e');
+      return {'status': 'error', 'message': 'Login error: $e'};
     }
   }
 
   Future<void> logout() async {
-    _authToken = null;
-  }
+    if (_authToken == null) return;
 
-  // ==================== RECUPERACIÓN DE CONTRASEÑA ====================
-  Future<Map<String, dynamic>> sendVerificationCode({
-    required String email,
-    bool isRegistration = false,
-  }) async {
     try {
-      final response = await _client.post(
-        Uri.parse('$baseUrl/v1/auth/send-recovery-code'),
-        headers: _jsonHeaders,
-        body: json.encode({
-          'email': email,
-          'purpose': isRegistration ? 'registration' : 'password_recovery',
-        }),
+      await _client.post(
+        Uri.parse('$baseUrl/v1/auth/logout'),
+        headers: _authHeaders,
       );
-
-      return _processResponse(
-        response,
-        isRegistration
-            ? 'Registration code sent successfully'
-            : 'Password recovery code sent successfully',
-      );
-    } catch (e) {
-      return {
-        'status': 'error',
-        'message': 'Error sending verification code: ${e.toString()}',
-      };
+    } catch (_) {
+      // Ignorar errores de logout
+    } finally {
+      _authToken = null;
     }
   }
 
-  Future<Map<String, dynamic>> ValidateVerificationCode({
-    required String email,
-    required String code,
-  }) async {
-    try {
-      final response = await _client.post(
-        Uri.parse('$baseUrl/v1/auth/verify-recovery-code'),
-        headers: _jsonHeaders,
-        body: json.encode({
-          'email': email,
-          'code': code,
-        }),
-      );
+  Future<bool> checkAuth() async {
+    if (_authToken == null) return false;
 
-      return _processResponse(response, 'Code verified successfully');
-    } catch (e) {
-      return {
-        'status': 'error',
-        'message': 'Error verifying code: ${e.toString()}',
-      };
-    }
+    final response = await _client.get(
+      Uri.parse('$baseUrl/v1/auth/check-auth'),
+      headers: _authHeaders,
+    );
+
+    return response.statusCode == 200;
   }
 
+  Future<Map<String, dynamic>> getUserDetails() async {
+    if (_authToken == null) {
+      return {'status': 'error', 'message': 'Token no disponible'};
+    }
+
+    final response = await _client.get(
+      Uri.parse('$baseUrl/v1/auth/user/details'),
+      headers: _authHeaders,
+    );
+
+    final data = json.decode(response.body);
+    return response.statusCode == 200
+        ? {'status': 'success', 'data': data}
+        : {'status': 'error', 'message': data['message']};
+  }
+
+  // ==================== CONTRASEÑA ====================
   Future<Map<String, dynamic>> changePassword({
     required String email,
     required String code,
     required String newPassword,
-    String? confirmNewPassword,
+    required String confirmNewPassword,
   }) async {
     try {
       final response = await _client.put(
@@ -233,7 +181,7 @@ class AuthApiService {
           'email': email,
           'code': code,
           'newPassword': newPassword,
-          'confirmNewPassword': confirmNewPassword ?? newPassword,
+          'confirmNewPassword': confirmNewPassword,
         }),
       );
 
@@ -246,47 +194,272 @@ class AuthApiService {
     }
   }
 
-  // ==================== VERIFICACIÓN DE EMAIL ====================
-  Future<Map<String, dynamic>> verifyEmail({
+  // ==================== VERIFICACIÓN ====================
+  Future<Map<String, dynamic>> sendVerificationCode({
+    required String email,
+    bool isRegistration = false,
+  }) async {
+    try {
+      final response = await _client.post(
+        Uri.parse('$baseUrl/v1/auth/send-verification-code?isRegistration=$isRegistration'),
+        headers: _jsonHeaders,
+        body: json.encode({'email': email}),
+      );
+
+      return _processResponse(response, 'Verification code sent successfully');
+    } catch (e) {
+      return {'status': 'error', 'message': 'Error sending code: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> validateVerificationCode({
     required String email,
     required String code,
   }) async {
     try {
       final response = await _client.post(
-        Uri.parse('$baseUrl/v1/auth/verify-email'),
+        Uri.parse('$baseUrl/v1/auth/validate-verification-code'),
         headers: _jsonHeaders,
-        body: json.encode({
-          'email': email,
-          'code': code,
-        }),
+        body: json.encode({'email': email, 'code': code}),
       );
 
-      return _processResponse(response, 'Email verified successfully');
+      return _processResponse(response, 'Code verified');
     } catch (e) {
-      return {
-        'status': 'error',
-        'message': 'Error verifying email: ${e.toString()}',
-      };
+      return {'status': 'error', 'message': 'Error verifying code: $e'};
     }
   }
 
-  // ==================== ACTUALIZACIÓN DE PERFIL ====================
-  Future<Map<String, dynamic>> updateProfile({
-    required Map<String, dynamic> userData,
+  // ==================== REGISTRO ====================
+  Future<Map<String, dynamic>> register({
+    required String email,
+    required String password,
+    required String confirmPassword,
+    required String name,
   }) async {
     try {
-      final response = await _client.put(
-        Uri.parse('$baseUrl/v1/user/profile'),
-        headers: _authHeaders,
-        body: json.encode(userData),
+      final response = await _client.post(
+        Uri.parse('$baseUrl/v1/auth/register'),
+        headers: _jsonHeaders,
+        body: json.encode({
+          'email': email,
+          'password': password,
+          'confirmPassword': confirmPassword,
+          'name': name,
+        }),
       );
 
-      return _processResponse(response, 'Profile updated successfully');
+      final token = _extractTokenFromCookies(response);
+      if (token != null) _authToken = token;
+
+      return _processResponse(response, 'Registration successful');
     } catch (e) {
-      return {
-        'status': 'error',
-        'message': 'Error updating profile: ${e.toString()}',
-      };
+      return {'status': 'error', 'message': 'Registration error: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> activateAccount({
+    required String email,
+    required String code,
+  }) async {
+    try {
+      final response = await _client.post(
+        Uri.parse('$baseUrl/v1/auth/activate-account'),
+        headers: _jsonHeaders,
+        body: json.encode({'email': email, 'code': code}),
+      );
+
+      return _processResponse(response, 'Account activated');
+    } catch (e) {
+      return {'status': 'error', 'message': 'Activation error: $e'};
+    }
+  }
+
+  // ==================== PERFIL ====================
+  Future<Map<String, dynamic>> getAllAccounts() async {
+    if (_authToken == null || _authToken!.isEmpty) {
+      print('[ERROR] getAllAccounts: Token no disponible');
+      return {'status': 'error', 'message': 'Token no disponible'};
+    }
+
+    print('[DEBUG] Token en getAllAccounts: $_authToken');
+    print('[DEBUG] Headers en getAllAccounts: $_authHeaders');
+
+    try {
+      final response = await _client.get(
+        Uri.parse('$baseUrl/v1/account'),
+        headers: _authHeaders,
+      );
+
+      print('[DEBUG] getAllAccounts response: ${response.statusCode} - ${response.body}');
+      return _processResponse(response, 'Accounts retrieved successfully');
+    } catch (e) {
+      print('[ERROR] Error en getAllAccounts: $e');
+      return {'status': 'error', 'message': 'Error retrieving accounts: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> registerAccount({
+    required String name,
+    required AccountType type,
+  }) async {
+    try {
+      final response = await _client.post(
+        Uri.parse('$baseUrl/v1/account/register'),
+        headers: {
+          ..._jsonHeaders,
+          if (_authToken != null) 'Authorization': 'Bearer $_authToken',
+        },
+        body: json.encode({
+          'name': name,
+          'type': type.name,
+        }),
+      );
+
+      final token = _extractTokenFromCookies(response);
+      if (token != null) _authToken = token;
+
+      return _processResponse(response, 'Account successfully registered');
+    } catch (e) {
+      return {'status': 'error', 'message': 'Account register error: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteAccount({
+    required int id,
+  }) async {
+    try {
+      final response = await _client.delete(
+        Uri.parse('$baseUrl/v1/account/$id'),
+        headers: {
+          ..._jsonHeaders,
+          if (_authToken != null) 'Authorization': 'Bearer $_authToken',
+        },
+      );
+
+      final token = _extractTokenFromCookies(response);
+      if (token != null) _authToken = token;
+
+      return _processResponse(response, 'Cuenta eliminada correctamente');
+    } catch (e) {
+      return {'status': 'error', 'message': 'Error al eliminar la cuenta: $e'};
+    }
+  }
+
+
+
+  // ==================== IMAGEN DE PERFIL ====================
+  Future<Map<String, dynamic>> uploadProfileImage({
+    required dynamic imageFile,
+  }) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/v1/auth/user/image/add'),
+      );
+
+      request.headers['Authorization'] = 'Bearer $_authToken';
+      request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
+
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      return _processResponse(response, 'Profile image uploaded successfully');
+    } catch (e) {
+      return {'status': 'error', 'message': 'Error uploading profile image: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> updateProfileImage({
+    required dynamic imageFile,
+  }) async {
+    try {
+      var request = http.MultipartRequest(
+        'PUT',
+        Uri.parse('$baseUrl/v1/auth/user/image/update'),
+      );
+
+      request.headers['Authorization'] = 'Bearer $_authToken';
+      request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
+
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      return _processResponse(response, 'Profile image updated successfully');
+    } catch (e) {
+      return {'status': 'error', 'message': 'Error updating profile image: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteProfileImage() async {
+    try {
+      final response = await _client.delete(
+        Uri.parse('$baseUrl/v1/auth/delete'),
+        headers: _authHeaders,
+      );
+
+      return _processResponse(response, 'Profile image deleted successfully');
+    } catch (e) {
+      return {'status': 'error', 'message': 'Error deleting profile image: $e'};
+    }
+  }
+
+  // ==================== IMAGENES DE CUENTAS ====================
+  Future<Map<String, dynamic>> uploadAccountImage({
+    required int accountId,
+    required dynamic imageFile,
+  }) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/v1/account/$accountId/image/add'),
+      );
+
+      request.headers['Authorization'] = 'Bearer $_authToken';
+      request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
+
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      return _processResponse(response, 'Account image uploaded successfully');
+    } catch (e) {
+      return {'status': 'error', 'message': 'Error uploading account image: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> updateAccountImage({
+    required int accountId,
+    required dynamic imageFile,
+  }) async {
+    try {
+      var request = http.MultipartRequest(
+        'PUT',
+        Uri.parse('$baseUrl/v1/account/$accountId/image/update'),
+      );
+
+      request.headers['Authorization'] = 'Bearer $_authToken';
+      request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
+
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      return _processResponse(response, 'Account image updated successfully');
+    } catch (e) {
+      return {'status': 'error', 'message': 'Error updating account image: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteAccountImage({
+    required int accountId,
+  }) async {
+    try {
+      final response = await _client.delete(
+        Uri.parse('$baseUrl/v1/account/$accountId/delete'),
+        headers: _authHeaders,
+      );
+
+      return _processResponse(response, 'Account image deleted successfully');
+    } catch (e) {
+      return {'status': 'error', 'message': 'Error deleting account image: $e'};
     }
   }
 }

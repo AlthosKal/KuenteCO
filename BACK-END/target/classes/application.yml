@@ -1,6 +1,6 @@
 jwt:
   secret: ${JWT_SECRET}
-  expiration: 7200
+  expiration: 86400
 
 management:
   endpoint:
@@ -66,9 +66,6 @@ server:
 
 
 spring:
-  jpa:
-    hibernate:
-      ddl-auto: update
   sendgrid:
     api-key: ${SENDGRID_API_KEY}
     email: ${EMAIL_SENDGRID}
@@ -78,13 +75,13 @@ spring:
   profiles:
     active: master,slave
 
-
 logging:
   level:
     org.springframework.security: DEBUG
     org.kuenteco.backend: DEBUG
     com.zaxxer.hikari: DEBUG
     org.hibernate.SQL: DEBUG
+    org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR
 
 info:
   application:

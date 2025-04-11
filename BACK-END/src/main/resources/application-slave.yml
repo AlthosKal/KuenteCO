@@ -14,18 +14,6 @@ slave:
       connection-timeout: 10000
       max-lifetime: 1800000
 
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        show_sql: true
-        format_sql: true
-        jdbc:
-          lob:
-            non_contextual_creation: true
-
 logging:
   level:
     org.hibernate.SQL: DEBUG

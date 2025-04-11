@@ -6,7 +6,8 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.kuenteco.backend.dto.ApiMessage;
 import org.kuenteco.backend.dto.auth.*;
-import org.kuenteco.backend.entity.slave.SlaveUser;
+import org.kuenteco.backend.dto.image.ImageDTO;
+import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.jwt.JwtUtil;
 import org.kuenteco.backend.service.auth.AuthService;
 import org.kuenteco.backend.service.auth.UserService;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -28,15 +30,15 @@ public class AuthController {
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping("/login")
-    public ResponseEntity<ApiMessage> login(@Valid @RequestBody LoginUserDTO loginUserDTO, BindingResult bindingResult,
-            HttpServletResponse response) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginUserDTO loginUserDTO, BindingResult bindingResult,
+                                   HttpServletResponse response) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new ApiMessage("Datos Invalidos"));
         }
 
         try {
-            String token = authService.authenticate(loginUserDTO.getEmail(), loginUserDTO.getPassword(), response);
-            return ResponseEntity.ok(new ApiMessage("Inicio de sesión exitoso"));
+            TokenResponseDTO tokenResponseDTO = authService.authenticate(loginUserDTO.getNameOrEmail(), loginUserDTO.getPassword(), response);
+            return ResponseEntity.ok(tokenResponseDTO);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
         }
@@ -79,7 +81,7 @@ public class AuthController {
             if (isValid) {
                 return ResponseEntity.ok(new ApiMessage("Código de verificación valido"));
             }
-            return ResponseEntity.badRequest().body(new ApiMessage("Código de verificación valido"));
+            return ResponseEntity.badRequest().body(new ApiMessage("Código de verificación invalido"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
         }
@@ -143,15 +145,54 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/check-auth")
-    public ResponseEntity<String> checkAuth() {
-        return ResponseEntity.ok().body("autenticado");
+    @PostMapping("/user/image/add")
+    public ResponseEntity<ImageDTO> uploadProfileImage(
+            @RequestParam("image") MultipartFile image,
+            @RequestHeader("Authorization") String token,
+            HttpServletResponse response) {
+        try {
+            // Extraer el token Bearer
+            String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+            ImageDTO imageDTO = authService.saveImage(image, jwtToken, response);
+            return new ResponseEntity<>(imageDTO, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/user/image/update")
+    public ResponseEntity<ImageDTO> updateProfileImage(
+            @RequestParam("image") MultipartFile image,
+            @RequestHeader("Authorization") String token,
+            HttpServletResponse response) {
+        try {
+            // Extraer el token Bearer
+            String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+            ImageDTO imageDTO = authService.updateImage(image, jwtToken, response);
+            return new ResponseEntity<>(imageDTO, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteProfileImage(
+            @RequestHeader("Authorization") String token,
+            HttpServletResponse response) {
+        try {
+            // Extraer el token Bearer
+            String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+            authService.deleteImage(jwtToken, response);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/user/details")
     public Object getAuthenticatedUser() {
         try{
-            SlaveUser user = userService.getUserDetails();
+            User user = userService.getUserDetails();
             return ResponseEntity.ok(user);
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));

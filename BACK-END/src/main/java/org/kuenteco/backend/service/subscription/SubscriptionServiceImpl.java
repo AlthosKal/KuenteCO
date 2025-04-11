@@ -5,18 +5,16 @@ import lombok.RequiredArgsConstructor;
 import org.kuenteco.backend.dto.subscription.AddSubscriptionDTO;
 import org.kuenteco.backend.dto.subscription.SubscriptionDetailDTO;
 import org.kuenteco.backend.dto.subscription.UpdateSubscriptionDTO;
-import org.kuenteco.backend.entity.master.MasterAccount;
-import org.kuenteco.backend.entity.master.MasterPaySubscription;
-import org.kuenteco.backend.entity.master.MasterPaymentHistory;
-import org.kuenteco.backend.entity.master.MasterSubscription;
-import org.kuenteco.backend.entity.master.extra.DescriptionPaymentHistory;
-import org.kuenteco.backend.entity.master.extra.PayMethodInfo;
-import org.kuenteco.backend.entity.slave.SlavePaySubscription;
-import org.kuenteco.backend.entity.slave.SlaveSubscription;
+import org.kuenteco.backend.entity.Account;
+import org.kuenteco.backend.entity.PaySubscription;
+import org.kuenteco.backend.entity.PaymentHistory;
+import org.kuenteco.backend.entity.Subscription;
+import org.kuenteco.backend.entity.extra.DescriptionPaymentHistory;
+import org.kuenteco.backend.entity.extra.PayMethodInfo;
 import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.enums.SubscriptionType;
 import org.kuenteco.backend.exception.exceptions.AccountException;
-import org.kuenteco.backend.mapper.dto.SubscriptionDetailMapper;
+import org.kuenteco.backend.mapper.SubscriptionDetailMapper;
 import org.kuenteco.backend.repository.master.MasterAccountRepository;
 import org.kuenteco.backend.repository.master.MasterPaySubscriptionRepository;
 import org.kuenteco.backend.repository.master.MasterPaymentHistoryRepository;
@@ -46,11 +44,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public SubscriptionDetailDTO getSubscriptions(Integer subscriptionId) {
         // Obtener la suscripción de la base de datos
-        SlaveSubscription subscription = slaveSubscriptionRepository.findById(subscriptionId)
+        Subscription subscription = slaveSubscriptionRepository.findById(subscriptionId)
                 .orElseThrow(() -> new EntityNotFoundException("Subscripción no encontrada con el id: " + subscriptionId));
 
         // Obtener el pago relacionado (puede ser null si no existe)
-        SlavePaySubscription paySubscription = slavePaySubscriptionRepository.findBySlaveSubscriptionId(subscriptionId)
+        PaySubscription paySubscription = slavePaySubscriptionRepository.findBySubscriptionId(subscriptionId)
                 .orElse(null);
 
         // Mapear a DTO
@@ -60,12 +58,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public void addSubscription(AddSubscriptionDTO addSubscriptionDTO, Integer accountId) throws IOException {
         // Obtener la cuenta del usuario actual
-        MasterAccount masterAccount = masterAccountRepository.findById(accountId)
+        Account account = masterAccountRepository.findById(accountId)
                 .orElseThrow(() -> new EntityNotFoundException("Cuenta no encontrada con el id: " + accountId));
 
         // 1. Crear la nueva suscripción
-        MasterSubscription subscription = new MasterSubscription();
-        subscription.setMasterAccount(masterAccount);
+        Subscription subscription = new Subscription();
+        subscription.setAccount(account);
         subscription.setType(addSubscriptionDTO.getType());
 
         // Establecer fechas de inicio y expiración
@@ -86,8 +84,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         masterSubscriptionRepository.save(subscription);
 
         // 2. Crear el registro de pago
-        MasterPaySubscription paySubscription = new MasterPaySubscription();
-        paySubscription.setMasterSubscription(subscription);
+        PaySubscription paySubscription = new PaySubscription();
+        paySubscription.setSubscription(subscription);
         paySubscription.setAmount(addSubscriptionDTO.getAmount());
         paySubscription.setPayDate(now);
 
@@ -100,8 +98,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         masterPaySubscriptionRepository.save(paySubscription);
 
         // 3. Crear el historial de pago
-        MasterPaymentHistory paymentHistory = new MasterPaymentHistory();
-        paymentHistory.setMasterPaySubscription(paySubscription);
+        PaymentHistory paymentHistory = new PaymentHistory();
+        paymentHistory.setPaySubscription(paySubscription);
         paymentHistory.setDetails(addSubscriptionDTO.getDetails());
 
         // Guardar el historial de pago
@@ -109,7 +107,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public void updateSubscription(UpdateSubscriptionDTO updateSubscriptionDTO, Integer subscriptionId, Integer masterAccountId) throws IOException {
+    public void updateSubscription(UpdateSubscriptionDTO updateSubscriptionDTO, Integer subscriptionId, Integer accountId) throws IOException {
         // Validar entrada
         if (updateSubscriptionDTO == null) {
             throw new IllegalArgumentException("Campos requeridos, no pueden ser nulos");
@@ -119,7 +117,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
 
         // Obtener la suscripción de la base de datos
-        MasterSubscription subscription = masterSubscriptionRepository.findById(subscriptionId)
+        Subscription subscription = masterSubscriptionRepository.findById(subscriptionId)
                 .orElseThrow(() -> new EntityNotFoundException("Subscripción no encotrada con el id: " + subscriptionId));
 
         // Validar que la suscripción esté activa
@@ -128,9 +126,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
 
         // Obtener el pago relacionado (si existe)
-        MasterPaySubscription paySubscription = null;
+        PaySubscription paySubscription = null;
         try {
-            Integer paySubscriptionId = getCurrentPaySubscriptionId(masterAccountId);
+            Integer paySubscriptionId = getCurrentPaySubscriptionId(accountId);
             paySubscription = masterPaySubscriptionRepository.findById(paySubscriptionId).orElse(null);
         } catch (AccountException e) {
             // No hay pago asociado, continuamos sin él
@@ -149,12 +147,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         masterSubscriptionRepository.save(subscription);
     }
 
-    private void registerSubscriptionChange(MasterSubscription subscription,
-                                            MasterPaySubscription paySubscription,
+    private void registerSubscriptionChange(Subscription subscription,
+                                            PaySubscription paySubscription,
                                             SubscriptionType previousType) {
         if (paySubscription != null) {
-            MasterPaymentHistory history = new MasterPaymentHistory();
-            history.setMasterPaySubscription(paySubscription);
+            PaymentHistory history = new PaymentHistory();
+            history.setPaySubscription(paySubscription);
 
             DescriptionPaymentHistory details = new DescriptionPaymentHistory();
             details.setTypeSubscription("Cambio de " + previousType + " a " + subscription.getType());
@@ -170,20 +168,20 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private Integer getCurrentPaySubscriptionId(Integer masterAccountId) {
         // Obtener la suscripción activa del usuario
-        MasterSubscription activeSubscription = masterSubscriptionRepository
-                .findByMasterAccount_IdAndState(masterAccountId, State.ACTIVE)
+        Subscription activeSubscription = masterSubscriptionRepository
+                .findByAccount_IdAndState(masterAccountId, State.ACTIVE)
                 .orElseThrow(() -> new AccountException(
                         "No active subscription found for account with id: " + masterAccountId));
 
         // Obtener el pago relacionado
-        return masterPaySubscriptionRepository.findByMasterSubscriptionId(activeSubscription.getId())
-                .map(MasterPaySubscription::getId)
+        return masterPaySubscriptionRepository.findBySubscriptionId(activeSubscription.getId())
+                .map(PaySubscription::getId)
                 .orElseThrow(() -> new AccountException(
                         "No payment found for active subscription with id: " + activeSubscription.getId()));
     }
 
     @Override
-    public void cancelSubscription(MasterSubscription subscription) throws IOException {
+    public void cancelSubscription(Subscription subscription) throws IOException {
         masterSubscriptionRepository.delete(subscription);
     }
 }

@@ -1,4 +1,4 @@
-import 'package:kuenteco/domain/entities/Subscription_plan.dart';
+import 'package:kuenteco/domain/dto/Subscription_plan.dart';
 
 class SubscriptionConstants {
   static const List<SubscriptionPlan> plans = [

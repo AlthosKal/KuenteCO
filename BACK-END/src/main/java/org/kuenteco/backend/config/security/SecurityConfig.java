@@ -35,6 +35,7 @@ public class SecurityConfig {
                         "/v1/auth/send-verification-code", "/v1/auth/activate-account", "/v1/auth/change-password")
                 .permitAll().requestMatchers("/v1/account/**").authenticated().anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
+                .authenticationProvider(authenticationProvider())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtEntryPoint()))
                 .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
@@ -70,6 +71,7 @@ public class SecurityConfig {
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "accept",
                 "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+        corsConfiguration.setExposedHeaders(List.of("Authorization"));
         corsConfiguration.setAllowCredentials(true); // Permite credenciales
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

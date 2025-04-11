@@ -3,7 +3,7 @@ package org.kuenteco.backend.dto.subscription;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.kuenteco.backend.entity.master.extra.DescriptionPaymentHistory;
+import org.kuenteco.backend.entity.extra.DescriptionPaymentHistory;
 import org.kuenteco.backend.enums.SubscriptionType;
 
 import java.math.BigDecimal;
