@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:kuenteco/infrastructure/repositories/Auth_repository.dart';
 import 'package:kuenteco/presentation/widgets/Background_widget.dart';
 import 'package:kuenteco/presentation/widgets/Create_profile_widget.dart';
@@ -9,7 +6,6 @@ import 'package:kuenteco/presentation/widgets/Delete_profile_widget.dart';
 import 'package:kuenteco/presentation/widgets/Footer_widget.dart';
 import 'package:kuenteco/presentation/widgets/Navbar_logged_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../domain/dto/AccountDetailDTO.dart';
 
 class LoggedInHomePage extends StatelessWidget {
@@ -50,7 +46,6 @@ class AccountSelectionScreen extends StatefulWidget {
 }
 
 class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
-  // Variables de estado
   List<AccountDetailDTO> accounts = [];
   bool isLoading = true;
   String errorMessage = '';
@@ -63,7 +58,6 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
     _initializeData();
   }
 
-  // Métodos de inicialización
   Future<void> _initializeData() async {
     await _loadAuthToken();
     if (_authToken != null) {
@@ -77,16 +71,12 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
       setState(() {
         _authToken = prefs.getString('authToken');
       });
-
-      if (_authToken == null) {
-        _handleTokenError('No se encontró token de autenticación');
-      }
+      if (_authToken == null) _handleTokenError('No se encontró token de autenticación');
     } catch (e) {
       _handleTokenError('Error al cargar el token: $e');
     }
   }
 
-  // Métodos para manejar cuentas - Usando AuthRepository
   Future<void> _fetchAccounts() async {
     setState(() {
       isLoading = true;
@@ -94,19 +84,13 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
     });
 
     try {
-      // Usando el método getAllAccounts del repositorio
       final result = await widget.authRepository.getAllAccounts();
 
       if (result.containsKey('accounts') && result['accounts'] is List) {
         _handleSuccessfulResponse(result['accounts']);
-      } else if (result.containsKey('message')) {
-        setState(() {
-          errorMessage = result['message'];
-          isLoading = false;
-        });
       } else {
         setState(() {
-          errorMessage = 'Error al cargar perfiles: formato de respuesta inesperado';
+          errorMessage = result['message'] ?? 'Error al cargar perfiles: formato de respuesta inesperado';
           isLoading = false;
         });
       }
@@ -121,15 +105,14 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
         accounts = responseData.map((json) => AccountDetailDTO.fromJson(json) as AccountDetailDTO).toList();
         isLoading = false;
       });
-    } else if (responseData is Map && responseData.containsKey('message')) {
+    } else {
       setState(() {
-        errorMessage = responseData['message'];
+        errorMessage = responseData['message'] ?? 'Respuesta inesperada';
         isLoading = false;
       });
     }
   }
 
-  // Métodos de manejo de errores
   void _handleTokenError(String message) {
     setState(() {
       errorMessage = message;
@@ -144,16 +127,11 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
     });
   }
 
-  // Métodos de autenticación
   Future<void> _handleLogout() async {
     try {
       await widget.authRepository.logout();
       if (mounted) {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/login',
-              (route) => false,
-        );
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
       }
     } catch (e) {
       if (mounted) {
@@ -164,7 +142,6 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
     }
   }
 
-  // Métodos de interacción con cuentas
   void _showCreateAccountDialog() {
     if (_authToken == null) return;
 
@@ -172,7 +149,6 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
       context: context,
       builder: (context) => CreateProfileWidget(
         onAccountCreated: _fetchAccounts,
-
         authToken: _authToken!,
         baseUrl: _baseUrl.replaceAll('/v1/account', ''),
         authRepository: widget.authRepository,
@@ -180,16 +156,14 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
     );
   }
 
-  void _showDeleteAccountDialog() {
-    if (_authToken == null || accounts.isEmpty) return;
-
-    final accountToDelete = accounts.first; // Aquí puedes ajustar cuál cuenta eliminar, o dejarlo abierto a UI futura.
+  void _showDeleteAccountDialog(AccountDetailDTO account) {
+    if (_authToken == null) return;
 
     showDialog(
       context: context,
       builder: (context) => DeleteProfileWidget(
-        accountId: accountToDelete.id,
-        accountName: accountToDelete.name,
+        accountId: account.id,
+        accountName: account.name,
         authToken: _authToken!,
         baseUrl: _baseUrl.replaceAll('/v1/account', ''),
         authRepository: widget.authRepository,
@@ -204,16 +178,13 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
     );
   }
 
-  // Construcción de la UI
   @override
   Widget build(BuildContext context) {
     return Background(
       child: Column(
         children: [
           _buildNavbar(context),
-          Expanded(
-            child: _buildMainContent(context),
-          ),
+          Expanded(child: _buildMainContent(context)),
           const Footer(),
         ],
       ),
@@ -223,7 +194,7 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
   Widget _buildNavbar(BuildContext context) {
     return KuentecoNavbar(
       currentRoute: '/loggedIn',
-      onLogout: () => _handleLogout(),
+      onLogout: _handleLogout,
       authRepository: widget.authRepository,
     );
   }
@@ -308,27 +279,21 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
     return Center(
       child: Column(
         children: [
-        Text(
-        'Selecciona tu perfil',
-        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      const SizedBox(height: 8),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.add, color: Colors.white),
-            tooltip: 'Crear perfil',
-            onPressed: _showCreateAccountDialog,
+          Text(
+            'Selecciona tu perfil',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.delete, color: Colors.white),
-            tooltip: 'Eliminar perfil',
-            onPressed: _showDeleteAccountDialog,
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.add, color: Colors.white),
+                tooltip: 'Crear perfil',
+                onPressed: _showCreateAccountDialog,
               ),
             ],
           ),
@@ -341,22 +306,14 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-
     if (errorMessage.isNotEmpty) {
       return Center(
-        child: Text(
-          errorMessage,
-          style: const TextStyle(color: Colors.red),
-        ),
+        child: Text(errorMessage, style: const TextStyle(color: Colors.red)),
       );
     }
-
     if (accounts.isEmpty) {
       return const Center(
-        child: Text(
-          'No hay perfiles disponibles',
-          style: TextStyle(color: Colors.white),
-        ),
+        child: Text('No hay perfiles disponibles', style: TextStyle(color: Colors.white)),
       );
     }
 
@@ -377,9 +334,7 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
   Widget _buildAccountCard(AccountDetailDTO account, BuildContext context) {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () => _selectAccount(context, account),
@@ -393,10 +348,11 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
                 children: [
                   CircleAvatar(
                     backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                    child:
-                         ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                         )
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, size: 20),
+                    tooltip: 'Eliminar este perfil',
+                    onPressed: () => _showDeleteAccountDialog(account),
                   ),
                 ],
               ),
@@ -407,7 +363,6 @@ class _AccountSelectionScreenState extends State<AccountSelectionScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 5),
               const Spacer(),
               Align(
                 alignment: Alignment.bottomRight,
