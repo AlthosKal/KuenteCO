@@ -1,9 +1,4 @@
-enum AccountType {
-  PERSONAL,
-  BUSINESS,
-  SAVINGS,
-  // Agrega más si están en el enum de backend
-}
+import 'package:kuenteco/domain/dto/Account_type.dart';
 
 class NewAccountDTO {
   final String name;
@@ -17,7 +12,7 @@ class NewAccountDTO {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'type': type.name, // Enviamos como String
+      'type': type.name,
     };
   }
 }

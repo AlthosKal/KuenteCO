@@ -19,6 +19,8 @@ class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
   final _nameOrEmailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _emailFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
   bool _obscurePassword = true;
   bool _rememberPassword = false;
   bool _isLoading = false;
@@ -27,6 +29,8 @@ class _LoginViewState extends State<LoginView> {
   void dispose() {
     _nameOrEmailController.dispose();
     _passwordController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
@@ -172,7 +176,12 @@ class _LoginViewState extends State<LoginView> {
   Widget _buildNameOrEmailField() {
     return AuthFormField(
       controller: _nameOrEmailController,
+      focusNode: _emailFocusNode,
+      textInputAction: TextInputAction.next,
       label: 'Correo electrónico o nombre de usuario',
+      onFieldSubmitted: (_) {
+        FocusScope.of(context).requestFocus(_passwordFocusNode);
+      },
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Ingresa tu email o nombre de usuario';
@@ -185,8 +194,11 @@ class _LoginViewState extends State<LoginView> {
   Widget _buildPasswordField() {
     return AuthFormField(
       controller: _passwordController,
-      label: 'Contraseña',
+      focusNode: _passwordFocusNode,
       obscureText: _obscurePassword,
+      textInputAction: TextInputAction.done,
+      onFieldSubmitted: (_) => _handleLogin(context),
+      label: 'Contraseña',
       suffixIcon: IconButton(
         icon: Icon(
           _obscurePassword ? Icons.visibility : Icons.visibility_off,
@@ -201,6 +213,7 @@ class _LoginViewState extends State<LoginView> {
       },
     );
   }
+
 
   Widget _buildRememberMeCheckbox() {
     return SizedBox(

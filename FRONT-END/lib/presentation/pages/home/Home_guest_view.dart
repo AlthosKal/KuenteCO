@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
 // Widgets
 import 'package:kuenteco/presentation/widgets/Background_widget.dart';
-import 'package:kuenteco/presentation/widgets/Navbar_guest_widget.dart';
 import 'package:kuenteco/presentation/widgets/Footer_widget.dart';
+import 'package:kuenteco/presentation/widgets/Navbar_guest_widget.dart';
 
 class HomeGuestPage extends StatelessWidget {
   final String title;

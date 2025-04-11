@@ -1,7 +1,8 @@
 import 'dart:convert';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:kuenteco/domain/dto/Account_type.dart';
 
 class AuthApiService {
   // ==================== PROPIEDADES ====================
@@ -274,21 +275,77 @@ class AuthApiService {
   }
 
   // ==================== PERFIL ====================
-  Future<Map<String, dynamic>> updateProfile({
-    required Map<String, dynamic> userData,
-  }) async {
+  Future<Map<String, dynamic>> getAllAccounts() async {
+    if (_authToken == null || _authToken!.isEmpty) {
+      print('[ERROR] getAllAccounts: Token no disponible');
+      return {'status': 'error', 'message': 'Token no disponible'};
+    }
+
+    print('[DEBUG] Token en getAllAccounts: $_authToken');
+    print('[DEBUG] Headers en getAllAccounts: $_authHeaders');
+
     try {
-      final response = await _client.put(
+      final response = await _client.get(
         Uri.parse('$baseUrl/v1/account'),
         headers: _authHeaders,
-        body: json.encode(userData),
       );
 
-      return _processResponse(response, 'Profile updated');
+      print('[DEBUG] getAllAccounts response: ${response.statusCode} - ${response.body}');
+      return _processResponse(response, 'Accounts retrieved successfully');
     } catch (e) {
-      return {'status': 'error', 'message': 'Profile update error: $e'};
+      print('[ERROR] Error en getAllAccounts: $e');
+      return {'status': 'error', 'message': 'Error retrieving accounts: $e'};
     }
   }
+
+  Future<Map<String, dynamic>> registerAccount({
+    required String name,
+    required AccountType type,
+  }) async {
+    try {
+      final response = await _client.post(
+        Uri.parse('$baseUrl/v1/account/register'),
+        headers: {
+          ..._jsonHeaders,
+          if (_authToken != null) 'Authorization': 'Bearer $_authToken',
+        },
+        body: json.encode({
+          'name': name,
+          'type': type.name,
+        }),
+      );
+
+      final token = _extractTokenFromCookies(response);
+      if (token != null) _authToken = token;
+
+      return _processResponse(response, 'Account successfully registered');
+    } catch (e) {
+      return {'status': 'error', 'message': 'Account register error: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteAccount({
+    required int id,
+  }) async {
+    try {
+      final response = await _client.delete(
+        Uri.parse('$baseUrl/v1/account/$id'),
+        headers: {
+          ..._jsonHeaders,
+          if (_authToken != null) 'Authorization': 'Bearer $_authToken',
+        },
+      );
+
+      final token = _extractTokenFromCookies(response);
+      if (token != null) _authToken = token;
+
+      return _processResponse(response, 'Cuenta eliminada correctamente');
+    } catch (e) {
+      return {'status': 'error', 'message': 'Error al eliminar la cuenta: $e'};
+    }
+  }
+
+
 
   // ==================== IMAGEN DE PERFIL ====================
   Future<Map<String, dynamic>> uploadProfileImage({
@@ -343,66 +400,6 @@ class AuthApiService {
       return _processResponse(response, 'Profile image deleted successfully');
     } catch (e) {
       return {'status': 'error', 'message': 'Error deleting profile image: $e'};
-    }
-  }
-
-  // ==================== CUENTAS ====================
-  Future<Map<String, dynamic>> getAllAccounts() async {
-    if (_authToken == null || _authToken!.isEmpty) {
-      print('[ERROR] getAllAccounts: Token no disponible');
-      return {'status': 'error', 'message': 'Token no disponible'};
-    }
-
-    print('[DEBUG] Token en getAllAccounts: $_authToken');
-    print('[DEBUG] Headers en getAllAccounts: $_authHeaders');
-
-    try {
-      final response = await _client.get(
-        Uri.parse('$baseUrl/v1/account'),
-        headers: _authHeaders,
-      );
-
-      print('[DEBUG] getAllAccounts response: ${response.statusCode} - ${response.body}');
-      return _processResponse(response, 'Accounts retrieved successfully');
-    } catch (e) {
-      print('[ERROR] Error en getAllAccounts: $e');
-      return {'status': 'error', 'message': 'Error retrieving accounts: $e'};
-    }
-  }
-
-  Future<Map<String, dynamic>> registerAccount({
-    required String name,
-    required String type,
-    required double initialBalance,
-  }) async {
-    try {
-      final response = await _client.post(
-        Uri.parse('$baseUrl/v1/account/register'),
-        headers: _authHeaders,
-        body: json.encode({
-          'name': name,
-          'type': type,
-        }),
-      );
-
-      return _processResponse(response, 'Account registered successfully');
-    } catch (e) {
-      return {'status': 'error', 'message': 'Error registering account: $e'};
-    }
-  }
-
-  Future<Map<String, dynamic>> deleteAccount({
-    required int accountId,
-  }) async {
-    try {
-      final response = await _client.delete(
-        Uri.parse('$baseUrl/v1/account/$accountId'),
-        headers: _authHeaders,
-      );
-
-      return _processResponse(response, 'Account deleted successfully');
-    } catch (e) {
-      return {'status': 'error', 'message': 'Error deleting account: $e'};
     }
   }
 
