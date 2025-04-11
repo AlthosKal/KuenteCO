@@ -75,7 +75,6 @@ public class AccountServiceImpl implements AccountService {
         masterAccountRepository.save(account);
     }
 
-
     public boolean existsByAccountName(String name) {
         return slaveAccountRepository.existsByName(name);
     }
