@@ -34,7 +34,7 @@ cd KuenteCO/BACK-END
 mkdir .env
 ```
 
-3. **Ejecuta el proyecto con Maven:**
+3. **Ejecuta el proyecto con Maven "asegurate de tener las bases de datos encendidas" y el ORM  de Hibernate creará las tablas:**
 
 ```bash
 ./mvnw spring-boot:run
