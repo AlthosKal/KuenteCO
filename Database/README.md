@@ -120,9 +120,6 @@ docker compose down
 docker compose up -d --build
 ```
 
-Claro, increíble Yeferson 🔥  
-Aquí tienes un fragmento adicional para el `README.md` de la carpeta `DATABASE` que explica la instalación y configuración de las extensiones `pg_http` y `pg_cron`, así como el uso de una función SQL que realiza solicitudes HTTP a la API de OpenExchangeRate:
-
 ---
 
 
