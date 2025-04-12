@@ -101,7 +101,7 @@ pg_basebackup -D /var/lib/postgresql/data \
 
 ## 🗃️ Scripts SQL: Tablas y Relaciones
 
-En la carpeta `/db` encontrarás los archivos `.sql` necesarios para crear por ejemplo los triggers y funciones de la base de datos.
+En la carpeta `/db` encontrarás los archivos `.sql` necesarios para crear por ejemplo los triggers y funciones de la base de datos "tambien se encuentra la backup de la base de datos maestra ", aunque se encuentre un archivo DatabaseStructureKuenteCO.sql con las tablas, para el proyecto se utilizo el ORM de Hibernate para construir estas.
 ---
 
 ## 🧠 Observaciones y Solución de Problemas
