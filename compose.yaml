@@ -1,0 +1,75 @@
+services:
+  backend:
+    image: yefff/image-backend-kuenteco:1.0.0
+    container_name: BackendKuenteCO
+    volumes:
+      - ./.env-docker:/workspace/.env
+    ports:
+      - "8080:8080"
+    env_file:
+    - .env-docker
+    depends_on:
+      postgres-master-database:
+        condition: service_healthy
+      postgres-replica-database:
+        condition: service_started
+    networks:
+      - kuenteco-network
+    restart: unless-stopped
+
+  postgres-master-database:
+    build:
+      context: ./Database/master
+      dockerfile: Dockerfile
+    image: yefff/image-master-kuenteco:1.0.0
+    container_name: DatabaseMasterKuenteCO
+    environment:
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME_MASTER}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD_MASTER}
+      POSTGRES_DB: KuenteCO
+    volumes:
+      - postgres-master-data:/var/lib/postgresql/data
+      - ./Database/db:/db
+    ports:
+      - "5432:5432"
+    networks:
+      - kuenteco-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U master -d KuenteCO"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  postgres-replica-database:
+    build:
+      context: ./Database/slave
+      dockerfile: Dockerfile
+    image: yefff/image-slave-kuenteco:1.0.0
+    container_name: DatabaseSlaveKuenteCO
+    environment:
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME_SLAVE}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD_SLAVE}
+      POSTGRES_DB: KuenteCO
+      MASTER_HOST: postgres-master-database
+      MASTER_PORT: 5432
+      REPLICATOR_USER: replicator
+      REPLICATOR_PASSWORD: ${SPRING_DATASOURCE_PASSWORD_SLAVE}
+    volumes:
+      - postgres-replica-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - kuenteco-network
+    depends_on:
+      postgres-master-database:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres-master-data:
+  postgres-replica-data:
+
+networks:
+  kuenteco-network:
+    driver: bridge

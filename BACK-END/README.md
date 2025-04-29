@@ -43,6 +43,14 @@ mkdir .env
 > [!NOTE]  
 > También puedes usar Docker para levantar la app en conjunto con Nginx (ver documentación raíz del repositorio para más detalles).
 
+
+4. **Una vez que se halla inicializado las bases de datos, se deben redirigir a la tabla de `role`, e insertar los siguientes valores**
+```postgresql
+INSERT INTO public.role(
+	id, name)
+	VALUES (0, ROLE_USER), (1, ROLE_ADMIN);
+```
+
 ---
 
 ## 📑 Rutas de la API
@@ -112,9 +120,3 @@ Para exponer la API de manera segura, se utiliza **Nginx como proxy inverso** en
 - Redirección de puertos y rutas
 - Certificados SSL (cuando se implemente en producción)
 - Protección contra ataques de denegación de servicio y escaneo de endpoints
-
----
-
-
-
-

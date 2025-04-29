@@ -47,7 +47,6 @@ KuenteCO implementa una arquitectura basada en una **Zona Desmilitarizada (DMZ)*
 
 El repositorio está dividido en tres carpetas principales:
 
-
 ---
 
 ### [📁 FRONT-END](./FRONT-END/README.md)
@@ -77,24 +76,49 @@ Contiene los scripts necesarios para crear y poblar la base de datos en PostgreS
 
 ---
 
-> [!NOTE]  
-> Próximamente
-
-
 ## ⚙️ Despliegue con Docker  
 
-Este repositorio incluye un archivo `compose.yaml` que permite levantar todos los servicios de manera sencilla:
+Este repositorio incluye un archivo `compose.yaml` que permite levantar todos los servicios de manera sencilla, 
+para levantar este stack se debe contar con un `.env-docker` para las credenciales, la plantilla de como debe ser este es la siguiente:
+
+```env
+# API de SendGrid
+SENDGRID_API_KEY=tu_api_key_de_sendgrid
+EMAIL_SENDGRID=tu_correo_de_sendgrid_configurado_para_enviar_correos
+VERIFICATION_EMAIL=id_de_tu_template_de_sengrid_para_verificar_correos
+RESET_PASSWORD=d-id_de_tu_template_de_sengrid_para_cambiar_contraseñas
+
+# API de Cloudinary
+CLOUDINARY_NAME=tu_cloud_name
+CLOUDINARY_API_KEY=tu_api_key_de_cloudinary
+CLOUDINARY_API_SECRET=tu_api_secret_de_cloudinary
+
+# Secret de JWT
+JWT_SECRET=tu_jwt_secret
+
+ # Conexion a la base de datos Maestra
+SPRING_DATASOURCE_URL_MASTER=jdbc:postgresql://postgres-master-database:5432/KuenteCO
+SPRING_DATASOURCE_USERNAME_MASTER=master
+SPRING_DATASOURCE_PASSWORD_MASTER=root
+
+# Conexion a la base de datos Esclava
+SPRING_DATASOURCE_URL_SLAVE=jdbc:postgresql://postgres-replica-database:5432/KuenteCO
+SPRING_DATASOURCE_USERNAME_SLAVE=replicator
+SPRING_DATASOURCE_PASSWORD_SLAVE=root
+
+
+```
 
 ```bash
-docker-compose up -d
+docker compose --env-file .env-docker up -d
 ```
 
 Esto desplegará:
 
-- El frontend en un contenedor independiente.
+- El frontend en un contenedor independiente.(proximamente)
 - El backend con conexión a la base de datos.
 - PostgreSQL con persistencia de datos.
-- Nginx configurado como proxy inverso y capa de acceso segura.
+- Nginx configurado como proxy inverso y capa de acceso segura.(proximamente)
 
 ---
 

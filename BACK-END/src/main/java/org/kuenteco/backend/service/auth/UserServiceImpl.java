@@ -59,17 +59,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findByUserName(String name) {
-        return slaveUserRepository.findByName(name).orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
-    }
-
-    @Override
-    public User findByEmail(String email) {
-        return slaveUserRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Datos Invalidos"));
-    }
-
-    @Override
     public User findByNameOrEmail(String nameOrEmail) {
         boolean isEmail = nameOrEmail.contains("@");
 

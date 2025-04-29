@@ -115,10 +115,9 @@ public class AuthServiceImpl implements AuthService {
     public TokenResponseDTO authenticate(String nameOrEmail, String password, HttpServletResponse response) {
         // Verificar si la cuenta está activa antes de autenticar
         // Determinar si es un email o nombre de usuario
-        User user = userService.findByNameOrEmail(nameOrEmail);
-        if (user.getAccountState() != State.ACTIVE) {
-            throw new RuntimeException("Cuenta no activada. Por favor verifica tu correo");
-        }
+        User user = Optional.ofNullable(userService.findByNameOrEmail(nameOrEmail))
+                .filter(u -> u.getAccountState() == State.ACTIVE)
+                .orElseThrow(() -> new RuntimeException("Cuenta no actrivada, Por favor verifica tu correo"));
 
         // Usar el email para la autenticación de Spring Security
         String emailForAuth = user.getEmail();
@@ -138,11 +137,9 @@ public class AuthServiceImpl implements AuthService {
     public void registerUser(NewUserDTO newUserDTO) {
         if (userService.existsByUserName(newUserDTO.getName())) {
             throw new IllegalArgumentException("Datos Inválidos, nombre con caracteres no permitidos o ya existente");
-        }
-        if (userService.existsByUserEmail(newUserDTO.getEmail())) {
+        } else if (userService.existsByUserEmail(newUserDTO.getEmail())) {
             throw new IllegalArgumentException("Datos Inválidos, correo con caracteres no permitidos o ya existente");
         }
-
         log.info("Intentando registrar nuevo usuario: {}", newUserDTO.getEmail());
 
         Role roleUser = slaveRoleRepository.findByName(RoleList.ROLE_USER)
@@ -182,11 +179,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void sendVerificationEmail(SendVerificationCodeDTO sendVerificationCodeDTO, boolean isRegistration)
             throws IOException {
-        String email = sendVerificationCodeDTO.getEmail();
-
-        if (isRegistration && !slaveUserRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email no registrado");
-        }
+        String email = Optional.ofNullable(sendVerificationCodeDTO.getEmail())
+                .filter(e -> isRegistration && slaveUserRepository.existsByEmail(e))
+                .orElseThrow(() -> new IllegalArgumentException("Email no registrado"));
 
         String code = String.format("%06d", new Random().nextInt(999999));
         verificationCodes.put(email, code);

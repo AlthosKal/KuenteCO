@@ -12,7 +12,6 @@ import java.util.Optional;
 @Repository
 @Transactional(transactionManager = "slaveTransactionManager", readOnly = true)
 public interface SlaveAccountRepository extends JpaRepository<Account, Integer> {
-    Optional<Account> findByName(String name);
 
     Boolean existsByName(String name);
 

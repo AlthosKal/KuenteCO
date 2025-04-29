@@ -30,20 +30,12 @@ public class SecurityConfig {
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors(Customizer.withDefaults()).csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/v1/auth/login", "/v1/auth/register", "/v1/auth/validate-verification-code",
-                                "/v1/auth/send-verification-code", "/v1/auth/activate-account",
-                                "/v1/auth/change-password",
-                                "/v1/documentation/**",
-                                "/swagger-ui.html",
-                                "/swagger-resources/**",
-                                "/swagger-ui/**",
-                                "/api-docs/**",
-                                "/api/api-docs/**",
-                                "/v3/api-docs/**",
-                                "/webjars/**")
-                        .permitAll().requestMatchers("/v1/account/**").authenticated().anyRequest().authenticated())
+        http.cors(Customizer.withDefaults()).csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(auth -> auth
+                .requestMatchers("/v1/auth/login", "/v1/auth/register", "/v1/auth/validate-verification-code",
+                        "/v1/auth/send-verification-code", "/v1/auth/activate-account", "/v1/auth/change-password",
+                        "/v1/documentation/**", "/swagger-ui.html", "/swagger-resources/**", "/swagger-ui/**",
+                        "/api-docs/**", "/api/api-docs/**", "/v3/api-docs/**", "/webjars/**")
+                .permitAll().requestMatchers("/v1/account/**").authenticated().anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults()).authenticationProvider(authenticationProvider())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtEntryPoint()))
                 .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
