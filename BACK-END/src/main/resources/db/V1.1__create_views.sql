@@ -16,14 +16,13 @@ GROUP BY
 --Tablas Relacionadas: Budget - Transaction
 CREATE OR REPLACE VIEW vw_budget_vs_actual AS
 SELECT
-    b.id AS budget_id,
-    b.name AS budget_name,
-    b.assigned_amount AS assigned_amount,
+    c.id AS category_id,
+    c.name AS category_name,
+    c.assigned_budget AS assigned_amount,
     COALESCE(SUM(t.amount), 0) AS actual_spent,
-    (b.assigned_amount - COALESCE(SUM(t.amount), 0)) AS remaining_amount
+    (c.assigned_budget - COALESCE(SUM(t.amount), 0)) AS remaining_amount
 FROM
-    Budget b
-        LEFT JOIN
-    Transaction t ON b.id_category = t.id_category
+    category c
+        LEFT JOIN transaction t ON c.id = t.id_category AND t.type = 'EXPENSE'
 GROUP BY
-    b.id, b.name, b.assigned_amount;
+    c.id, c.name, c.assigned_budget;
