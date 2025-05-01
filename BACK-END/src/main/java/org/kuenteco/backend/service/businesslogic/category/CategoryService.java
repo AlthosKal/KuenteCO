@@ -2,7 +2,6 @@ package org.kuenteco.backend.service.businesslogic.category;
 
 import org.kuenteco.backend.dto.businesslogic.CategoryDTO;
 import org.kuenteco.backend.entity.Category;
-import org.kuenteco.backend.entity.extra.DescriptionCategory;
 import org.kuenteco.backend.enums.State;
 
 import java.math.BigDecimal;

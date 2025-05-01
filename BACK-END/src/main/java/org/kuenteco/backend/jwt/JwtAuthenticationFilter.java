@@ -20,7 +20,6 @@ import org.springframework.web.util.WebUtils;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 
 @NoArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {

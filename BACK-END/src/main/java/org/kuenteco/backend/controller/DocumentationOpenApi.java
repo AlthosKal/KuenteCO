@@ -1,4 +1,4 @@
-package org.kuenteco.backend.controller.auth;
+package org.kuenteco.backend.controller;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 // Controlador para redireccionar a la documentación de la API
 @Controller
-@RequestMapping("/v1/documentation/auth")
-public class DocumentationAuthController {
+@RequestMapping("/v1/documentation")
+public class DocumentationOpenApi {
 
     // Endpoint que redirige a la interfaz Swagger UI para visualizar la documentación de la API
     @Operation(summary = "Redirect to Swagger UI", description = "Redirects to the Swagger UI page for API documentation")

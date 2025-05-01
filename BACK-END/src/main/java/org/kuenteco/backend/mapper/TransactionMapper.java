@@ -3,7 +3,9 @@ package org.kuenteco.backend.mapper;
 import org.kuenteco.backend.dto.businesslogic.TransactionRequestDTO;
 import org.kuenteco.backend.dto.businesslogic.TransactionResponseDTO;
 import org.kuenteco.backend.entity.Transaction;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface TransactionMapper {

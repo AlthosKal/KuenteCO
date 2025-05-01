@@ -1,25 +1,16 @@
 package org.kuenteco.backend.service.businesslogic.category;
 
 import lombok.RequiredArgsConstructor;
-import org.kuenteco.backend.repository.master.MasterAccountRepository;
-import org.kuenteco.backend.repository.master.MasterAssetRepository;
-import org.kuenteco.backend.repository.master.MasterCategoryRepository;
-import org.kuenteco.backend.repository.slave.SlaveAccountRepository;
-import org.kuenteco.backend.repository.slave.SlaveAssetRepository;
-import org.kuenteco.backend.repository.slave.SlaveCategoryRepository;
-import org.springframework.stereotype.Service;
 import org.kuenteco.backend.dto.businesslogic.CategoryDTO;
-import org.kuenteco.backend.entity.Account;
-import org.kuenteco.backend.entity.Asset;
-import org.kuenteco.backend.entity.Budget;
-import org.kuenteco.backend.entity.Category;
-import org.kuenteco.backend.entity.Transaction;
-import org.kuenteco.backend.entity.extra.DescriptionCategory;
+import org.kuenteco.backend.entity.*;
 import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.enums.TransactionType;
+import org.kuenteco.backend.repository.master.MasterAccountRepository;
+import org.kuenteco.backend.repository.master.MasterAssetRepository;
 import org.kuenteco.backend.repository.master.MasterBudgetRepository;
-import org.kuenteco.backend.repository.slave.SlaveBudgetRepository;
-import org.kuenteco.backend.repository.slave.SlaveTransactionRepository;
+import org.kuenteco.backend.repository.master.MasterCategoryRepository;
+import org.kuenteco.backend.repository.slave.*;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;

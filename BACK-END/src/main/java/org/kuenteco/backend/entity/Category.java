@@ -4,9 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import org.kuenteco.backend.entity.extra.DescriptionCategory;
 import org.kuenteco.backend.enums.State;
+
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 

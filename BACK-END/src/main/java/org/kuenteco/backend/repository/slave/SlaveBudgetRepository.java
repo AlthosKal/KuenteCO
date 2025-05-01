@@ -1,6 +1,5 @@
 package org.kuenteco.backend.repository.slave;
 
-import org.kuenteco.backend.entity.Account;
 import org.kuenteco.backend.entity.Budget;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

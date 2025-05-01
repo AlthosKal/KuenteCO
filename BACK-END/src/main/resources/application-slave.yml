@@ -14,6 +14,20 @@ slave:
       connection-timeout: 10000
       max-lifetime: 1800000
 
+  jpa:
+    hibernate:
+      ddl-auto: none # Deshabilitamos DDL automático en el slave
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        connection:
+          read_only: true
+
+    # Deshabilitamos Flyway en el perfil esclavo
+    flyway:
+      enabled: false
+
 logging:
   level:
     org.hibernate.SQL: DEBUG

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.kuenteco.backend.entity.extra.Image;
 import org.kuenteco.backend.enums.AccountType;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Data

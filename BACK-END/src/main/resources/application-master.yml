@@ -25,7 +25,21 @@ spring:
             non_contextual_creation: true
     open-in-view: false
 
+  flyway:
+    enabled: true
+    locations: classpath:db
+    baseline-on-migrate: true
+    out-of-order: false
+    validate-on-migrate: true
+    sql-migration-prefix: V
+    sql-migration-separator: __
+    sql-migration-suffixes: .sql
+    schemas: public
+    placeholders:
+      application_user: ${SPRING_DATASOURCE_USERNAME_MASTER}
+
 logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.flywaydb: DEBUG

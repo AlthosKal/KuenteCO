@@ -4,7 +4,6 @@ import org.kuenteco.backend.dto.businesslogic.CategoryRequestDTO;
 import org.kuenteco.backend.dto.businesslogic.CategoryResponseDTO;
 import org.kuenteco.backend.entity.Category;
 import org.kuenteco.backend.entity.Transaction;
-import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.enums.TransactionType;
 import org.kuenteco.backend.repository.slave.SlaveTransactionRepository;
 import org.mapstruct.*;
