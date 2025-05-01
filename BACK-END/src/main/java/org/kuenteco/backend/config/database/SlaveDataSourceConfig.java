@@ -28,7 +28,7 @@ public class SlaveDataSourceConfig {
 
     @Bean(name = "slaveDataSource")
     public DataSource dataSource() {
-        log.info("Configurando entity Manager Factory para la replica de la base de datos maestra");
+        log.info("Configurando data source para la replica");
         DriverManagerDataSource slaveDataSource = new DriverManagerDataSource();
         slaveDataSource.setUrl(environment.getProperty("slave.datasource.url"));
         slaveDataSource.setUsername(environment.getProperty("slave.datasource.username"));
@@ -39,7 +39,7 @@ public class SlaveDataSourceConfig {
 
     @Bean(name = "slaveEntityManagerFactory")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-        log.info("Configurando entity Manager Factory para la replica de la base de datos maestra");
+        log.info("Configurando entity Manager Factory para la replica");
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
         em.setPackagesToScan("org.kuenteco.backend.entity");
@@ -52,7 +52,6 @@ public class SlaveDataSourceConfig {
         properties.put("hibernate.show_sql", environment.getProperty("slave.jpa.properties.hibernate.show_sql", "false"));
         properties.put("hibernate.format_sql", environment.getProperty("slave.jpa.properties.hibernate.format_sql", "false"));
         properties.put("hibernate.hbm2ddl.auto", "none");  // Forzamos a none para el esclavo
-        properties.put("hibernate.dialect", environment.getProperty("slave.jpa.properties.hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect"));
 
         // Configuración explícita para modo sólo lectura
         properties.put("hibernate.connection.read_only", "true");

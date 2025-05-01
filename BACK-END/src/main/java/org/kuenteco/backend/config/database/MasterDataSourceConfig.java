@@ -31,7 +31,7 @@ public class MasterDataSourceConfig {
     @Primary
     @Bean(name = "masterDataSource")
     public DataSource dataSource() {
-        log.info("Configurando entity Manager Factory para la base de datos maestra");
+        log.info("Configurando entity data source para la base de datos maestra");
         DriverManagerDataSource masterDataSource = new DriverManagerDataSource();
         masterDataSource.setUrl(environment.getProperty("spring.datasource.url"));
         masterDataSource.setUsername(environment.getProperty("spring.datasource.username"));
@@ -56,7 +56,6 @@ public class MasterDataSourceConfig {
         properties.put("hibernate.show_sql", environment.getProperty("spring.jpa.properties.hibernate.show_sql", "false"));
         properties.put("hibernate.format_sql", environment.getProperty("spring.jpa.properties.hibernate.format_sql", "false"));
         properties.put("hibernate.hbm2ddl.auto", environment.getProperty("spring.jpa.hibernate.ddl-auto", "validate"));
-        properties.put("hibernate.dialect", environment.getProperty("spring.jpa.properties.hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect"));
         properties.put("hibernate.jdbc.lob.non_contextual_creation", environment.getProperty("spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation", "true"));
         properties.put("hibernate.current_session_context_class", "thread");
         properties.put("hibernate.id.new_generator_mappings", "true");

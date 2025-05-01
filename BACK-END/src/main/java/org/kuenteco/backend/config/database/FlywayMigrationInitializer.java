@@ -1,36 +1,33 @@
 package org.kuenteco.backend.config.database;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.env.Environment;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Configuration
-@RequiredArgsConstructor
-@ConditionalOnProperty(name = "spring.flyway.enabled", havingValue = "true", matchIfMissing = true)
-public class FlywayConfig {
+public class FlywayMigrationInitializer implements ApplicationListener<ContextRefreshedEvent> {
 
+    private final DataSource dataSource;
     private final Environment environment;
 
-    /**
-     * Configura Flyway para la base de datos maestra.
-     * Esta configuración asegura que las migraciones se ejecuten
-     * únicamente en la base de datos principal y no en réplicas.
-     *
-     * @param dataSource El DataSource maestro inyectado
-     * @return La instancia de Flyway configurada y ejecutada
-     */
-    @Bean(name = "flyway")
-    @DependsOn("masterDataSource")
-    public Flyway flyway(@Qualifier("masterDataSource") DataSource dataSource) {
+    @Autowired
+    public FlywayMigrationInitializer(@Qualifier("masterDataSource") DataSource dataSource, Environment environment) {
+        this.dataSource = dataSource;
+        this.environment = environment;
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
         log.info("Configurando Flyway para migraciones de base de datos");
 
         Flyway flyway = Flyway.configure()
@@ -57,9 +54,6 @@ public class FlywayConfig {
             log.error("Error durante la migración de Flyway: {}", e.getMessage(), e);
             throw e;
         }
-
-
-        return flyway;
     }
 
     /**
@@ -67,8 +61,8 @@ public class FlywayConfig {
      *
      * @return Mapa de placeholders configurados
      */
-    private java.util.Map<String, String> getPlaceholders() {
-        java.util.Map<String, String> placeholders = new java.util.HashMap<>();
+    private Map<String, String> getPlaceholders() {
+        Map<String, String> placeholders = new HashMap<>();
 
         // Obtener properties con el prefijo flyway.placeholders
         if (environment.getProperty("spring.flyway.placeholders.application_user") != null) {
