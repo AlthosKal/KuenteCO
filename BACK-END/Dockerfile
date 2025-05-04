@@ -2,6 +2,8 @@
 FROM maven:3.9.9-eclipse-temurin-21 AS builder
 WORKDIR /workspace
 
+ENV SPRING_OUTPUT_ANSI_ENABLED=ALWAYS
+
 # Copy pom.xml and download dependencies (cached layer)
 COPY pom.xml .
 RUN mvn dependency:go-offline
