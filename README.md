@@ -109,6 +109,7 @@ SPRING_DATASOURCE_PASSWORD_SLAVE=root
 
 ```
 
+Al ejecutar el siguiente comando, se levantará un stack de Docker:
 ```bash
 docker compose --env-file .env-docker up -d
 ```
