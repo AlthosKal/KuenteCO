@@ -1,9 +1,11 @@
 package org.kuenteco.backend.entity;
 
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 import org.kuenteco.backend.entity.extra.ContentNotification;
 
 import java.sql.Timestamp;
@@ -25,6 +27,7 @@ public class Notification {
     @Column(name = "date_send")
     private Timestamp dateSend;
 
-    @Column(columnDefinition = "JSONB")
+    @Type(JsonBinaryType.class)
+    @Column(columnDefinition = "jsonb")
     private ContentNotification content;
 }

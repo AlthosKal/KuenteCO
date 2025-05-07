@@ -1,9 +1,11 @@
 package org.kuenteco.backend.entity;
 
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 import org.kuenteco.backend.entity.extra.DescriptionTransaction;
 import org.kuenteco.backend.entity.extra.ExchangeRate;
 import org.kuenteco.backend.enums.TransactionType;
@@ -37,7 +39,8 @@ public class Transaction {
     @Column(name = "transaction_date")
     private Timestamp transactionDate;
 
-    @Column(columnDefinition = "JSONB")
+    @Type(JsonBinaryType.class)
+    @Column(columnDefinition = "jsonb")
     private DescriptionTransaction description;
 
     @ManyToOne

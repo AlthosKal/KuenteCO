@@ -1,9 +1,12 @@
 package org.kuenteco.backend.entity;
 
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
+import org.kuenteco.backend.entity.extra.DescriptionCategory;
 import org.kuenteco.backend.enums.State;
 
 import java.math.BigDecimal;
@@ -29,8 +32,9 @@ public class Category {
 
     private String name;
 
-    // @Column(columnDefinition = "jsonb")
-    private String description;
+    @Type(JsonBinaryType.class)
+    @Column(columnDefinition = "jsonb")
+    private DescriptionCategory description;
 
     @Column(name = "assigned_budget")
     private BigDecimal assignedBudget;
