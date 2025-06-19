@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.3</version>
+        <version>3.5.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.kuenteco</groupId>
@@ -33,14 +33,17 @@
         <quickperf.version>1.1.0</quickperf.version>
         <hamcrest.version>2.2</hamcrest.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
+        <hibernate.types.version>2.21.1</hibernate.types.version>
         <junit-platform-launcher.version>1.8.2</junit-platform-launcher.version>
         <jakarta-validation.version>3.0.2</jakarta-validation.version>
+        <poi-ooxml.version>5.3.0</poi-ooxml.version>
+        <http.version>4.5.13</http.version>
 
         <!-- Plugin Versions -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
-        <formatter-maven-plugin.version>2.24.1</formatter-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
+        <spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
 
         <!-- Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -84,7 +87,7 @@
         <dependency>
             <groupId>com.vladmihalcea</groupId>
             <artifactId>hibernate-types-60</artifactId>
-            <version>2.21.1</version>
+            <version>${hibernate.types.version}</version>
         </dependency>
 
         <dependency>
@@ -111,6 +114,7 @@
             <scope>provided</scope>
             <version>${lombok.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
@@ -189,9 +193,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sendgrid</groupId>
-            <artifactId>sendgrid-java</artifactId>
-            <version>${sendgrid-java.version}</version>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi-ooxml.version}</version>
         </dependency>
 
         <dependency>
@@ -230,6 +234,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.sendgrid</groupId>
+            <artifactId>sendgrid-java</artifactId>
+            <version>${sendgrid-java.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.cloudinary</groupId>
             <artifactId>cloudinary-http44</artifactId>
             <version>${cloudinary.version}</version>
@@ -245,22 +255,19 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${http.version}</version> <!-- o la versión que prefieras unificar -->
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>${http.version}</version> <!-- para garantizar también la convergencia de httpmime -->
+        </dependency>
     </dependencies>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpclient</artifactId>
-                <version>4.5.13</version> <!-- o la versión que prefieras unificar -->
-            </dependency>
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpmime</artifactId>
-                <version>4.5.13</version> <!-- para garantizar también la convergencia de httpmime -->
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <!-- Sección de configuración de construcción del proyecto -->
     <build>
@@ -285,23 +292,6 @@
                 </executions>
             </plugin>
 
-            <!-- Plugin para formatear el código automáticamente -->
-            <plugin>
-                <groupId>net.revelc.code.formatter</groupId>
-                <artifactId>formatter-maven-plugin</artifactId>
-                <version>${formatter-maven-plugin.version}</version>
-                <configuration>
-                    <encoding>UTF-8</encoding> <!-- Se define la codificación de caracteres -->
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>format</goal> <!-- Objetivo de formatear el código -->
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- Plugin para imponer reglas de calidad y versiones de dependencias -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -309,16 +299,22 @@
                 <version>${maven-enforcer-plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>enforce-version</id>
+                        <id>enforce</id>
                         <goals>
                             <goal>enforce</goal> <!-- Impone reglas sobre versiones de dependencias y Java -->
                         </goals>
                         <configuration>
                             <rules>
-                                <dependencyConvergence/> <!-- Asegura que las versiones de dependencias sean consistentes -->
                                 <requireJavaVersion>
-                                    <version>${java.version}</version> <!-- Verifica que la versión de Java sea la correcta -->
+                                    <version>${java.version}</version>
+                                    <message>Invalid Java version. It should, at least, be ${java.version}</message>
                                 </requireJavaVersion>
+                                <requireMavenVersion>
+                                    <version>${maven.version}</version>
+                                    <message>Invalid Maven version. It should, at least, be ${maven.version}</message>
+                                </requireMavenVersion>
+                                <banDuplicatePomDependencyVersions/>
+                                <dependencyConvergence/>
                             </rules>
                         </configuration>
                     </execution>
@@ -354,6 +350,33 @@
             </plugin>
 
             <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${spotless-maven-plugin.version}</version>
+                <configuration>
+                    <java>
+                        <includes>
+                            <include>src/main/java/**/*.java</include> <!-- Check application code -->
+                            <include>src/test/java/**/*.java</include> <!-- Check application tests code -->
+                        </includes>
+                        <importOrder /> <!-- standard import order -->
+                        <removeUnusedImports /> <!-- remove unused imports -->
+                        <googleJavaFormat>
+                            <style>AOSP</style> <!-- or GOOGLE (optional) -->
+                        </googleJavaFormat>
+                    </java>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                            <goal>apply</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco-maven-plugin.version}</version>
@@ -374,5 +397,16 @@
             </plugin>
         </plugins>
     </build>
+
+    <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>

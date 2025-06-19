@@ -1,16 +1,14 @@
 package org.kuenteco.backend.entity.extra;
 
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DescriptionPaymentHistory implements Serializable {
+public class DescriptionPaymentHistory {
     private String typeSubscription;
     private String paymentMethod;
     private BigDecimal amount;

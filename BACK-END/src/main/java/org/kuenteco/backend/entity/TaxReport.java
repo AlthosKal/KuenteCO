@@ -1,7 +1,6 @@
 package org.kuenteco.backend.entity;
 
 import jakarta.persistence.*;
-
 import java.sql.Timestamp;
 
 @Entity
@@ -12,8 +11,8 @@ public class TaxReport {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_account")
-    private Account account;
+    @JoinColumn(name = "id_profile")
+    private Profile profile;
 
     @Column(name = "tax_year")
     private Integer taxYear;

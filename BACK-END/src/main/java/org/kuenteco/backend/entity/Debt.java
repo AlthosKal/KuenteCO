@@ -1,15 +1,14 @@
 package org.kuenteco.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.kuenteco.backend.enums.StateDebt;
-
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import lombok.*;
+import org.kuenteco.backend.enums.StateDebt;
 
-@Data
+@Builder
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,8 +19,8 @@ public class Debt {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_account")
-    private Account account;
+    @JoinColumn(name = "id_profile")
+    private Profile profile;
 
     private String name;
 

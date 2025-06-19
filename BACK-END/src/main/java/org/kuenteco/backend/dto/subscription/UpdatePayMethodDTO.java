@@ -1,4 +1,3 @@
 package org.kuenteco.backend.dto.subscription;
 
-public class UpdatePayMethodDTO {
-}
+public class UpdatePayMethodDTO {}

@@ -9,12 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ImageDTO {
-    @NotBlank
-    private String name;
-
-    @NotBlank
-    private String imageUrl;
-
-    @NotBlank
-    private String id_image;
+    @NotBlank private String name;
+    @NotBlank private String imageUrl;
+    private String imageId;
 }

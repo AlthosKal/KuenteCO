@@ -1,5 +1,6 @@
 package org.kuenteco.backend.config.security;
 
+import java.util.List;
 import org.kuenteco.backend.jwt.JwtAuthenticationFilter;
 import org.kuenteco.backend.jwt.JwtEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,23 +21,39 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    @Autowired
-    private UserDetailsService userDetailsService;
+    @Autowired private UserDetailsService userDetailsService;
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors(Customizer.withDefaults()).csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(auth -> auth
-                .requestMatchers("/v1/auth/login", "/v1/auth/register", "/v1/auth/validate-verification-code",
-                        "/v1/auth/send-verification-code", "/v1/auth/activate-account", "/v1/auth/change-password",
-                        "/v1/documentation/**", "/swagger-ui.html", "/swagger-resources/**", "/swagger-ui/**",
-                        "/api-docs/**", "/api/api-docs/**", "/v3/api-docs/**", "/webjars/**")
-                .permitAll().requestMatchers("/v1/account/**").authenticated().anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults()).authenticationProvider(authenticationProvider())
+        http.cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(
+                        auth ->
+                                auth.requestMatchers(
+                                                "/v1/auth/login",
+                                                "/v1/auth/register",
+                                                "/v1/auth/validate-verification-code",
+                                                "/v1/auth/send-verification-code",
+                                                "/v1/auth/activate-account",
+                                                "/v1/auth/change-password",
+                                                "/v1/documentation/**",
+                                                "/swagger-ui.html",
+                                                "/swagger-resources/**",
+                                                "/swagger-ui/**",
+                                                "/api-docs/**",
+                                                "/api/api-docs/**",
+                                                "/v3/api-docs/**",
+                                                "/webjars/**")
+                                        .permitAll()
+                                        .requestMatchers("/v1/account/**")
+                                        .authenticated()
+                                        .anyRequest()
+                                        .authenticated())
+                .httpBasic(Customizer.withDefaults())
+                .authenticationProvider(authenticationProvider())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtEntryPoint()))
                 .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
@@ -70,8 +87,15 @@ public class SecurityConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedOriginPatterns(List.of("*")); // Permite todos los orígenes
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        corsConfiguration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "accept",
-                "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+        corsConfiguration.setAllowedHeaders(
+                List.of(
+                        "Authorization",
+                        "Content-Type",
+                        "X-Requested-With",
+                        "accept",
+                        "Origin",
+                        "Access-Control-Request-Method",
+                        "Access-Control-Request-Headers"));
         corsConfiguration.setExposedHeaders(List.of("Authorization"));
         corsConfiguration.setAllowCredentials(true); // Permite credenciales
 

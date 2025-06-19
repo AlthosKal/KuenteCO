@@ -1,15 +1,14 @@
 package org.kuenteco.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.sql.Timestamp;
+import lombok.*;
 import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.enums.SubscriptionType;
 
-import java.sql.Timestamp;
-
-@Data
+@Getter
+@Setter
+@Builder
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,8 +19,8 @@ public class Subscription {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_account")
-    private Account account;
+    @JoinColumn(name = "id_user")
+    private User user;
 
     @Enumerated(EnumType.STRING)
     private SubscriptionType type;

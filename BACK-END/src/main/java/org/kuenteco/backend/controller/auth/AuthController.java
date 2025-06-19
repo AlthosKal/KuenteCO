@@ -3,194 +3,159 @@ package org.kuenteco.backend.controller.auth;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import lombok.AllArgsConstructor;
-import org.kuenteco.backend.dto.ApiMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.dto.auth.*;
 import org.kuenteco.backend.dto.image.ImageDTO;
-import org.kuenteco.backend.jwt.JwtUtil;
+import org.kuenteco.backend.exception.ApiResponse;
 import org.kuenteco.backend.service.auth.AuthService;
+import org.kuenteco.backend.service.auth.SendgridService;
 import org.kuenteco.backend.service.auth.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.kuenteco.backend.service.image.auth.UserImageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
+@Slf4j
 @RestController
 @RequestMapping("/v1/auth")
 @AllArgsConstructor
 public class AuthController implements AuthResource {
     private final UserService userService;
     private final AuthService authService;
-    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+    private final UserImageService imageService;
+    private final SendgridService sendgridService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginUserDTO loginUserDTO, BindingResult bindingResult,
+    public ResponseEntity<?> login(
+            @Valid @RequestBody LoginUserDTO loginUserDTO,
+            HttpServletRequest request,
             HttpServletResponse response) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(new ApiMessage("Datos Invalidos"));
-        }
-
-        try {
-            TokenResponseDTO tokenResponseDTO = authService.authenticate(loginUserDTO.getNameOrEmail(),
-                    loginUserDTO.getPassword(), response);
-            return ResponseEntity.ok(tokenResponseDTO);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
-        }
+        TokenResponseDTO dto = authService.authenticate(loginUserDTO, response);
+        return ResponseEntity.ok(
+                ApiResponse.ok("Inicio de Sesión exitoso", dto, request.getRequestURI()));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiMessage> register(@Valid @RequestBody NewUserDTO newUserDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(new ApiMessage("Datos Invalidos"));
-        }
-
-        try {
-            authService.registerUser(newUserDTO);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ApiMessage("Registro exitoso. Codigo de verificación enviado al correo"));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
-        }
+    public ResponseEntity<?> register(
+            @Valid @RequestBody NewUserDTO newUserDTO, HttpServletRequest request) {
+        authService.registerUser(newUserDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.ok(
+                                "Registro exitoso. Codigo de verificación enviado al correo",
+                                newUserDTO,
+                                request.getRequestURI()));
     }
 
     @PostMapping("/send-verification-code")
-    public ResponseEntity<ApiMessage> sendVerificationCode(
-            @Valid @RequestBody SendVerificationCodeDTO sendVerificationCodeDTO,
-            @RequestParam(required = false, defaultValue = "false") boolean isRegistration) {
-        try {
-            authService.sendVerificationEmail(sendVerificationCodeDTO, isRegistration);
-            return ResponseEntity.ok(new ApiMessage("Código de verificación enviado"));
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiMessage("Error enviando código de verificación"));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
-        }
+    public ResponseEntity<?> sendVerificationCode(
+            @Valid @RequestBody SendVerificationCodeDTO dto,
+            @RequestParam(defaultValue = "false") boolean isRegistration,
+            HttpServletRequest request) {
+
+        sendgridService.sendVerificationEmail(dto, isRegistration);
+        return ResponseEntity.ok(
+                ApiResponse.ok("Código de verificación enviado", dto, request.getRequestURI()));
     }
 
     @PostMapping("/validate-verification-code")
-    public ResponseEntity<ApiMessage> validateVerificationCode(@Valid @RequestBody ValidateVerificationCodeDTO dto) {
-        try {
-            boolean isValid = authService.validateVerificationCode(dto.getEmail(), dto.getCode());
-            if (isValid) {
-                return ResponseEntity.ok(new ApiMessage("Código de verificación valido"));
-            }
-            return ResponseEntity.badRequest().body(new ApiMessage("Código de verificación invalido"));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
-        }
+    public ResponseEntity<?> validateVerificationCode(
+            @Valid @RequestBody ValidateVerificationCodeDTO dto, HttpServletRequest request) {
+        boolean isValid = sendgridService.validateVerificationCode(dto);
+        String message =
+                isValid ? "Código de Verificación valido" : "Código de Verificación Invalido";
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.ok(message, dto, request.getRequestURI()));
     }
 
     @PostMapping("/activate-account")
-    public ResponseEntity<ApiMessage> activateAccount(@Valid @RequestBody ValidateVerificationCodeDTO dto) {
-        try {
-            // 1. Validar el código
-            if (!authService.validateVerificationCode(dto.getEmail(), dto.getCode())) {
-                return ResponseEntity.badRequest().body(new ApiMessage("Código de verificación valido"));
-            }
-
-            // 2. Activar la cuenta
-            authService.activateUser(dto.getEmail());
-            return ResponseEntity.ok(new ApiMessage("Cuenta activada correctamente"));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
+    public ResponseEntity<?> activateAccount(
+            @Valid @RequestBody ValidateVerificationCodeDTO dto, HttpServletRequest request) {
+        // 1. Validar el código
+        if (!sendgridService.validateVerificationCode(dto)) {
+            return ResponseEntity.badRequest()
+                    .body(
+                            ApiResponse.ok(
+                                    "Código de verificación valido", dto, request.getRequestURI()));
         }
+        // 2. Activar la cuenta
+        authService.activateUser(dto.getEmail());
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Cuenta activada correctamente", dto.getEmail(), request.getRequestURI()));
     }
 
     @PutMapping("/change-password")
-    public ResponseEntity<ApiMessage> changePassword(@Valid @RequestBody ChangePasswordDTO dto) {
-
-        try {
-            if (dto.getCode() == null || dto.getCode().trim().isEmpty()) {
-                log.error("Error: Código de verificación vació");
-                return ResponseEntity.badRequest().body(new ApiMessage("Código de verificación es requerido"));
-            }
-
-            if (!dto.getNewPassword().equals(dto.getConfirmNewPassword())) {
-                log.error("Error: No coinciden las contraseñas");
-                return ResponseEntity.badRequest().body(new ApiMessage("No coinciden las contraseñas"));
-            }
-
-            String message = authService.changePasswordWithVerification(dto.getEmail(), dto.getCode(),
-                    dto.getNewPassword());
-            log.info("Contraseña actualizada correctamente");
-            return ResponseEntity.ok(new ApiMessage(message));
-        } catch (RuntimeException e) {
-            log.error("Error en el cambio de contraseña: " + e.getMessage());
-            return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
+    public ResponseEntity<?> changePassword(
+            @Valid @RequestBody ChangePasswordDTO dto, HttpServletRequest request) {
+        if (dto.getCode() == null || dto.getCode().trim().isEmpty()) {
+            log.error("Error: Código de verificación vació");
+            return ResponseEntity.badRequest()
+                    .body(
+                            ApiResponse.error(
+                                    "Código de verificación es requerido",
+                                    request.getRequestURI()));
         }
+        String message = authService.changePasswordWithVerification(dto);
+        log.info("Contraseña actualizada correctamente");
+        return ResponseEntity.ok(ApiResponse.ok(message, dto, request.getRequestURI()));
     }
 
     // Cerrar Sesión
     @PostMapping("/logout")
-    public ResponseEntity<ApiMessage> logout(HttpServletRequest request, HttpServletResponse response,
-            JwtUtil jwtUtil) {
-        try {
-            // Obtener el token del request
-            String token = jwtUtil.resolveToken(request);
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        authService.logout(request, response);
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.ok("Cierre de Sesión exitoso", null, request.getRequestURI()));
+    }
 
-            if (token != null) {
-                authService.logout(token, response);
-                return ResponseEntity.ok(new ApiMessage("Cierre de sesión exitoso"));
-            }
-            return ResponseEntity.badRequest().body(new ApiMessage("Token no proporcionado"));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
-        }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable String id) throws IOException {
+        userService.deteleUser(new DeleteUserDTO(id));
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/user/image/add")
-    public ResponseEntity<ImageDTO> uploadProfileImage(@RequestParam("image") MultipartFile image,
-            @RequestHeader("Authorization") String token, HttpServletResponse response) {
-        try {
-            // Extraer el token Bearer
-            String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
-            ImageDTO imageDTO = authService.saveImage(image, jwtToken, response);
-            return new ResponseEntity<>(imageDTO, HttpStatus.CREATED);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<?> uploadUserImage(
+            @RequestParam("image") MultipartFile image,
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws IOException {
+
+        ImageDTO imageDTO = imageService.saveImage(image, request, response);
+        return new ResponseEntity<>(
+                ApiResponse.ok("Imagen Guardada", imageDTO, request.getRequestURI()),
+                HttpStatus.CREATED);
     }
 
     @PutMapping("/user/image/update")
-    public ResponseEntity<ImageDTO> updateProfileImage(@RequestParam("image") MultipartFile image,
-            @RequestHeader("Authorization") String token, HttpServletResponse response) {
-        try {
-            // Extraer el token Bearer
-            String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
-            ImageDTO imageDTO = authService.updateImage(image, jwtToken, response);
-            return new ResponseEntity<>(imageDTO, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<?> updateUserImage(
+            @RequestParam("image") MultipartFile image,
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws IOException {
+
+        ImageDTO imageDTO = imageService.updateImage(image, request, response);
+        return new ResponseEntity<>(
+                ApiResponse.ok("Imagen Actualizada", imageDTO, request.getRequestURI()),
+                HttpStatus.OK);
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteProfileImage(@RequestHeader("Authorization") String token,
-            HttpServletResponse response) {
-        try {
-            // Extraer el token Bearer
-            String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
-            authService.deleteImage(jwtToken, response);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<?> deleteUserImage(
+            HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        imageService.deleteImage(request, response);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/user/details")
-    public Object getAuthenticatedUser() {
-        try {
-            UserDetailDTO userDetailDTO = userService.getUserDetailsDTO();
-            return ResponseEntity.ok(userDetailDTO);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
-        }
+    public ResponseEntity<?> getAuthenticatedUser(HttpServletRequest request) {
+        UserDetailDTO dto = userService.getUserDetailsDTO();
+        return ResponseEntity.ok(
+                ApiResponse.ok("Usuario Autenticado", dto, request.getRequestURI()));
     }
 }

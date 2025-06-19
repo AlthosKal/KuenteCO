@@ -1,5 +1,8 @@
 package org.kuenteco.backend.config.database;
 
+import java.util.HashMap;
+import java.util.Map;
+import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.env.Environment;
 
-import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.Map;
-
 @Slf4j
 @Configuration
 public class FlywayMigrationInitializer implements ApplicationListener<ContextRefreshedEvent> {
@@ -21,7 +20,8 @@ public class FlywayMigrationInitializer implements ApplicationListener<ContextRe
     private final Environment environment;
 
     @Autowired
-    public FlywayMigrationInitializer(@Qualifier("masterDataSource") DataSource dataSource, Environment environment) {
+    public FlywayMigrationInitializer(
+            @Qualifier("masterDataSource") DataSource dataSource, Environment environment) {
         this.dataSource = dataSource;
         this.environment = environment;
     }
@@ -30,18 +30,35 @@ public class FlywayMigrationInitializer implements ApplicationListener<ContextRe
     public void onApplicationEvent(ContextRefreshedEvent event) {
         log.info("Configurando Flyway para migraciones de base de datos");
 
-        Flyway flyway = Flyway.configure()
-                .dataSource(dataSource)
-                .locations(environment.getProperty("spring.flyway.locations", "classpath:db"))
-                .baselineOnMigrate(environment.getProperty("spring.flyway.baseline-on-migrate", Boolean.class, true))
-                .validateOnMigrate(environment.getProperty("spring.flyway.validate-on-migrate", Boolean.class, true))
-                .outOfOrder(environment.getProperty("spring.flyway.out-of-order", Boolean.class, false))
-                .sqlMigrationPrefix(environment.getProperty("spring.flyway.sql-migration-prefix", "V"))
-                .sqlMigrationSeparator(environment.getProperty("spring.flyway.sql-migration-separator", "__"))
-                .sqlMigrationSuffixes(environment.getProperty("spring.flyway.sql-migration-suffixes", ".sql").split(","))
-                .placeholders(getPlaceholders())
-                .schemas(environment.getProperty("spring.flyway.schemas", "public").split(","))
-                .load();
+        Flyway flyway =
+                Flyway.configure()
+                        .dataSource(dataSource)
+                        .locations(
+                                environment.getProperty("spring.flyway.locations", "classpath:db"))
+                        .baselineOnMigrate(
+                                environment.getProperty(
+                                        "spring.flyway.baseline-on-migrate", Boolean.class, true))
+                        .validateOnMigrate(
+                                environment.getProperty(
+                                        "spring.flyway.validate-on-migrate", Boolean.class, true))
+                        .outOfOrder(
+                                environment.getProperty(
+                                        "spring.flyway.out-of-order", Boolean.class, false))
+                        .sqlMigrationPrefix(
+                                environment.getProperty("spring.flyway.sql-migration-prefix", "V"))
+                        .sqlMigrationSeparator(
+                                environment.getProperty(
+                                        "spring.flyway.sql-migration-separator", "__"))
+                        .sqlMigrationSuffixes(
+                                environment
+                                        .getProperty("spring.flyway.sql-migration-suffixes", ".sql")
+                                        .split(","))
+                        .placeholders(getPlaceholders())
+                        .schemas(
+                                environment
+                                        .getProperty("spring.flyway.schemas", "public")
+                                        .split(","))
+                        .load();
 
         log.info("Ejecutando migraciones Flyway");
         try {
@@ -66,7 +83,8 @@ public class FlywayMigrationInitializer implements ApplicationListener<ContextRe
 
         // Obtener properties con el prefijo flyway.placeholders
         if (environment.getProperty("spring.flyway.placeholders.application_user") != null) {
-            placeholders.put("application_user",
+            placeholders.put(
+                    "application_user",
                     environment.getProperty("spring.flyway.placeholders.application_user"));
         }
 

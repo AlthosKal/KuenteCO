@@ -2,17 +2,16 @@ package org.kuenteco.backend.entity;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import lombok.*;
 import org.hibernate.annotations.Type;
 import org.kuenteco.backend.entity.extra.DescriptionCategory;
 import org.kuenteco.backend.enums.State;
 
-import java.math.BigDecimal;
-import java.sql.Timestamp;
-
-@Data
+@Builder
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,8 +22,8 @@ public class Category {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_account")
-    private Account account;
+    @JoinColumn(name = "id_profile")
+    private Profile profile;
 
     @ManyToOne
     @JoinColumn(name = "id_asset")

@@ -9,5 +9,6 @@ import org.kuenteco.backend.enums.SubscriptionType;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateSubscriptionDTO {
+    private Integer subscriptionId;
     private SubscriptionType type;
 }

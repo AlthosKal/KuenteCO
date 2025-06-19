@@ -5,16 +5,12 @@ import org.kuenteco.backend.dto.subscription.SubscriptionDetailDTO;
 import org.kuenteco.backend.dto.subscription.UpdateSubscriptionDTO;
 import org.kuenteco.backend.entity.Subscription;
 
-import java.io.IOException;
-
 public interface SubscriptionService {
-    SubscriptionDetailDTO getSubscriptions(Integer subscriptionId);
+    SubscriptionDetailDTO getSubscriptions();
 
-    void addSubscription(AddSubscriptionDTO addSubscriptionDTO, Integer accountId) throws IOException;
+    void addSubscription(AddSubscriptionDTO addSubscriptionDTO);
 
-    void updateSubscription(UpdateSubscriptionDTO updateSubscriptionDTO, Integer subscriptionId, Integer accountId)
-            throws IOException;
+    void updateSubscription(UpdateSubscriptionDTO updateSubscriptionDTO);
 
-    void cancelSubscription(Subscription subscription) throws IOException;
-
+    void cancelSubscription(Subscription subscription);
 }

@@ -11,18 +11,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChangePasswordDTO {
-    @Email
-    @NotBlank
-    private String email;
+    @Email @NotBlank private String email;
 
-    @NotBlank
-    private String code;
+    @NotBlank private String code;
 
     @NotBlank
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String newPassword;
-
-    @NotBlank
-    @Size(min = 8, message = "Password must be at least 8 characters long")
-    private String confirmNewPassword;
 }

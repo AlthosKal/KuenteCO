@@ -7,5 +7,4 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional(transactionManager = "masterTransactionManager")
-public interface MasterTransactionRepository extends JpaRepository<Transaction, Integer> {
-}
+public interface MasterTransactionRepository extends JpaRepository<Transaction, Integer> {}

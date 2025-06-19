@@ -1,4 +1,3 @@
 package org.kuenteco.backend.validations;
 
-public @interface PayMethodConstraint {
-}
+public @interface PayMethodConstraint {}

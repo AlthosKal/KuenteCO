@@ -7,5 +7,4 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional(transactionManager = "slaveTransactionManager", readOnly = true)
-public interface SlavePaymentHistoryRepository extends JpaRepository<PaymentHistory, Integer> {
-}
+public interface SlavePaymentHistoryRepository extends JpaRepository<PaymentHistory, Integer> {}

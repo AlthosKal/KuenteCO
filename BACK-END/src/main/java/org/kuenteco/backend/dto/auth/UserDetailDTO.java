@@ -4,16 +4,19 @@ import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.kuenteco.backend.entity.extra.Image;
+import org.kuenteco.backend.dto.image.ImageDTO;
+import org.kuenteco.backend.enums.State;
+import org.kuenteco.backend.enums.UserType;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDetailDTO {
-    private String name;
+    @Version private Integer version;
+    private ImageDTO image;
+    private String username;
     private String email;
+    private UserType type;
     private RoleDetailDTO role;
-    @Version
-    private Integer version;
-    private Image masterImage;
+    private State state;
 }

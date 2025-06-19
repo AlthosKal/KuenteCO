@@ -1,13 +1,14 @@
 package org.kuenteco.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
+import lombok.*;
 
-@Data
+@Builder
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "budget")
 public class Budget {
@@ -16,8 +17,8 @@ public class Budget {
     private Integer id;
 
     @OneToOne
-    @JoinColumn(name = "id_account", unique = true)
-    private Account account;
+    @JoinColumn(name = "id_profile", unique = true)
+    private Profile profile;
 
     @Column(name = "total_budget")
     private BigDecimal totalBudget;

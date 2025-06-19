@@ -9,6 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SendVerificationCodeDTO {
-    @Email
-    private String email;
+    @Email private String email;
 }

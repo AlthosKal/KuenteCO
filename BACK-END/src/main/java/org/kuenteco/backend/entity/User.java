@@ -2,18 +2,29 @@ package org.kuenteco.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.kuenteco.backend.entity.extra.Image;
 import org.kuenteco.backend.enums.State;
+import org.kuenteco.backend.enums.UserType;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Table(name = "kuentecouser")
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(
+        name = "kuentecouser",
+        indexes = {
+            @Index(name = "idx_user_username", columnList = "username"), // Ya implícito
+            // por
+            // unique=true
+            @Index(name = "idx_user_email", columnList = "email"), // Ya implícito por unique=true
+            @Index(
+                    name = "idx_user_name_email",
+                    columnList = "username,email"), // Búsquedas combinadas
+            @Index(name = "idx_user_password", columnList = "password") // Para autenticación
+        })
 public class User {
 
     @Id
@@ -21,18 +32,22 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @NotBlank
-    @Column(unique = true, nullable = false)
-    private String name;
+    @Version private Integer version;
 
-    @NotBlank
-    @Column(unique = true, nullable = false)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_image", referencedColumnName = "id")
+    private Image image;
+
+    @Column(unique = true)
+    private String username;
+
+    @Column(unique = true)
     private String email;
 
-    @NotBlank
-    @JsonIgnore
-    @Column(nullable = false)
-    private String password;
+    @JsonIgnore private String password;
+
+    @Enumerated(EnumType.STRING)
+    private UserType type;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "id_role", nullable = false)
@@ -40,21 +55,5 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "account_state")
-    private State accountState;
-
-    @Version
-    private Integer version;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_image", referencedColumnName = "id")
-    private Image masterImage;
-
-    public User(String name, String email, String password, Role role) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-        this.accountState = State.PENDING;
-        this.version = 0;
-    }
+    private State state;
 }

@@ -2,13 +2,13 @@ package org.kuenteco.backend.entity;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Type;
 import org.kuenteco.backend.entity.extra.DescriptionPaymentHistory;
 
-@Data
+@Getter
+@Setter
+@Builder
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,6 +23,6 @@ public class PaymentHistory {
     private PaySubscription paySubscription;
 
     @Type(JsonBinaryType.class)
-    @Column(columnDefinition = "JSONB")
+    @Column(columnDefinition = "jsonb")
     private DescriptionPaymentHistory details;
 }

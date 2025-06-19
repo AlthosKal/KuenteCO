@@ -7,5 +7,4 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional(transactionManager = "slaveTransactionManager", readOnly = true)
-public interface SlaveImageRepository extends JpaRepository<Image, Integer> {
-}
+public interface SlaveImageRepository extends JpaRepository<Image, Integer> {}

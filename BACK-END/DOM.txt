@@ -1,0 +1,398 @@
+.
+├── BACK-END.iml
+├── Dockerfile
+├── DOM.txt
+├── HELP.md
+├── logs
+│   ├── api_reservations-error.log
+│   ├── api_reservations.log
+│   ├── KuenteCO-error.log
+│   └── KuenteCO.log
+├── log.txt
+├── mvnw
+├── mvnw.cmd
+├── pom.xml
+├── README.md
+├── src
+│   └── main
+│       ├── java
+│       │   └── org
+│       │       └── kuenteco
+│       │           └── backend
+│       │               ├── BackEndApplication.java
+│       │               ├── config
+│       │               │   ├── api
+│       │               │   │   └── CloudinaryConfig.java
+│       │               │   ├── database
+│       │               │   │   ├── DatabaseConfig.java
+│       │               │   │   ├── FlywayMigrationInitializer.java
+│       │               │   │   ├── MasterDataSourceConfig.java
+│       │               │   │   └── SlaveDataSourceConfig.java
+│       │               │   └── security
+│       │               │       └── SecurityConfig.java
+│       │               ├── controller
+│       │               │   ├── auth
+│       │               │   │   ├── AuthController.java
+│       │               │   │   └── AuthResource.java
+│       │               │   ├── DocumentationOpenApi.java
+│       │               │   ├── profile
+│       │               │   │   ├── ProfileController.java
+│       │               │   │   └── ProfileResource.java
+│       │               │   └── SubscriptionController.java
+│       │               ├── dto
+│       │               │   ├── auth
+│       │               │   │   ├── ChangePasswordDTO.java
+│       │               │   │   ├── DeleteUserDTO.java
+│       │               │   │   ├── LoginUserDTO.java
+│       │               │   │   ├── NewUserDTO.java
+│       │               │   │   ├── RoleDetailDTO.java
+│       │               │   │   ├── SendVerificationCodeDTO.java
+│       │               │   │   ├── TokenResponseDTO.java
+│       │               │   │   ├── UserDetailDTO.java
+│       │               │   │   └── ValidateVerificationCodeDTO.java
+│       │               │   ├── image
+│       │               │   │   └── ImageDTO.java
+│       │               │   ├── profile
+│       │               │   │   ├── LoginProfileDTO.java
+│       │               │   │   ├── NewProfileDTO.java
+│       │               │   │   ├── ProfileDetailDTO.java
+│       │               │   │   └── UpdateProfileDTO.java
+│       │               │   └── subscription
+│       │               │       ├── AddSubscriptionDTO.java
+│       │               │       ├── SubscriptionDetailDTO.java
+│       │               │       ├── UpdatePayMethodDTO.java
+│       │               │       └── UpdateSubscriptionDTO.java
+│       │               ├── entity
+│       │               │   ├── Asset.java
+│       │               │   ├── Budget.java
+│       │               │   ├── Category.java
+│       │               │   ├── Debt.java
+│       │               │   ├── extra
+│       │               │   │   ├── ContentNotification.java
+│       │               │   │   ├── DescriptionCategory.java
+│       │               │   │   ├── DescriptionPaymentHistory.java
+│       │               │   │   ├── DescriptionTransaction.java
+│       │               │   │   ├── ExchangeRate.java
+│       │               │   │   ├── Image.java
+│       │               │   │   └── PayMethodInfo.java
+│       │               │   ├── Goal.java
+│       │               │   ├── Investment.java
+│       │               │   ├── Notification.java
+│       │               │   ├── PaymentHistory.java
+│       │               │   ├── PaySubscription.java
+│       │               │   ├── Profile.java
+│       │               │   ├── Role.java
+│       │               │   ├── Subscription.java
+│       │               │   ├── TaxReport.java
+│       │               │   ├── Transaction.java
+│       │               │   └── User.java
+│       │               ├── enums
+│       │               │   ├── GoalType.java
+│       │               │   ├── RoleList.java
+│       │               │   ├── StateDebt.java
+│       │               │   ├── StateInvestment.java
+│       │               │   ├── State.java
+│       │               │   ├── SubscriptionType.java
+│       │               │   ├── TransactionType.java
+│       │               │   └── UserType.java
+│       │               ├── exception
+│       │               │   ├── ApiResponse.java
+│       │               │   ├── exceptions
+│       │               │   │   ├── AuthException.java
+│       │               │   │   ├── ProfileException.java
+│       │               │   │   └── SendgridException.java
+│       │               │   └── GlobalExceptionHandler.java
+│       │               ├── jwt
+│       │               │   ├── JwtAuthenticationFilter.java
+│       │               │   ├── JwtEntryPoint.java
+│       │               │   └── JwtUtil.java
+│       │               ├── mapper
+│       │               │   ├── auth
+│       │               │   │   ├── NewUserMapper.java
+│       │               │   │   ├── RoleDetailMapper.java
+│       │               │   │   └── UserDetailMapper.java
+│       │               │   ├── image
+│       │               │   │   └── ImageMapper.java
+│       │               │   ├── profile
+│       │               │   │   ├── NewProfileMapper.java
+│       │               │   │   ├── ProfileDetailMapper.java
+│       │               │   │   └── UpdateProfileMapper.java
+│       │               │   └── SubscriptionDetailMapper.java
+│       │               ├── repository
+│       │               │   ├── master
+│       │               │   │   ├── MasterAssetRepository.java
+│       │               │   │   ├── MasterBudgetRepository.java
+│       │               │   │   ├── MasterCategoryRepository.java
+│       │               │   │   ├── MasterImageRepository.java
+│       │               │   │   ├── MasterPaymentHistoryRepository.java
+│       │               │   │   ├── MasterPaySubscriptionRepository.java
+│       │               │   │   ├── MasterProfileRepository.java
+│       │               │   │   ├── MasterRoleRepository.java
+│       │               │   │   ├── MasterSubscriptionRepository.java
+│       │               │   │   ├── MasterTransactionRepository.java
+│       │               │   │   └── MasterUserRepository.java
+│       │               │   └── slave
+│       │               │       ├── SlaveAssetRepository.java
+│       │               │       ├── SlaveBudgetRepository.java
+│       │               │       ├── SlaveCategoryRepository.java
+│       │               │       ├── SlaveImageRepository.java
+│       │               │       ├── SlavePaymentHistoryRepository.java
+│       │               │       ├── SlavePaySubscriptionRepository.java
+│       │               │       ├── SlaveProfileRepository.java
+│       │               │       ├── SlaveRoleRepository.java
+│       │               │       ├── SlaveSubscriptionRepository.java
+│       │               │       ├── SlaveTransactionRepository.java
+│       │               │       └── SlaveUserRepository.java
+│       │               ├── service
+│       │               │   ├── auth
+│       │               │   │   ├── AuthServiceImpl.java
+│       │               │   │   ├── AuthService.java
+│       │               │   │   ├── CookieServiceImpl.java
+│       │               │   │   ├── CookieService.java
+│       │               │   │   ├── SendgridServiceImpl.java
+│       │               │   │   ├── SendgridService.java
+│       │               │   │   ├── TokenBlacklistServiceImpl.java
+│       │               │   │   ├── TokenBlacklistService.java
+│       │               │   │   ├── UserServiceImpl.java
+│       │               │   │   └── UserService.java
+│       │               │   ├── image
+│       │               │   │   ├── auth
+│       │               │   │   │   ├── UserImageServiceImpl.java
+│       │               │   │   │   └── UserImageService.java
+│       │               │   │   ├── CloudinaryServiceImpl.java
+│       │               │   │   ├── CloudinaryService.java
+│       │               │   │   └── profile
+│       │               │   │       ├── ProfileImageServiceImpl.java
+│       │               │   │       └── ProfileImageService.java
+│       │               │   ├── profile
+│       │               │   │   ├── ProfileServiceImpl.java
+│       │               │   │   └── ProfileService.java
+│       │               │   └── subscription
+│       │               │       ├── SubscriptionServiceImpl.java
+│       │               │       └── SubscriptionService.java
+│       │               └── validations
+│       │                   ├── PayMethodConstraint.java
+│       │                   └── PayMethodValidator.java
+│       └── resources
+│           ├── application-master.yml
+│           ├── application-slave.yml
+│           ├── application.yml
+│           ├── banner.txt
+│           └── db
+│               ├── V1.0__create_functions.sql
+│               ├── V1.1__create_views.sql
+│               ├── V1.2__insert_rows.sql
+│               ├── V1.3__create_triggers.sql
+│               └── V1.4__create_logstables.sql
+└── target
+    ├── BACK-END-0.0.1-SNAPSHOT.jar
+    ├── BACK-END-0.0.1-SNAPSHOT.jar.original
+    ├── classes
+    │   ├── application-master.yml
+    │   ├── application-slave.yml
+    │   ├── application.yml
+    │   ├── banner.txt
+    │   ├── db
+    │   │   ├── V1.0__create_functions.sql
+    │   │   ├── V1.1__create_views.sql
+    │   │   ├── V1.2__insert_rows.sql
+    │   │   ├── V1.3__create_triggers.sql
+    │   │   └── V1.4__create_logstables.sql
+    │   └── org
+    │       └── kuenteco
+    │           └── backend
+    │               ├── BackEndApplication.class
+    │               ├── config
+    │               │   ├── api
+    │               │   │   └── CloudinaryConfig.class
+    │               │   ├── database
+    │               │   │   ├── DatabaseConfig.class
+    │               │   │   ├── FlywayMigrationInitializer.class
+    │               │   │   ├── MasterDataSourceConfig.class
+    │               │   │   └── SlaveDataSourceConfig.class
+    │               │   └── security
+    │               │       └── SecurityConfig.class
+    │               ├── controller
+    │               │   ├── auth
+    │               │   │   ├── AuthController.class
+    │               │   │   └── AuthResource.class
+    │               │   ├── DocumentationOpenApi.class
+    │               │   ├── profile
+    │               │   │   ├── ProfileController.class
+    │               │   │   └── ProfileResource.class
+    │               │   └── SubscriptionController.class
+    │               ├── dto
+    │               │   ├── auth
+    │               │   │   ├── ChangePasswordDTO.class
+    │               │   │   ├── DeleteUserDTO.class
+    │               │   │   ├── LoginUserDTO.class
+    │               │   │   ├── NewUserDTO.class
+    │               │   │   ├── RoleDetailDTO.class
+    │               │   │   ├── SendVerificationCodeDTO.class
+    │               │   │   ├── TokenResponseDTO.class
+    │               │   │   ├── UserDetailDTO.class
+    │               │   │   └── ValidateVerificationCodeDTO.class
+    │               │   ├── image
+    │               │   │   └── ImageDTO.class
+    │               │   ├── profile
+    │               │   │   ├── LoginProfileDTO.class
+    │               │   │   ├── NewProfileDTO.class
+    │               │   │   ├── ProfileDetailDTO.class
+    │               │   │   └── UpdateProfileDTO.class
+    │               │   └── subscription
+    │               │       ├── AddSubscriptionDTO.class
+    │               │       ├── SubscriptionDetailDTO.class
+    │               │       ├── UpdatePayMethodDTO.class
+    │               │       └── UpdateSubscriptionDTO.class
+    │               ├── entity
+    │               │   ├── Asset.class
+    │               │   ├── Budget.class
+    │               │   ├── Category.class
+    │               │   ├── Debt.class
+    │               │   ├── extra
+    │               │   │   ├── ContentNotification.class
+    │               │   │   ├── DescriptionCategory.class
+    │               │   │   ├── DescriptionPaymentHistory.class
+    │               │   │   ├── DescriptionTransaction.class
+    │               │   │   ├── ExchangeRate.class
+    │               │   │   ├── Image$ImageBuilder.class
+    │               │   │   ├── Image.class
+    │               │   │   └── PayMethodInfo.class
+    │               │   ├── Goal.class
+    │               │   ├── Investment.class
+    │               │   ├── Notification.class
+    │               │   ├── PaymentHistory.class
+    │               │   ├── PaySubscription.class
+    │               │   ├── Profile$ProfileBuilder.class
+    │               │   ├── Profile.class
+    │               │   ├── Role.class
+    │               │   ├── Subscription.class
+    │               │   ├── TaxReport.class
+    │               │   ├── Transaction$TransactionBuilder.class
+    │               │   ├── Transaction.class
+    │               │   ├── User$UserBuilder.class
+    │               │   └── User.class
+    │               ├── enums
+    │               │   ├── GoalType.class
+    │               │   ├── RoleList.class
+    │               │   ├── State.class
+    │               │   ├── StateDebt.class
+    │               │   ├── StateInvestment.class
+    │               │   ├── SubscriptionType.class
+    │               │   ├── TransactionType.class
+    │               │   └── UserType.class
+    │               ├── exception
+    │               │   ├── ApiResponse$ApiResponseBuilder.class
+    │               │   ├── ApiResponse.class
+    │               │   ├── exceptions
+    │               │   │   ├── AuthException.class
+    │               │   │   ├── ProfileException.class
+    │               │   │   └── SendgridException.class
+    │               │   └── GlobalExceptionHandler.class
+    │               ├── jwt
+    │               │   ├── JwtAuthenticationFilter.class
+    │               │   ├── JwtEntryPoint.class
+    │               │   └── JwtUtil.class
+    │               ├── mapper
+    │               │   ├── auth
+    │               │   │   ├── NewUserMapper.class
+    │               │   │   ├── NewUserMapperImpl.class
+    │               │   │   ├── RoleDetailMapper.class
+    │               │   │   ├── RoleDetailMapperImpl.class
+    │               │   │   ├── UserDetailMapper.class
+    │               │   │   └── UserDetailMapperImpl.class
+    │               │   ├── image
+    │               │   │   ├── ImageMapper.class
+    │               │   │   └── ImageMapperImpl.class
+    │               │   ├── profile
+    │               │   │   ├── NewProfileMapper.class
+    │               │   │   ├── NewProfileMapperImpl.class
+    │               │   │   ├── ProfileDetailMapper.class
+    │               │   │   ├── ProfileDetailMapperImpl.class
+    │               │   │   ├── UpdateProfileMapper.class
+    │               │   │   └── UpdateProfileMapperImpl.class
+    │               │   ├── SubscriptionDetailMapper.class
+    │               │   └── SubscriptionDetailMapperImpl.class
+    │               ├── repository
+    │               │   ├── master
+    │               │   │   ├── MasterAssetRepository.class
+    │               │   │   ├── MasterBudgetRepository.class
+    │               │   │   ├── MasterCategoryRepository.class
+    │               │   │   ├── MasterImageRepository.class
+    │               │   │   ├── MasterPaymentHistoryRepository.class
+    │               │   │   ├── MasterPaySubscriptionRepository.class
+    │               │   │   ├── MasterProfileRepository.class
+    │               │   │   ├── MasterRoleRepository.class
+    │               │   │   ├── MasterSubscriptionRepository.class
+    │               │   │   ├── MasterTransactionRepository.class
+    │               │   │   └── MasterUserRepository.class
+    │               │   └── slave
+    │               │       ├── SlaveAssetRepository.class
+    │               │       ├── SlaveBudgetRepository.class
+    │               │       ├── SlaveCategoryRepository.class
+    │               │       ├── SlaveImageRepository.class
+    │               │       ├── SlavePaymentHistoryRepository.class
+    │               │       ├── SlavePaySubscriptionRepository.class
+    │               │       ├── SlaveProfileRepository.class
+    │               │       ├── SlaveRoleRepository.class
+    │               │       ├── SlaveSubscriptionRepository.class
+    │               │       ├── SlaveTransactionRepository.class
+    │               │       └── SlaveUserRepository.class
+    │               ├── service
+    │               │   ├── auth
+    │               │   │   ├── AuthService.class
+    │               │   │   ├── AuthServiceImpl.class
+    │               │   │   ├── CookieService.class
+    │               │   │   ├── CookieServiceImpl.class
+    │               │   │   ├── SendgridService.class
+    │               │   │   ├── SendgridServiceImpl.class
+    │               │   │   ├── TokenBlacklistService.class
+    │               │   │   ├── TokenBlacklistServiceImpl.class
+    │               │   │   ├── UserService.class
+    │               │   │   └── UserServiceImpl.class
+    │               │   ├── image
+    │               │   │   ├── auth
+    │               │   │   │   ├── UserImageService.class
+    │               │   │   │   └── UserImageServiceImpl.class
+    │               │   │   ├── CloudinaryService.class
+    │               │   │   ├── CloudinaryServiceImpl.class
+    │               │   │   └── profile
+    │               │   │       ├── ProfileImageService.class
+    │               │   │       └── ProfileImageServiceImpl.class
+    │               │   ├── profile
+    │               │   │   ├── ProfileService.class
+    │               │   │   └── ProfileServiceImpl.class
+    │               │   └── subscription
+    │               │       ├── SubscriptionService.class
+    │               │       └── SubscriptionServiceImpl.class
+    │               └── validations
+    │                   ├── PayMethodConstraint.class
+    │                   └── PayMethodValidator.class
+    ├── generated-sources
+    │   └── annotations
+    │       └── org
+    │           └── kuenteco
+    │               └── backend
+    │                   └── mapper
+    │                       ├── auth
+    │                       │   ├── NewUserMapperImpl.java
+    │                       │   ├── RoleDetailMapperImpl.java
+    │                       │   └── UserDetailMapperImpl.java
+    │                       ├── image
+    │                       │   └── ImageMapperImpl.java
+    │                       ├── profile
+    │                       │   ├── NewProfileMapperImpl.java
+    │                       │   ├── ProfileDetailMapperImpl.java
+    │                       │   └── UpdateProfileMapperImpl.java
+    │                       └── SubscriptionDetailMapperImpl.java
+    ├── maven-archiver
+    │   └── pom.properties
+    ├── maven-status
+    │   └── maven-compiler-plugin
+    │       └── compile
+    │           └── default-compile
+    │               ├── createdFiles.lst
+    │               └── inputFiles.lst
+    └── spotless-index
+
+96 directories, 300 files

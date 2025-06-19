@@ -1,13 +1,14 @@
 package org.kuenteco.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@Builder
 @Entity
+@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "asset")
 public class Asset {
@@ -16,13 +17,12 @@ public class Asset {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_account")
-    private Account account;
+    @JoinColumn(name = "id_profile")
+    private Profile profile;
 
     private String name;
 
     private BigDecimal value;
 
     private String type;
-
 }

@@ -1,31 +1,30 @@
 package org.kuenteco.backend.entity.extra;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
-@NoArgsConstructor
 @Entity
-@Table(name = "image")
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(
+        name = "image",
+        indexes = {
+            @Index(name = "idx_image_image_id", columnList = "id_image"), // Cloudinary ID
+            @Index(name = "idx_image_url", columnList = "url_image") // Búsquedas por URL
+        })
 public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank
     private String name;
 
-    @NotBlank
+    @Column(name = "url_image")
     private String imageUrl;
 
-    @NotBlank
-    private String id_image;
-
-    public Image(String name, String imageUrl, String id_image) {
-        this.name = name;
-        this.imageUrl = imageUrl;
-        this.id_image = id_image;
-    }
+    @Column(name = "id_image")
+    private String imageId;
 }

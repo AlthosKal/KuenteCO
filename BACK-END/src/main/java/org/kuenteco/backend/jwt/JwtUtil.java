@@ -6,16 +6,17 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import javax.crypto.SecretKey;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-
+@Slf4j
 @Component
 public class JwtUtil {
 
@@ -28,16 +29,21 @@ public class JwtUtil {
     public String generateToken(Authentication authentication) {
         UserDetails mainUser = (UserDetails) authentication.getPrincipal();
         SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        return Jwts.builder().setSubject(mainUser.getUsername()).setIssuedAt(new Date())
+        return Jwts.builder()
+                .setSubject(mainUser.getUsername())
+                .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + expiration * 1000L))
-                .signWith(key, SignatureAlgorithm.HS256).compact();
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
     }
 
     public String resolveToken(HttpServletRequest request) {
         // Primero intentar obtener de header Authorization (Bearer token)
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+            String token = bearerToken.substring(7).trim();
+            log.debug("JWT Token: {}", token);
+            return token;
         }
 
         // Si no está en el header, intentar obtener de cookie
@@ -46,12 +52,8 @@ public class JwtUtil {
     }
 
     public Boolean validateToken(String token, UserDetails details) {
-        try {
-            final String email = extractEmail(token);
-            return (email.equals(details.getUsername()) && !isTokenExpired(token));
-        } catch (Exception e) {
-            return false;
-        }
+        final String email = extractEmail(token);
+        return (email.equals(details.getUsername()) && !isTokenExpired(token));
     }
 
     public Boolean isTokenExpired(String token) {
@@ -70,5 +72,4 @@ public class JwtUtil {
     public String extractEmail(String token) {
         return extractAllClaims(token).getSubject();
     }
-
 }

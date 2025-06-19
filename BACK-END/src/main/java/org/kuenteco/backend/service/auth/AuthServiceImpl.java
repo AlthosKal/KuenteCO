@@ -1,35 +1,25 @@
 package org.kuenteco.backend.service.auth;
 
-import com.sendgrid.Method;
-import com.sendgrid.Request;
-import com.sendgrid.Response;
-import com.sendgrid.SendGrid;
-import com.sendgrid.helpers.mail.Mail;
-import com.sendgrid.helpers.mail.objects.Email;
-import com.sendgrid.helpers.mail.objects.Personalization;
+import static org.kuenteco.backend.service.auth.SendgridServiceImpl.verificationCodes;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.kuenteco.backend.dto.auth.NewUserDTO;
-import org.kuenteco.backend.dto.auth.SendVerificationCodeDTO;
-import org.kuenteco.backend.dto.auth.TokenResponseDTO;
-import org.kuenteco.backend.dto.image.ImageDTO;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+import org.kuenteco.backend.dto.auth.*;
 import org.kuenteco.backend.entity.Role;
 import org.kuenteco.backend.entity.User;
-import org.kuenteco.backend.entity.extra.Image;
 import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.State;
+import org.kuenteco.backend.exception.exceptions.AuthException;
 import org.kuenteco.backend.jwt.JwtUtil;
-import org.kuenteco.backend.mapper.ImageMapper;
+import org.kuenteco.backend.mapper.auth.NewUserMapper;
 import org.kuenteco.backend.repository.master.MasterRoleRepository;
 import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveRoleRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
-import org.kuenteco.backend.service.image.ImageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -39,17 +29,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
+@Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
@@ -57,41 +38,31 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final CookieService cookieService;
     private final UserService userService;
-    private final ImageService imageService;
+    private final MasterRoleRepository masterRoleRepository;
     private final SlaveRoleRepository slaveRoleRepository;
+    private final MasterUserRepository masterUserRepository;
     private final SlaveUserRepository slaveUserRepository;
     private final TokenBlacklistService tokenBlacklistService;
-    private final TransactionTemplate masterTransactionTemplate;
-    private final MasterUserRepository masterUserRepository;
-    private final MasterRoleRepository masterRoleRepository;
-    private final ImageMapper imageMapper;
-
-    // SendGrid
-    @Value("${spring.sendgrid.api-key}")
-    private String SENDGRID_API_KEY;
-
-    @Value("${spring.sendgrid.email}")
-    private String EmailSendGrid;
-
-    @Value("${spring.sendgrid.functions.verify-email}")
-    private String VerifyEmail;
-
-    @Value("${spring.sendgrid.functions.reset-password}")
-    private String ResetPassword;
-
-    private final Map<String, String> verificationCodes = new ConcurrentHashMap<>();
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
-    private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
+    private final TransactionTemplate transactionTemplate;
+    private final NewUserMapper newUserMapper;
+    private final SendgridService sendgridService;
 
     @Autowired
-    public AuthServiceImpl(UserService userService, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
-            AuthenticationManagerBuilder authenticationManagerBuilder, CookieService cookieService,
-            TokenBlacklistService tokenBlacklistService, SlaveRoleRepository slaveRoleRepository,
-            SlaveUserRepository slaveUserRepository, MasterUserRepository masterUserRepository,
+    public AuthServiceImpl(
+            UserService userService,
+            PasswordEncoder passwordEncoder,
+            JwtUtil jwtUtil,
+            AuthenticationManagerBuilder authenticationManagerBuilder,
+            CookieService cookieService,
+            TokenBlacklistService tokenBlacklistService,
+            SlaveRoleRepository slaveRoleRepository,
+            SlaveUserRepository slaveUserRepository,
+            MasterUserRepository masterUserRepository,
             MasterRoleRepository masterRoleRepository,
-            @Qualifier("masterTransactionManager") PlatformTransactionManager masterTransactionManager,
-            ImageService imageService, ImageMapper imageMapper) {
+            @Qualifier("masterTransactionManager")
+                    PlatformTransactionManager masterTransactionManager,
+            NewUserMapper newUserMapper,
+            SendgridService sendgridService) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
@@ -102,29 +73,33 @@ public class AuthServiceImpl implements AuthService {
         this.slaveRoleRepository = slaveRoleRepository;
         this.slaveUserRepository = slaveUserRepository;
         this.masterUserRepository = masterUserRepository;
-        this.imageService = imageService;
-        this.imageMapper = imageMapper;
+        this.newUserMapper = newUserMapper;
+        this.sendgridService = sendgridService;
 
         // Configuración de transacción con timeout apropiado
-        this.masterTransactionTemplate = new TransactionTemplate(masterTransactionManager);
-        this.masterTransactionTemplate.setTimeout(30); // 30 segundos
-        this.masterTransactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        this.transactionTemplate = new TransactionTemplate(masterTransactionManager);
+        this.transactionTemplate.setTimeout(30); // 30 segundos
+        this.transactionTemplate.setPropagationBehavior(
+                TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
 
     @Override
-    public TokenResponseDTO authenticate(String nameOrEmail, String password, HttpServletResponse response) {
+    public TokenResponseDTO authenticate(LoginUserDTO dto, HttpServletResponse response) {
         // Verificar si la cuenta está activa antes de autenticar
         // Determinar si es un email o nombre de usuario
-        User user = Optional.ofNullable(userService.findByNameOrEmail(nameOrEmail))
-                .filter(u -> u.getAccountState() == State.ACTIVE)
-                .orElseThrow(() -> new RuntimeException("Cuenta no actrivada, Por favor verifica tu correo"));
+        User user =
+                Optional.ofNullable(userService.findByNameOrEmail(dto.nameOrEmail))
+                        .filter(u -> u.getState() == State.ACTIVE)
+                        .orElseThrow(
+                                () ->
+                                        new AuthException(
+                                                "Cuenta no activada, Por favor verifica tu correo"));
 
-        // Usar el email para la autenticación de Spring Security
-        String emailForAuth = user.getEmail();
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(user.getEmail(), dto.password);
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(emailForAuth,
-                password);
-        Authentication authResult = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        Authentication authResult =
+                authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authResult);
 
         String jwt = jwtUtil.generateToken(authResult);
@@ -134,203 +109,115 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void registerUser(NewUserDTO newUserDTO) {
-        if (userService.existsByUserName(newUserDTO.getName())) {
-            throw new IllegalArgumentException("Datos Inválidos, nombre con caracteres no permitidos o ya existente");
-        } else if (userService.existsByUserEmail(newUserDTO.getEmail())) {
-            throw new IllegalArgumentException("Datos Inválidos, correo con caracteres no permitidos o ya existente");
+    public void registerUser(NewUserDTO dto) {
+        if (userService.existsByUserName(dto.getUsername())) {
+            throw new AuthException(
+                    "Datos Inválidos, nombre con caracteres no permitidos o ya existente");
+        } else if (userService.existsByUserEmail(dto.getEmail())) {
+            throw new AuthException(
+                    "Datos Inválidos, correo con caracteres no permitidos o ya existente");
         }
-        log.info("Intentando registrar nuevo usuario: {}", newUserDTO.getEmail());
+        log.info("Registrando nuevo usuario: {}", dto.getEmail());
 
-        Role roleUser = slaveRoleRepository.findByName(RoleList.ROLE_USER)
-                .orElseThrow(() -> new RuntimeException("Role no encontrado"));
+        Role role =
+                slaveRoleRepository
+                        .findByName(RoleList.ROLE_USER)
+                        .orElseThrow(() -> new AuthException("Role no encontrado"));
 
         // Asegurar que el rol existe en la base de datos maestra
-        Role masterRole = slaveRoleRepository.findByName(RoleList.ROLE_USER)
-                .orElseGet(() -> masterRoleRepository.save(roleUser));
+        Role masterRole =
+                slaveRoleRepository
+                        .findByName(RoleList.ROLE_USER)
+                        .orElseGet(() -> masterRoleRepository.save(role));
 
         // Utilizar transacción explícita para guardar el usuario
-        masterTransactionTemplate.execute(status -> {
-            try {
-                // Nuevo usuario se crea con estado PENDING
-                User user = new User(newUserDTO.getName(), newUserDTO.getEmail(),
-                        passwordEncoder.encode(newUserDTO.getPassword()), masterRole);
-                user.setAccountState(State.PENDING);
-                user.setVersion(0); // Inicializar versión para bloqueo optimista
+        transactionTemplate.execute(
+                status -> {
 
-                userService.saveUser(user);
-                return null;
-            } catch (Exception e) {
-                status.setRollbackOnly();
-                throw new RuntimeException("Error al registrar usuario", e);
-            }
-        });
+                    // Nuevo usuario se crea con estado PENDING
+                    User user = newUserMapper.toEntity(dto);
+                    user.setPassword(passwordEncoder.encode(dto.getPassword()));
+                    user.setRole(masterRole);
+                    user.setState(State.PENDING);
+                    user.setVersion(0); // Inicializar versión para bloqueo optimista
+
+                    userService.saveUser(user);
+                    return "Usuarío registrado correctamente";
+                });
 
         // Enviar código de verificación automáticamente
-        SendVerificationCodeDTO verificationDTO = new SendVerificationCodeDTO();
-        verificationDTO.setEmail(newUserDTO.getEmail());
-        try {
-            sendVerificationEmail(verificationDTO, true);
-        } catch (IOException e) {
-            throw new RuntimeException("Error enviando correo de verificación", e);
-        }
-    }
-
-    @Override
-    public void sendVerificationEmail(SendVerificationCodeDTO sendVerificationCodeDTO, boolean isRegistration)
-            throws IOException {
-        String email = Optional.ofNullable(sendVerificationCodeDTO.getEmail())
-                .filter(e -> isRegistration && slaveUserRepository.existsByEmail(e))
-                .orElseThrow(() -> new IllegalArgumentException("Email no registrado"));
-
-        String code = String.format("%06d", new Random().nextInt(999999));
-        verificationCodes.put(email, code);
-        log.info("Código de verificacion: " + code);
-
-        // Programar la eliminación del código después de 15 minutos
-        scheduler.schedule(() -> verificationCodes.remove(email), 15, TimeUnit.MINUTES);
-        scheduler.schedule(() -> userService.deletePendingEmail(email), 15, TimeUnit.MINUTES);
-
-        Email from = new Email(EmailSendGrid);
-        Email to = new Email(email);
-
-        // Elegir la plantilla adecuada basada en el tipo de verificación
-        String templateId = isRegistration ? VerifyEmail : // Verificación de email
-                ResetPassword; // Recuperación de contraseña
-
-        // Crear personalización con datos dinámicos
-        Mail mail = new Mail();
-        mail.setFrom(from);
-        mail.setSubject(isRegistration ? "Verifica tu registro en KuenteCO" : "Código de recuperación de contraseña");
-
-        Personalization personalization = new Personalization();
-        personalization.addTo(to);
-
-        // Agregar datos dinámicos a la plantilla
-        if (isRegistration) {
-            personalization.addDynamicTemplateData("codeVerificationEmail", code);
-            // URL de verificación:
-            // personalization.addDynamicTemplateData("verification_url", "https://kuenteco.com/verify?email=" + email);
-        } else {
-            personalization.addDynamicTemplateData("codeResetPassword", code);
-            // URL de reset:
-            // personalization.addDynamicTemplateData("reset_password_url", "https://kuenteco.com/reset-password?email="
-            // + email);
-        }
-
-        mail.addPersonalization(personalization);
-        mail.setTemplateId(templateId);
-
-        SendGrid sg = new SendGrid(SENDGRID_API_KEY);
-        Request request = new Request();
-        try {
-            request.setMethod(Method.POST);
-            request.setEndpoint("mail/send");
-            request.setBody(mail.build());
-            Response response = sg.api(request);
-
-            if (response.getStatusCode() < 200 || response.getStatusCode() >= 300) {
-                throw new IOException("Error en el envío del correo: " + response.getBody());
-            }
-        } catch (IOException ex) {
-            verificationCodes.remove(email);
-            throw ex;
-        }
-    }
-
-    @Override
-    public boolean validateVerificationCode(String email, String code) {
-        String storedCode = verificationCodes.get(email);
-        return code != null && code.equals(storedCode);
+        sendgridService.sendVerificationEmail(new SendVerificationCodeDTO(dto.getEmail()), true);
     }
 
     @Override
     public void activateUser(String email) {
         // Usar transacción explícita en lugar de anotación para mejor control
-        Boolean result = masterTransactionTemplate.execute(status -> {
-            try {
-                // Buscar directamente en la base de datos maestra, no en la esclava
-                Optional<User> masterUserOpt = slaveUserRepository.findByEmail(email);
+        Boolean result =
+                transactionTemplate.execute(
+                        status -> {
+                            // Buscar directamente en la base de datos maestra, no en la esclava
+                            User user =
+                                    slaveUserRepository
+                                            .findByEmail(email)
+                                            .orElseThrow(
+                                                    () ->
+                                                            new AuthException(
+                                                                    "Usuario no encontrado"));
 
-                if (masterUserOpt.isEmpty()) {
-                    throw new RuntimeException("Usuario no encontrado");
-                }
+                            // Verificar si la cuenta ya está activada
+                            if (State.ACTIVE.equals(user.getState())) {
+                                return true; // Ya está activada, operación exitosa
+                            }
 
-                User masterUser = masterUserOpt.get();
+                            // Activar la cuenta
+                            user.setState(State.ACTIVE);
+                            masterUserRepository.save(user);
 
-                // Verificar si la cuenta ya está activada
-                if (State.ACTIVE.equals(masterUser.getAccountState())) {
-                    return true; // Ya está activada, operación exitosa
-                }
+                            // Eliminar el código después de usarlo
+                            verificationCodes.remove(email);
 
-                // Activar la cuenta
-                masterUser.setAccountState(State.ACTIVE);
-                masterUserRepository.save(masterUser);
-
-                // Eliminar el código después de usarlo
-                verificationCodes.remove(email);
-
-                return true;
-            } catch (OptimisticLockingFailureException e) {
-                // Manejar específicamente fallos de bloqueo optimista
-                status.setRollbackOnly();
-                throw new RuntimeException("Error de concurrencia al activar la cuenta. Por favor, intente nuevamente.",
-                        e);
-            } catch (Exception e) {
-                status.setRollbackOnly();
-                throw new RuntimeException("Error al activar la cuenta: " + e.getMessage(), e);
-            }
-        });
-
+                            return true;
+                        });
         if (result == null || !result) {
-            throw new RuntimeException("No se pudo activar la cuenta. Por favor, intente nuevamente.");
+            throw new RuntimeException(
+                    "No se pudo activar la cuenta. Por favor, intente nuevamente.");
         }
     }
 
     @Override
-    public String changePasswordWithVerification(String email, String code, String newPassword) {
+    public String changePasswordWithVerification(ChangePasswordDTO changePasswordDTO) {
         // Usar transacción para cambiar la contraseña
-        return masterTransactionTemplate.execute(status -> {
-            try {
-                // Buscar directamente en la base de datos maestra
-                Optional<User> masterUserOpt = slaveUserRepository.findByEmail(email);
+        return transactionTemplate.execute(
+                status -> {
+                    // Buscar directamente en la base de datos maestra
+                    User user =
+                            slaveUserRepository
+                                    .findByEmail(changePasswordDTO.getEmail())
+                                    .orElseThrow(() -> new AuthException("Usuario no encontrado"));
 
-                if (masterUserOpt.isEmpty()) {
-                    throw new RuntimeException("Usuario no encontrado");
-                }
+                    // Verificar que la cuenta esté activa
+                    if (user.getState() != State.ACTIVE) {
+                        throw new RuntimeException("La cuenta no está activa");
+                    }
 
-                User masterUser = masterUserOpt.get();
+                    user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
+                    masterUserRepository.save(user);
 
-                // Verificar que la cuenta esté activa
-                if (masterUser.getAccountState() != State.ACTIVE) {
-                    throw new RuntimeException("La cuenta no está activa");
-                }
+                    // Eliminar el código después de usarlo
+                    verificationCodes.remove(changePasswordDTO.getEmail());
 
-                // Comprobar política de contraseñas mínimas
-                if (newPassword.length() < 6) {
-                    throw new RuntimeException("La contraseña debe tener al menos 6 caracteres");
-                }
-
-                masterUser.setPassword(passwordEncoder.encode(newPassword));
-                masterUserRepository.save(masterUser);
-
-                // Eliminar el código después de usarlo
-                verificationCodes.remove(email);
-
-                return "Contraseña actualizada correctamente";
-            } catch (OptimisticLockingFailureException e) {
-                status.setRollbackOnly();
-                throw new RuntimeException(
-                        "Error de concurrencia al cambiar la contraseña. Por favor, intente nuevamente.", e);
-            } catch (Exception e) {
-                status.setRollbackOnly();
-                throw new RuntimeException("Error al cambiar la contraseña: " + e.getMessage(), e);
-            }
-        });
+                    return "Contraseña actualizada correctamente";
+                });
     }
 
     @Override
-    public void logout(String token, HttpServletResponse response) {
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        // Obtener el token del request
+        String token = jwtUtil.resolveToken(request);
+
+        if (token == null) {
+            throw new AuthException("Token no proporcionado");
+        }
         // 1. Invalidar el token
         tokenBlacklistService.addToBlacklist(token);
 
@@ -339,83 +226,5 @@ public class AuthServiceImpl implements AuthService {
 
         // 3. Limpiar el contexto de seguridad
         SecurityContextHolder.clearContext();
-    }
-
-    @Override
-    public ImageDTO saveImage(MultipartFile image, String token, HttpServletResponse response) {
-        try {
-            String username = jwtUtil.extractEmail(token);
-            User user = slaveUserRepository.findByName(username)
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-            // Verificar si ya tiene una imagen previa
-            if (user.getMasterImage() != null) {
-                throw new RuntimeException(
-                        "El usuario ya tiene una imagen de perfil. Utilice updateImage para actualizarla.");
-            }
-
-            // Subir la nueva imagen
-            Image masterImage = imageService.uploadImage(image);
-            user.setMasterImage(masterImage);
-            masterUserRepository.save(user);
-
-            return imageMapper.toDTO(masterImage);
-        } catch (IOException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            throw new RuntimeException("Error al guardar la imagen: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public ImageDTO updateImage(MultipartFile image, String token, HttpServletResponse response) {
-        try {
-            String username = jwtUtil.extractEmail(token);
-            User user = slaveUserRepository.findByName(username)
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-            // Verificar si tiene imagen para actualizar
-            if (user.getMasterImage() == null) {
-                throw new RuntimeException("El usuario no tiene una imagen de perfil para actualizar.");
-            }
-
-            // Eliminar la imagen anterior
-            imageService.deleteImage(user.getMasterImage());
-
-            // Subir la nueva imagen
-            Image masterImage = imageService.uploadImage(image);
-            user.setMasterImage(masterImage);
-            masterUserRepository.save(user);
-
-            return imageMapper.toDTO(masterImage);
-        } catch (IOException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            throw new RuntimeException("Error al actualizar la imagen: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public void deleteImage(String token, HttpServletResponse response) {
-        try {
-            String username = jwtUtil.extractEmail(token);
-            User user = slaveUserRepository.findByName(username)
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-            // Verificar si tiene imagen para eliminar
-            if (user.getMasterImage() == null) {
-                throw new RuntimeException("El usuario no tiene una imagen de perfil para eliminar.");
-            }
-
-            // Eliminar la imagen
-            Image imageToDelete = user.getMasterImage();
-            user.setMasterImage(null);
-            masterUserRepository.save(user);
-
-            imageService.deleteImage(imageToDelete);
-
-            response.setStatus(HttpServletResponse.SC_OK);
-        } catch (IOException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            throw new RuntimeException("Error al eliminar la imagen: " + e.getMessage());
-        }
     }
 }

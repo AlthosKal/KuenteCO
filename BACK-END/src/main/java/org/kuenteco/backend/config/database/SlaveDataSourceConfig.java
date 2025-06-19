@@ -1,5 +1,8 @@
 package org.kuenteco.backend.config.database;
 
+import java.util.HashMap;
+import java.util.Map;
+import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,17 +17,15 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.Map;
-
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = "org.kuenteco.backend.repository.slave", entityManagerFactoryRef = "slaveEntityManagerFactory", transactionManagerRef = "slaveTransactionManager")
+@EnableJpaRepositories(
+        basePackages = "org.kuenteco.backend.repository.slave",
+        entityManagerFactoryRef = "slaveEntityManagerFactory",
+        transactionManagerRef = "slaveTransactionManager")
 public class SlaveDataSourceConfig {
-    @Autowired
-    private Environment environment;
     private static final Logger log = LoggerFactory.getLogger(MasterDataSourceConfig.class);
+    @Autowired private Environment environment;
 
     @Bean(name = "slaveDataSource")
     public DataSource dataSource() {
@@ -33,7 +34,8 @@ public class SlaveDataSourceConfig {
         slaveDataSource.setUrl(environment.getProperty("slave.datasource.url"));
         slaveDataSource.setUsername(environment.getProperty("slave.datasource.username"));
         slaveDataSource.setPassword(environment.getProperty("slave.datasource.password"));
-        slaveDataSource.setDriverClassName(environment.getProperty("slave.datasource.driver-class-name"));
+        slaveDataSource.setDriverClassName(
+                environment.getProperty("slave.datasource.driver-class-name"));
         return slaveDataSource;
     }
 
@@ -49,13 +51,19 @@ public class SlaveDataSourceConfig {
         em.setJpaVendorAdapter(vendorAdapter);
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.show_sql", environment.getProperty("slave.jpa.properties.hibernate.show_sql", "false"));
-        properties.put("hibernate.format_sql", environment.getProperty("slave.jpa.properties.hibernate.format_sql", "false"));
-        properties.put("hibernate.hbm2ddl.auto", "none");  // Forzamos a none para el esclavo
+        properties.put(
+                "hibernate.show_sql",
+                environment.getProperty("slave.jpa.properties.hibernate.show_sql", "false"));
+        properties.put(
+                "hibernate.format_sql",
+                environment.getProperty("slave.jpa.properties.hibernate.format_sql", "false"));
+        properties.put("hibernate.hbm2ddl.auto", "none"); // Forzamos a none para el esclavo
 
         // Configuración explícita para modo sólo lectura
         properties.put("hibernate.connection.read_only", "true");
-        properties.put("hibernate.connection.handling_mode", "DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION");
+        properties.put(
+                "hibernate.connection.handling_mode",
+                "DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION");
         properties.put("hibernate.query.read_only", "true");
         em.setJpaPropertyMap(properties);
 

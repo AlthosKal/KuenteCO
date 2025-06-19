@@ -10,10 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ValidateVerificationCodeDTO {
-    @Email
-    @NotBlank
-    private String email;
-
-    @NotBlank
-    private String code;
+    @Email @NotBlank private String email;
+    @NotBlank private String code;
 }

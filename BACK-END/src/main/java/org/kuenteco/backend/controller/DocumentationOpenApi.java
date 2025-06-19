@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class DocumentationOpenApi {
 
     // Endpoint que redirige a la interfaz Swagger UI para visualizar la documentación de la API
-    @Operation(summary = "Redirect to Swagger UI", description = "Redirects to the Swagger UI page for API documentation")
+    @Operation(
+            summary = "Redirect to Swagger UI",
+            description = "Redirects to the Swagger UI page for API documentation")
     @GetMapping
     public String redirectToSwaggerUi() {
         return "redirect:/swagger-ui.html";
