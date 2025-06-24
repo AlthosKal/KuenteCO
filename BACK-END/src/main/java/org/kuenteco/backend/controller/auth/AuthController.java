@@ -28,26 +28,34 @@ public class AuthController implements AuthResource {
     private final UserImageService imageService;
     private final SendgridService sendgridService;
 
+    @GetMapping("/user/details")
+    public ResponseEntity<?> getAuthenticatedUser(HttpServletRequest request) {
+        UserDetailDTO dto = userService.getUserDetails();
+        return new ResponseEntity<>(
+                ApiResponse.ok("Usuario Autenticado", dto, request.getRequestURI()), HttpStatus.OK);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(
-            @Valid @RequestBody LoginUserDTO loginUserDTO,
+            @Valid @RequestBody LoginDTO loginUserDTO,
             HttpServletRequest request,
             HttpServletResponse response) {
         TokenResponseDTO dto = authService.authenticate(loginUserDTO, response);
-        return ResponseEntity.ok(
-                ApiResponse.ok("Inicio de Sesión exitoso", dto, request.getRequestURI()));
+        return new ResponseEntity<>(
+                ApiResponse.ok("Inicio de Sesión exitoso", dto, request.getRequestURI()),
+                HttpStatus.OK);
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(
             @Valid @RequestBody NewUserDTO newUserDTO, HttpServletRequest request) {
         authService.registerUser(newUserDTO);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(
-                        ApiResponse.ok(
-                                "Registro exitoso. Codigo de verificación enviado al correo",
-                                newUserDTO,
-                                request.getRequestURI()));
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Registro exitoso. Código de verificación enviado al correo",
+                        newUserDTO,
+                        request.getRequestURI()),
+                HttpStatus.CREATED);
     }
 
     @PostMapping("/send-verification-code")
@@ -57,69 +65,77 @@ public class AuthController implements AuthResource {
             HttpServletRequest request) {
 
         sendgridService.sendVerificationEmail(dto, isRegistration);
-        return ResponseEntity.ok(
-                ApiResponse.ok("Código de verificación enviado", dto, request.getRequestURI()));
+        return new ResponseEntity<>(
+                ApiResponse.ok("Código de verificación enviado", dto, request.getRequestURI()),
+                HttpStatus.OK);
     }
 
     @PostMapping("/validate-verification-code")
     public ResponseEntity<?> validateVerificationCode(
             @Valid @RequestBody ValidateVerificationCodeDTO dto, HttpServletRequest request) {
         boolean isValid = sendgridService.validateVerificationCode(dto);
-        String message =
-                isValid ? "Código de Verificación valido" : "Código de Verificación Invalido";
-        return ResponseEntity.badRequest()
-                .body(ApiResponse.ok(message, dto, request.getRequestURI()));
+        if (!isValid) {
+            return new ResponseEntity<>(
+                    ApiResponse.error("Código de Verificación Invalido", request.getRequestURI()),
+                    HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(
+                ApiResponse.ok("Código de Verificación valido", dto, request.getRequestURI()),
+                HttpStatus.OK);
     }
 
-    @PostMapping("/activate-account")
-    public ResponseEntity<?> activateAccount(
+    @PostMapping("/activate-user")
+    public ResponseEntity<?> activateUser(
             @Valid @RequestBody ValidateVerificationCodeDTO dto, HttpServletRequest request) {
+
+        boolean isValid = sendgridService.validateVerificationCode(dto);
         // 1. Validar el código
-        if (!sendgridService.validateVerificationCode(dto)) {
-            return ResponseEntity.badRequest()
-                    .body(
-                            ApiResponse.ok(
-                                    "Código de verificación valido", dto, request.getRequestURI()));
+        if (!isValid) {
+            return new ResponseEntity<>(
+                    ApiResponse.error("Código de Verificación Invalido", request.getRequestURI()),
+                    HttpStatus.BAD_REQUEST);
         }
         // 2. Activar la cuenta
         authService.activateUser(dto.getEmail());
-        return ResponseEntity.ok(
+        return new ResponseEntity<>(
                 ApiResponse.ok(
-                        "Cuenta activada correctamente", dto.getEmail(), request.getRequestURI()));
+                        "Cuenta activada correctamente", dto.getEmail(), request.getRequestURI()),
+                HttpStatus.OK);
     }
 
-    @PutMapping("/change-password")
+    @PatchMapping("/change-password")
     public ResponseEntity<?> changePassword(
             @Valid @RequestBody ChangePasswordDTO dto, HttpServletRequest request) {
         if (dto.getCode() == null || dto.getCode().trim().isEmpty()) {
             log.error("Error: Código de verificación vació");
-            return ResponseEntity.badRequest()
-                    .body(
-                            ApiResponse.error(
-                                    "Código de verificación es requerido",
-                                    request.getRequestURI()));
+            return new ResponseEntity<>(
+                    ApiResponse.error(
+                            "Código de verificación es requerido", request.getRequestURI()),
+                    HttpStatus.BAD_REQUEST);
         }
         String message = authService.changePasswordWithVerification(dto);
         log.info("Contraseña actualizada correctamente");
-        return ResponseEntity.ok(ApiResponse.ok(message, dto, request.getRequestURI()));
+        return new ResponseEntity<>(
+                ApiResponse.ok(message, dto, request.getRequestURI()), HttpStatus.CREATED);
     }
 
     // Cerrar Sesión
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         authService.logout(request, response);
-        return ResponseEntity.badRequest()
-                .body(ApiResponse.ok("Cierre de Sesión exitoso", null, request.getRequestURI()));
+        return new ResponseEntity<>(
+                ApiResponse.ok("Cierre de Sesión exitoso", null, request.getRequestURI()),
+                HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable String id) throws IOException {
-        userService.deteleUser(new DeleteUserDTO(id));
+    public ResponseEntity<?> delete(@PathVariable String id) throws IOException {
+        userService.deleteUser(new DeleteUserDTO(id));
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/user/image/add")
-    public ResponseEntity<?> uploadUserImage(
+    public ResponseEntity<?> uploadImage(
             @RequestParam("image") MultipartFile image,
             HttpServletRequest request,
             HttpServletResponse response)
@@ -131,8 +147,8 @@ public class AuthController implements AuthResource {
                 HttpStatus.CREATED);
     }
 
-    @PutMapping("/user/image/update")
-    public ResponseEntity<?> updateUserImage(
+    @PatchMapping("/user/image/update")
+    public ResponseEntity<?> updateImage(
             @RequestParam("image") MultipartFile image,
             HttpServletRequest request,
             HttpServletResponse response)
@@ -145,17 +161,10 @@ public class AuthController implements AuthResource {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteUserImage(
-            HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ResponseEntity<?> deleteImage(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
 
         imageService.deleteImage(request, response);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/user/details")
-    public ResponseEntity<?> getAuthenticatedUser(HttpServletRequest request) {
-        UserDetailDTO dto = userService.getUserDetailsDTO();
-        return ResponseEntity.ok(
-                ApiResponse.ok("Usuario Autenticado", dto, request.getRequestURI()));
     }
 }

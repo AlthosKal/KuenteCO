@@ -3,13 +3,13 @@ package org.kuenteco.backend.service.auth;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.kuenteco.backend.dto.auth.ChangePasswordDTO;
-import org.kuenteco.backend.dto.auth.LoginUserDTO;
+import org.kuenteco.backend.dto.auth.LoginDTO;
 import org.kuenteco.backend.dto.auth.NewUserDTO;
 import org.kuenteco.backend.dto.auth.TokenResponseDTO;
 
 public interface AuthService {
     // Metodos para registro e inicio de sesión
-    TokenResponseDTO authenticate(LoginUserDTO loginUserDTO, HttpServletResponse response);
+    TokenResponseDTO authenticate(LoginDTO loginUserDTO, HttpServletResponse response);
 
     void registerUser(NewUserDTO newUserDTO);
 

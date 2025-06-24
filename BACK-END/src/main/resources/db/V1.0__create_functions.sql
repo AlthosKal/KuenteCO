@@ -1,4 +1,4 @@
--- Extenciones de PostgreSQL para la tarea programada y la ejecución de la solicitud HTTP
+-- Extenciónes de PostgreSQL para la tarea programada y la ejecución de la solicitud HTTP
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 CREATE EXTENSION IF NOT EXISTS http;
 

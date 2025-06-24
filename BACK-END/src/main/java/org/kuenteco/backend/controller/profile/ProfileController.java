@@ -4,15 +4,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
-import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.kuenteco.backend.dto.auth.ChangePasswordDTO;
+import org.kuenteco.backend.dto.auth.LoginDTO;
 import org.kuenteco.backend.dto.auth.TokenResponseDTO;
 import org.kuenteco.backend.dto.image.ImageDTO;
-import org.kuenteco.backend.dto.profile.LoginProfileDTO;
 import org.kuenteco.backend.dto.profile.NewProfileDTO;
 import org.kuenteco.backend.dto.profile.ProfileDetailDTO;
 import org.kuenteco.backend.dto.profile.UpdateProfileDTO;
-import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.exception.ApiResponse;
 import org.kuenteco.backend.service.image.profile.ProfileImageService;
 import org.kuenteco.backend.service.profile.ProfileService;
@@ -21,63 +21,91 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RestController
 @RequestMapping("/v1/profile")
 @AllArgsConstructor
 public class ProfileController {
-
     private final ProfileService profileService;
     private final ProfileImageService imageService;
 
     @GetMapping
     public ResponseEntity<?> getAllProfiles(HttpServletRequest request) {
-        Object dto = profileService.getProfiles();
-        return ResponseEntity.status(HttpStatus.OK).body(
-                ApiResponse.ok(
-                        "Cuentas Obtenidas correctamente",
-                        dto,
-                        request.getRequestURI()));
+        Object result = profileService.getProfiles();
+        return new ResponseEntity<>(
+                ApiResponse.ok("Cuentas Obtenidas correctamente", result, request.getRequestURI()),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/details")
+    public ResponseEntity<?> getAuthenticatedProfile(HttpServletRequest request) {
+        ProfileDetailDTO dto = profileService.getProfileDetails();
+        return new ResponseEntity<>(
+                ApiResponse.ok("Perfil Autenticado", dto, request.getRequestURI()), HttpStatus.OK);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(
-            @Valid @RequestBody LoginProfileDTO loginProfileDTO,
+            @Valid @RequestBody LoginDTO loginDTO,
             HttpServletRequest request,
             HttpServletResponse response) {
-        TokenResponseDTO dto = profileService.authenticate(loginProfileDTO, response);
-        return ResponseEntity.ok(
-                ApiResponse.ok("Inicio de Sesión exitoso", dto, request.getRequestURI()));
+        TokenResponseDTO dto = profileService.authenticate(loginDTO, response);
+        return new ResponseEntity<>(
+                ApiResponse.ok("Inicio de Sesión exitoso", dto, request.getRequestURI()),
+                HttpStatus.OK);
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> registerProfile(
-            @RequestBody NewProfileDTO dto,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+    public ResponseEntity<?> register(@RequestBody NewProfileDTO dto, HttpServletRequest request) {
         profileService.registerProfile(dto);
-        return ResponseEntity.ok(
-                ApiResponse.ok("Cuenta registrada correctamente", null, request.getRequestURI()));
+        return new ResponseEntity<>(
+                ApiResponse.ok("Cuenta registrada correctamente", dto, request.getRequestURI()),
+                HttpStatus.CREATED);
     }
 
-    @PostMapping("/update")
-    public ResponseEntity<?> updateProfile(
-            @RequestBody UpdateProfileDTO dto,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+    @PatchMapping("/update")
+    public ResponseEntity<?> update(@RequestBody UpdateProfileDTO dto, HttpServletRequest request) {
         profileService.updateProfile(dto);
-        return ResponseEntity.ok(
-                ApiResponse.ok("Cuenta actualizada correctamente", null, request.getRequestURI()));
+        return new ResponseEntity<>(
+                ApiResponse.ok("Cuenta actualizada correctamente", null, request.getRequestURI()),
+                HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            @Valid @RequestBody ChangePasswordDTO dto, HttpServletRequest request) {
+        if (dto.getCode() == null || dto.getCode().trim().isEmpty()) {
+            log.error("Error: Código de verificación vació");
+            return new ResponseEntity<>(
+                    ApiResponse.error(
+                            "Código de verificación es requerido", request.getRequestURI()),
+                    HttpStatus.BAD_REQUEST);
+        }
+        String message = profileService.changePasswordWithVerification(dto);
+        log.info("Contraseña actualizada correctamente");
+        return new ResponseEntity<>(
+                ApiResponse.ok(message, dto, request.getRequestURI()), HttpStatus.CREATED);
+    }
+
+    // Cerrar Sesión
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        profileService.logout(request, response);
+        return new ResponseEntity<>(
+                ApiResponse.ok("Cierre de Sesión exitoso", null, request.getRequestURI()),
+                HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProfile(Profile profile, HttpServletRequest request) {
-        profileService.deleteProfile(profile);
-        return ResponseEntity.ok(
-                ApiResponse.ok("Perfil eliminado correctamente", null, request.getRequestURI()));
+    public ResponseEntity<?> delete(@PathVariable Integer id, HttpServletRequest request) {
+        profileService.deleteProfile(id);
+        return new ResponseEntity<>(
+                ApiResponse.ok("Perfil eliminado correctamente", null, request.getRequestURI()),
+                HttpStatus.OK);
     }
 
     @PostMapping("/image/add")
-    public ResponseEntity<?> uploadProfileImage(
+    public ResponseEntity<?> uploadImage(
             @RequestParam("image") MultipartFile image,
             HttpServletRequest request,
             HttpServletResponse response)
@@ -89,8 +117,8 @@ public class ProfileController {
                 HttpStatus.CREATED);
     }
 
-    @PutMapping("/image/update")
-    public ResponseEntity<?> updateProfileImage(
+    @PatchMapping("/image/update")
+    public ResponseEntity<?> updateImage(
             @RequestParam("image") MultipartFile image,
             HttpServletRequest request,
             HttpServletResponse response)
@@ -103,8 +131,8 @@ public class ProfileController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteProfileImage(
-            HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ResponseEntity<?> deleteImage(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
 
         imageService.deleteImage(request, response);
         return ResponseEntity.noContent().build();

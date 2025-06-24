@@ -34,6 +34,10 @@ public class User {
 
     @Version private Integer version;
 
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "id_role", nullable = false)
+    private Role role;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_image", referencedColumnName = "id")
     private Image image;
@@ -48,10 +52,6 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private UserType type;
-
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "id_role", nullable = false)
-    private Role role;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "account_state")

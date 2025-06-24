@@ -8,8 +8,6 @@ import lombok.*;
 import org.hibernate.annotations.Check;
 import org.hibernate.annotations.Type;
 import org.kuenteco.backend.entity.extra.DescriptionTransaction;
-import org.kuenteco.backend.entity.extra.ExchangeRate;
-import org.kuenteco.backend.enums.TransactionType;
 
 @Entity
 @Builder
@@ -38,8 +36,9 @@ public class Transaction {
     @JoinColumn(name = "id_category")
     private Category category;
 
-    @Enumerated(EnumType.STRING)
-    private TransactionType type;
+    @ManyToOne
+    @JoinColumn(name = "id_budget")
+    private Budget budget;
 
     private BigDecimal amount;
 
@@ -49,16 +48,4 @@ public class Transaction {
     @Type(JsonBinaryType.class)
     @Column(columnDefinition = "jsonb")
     private DescriptionTransaction description;
-
-    @ManyToOne
-    @JoinColumn(name = "id_debt")
-    private Debt relatedDebt; // Para pagos de deuda
-
-    @ManyToOne
-    @JoinColumn(name = "id_goal")
-    private Goal relatedGoal; // Para contribuciones a metas
-
-    @ManyToOne
-    @JoinColumn(name = "id_exchange_rate")
-    private ExchangeRate exchangeRate;
 }

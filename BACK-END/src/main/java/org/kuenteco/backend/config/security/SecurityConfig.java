@@ -1,6 +1,7 @@
 package org.kuenteco.backend.config.security;
 
 import java.util.List;
+import org.kuenteco.backend.jwt.AuthenticatedUser;
 import org.kuenteco.backend.jwt.JwtAuthenticationFilter;
 import org.kuenteco.backend.jwt.JwtEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -24,7 +24,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    @Autowired private UserDetailsService userDetailsService;
+    @Autowired private AuthenticatedUser authenticatedUser;
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -34,10 +34,11 @@ public class SecurityConfig {
                         auth ->
                                 auth.requestMatchers(
                                                 "/v1/auth/login",
+                                                "/v1/profile/login",
                                                 "/v1/auth/register",
                                                 "/v1/auth/validate-verification-code",
                                                 "/v1/auth/send-verification-code",
-                                                "/v1/auth/activate-account",
+                                                "/v1/auth/activate-user",
                                                 "/v1/auth/change-password",
                                                 "/v1/documentation/**",
                                                 "/swagger-ui.html",
@@ -77,7 +78,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
+        authenticationProvider.setUserDetailsService(authenticatedUser);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
@@ -86,7 +87,8 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedOriginPatterns(List.of("*")); // Permite todos los orígenes
-        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        corsConfiguration.setAllowedMethods(
+                List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(
                 List.of(
                         "Authorization",

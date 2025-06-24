@@ -1,4 +1,4 @@
-package org.kuenteco.backend.controller;
+package org.kuenteco.backend.controller.subscription;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;

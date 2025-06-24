@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.service.auth.TokenBlacklistService;
-import org.kuenteco.backend.service.auth.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,7 +22,7 @@ import org.springframework.web.util.WebUtils;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired private JwtUtil jwtUtil;
-    @Autowired private UserService userService;
+    @Autowired private AuthenticatedUser authenticatedUser;
     @Autowired private TokenBlacklistService tokenBlacklistService;
 
     @Override
@@ -31,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String nameOrEmail = null;
+        String email = null;
         String jwt = null;
         try {
             jwt = getJWT(request);
@@ -41,12 +40,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token invalidado");
                     return;
                 }
-                nameOrEmail = jwtUtil.extractEmail(jwt);
+                email = jwtUtil.extractEmail(jwt);
             }
 
-            if (nameOrEmail != null
-                    && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userService.loadUserByUsername(nameOrEmail);
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = authenticatedUser.loadUserByUsername(email);
 
                 if (jwtUtil.validateToken(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =

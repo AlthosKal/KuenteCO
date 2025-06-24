@@ -1,27 +1,37 @@
 package org.kuenteco.backend.service.profile;
 
+import static org.kuenteco.backend.service.auth.SendgridServiceImpl.verificationCodes;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.kuenteco.backend.dto.auth.ChangePasswordDTO;
+import org.kuenteco.backend.dto.auth.LoginDTO;
 import org.kuenteco.backend.dto.auth.TokenResponseDTO;
-import org.kuenteco.backend.dto.profile.LoginProfileDTO;
 import org.kuenteco.backend.dto.profile.NewProfileDTO;
 import org.kuenteco.backend.dto.profile.ProfileDetailDTO;
 import org.kuenteco.backend.dto.profile.UpdateProfileDTO;
 import org.kuenteco.backend.entity.Profile;
+import org.kuenteco.backend.entity.Role;
 import org.kuenteco.backend.entity.User;
+import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.UserType;
+import org.kuenteco.backend.exception.exceptions.AuthException;
 import org.kuenteco.backend.exception.exceptions.ProfileException;
 import org.kuenteco.backend.jwt.JwtUtil;
 import org.kuenteco.backend.mapper.profile.NewProfileMapper;
 import org.kuenteco.backend.mapper.profile.ProfileDetailMapper;
 import org.kuenteco.backend.mapper.profile.UpdateProfileMapper;
 import org.kuenteco.backend.repository.master.MasterProfileRepository;
+import org.kuenteco.backend.repository.master.MasterRoleRepository;
 import org.kuenteco.backend.repository.slave.SlaveProfileRepository;
+import org.kuenteco.backend.repository.slave.SlaveRoleRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.kuenteco.backend.service.auth.CookieService;
+import org.kuenteco.backend.service.auth.TokenBlacklistService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -34,6 +44,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Service
 @RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
+    private final TokenBlacklistService tokenBlacklistService;
+    private final MasterRoleRepository masterRoleRepository;
+    private final SlaveRoleRepository slaveRoleRepository;
     private final MasterProfileRepository masterProfileRepository;
     private final SlaveProfileRepository slaveProfileRepository;
     private final SlaveUserRepository slaveUserRepository;
@@ -47,7 +60,7 @@ public class ProfileServiceImpl implements ProfileService {
     private final CookieService cookieService;
 
     @Override
-    public TokenResponseDTO authenticate(LoginProfileDTO dto, HttpServletResponse response) {
+    public TokenResponseDTO authenticate(LoginDTO dto, HttpServletResponse response) {
         // Verificar si la cuenta está activa antes de autenticar
         // Determinar si es un email o nombre de usuario
         Profile profile =
@@ -65,9 +78,10 @@ public class ProfileServiceImpl implements ProfileService {
         String jwt = jwtUtil.generateToken(authResult);
         cookieService.addHttpOnlyCookie("jwt", jwt, 7 * 24 * 60 * 60, response);
 
-        return new TokenResponseDTO(jwt, profile.getUsername().toString());
+        return new TokenResponseDTO(jwt, profile.getRole().getName().toString());
     }
 
+    @Override
     public Object getProfiles() {
         // Obtener el usuario autenticado
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -85,9 +99,16 @@ public class ProfileServiceImpl implements ProfileService {
         }
 
         // Devolver las cuentas del usuario
+        return profileDetailMapper.toDtoList(profile);
+    }
+
+    @Override
+    public ProfileDetailDTO getProfileDetails() {
+        Profile profile = getDetails();
         return profileDetailMapper.toDto(profile);
     }
 
+    @Override
     public void registerProfile(NewProfileDTO dto) {
         // Obtener el usuario autenticado
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -103,10 +124,21 @@ public class ProfileServiceImpl implements ProfileService {
 
         log.info("Registrando nuevo perfil {}", dto.getEmail());
 
+        Role role =
+                slaveRoleRepository
+                        .findByName(RoleList.ROLE_PROFILE)
+                        .orElseThrow(() -> new AuthException("Role no encontrado"));
+
+        // Asegurar que el rol existe en la base de datos maestra
+        Role masterRole =
+                slaveRoleRepository
+                        .findByName(RoleList.ROLE_PROFILE)
+                        .orElseGet(() -> masterRoleRepository.save(role));
         transactionTemplate.execute(
                 status -> {
                     Profile profile = newProfileMapper.toEntity(dto);
                     profile.setPassword(passwordEncoder.encode(dto.getPassword()));
+                    profile.setRole(masterRole);
                     profile.setUser(user);
 
                     masterProfileRepository.save(profile);
@@ -137,11 +169,49 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void deleteProfile(Profile profile) {
-        masterProfileRepository.delete(profile);
+    public String changePasswordWithVerification(ChangePasswordDTO changePasswordDTO) {
+        // Usar transacción para cambiar la contraseña
+        return transactionTemplate.execute(
+                status -> {
+                    // Buscar directamente en la base de datos maestra
+                    Profile profile =
+                            slaveProfileRepository
+                                    .findByEmail(changePasswordDTO.getEmail())
+                                    .orElseThrow(() -> new AuthException("Usuario no encontrado"));
+
+                    profile.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
+                    masterProfileRepository.save(profile);
+
+                    // Eliminar el código después de usarlo
+                    verificationCodes.remove(changePasswordDTO.getEmail());
+
+                    return "Contraseña actualizada correctamente";
+                });
     }
 
-    public Profile findByNameOrEmail(String nameOrEmail) {
+    @Override
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        String token = jwtUtil.resolveToken(request);
+
+        if (token == null) {
+            throw new AuthException("Token no proporcionado");
+        }
+        // 1. Invalidar el token
+        tokenBlacklistService.addToBlacklist(token);
+
+        // 2. Limpiar la cookie
+        cookieService.deleteCookie("jwt", response);
+
+        // 3. Limpiar el contexto de seguridad
+        SecurityContextHolder.clearContext();
+    }
+
+    @Override
+    public void deleteProfile(Integer id) {
+        masterProfileRepository.deleteById(id);
+    }
+
+    private Profile findByNameOrEmail(String nameOrEmail) {
         boolean isEmail = nameOrEmail.contains("@");
 
         if (isEmail) {
@@ -153,6 +223,12 @@ public class ProfileServiceImpl implements ProfileService {
                     .findByUsername(nameOrEmail)
                     .orElseThrow(() -> new ProfileException("Datos Invalidos"));
         }
+    }
+
+    private Profile getDetails() {
+        String nameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        return findByNameOrEmail(nameOrEmail);
     }
 
     public boolean existsByProfileName(String username) {

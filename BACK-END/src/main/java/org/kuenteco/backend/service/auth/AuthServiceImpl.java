@@ -55,10 +55,10 @@ public class AuthServiceImpl implements AuthService {
             AuthenticationManagerBuilder authenticationManagerBuilder,
             CookieService cookieService,
             TokenBlacklistService tokenBlacklistService,
-            SlaveRoleRepository slaveRoleRepository,
             SlaveUserRepository slaveUserRepository,
             MasterUserRepository masterUserRepository,
             MasterRoleRepository masterRoleRepository,
+            SlaveRoleRepository slaveRoleRepository,
             @Qualifier("masterTransactionManager")
                     PlatformTransactionManager masterTransactionManager,
             NewUserMapper newUserMapper,
@@ -84,7 +84,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public TokenResponseDTO authenticate(LoginUserDTO dto, HttpServletResponse response) {
+    public TokenResponseDTO authenticate(LoginDTO dto, HttpServletResponse response) {
         // Verificar si la cuenta está activa antes de autenticar
         // Determinar si es un email o nombre de usuario
         User user =
@@ -141,7 +141,7 @@ public class AuthServiceImpl implements AuthService {
                     user.setState(State.PENDING);
                     user.setVersion(0); // Inicializar versión para bloqueo optimista
 
-                    userService.saveUser(user);
+                    masterUserRepository.save(user);
                     return "Usuarío registrado correctamente";
                 });
 

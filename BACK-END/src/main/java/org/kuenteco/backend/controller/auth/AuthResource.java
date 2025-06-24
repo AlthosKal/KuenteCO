@@ -66,7 +66,7 @@ public interface AuthResource {
                             content =
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = LoginUserDTO.class),
+                                            schema = @Schema(implementation = LoginDTO.class),
                                             examples = {
                                                 @ExampleObject(
                                                         name = "Login con email",
@@ -88,7 +88,7 @@ public interface AuthResource {
                             """)
                                             })))
     ResponseEntity<?> login(
-            @Valid @RequestBody LoginUserDTO loginUserDTO,
+            @Valid @RequestBody LoginDTO loginUserDTO,
             HttpServletRequest request,
             HttpServletResponse response);
 
@@ -334,7 +334,7 @@ public interface AuthResource {
                           "code": "123456"
                         }
                     """))))
-    ResponseEntity<?> activateAccount(
+    ResponseEntity<?> activateUser(
             @Valid @RequestBody ValidateVerificationCodeDTO dto, HttpServletRequest request);
 
     @Operation(
@@ -430,7 +430,7 @@ public interface AuthResource {
             })
     ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response);
 
-    ResponseEntity<?> deleteUser(@PathVariable String id) throws IOException;
+    ResponseEntity<?> delete(@PathVariable String id) throws IOException;
 
     @Operation(
             description = "Carga una nueva imagen de perfil para el usuario autenticado",
@@ -469,7 +469,7 @@ public interface AuthResource {
                                         example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."))
             })
     @PostMapping("/user/image/add")
-    ResponseEntity<?> uploadUserImage(
+    ResponseEntity<?> uploadImage(
             @RequestParam("image") MultipartFile image,
             HttpServletRequest request,
             HttpServletResponse response)
@@ -511,7 +511,7 @@ public interface AuthResource {
                                         type = "string",
                                         example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."))
             })
-    ResponseEntity<?> updateUserImage(
+    ResponseEntity<?> updateImage(
             @RequestParam("image") MultipartFile image,
             HttpServletRequest request,
             HttpServletResponse response)
@@ -538,7 +538,7 @@ public interface AuthResource {
                                         type = "string",
                                         example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."))
             })
-    ResponseEntity<?> deleteUserImage(HttpServletRequest request, HttpServletResponse response)
+    ResponseEntity<?> deleteImage(HttpServletRequest request, HttpServletResponse response)
             throws IOException;
 
     @Operation(

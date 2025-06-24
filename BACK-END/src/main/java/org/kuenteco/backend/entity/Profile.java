@@ -22,6 +22,14 @@ public class Profile {
     @JoinColumn(name = "id_user", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "id_role", nullable = false)
+    private Role role;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_image", referencedColumnName = "id")
+    private Image image;
+
     private String username;
 
     @Column(unique = true)
@@ -31,8 +39,4 @@ public class Profile {
 
     @Column(name = "start_date")
     private Timestamp startDate;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_image", referencedColumnName = "id")
-    private Image image;
 }

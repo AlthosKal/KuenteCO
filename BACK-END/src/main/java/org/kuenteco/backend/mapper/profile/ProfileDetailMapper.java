@@ -7,5 +7,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface ProfileDetailMapper {
-    List<ProfileDetailDTO> toDto(List<Profile> profile);
+    ProfileDetailDTO toDto(Profile profile);
+
+    List<ProfileDetailDTO> toDtoList(List<Profile> profile);
 }

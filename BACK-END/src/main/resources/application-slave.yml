@@ -28,6 +28,6 @@ slave:
     flyway:
       enabled: false
 
-logging:
-  level:
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+#logging:
+#  level:
+#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

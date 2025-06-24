@@ -5,9 +5,9 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import lombok.*;
+import org.hibernate.annotations.Check;
 import org.hibernate.annotations.Type;
 import org.kuenteco.backend.entity.extra.DescriptionCategory;
-import org.kuenteco.backend.enums.State;
 
 @Builder
 @Getter
@@ -16,6 +16,9 @@ import org.kuenteco.backend.enums.State;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "category")
+@Check(
+        constraints =
+                "(id_profile IS NOT NULL AND id_user IS NULL) OR (id_profile IS NULL AND id_user IS NOT NULL)")
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,10 +29,12 @@ public class Category {
     private Profile profile;
 
     @ManyToOne
-    @JoinColumn(name = "id_asset")
-    private Asset asset;
+    @JoinColumn(name = "id_user", unique = true)
+    private User user;
 
-    private String name;
+    @OneToOne
+    @JoinColumn(name = "id_budget")
+    private Budget budget;
 
     @Type(JsonBinaryType.class)
     @Column(columnDefinition = "jsonb")
@@ -43,7 +48,4 @@ public class Category {
 
     @Column(name = "finish_date")
     private Timestamp finishDate;
-
-    @Enumerated(EnumType.STRING)
-    private State state;
 }
