@@ -13,7 +13,9 @@ import org.kuenteco.backend.enums.State;
 @AllArgsConstructor
 public class DescriptionCategory {
     private String name;
+
     private BigDecimal assignedBudget;
+
     @Enumerated(EnumType.STRING)
     private State state;
 }

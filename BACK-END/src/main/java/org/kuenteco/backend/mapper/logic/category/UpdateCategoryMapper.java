@@ -1,6 +1,6 @@
 package org.kuenteco.backend.mapper.logic.category;
 
-import org.kuenteco.backend.dto.logic.category.NewCategoryDTO;
+import org.kuenteco.backend.dto.logic.category.CategoryDTO;
 import org.kuenteco.backend.entity.Category;
 import org.kuenteco.backend.mapper.logic.budget.UpdateBudgetMapper;
 import org.mapstruct.Mapper;
@@ -9,10 +9,8 @@ import org.mapstruct.Mapping;
 @Mapper(
         componentModel = "spring",
         uses = {UpdateBudgetMapper.class})
-public interface NewCategoryMapper {
-
-    @Mapping(target = "id", ignore = true)
+public interface UpdateCategoryMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "budget", source = "budget")
-    Category toEntity(NewCategoryDTO dto);
+    Category toEntity(CategoryDTO dto);
 }

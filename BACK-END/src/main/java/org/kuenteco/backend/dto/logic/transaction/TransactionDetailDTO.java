@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.kuenteco.backend.dto.logic.budget.BudgetDetailDTO;
+import org.kuenteco.backend.dto.logic.budget.BudgetDTO;
 import org.kuenteco.backend.dto.logic.category.CategoryDTO;
 import org.kuenteco.backend.entity.extra.DescriptionTransaction;
 import org.kuenteco.backend.enums.TransactionType;
@@ -16,7 +16,7 @@ import org.kuenteco.backend.enums.TransactionType;
 public class TransactionDetailDTO {
     private Integer id;
     private CategoryDTO category;
-    private BudgetDetailDTO budget;
+    private BudgetDTO budget;
     private TransactionType type;
     private BigDecimal amount;
     private Timestamp timestamp;

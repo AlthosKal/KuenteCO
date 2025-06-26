@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1/transaction")
 @AllArgsConstructor
 public class TransactionController {
-    private final TransactionService transactionService;
+    private TransactionService transactionService;
 
     @GetMapping
     public ResponseEntity<?> getTransactions(HttpServletRequest request) {
@@ -28,7 +28,7 @@ public class TransactionController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> registerTransaction(
+    public ResponseEntity<?> addTransaction(
             @Valid @RequestBody NewTransactionDTO dto, HttpServletRequest request) {
         transactionService.addTransaction(dto);
         return new ResponseEntity<>(
@@ -37,7 +37,7 @@ public class TransactionController {
                 HttpStatus.CREATED);
     }
 
-    @PostMapping("/add/batch")
+    @PostMapping("/batch/add")
     public ResponseEntity<?> registerTransactions(
             @Valid @RequestBody List<NewTransactionDTO> dto, HttpServletRequest request) {
         dto.forEach(transactionService::addTransaction);
@@ -59,7 +59,7 @@ public class TransactionController {
                 HttpStatus.CREATED);
     }
 
-    @PutMapping("/update/batch")
+    @PutMapping("/batch/update")
     public ResponseEntity<?> updateTransactions(
             @Valid @RequestBody List<UpdateTransactionDTO> dto, HttpServletRequest request) {
         dto.forEach(transactionService::updateTransaction);
@@ -82,11 +82,11 @@ public class TransactionController {
     // Usando RequestParam para la lista
     @DeleteMapping("/batch")
     public ResponseEntity<?> deleteTransactions(
-            @RequestParam List<Integer> ids, HttpServletRequest request) {
-        ids.forEach(transactionService::deleteTransaction);
+            @RequestParam List<Integer> id, HttpServletRequest request) {
+        id.forEach(transactionService::deleteTransaction);
         return new ResponseEntity<>(
                 ApiResponse.ok(
-                        String.format("%d transacciones eliminadas correctamente", ids.size()),
+                        String.format("%d transacciones eliminadas correctamente", id.size()),
                         null,
                         request.getRequestURI()),
                 HttpStatus.NO_CONTENT);

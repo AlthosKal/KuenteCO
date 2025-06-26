@@ -121,7 +121,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadCredentials(
             BadCredentialsException ex, HttpServletRequest request) {
-        log.warn("Intento de autenticación fallido (Credenciales incorrectas): {}", ex.getMessage());
+        log.warn(
+                "Intento de autenticación fallido (Credenciales incorrectas): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ApiResponse.error("Credenciales inválidas", request.getRequestURI()));
     }
@@ -139,6 +140,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleCategoryException(
             UsernameNotFoundException ex, HttpServletRequest request) {
         log.warn("Error con el servicio de Rubros: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error("Credenciales inválidas", request.getRequestURI()));
+    }
+
+    @ExceptionHandler(BudgetException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBudgetException(
+            UsernameNotFoundException ex, HttpServletRequest request) {
+        log.warn("Error con el servicio de Presupuestos: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ApiResponse.error("Credenciales inválidas", request.getRequestURI()));
     }

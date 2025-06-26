@@ -15,14 +15,11 @@ public interface NewTransactionMapper {
         @Mapping(target = "user", ignore = true),
         @Mapping(target = "transactionDate", ignore = true),
         // Mapeo de Category
-        @Mapping(target = "category.profile", ignore = true),
         @Mapping(target = "category.user", ignore = true),
         @Mapping(target = "category.budget", ignore = true),
-        @Mapping(target = "category.assignedBudget", ignore = true),
         @Mapping(target = "category.startDate", ignore = true),
         @Mapping(target = "category.finishDate", ignore = true),
         // Mapeo de Budget
-        @Mapping(target = "budget.profile", ignore = true),
         @Mapping(target = "budget.user", ignore = true),
         @Mapping(target = "budget.totalBudget", ignore = true),
         @Mapping(target = "budget.remainingBudget", ignore = true)

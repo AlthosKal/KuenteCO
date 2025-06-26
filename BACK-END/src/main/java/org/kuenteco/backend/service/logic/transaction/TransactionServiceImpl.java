@@ -46,7 +46,6 @@ public class TransactionServiceImpl implements TransactionService {
 
         log.info("Obteniendo transacciones para: {}", email);
 
-
         // Primero intenta buscar como usuario
         User user = slaveUserRepository.findByEmail(email).orElse(null);
         if (user != null) {

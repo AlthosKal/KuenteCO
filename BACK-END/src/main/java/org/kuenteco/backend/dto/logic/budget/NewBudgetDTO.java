@@ -6,10 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class BudgetDetailDTO {
-    private Integer id;
+@NoArgsConstructor
+public class NewBudgetDTO {
     private BigDecimal totalBudget;
     private BigDecimal remainingBudget;
 }

@@ -7,11 +7,11 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "category_enrollment")
-public class CategoryEnrollment {
+@Table(name = "budget_enrollment")
+public class BudgetEnrollment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -25,8 +25,8 @@ public class CategoryEnrollment {
     private Profile profile;
 
     @ManyToOne
-    @JoinColumn(name = "id_category", referencedColumnName = "id")
-    private Category category;
+    @JoinColumn(name = "id_budget", referencedColumnName = "id")
+    private Budget budget;
 
     private Timestamp enrollmentDate;
 }

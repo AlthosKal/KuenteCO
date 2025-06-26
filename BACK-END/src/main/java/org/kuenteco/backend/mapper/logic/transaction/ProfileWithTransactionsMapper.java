@@ -3,7 +3,6 @@ package org.kuenteco.backend.mapper.logic.transaction;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
-
 import org.kuenteco.backend.dto.logic.transaction.ProfileWithTransactionsDTO;
 import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.Transaction;
@@ -18,7 +17,9 @@ public interface ProfileWithTransactionsMapper {
     @Mapping(target = "email", source = "profile.email")
     @Mapping(target = "startDate", source = "profile.startDate")
     @Mapping(target = "transactions", source = "transactions")
-    @Mapping(target = "transactionCount", expression = "java(transactions != null ? transactions.size() : 0)")
+    @Mapping(
+            target = "transactionCount",
+            expression = "java(transactions != null ? transactions.size() : 0)")
     @Mapping(target = "totalAmount", expression = "java(calculateTotalAmount(transactions))")
     ProfileWithTransactionsDTO toDto(Profile profile, List<Transaction> transactions);
 

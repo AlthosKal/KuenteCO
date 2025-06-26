@@ -1,11 +1,10 @@
 package org.kuenteco.backend.mapper.logic.category;
 
+import java.util.List;
 import org.kuenteco.backend.dto.logic.category.CategoryEnrollmentDTO;
 import org.kuenteco.backend.entity.CategoryEnrollment;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface CategoryEnrollmentMapper {
