@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.dto.auth.SendVerificationCodeDTO;
 import org.kuenteco.backend.dto.auth.ValidateVerificationCodeDTO;
 import org.kuenteco.backend.exception.exceptions.SendgridException;
-import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -30,9 +29,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SendgridServiceImpl implements SendgridService {
     public static final Map<String, String> verificationCodes = new ConcurrentHashMap<>();
-    private final MasterUserRepository masterUserRepository;
     private final SlaveUserRepository slaveUserRepository;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private final UserService userService;
 
     // SendGrid
     @Value("${spring.sendgrid.api-key}")
@@ -65,7 +64,7 @@ public class SendgridServiceImpl implements SendgridService {
         log.info("Código de verificacion: " + code);
 
         // Programar la eliminación del código después de 15 minutos
-        scheduleCodeRemoval(email);
+        scheduleRemoval(email);
 
         try {
             sendEmail(email, code, isRegistration);
@@ -83,8 +82,9 @@ public class SendgridServiceImpl implements SendgridService {
         return code != null && code.equals(storedCode);
     }
 
-    private void scheduleCodeRemoval(String email) {
+    private void scheduleRemoval(String email) {
         scheduler.schedule(() -> verificationCodes.remove(email), 15, TimeUnit.MINUTES);
+        scheduler.schedule(() -> userService.deletePendingEmail(email), 15, TimeUnit.MINUTES);
     }
 
     private String generateVerificationCode() {

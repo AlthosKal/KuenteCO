@@ -6,12 +6,16 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.dto.logic.transaction.NewTransactionDTO;
+import org.kuenteco.backend.dto.logic.transaction.ProfileWithTransactionsDTO;
 import org.kuenteco.backend.dto.logic.transaction.UpdateTransactionDTO;
+import org.kuenteco.backend.dto.logic.transaction.UserProfilesWithTransactionsDTO;
 import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.Transaction;
 import org.kuenteco.backend.entity.User;
+import org.kuenteco.backend.enums.UserType;
 import org.kuenteco.backend.exception.exceptions.TransactionException;
 import org.kuenteco.backend.mapper.logic.transaction.NewTransactionMapper;
+import org.kuenteco.backend.mapper.logic.transaction.ProfileWithTransactionsMapper;
 import org.kuenteco.backend.mapper.logic.transaction.TransactionDetailMapper;
 import org.kuenteco.backend.mapper.logic.transaction.UpdateTransactionMapper;
 import org.kuenteco.backend.repository.master.MasterTransactionRepository;
@@ -28,11 +32,12 @@ import org.springframework.stereotype.Service;
 public class TransactionServiceImpl implements TransactionService {
     private final MasterTransactionRepository masterTransactionRepository;
     private final SlaveTransactionRepository slaveTransactionRepository;
-    private final SlaveProfileRepository slaveProfileRepository;
     private final SlaveUserRepository slaveUserRepository;
+    private final SlaveProfileRepository slaveProfileRepository;
     private final TransactionDetailMapper transactionDetailMapper;
     private final NewTransactionMapper newTransactionMapper;
     private final UpdateTransactionMapper updateTransactionMapper;
+    private final ProfileWithTransactionsMapper profileWithTransactionsMapper;
 
     @Override
     public Object getTransactions() {
@@ -41,25 +46,31 @@ public class TransactionServiceImpl implements TransactionService {
 
         log.info("Obteniendo transacciones para: {}", email);
 
-        // Primero intenta buscar como usuario personal
+
+        // Primero intenta buscar como usuario
         User user = slaveUserRepository.findByEmail(email).orElse(null);
         if (user != null) {
-            log.info("Usuario personal encontrado: {}", email);
-            return getPersonalUserTransactions(user);
+            if (user.getType().equals(UserType.BUSINESS)) {
+                log.info("Usuario encontrado {}", email);
+                return getUserProfilesWithTransactions(user);
+            } else if (user.getType().equals(UserType.PERSONAL)) {
+                log.info("Usuario encontrado: {}", email);
+                return getUserTransactions(user);
+            }
         }
 
-        // Si no es usuario personal, busca como perfil de negocio
+        // Si no es usuario, busca como perfil
         Profile profile = slaveProfileRepository.findByEmail(email).orElse(null);
         if (profile != null) {
             log.info("Perfil de negocio encontrado: {}", email);
-            return getBusinessProfileTransactions(profile);
+            return getProfileTransactions(profile);
         }
 
         throw new TransactionException("Usuario o perfil no encontrado: " + email);
     }
 
     @Override
-    public void registerTransaction(NewTransactionDTO dto) {
+    public void addTransaction(NewTransactionDTO dto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
@@ -72,7 +83,6 @@ public class TransactionServiceImpl implements TransactionService {
             transaction.setUser(user);
             transaction.setTransactionDate(Timestamp.from(Instant.now()));
             masterTransactionRepository.save(transaction);
-            return;
         }
 
         // Si no es usuario personal, busca como perfil de negocio
@@ -82,7 +92,6 @@ public class TransactionServiceImpl implements TransactionService {
             transaction.setProfile(profile);
             transaction.setTransactionDate(Timestamp.from(Instant.now()));
             masterTransactionRepository.save(transaction);
-            return;
         }
 
         throw new TransactionException("Usuario o perfil no encontrado: " + email);
@@ -101,7 +110,6 @@ public class TransactionServiceImpl implements TransactionService {
             log.info("Actualizando transacción para usuario personal: {}", email);
             transaction.setUser(user);
             masterTransactionRepository.save(transaction);
-            return;
         }
 
         // Si no es usuario personal, busca como perfil de negocio
@@ -110,7 +118,6 @@ public class TransactionServiceImpl implements TransactionService {
             log.info("Actualizando transacción para perfil de negocio: {}", email);
             transaction.setProfile(profile);
             masterTransactionRepository.save(transaction);
-            return;
         }
 
         throw new TransactionException("Usuario o perfil no encontrado: " + email);
@@ -131,7 +138,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     // Métodos auxiliares
-    private Object getPersonalUserTransactions(User user) {
+    private Object getUserTransactions(User user) {
         List<Transaction> transactions = slaveTransactionRepository.findByUser(user);
 
         if (transactions.isEmpty()) {
@@ -141,7 +148,53 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionDetailMapper.toDtoList(transactions);
     }
 
-    private Object getBusinessProfileTransactions(Profile profile) {
+    private UserProfilesWithTransactionsDTO getUserProfilesWithTransactions(User user) {
+        // Obtener todos los perfiles del usuarío
+        List<Profile> profiles = slaveProfileRepository.findByUser(user);
+
+        if (profiles.isEmpty()) {
+            log.info("No tienes perfiles registrados");
+            return UserProfilesWithTransactionsDTO.builder()
+                    .username(user.getUsername())
+                    .email(user.getEmail())
+                    .profiles(List.of())
+                    .totalProfiles(0)
+                    .totalTransactions(0)
+                    .build();
+        }
+
+        List<ProfileWithTransactionsDTO> profilesWithTransactions =
+                profiles.stream()
+                        .map(
+                                profile -> {
+                                    List<Transaction> transactions =
+                                            slaveTransactionRepository.findByProfile(profile);
+                                    return profileWithTransactionsMapper.toDto(
+                                            profile, transactions);
+                                })
+                        .toList();
+
+        // Calcular totales
+        int totalTransactions =
+                profilesWithTransactions.stream()
+                        .mapToInt(ProfileWithTransactionsDTO::getTransactionCount)
+                        .sum();
+        log.info(
+                "Usuario {} tiene {} perfiles con {} transacciones totales",
+                user.getEmail(),
+                profiles.size(),
+                totalTransactions);
+
+        return UserProfilesWithTransactionsDTO.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .profiles(profilesWithTransactions)
+                .totalProfiles(profiles.size())
+                .totalTransactions(totalTransactions)
+                .build();
+    }
+
+    private Object getProfileTransactions(Profile profile) {
         List<Transaction> transactions = slaveTransactionRepository.findByProfile(profile);
 
         if (transactions.isEmpty()) {

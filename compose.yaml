@@ -1,6 +1,6 @@
 services:
   backend:
-    image: yefff/image-backend-kuenteco:1.0.0
+    image: yefff/image-backend-kuenteco:1.1.0
     container_name: BackendKuenteCO
     volumes:
       - ./.env-docker:/workspace/.env
@@ -15,7 +15,6 @@ services:
         condition: service_started
     networks:
       - kuenteco-network
-    restart: unless-stopped
 
   postgres-master-database:
     build:
@@ -39,7 +38,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    restart: unless-stopped
 
   postgres-replica-database:
     build:
@@ -64,7 +62,6 @@ services:
     depends_on:
       postgres-master-database:
         condition: service_healthy
-    restart: unless-stopped
 
 volumes:
   postgres-master-data:

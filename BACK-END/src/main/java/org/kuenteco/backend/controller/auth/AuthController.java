@@ -49,7 +49,7 @@ public class AuthController implements AuthResource {
     @PostMapping("/register")
     public ResponseEntity<?> register(
             @Valid @RequestBody NewUserDTO newUserDTO, HttpServletRequest request) {
-        authService.registerUser(newUserDTO);
+        authService.addUser(newUserDTO);
         return new ResponseEntity<>(
                 ApiResponse.ok(
                         "Registro exitoso. Código de verificación enviado al correo",

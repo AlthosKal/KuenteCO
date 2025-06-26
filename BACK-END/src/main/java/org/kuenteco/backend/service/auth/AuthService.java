@@ -11,7 +11,7 @@ public interface AuthService {
     // Metodos para registro e inicio de sesión
     TokenResponseDTO authenticate(LoginDTO loginUserDTO, HttpServletResponse response);
 
-    void registerUser(NewUserDTO newUserDTO);
+    void addUser(NewUserDTO newUserDTO);
 
     void activateUser(String email);
 

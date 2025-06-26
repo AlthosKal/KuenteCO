@@ -13,6 +13,18 @@
 			"item": [
 				{
 					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -794,9 +806,48 @@
 				"type": "text/javascript",
 				"exec": [
 					"// Auto-save JWT token from login responses",
-					"if (pm.response.json() && pm.response.json().data && pm.response.json().data.token) {",
-					"    pm.environment.set('jwt_token', pm.response.json().data.token);",
-					"    console.log('JWT Token saved to environment variable');",
+					"try {",
+					"    // Verificar que la respuesta sea exitosa (status 200-299)",
+					"    if (pm.response.code >= 200 && pm.response.code < 300) {",
+					"        ",
+					"        // Parsear la respuesta JSON una sola vez",
+					"        const responseJson = pm.response.json();",
+					"        ",
+					"        // Verificar la estructura de la respuesta y que success sea true",
+					"        if (responseJson && ",
+					"            responseJson.success === true && ",
+					"            responseJson.data && ",
+					"            responseJson.data.token) {",
+					"            ",
+					"            // Guardar el token JWT en la variable de entorno",
+					"            pm.environment.set('jwt_token', responseJson.data.token);",
+					"            ",
+					"            // Opcional: También guardar el rol del usuario",
+					"            if (responseJson.data.role) {",
+					"                pm.environment.set('user_role', responseJson.data.role);",
+					"            }",
+					"            ",
+					"            console.log('✅ JWT Token guardado exitosamente en variable de entorno');",
+					"            console.log('Token:', responseJson.data.token);",
+					"            ",
+					"            // Opcional: Mostrar información adicional",
+					"            if (responseJson.data.role) {",
+					"                console.log('Rol de usuario:', responseJson.data.role);",
+					"            }",
+					"            ",
+					"        } else {",
+					"            console.log('⚠️ La respuesta no contiene un token válido o success es false');",
+					"            console.log('Estructura de respuesta:', JSON.stringify(responseJson, null, 2));",
+					"        }",
+					"        ",
+					"    } else {",
+					"        console.log('❌ Error en la respuesta del servidor. Status:', pm.response.code);",
+					"        console.log('Mensaje:', pm.response.text());",
+					"    }",
+					"    ",
+					"} catch (error) {",
+					"    console.log('❌ Error al procesar la respuesta JWT:', error.message);",
+					"    console.log('Respuesta completa:', pm.response.text());",
 					"}"
 				]
 			}

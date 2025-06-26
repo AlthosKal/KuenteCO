@@ -109,7 +109,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void registerUser(NewUserDTO dto) {
+    public void addUser(NewUserDTO dto) {
         if (userService.existsByUserName(dto.getUsername())) {
             throw new AuthException(
                     "Datos Inválidos, nombre con caracteres no permitidos o ya existente");

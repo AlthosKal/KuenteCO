@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.kuenteco.backend.dto.logic.budget.BudgetDetailDTO;
-import org.kuenteco.backend.dto.logic.category.CategoryDetailDTO;
+import org.kuenteco.backend.dto.logic.category.CategoryDTO;
 import org.kuenteco.backend.entity.extra.DescriptionTransaction;
 import org.kuenteco.backend.enums.TransactionType;
 
@@ -14,7 +14,8 @@ import org.kuenteco.backend.enums.TransactionType;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionDetailDTO {
-    private CategoryDetailDTO category;
+    private Integer id;
+    private CategoryDTO category;
     private BudgetDetailDTO budget;
     private TransactionType type;
     private BigDecimal amount;

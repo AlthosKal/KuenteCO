@@ -3,10 +3,8 @@ package org.kuenteco.backend.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.kuenteco.backend.exception.exceptions.AuthException;
-import org.kuenteco.backend.exception.exceptions.ProfileException;
-import org.kuenteco.backend.exception.exceptions.SendgridException;
-import org.kuenteco.backend.exception.exceptions.SubscriptionException;
+import org.kuenteco.backend.exception.exceptions.*;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -28,7 +26,7 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException ex, HttpServletRequest request) {
         String errorMessage =
                 ex.getBindingResult().getAllErrors().stream()
-                        .map(e -> e.getDefaultMessage())
+                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
                         .collect(Collectors.joining("; "));
 
         log.warn("Error de validación: {}", errorMessage);
@@ -42,7 +40,7 @@ public class GlobalExceptionHandler {
             BindException ex, HttpServletRequest request) {
         String errorMessage =
                 ex.getBindingResult().getAllErrors().stream()
-                        .map(e -> e.getDefaultMessage())
+                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
                         .collect(Collectors.joining("; "));
 
         log.warn("Error de enlace de datos: {}", errorMessage);
@@ -123,7 +121,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadCredentials(
             BadCredentialsException ex, HttpServletRequest request) {
-        log.warn("Intento de autenticación fallido: {}", ex.getMessage());
+        log.warn("Intento de autenticación fallido (Credenciales incorrectas): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ApiResponse.error("Credenciales inválidas", request.getRequestURI()));
     }
@@ -132,7 +130,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleUsernameNotFound(
             UsernameNotFoundException ex, HttpServletRequest request) {
-        log.warn("Intento de autenticación fallido: {}", ex.getMessage());
+        log.warn("Intento de autenticación fallido (Usuarío no encontrado): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error("Credenciales inválidas", request.getRequestURI()));
+    }
+
+    @ExceptionHandler(CategoryException.class)
+    public ResponseEntity<ApiResponse<Void>> handleCategoryException(
+            UsernameNotFoundException ex, HttpServletRequest request) {
+        log.warn("Error con el servicio de Rubros: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ApiResponse.error("Credenciales inválidas", request.getRequestURI()));
     }

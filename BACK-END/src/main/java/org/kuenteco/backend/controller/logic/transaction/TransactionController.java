@@ -30,7 +30,7 @@ public class TransactionController {
     @PostMapping("/add")
     public ResponseEntity<?> registerTransaction(
             @Valid @RequestBody NewTransactionDTO dto, HttpServletRequest request) {
-        transactionService.registerTransaction(dto);
+        transactionService.addTransaction(dto);
         return new ResponseEntity<>(
                 ApiResponse.ok(
                         "Transacción registrada correctamente", dto, request.getRequestURI()),
@@ -40,7 +40,7 @@ public class TransactionController {
     @PostMapping("/add/batch")
     public ResponseEntity<?> registerTransactions(
             @Valid @RequestBody List<NewTransactionDTO> dto, HttpServletRequest request) {
-        dto.forEach(transactionService::registerTransaction);
+        dto.forEach(transactionService::addTransaction);
         return new ResponseEntity<>(
                 ApiResponse.ok(
                         String.format("%d transacciones creadas exitosamente", dto.size()),
