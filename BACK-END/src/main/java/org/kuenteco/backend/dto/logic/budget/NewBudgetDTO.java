@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NewBudgetDTO {
+    private String name;
     private BigDecimal totalBudget;
     private BigDecimal remainingBudget;
 }

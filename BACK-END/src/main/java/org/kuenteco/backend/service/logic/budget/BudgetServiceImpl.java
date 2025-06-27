@@ -49,14 +49,12 @@ public class BudgetServiceImpl implements BudgetService {
     public void addBudget(NewBudgetDTO dto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-
-        Budget budget = newBudgetMapper.toEntity(dto);
-
         User user =
                 slaveUserRepository
                         .findByEmail(email)
                         .orElseThrow(() -> new BudgetException("Usuario no encontrado: " + email));
 
+        Budget budget = newBudgetMapper.toEntity(dto);
         log.info("Registrando la presupuesto para: {}", email);
         budget.setUser(user);
         masterBudgetRepository.save(budget);
@@ -67,15 +65,13 @@ public class BudgetServiceImpl implements BudgetService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
-        Budget budget = updateBudgetMapper.toEntity(dto);
-
         User user =
                 slaveUserRepository
                         .findByEmail(email)
                         .orElseThrow(() -> new BudgetException("Usuario no encontrado: " + email));
-
+        Budget budget = slaveBudgetRepository.findBudgetByUser(user);
+        updateBudgetMapper.toEntity(dto);
         log.info("Actualizando la presupuesto para: {}", email);
-        budget.setUser(user);
         masterBudgetRepository.save(budget);
     }
 

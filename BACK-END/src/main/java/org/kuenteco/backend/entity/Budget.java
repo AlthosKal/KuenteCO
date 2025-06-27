@@ -20,6 +20,8 @@ public class Budget {
     @JoinColumn(name = "id_user", unique = true)
     private User user;
 
+    private String name;
+
     @Column(name = "total_budget")
     private BigDecimal totalBudget;
 

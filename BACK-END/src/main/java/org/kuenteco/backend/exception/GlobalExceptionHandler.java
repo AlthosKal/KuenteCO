@@ -151,4 +151,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ApiResponse.error("Credenciales inválidas", request.getRequestURI()));
     }
+
+    @ExceptionHandler(DebtException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDebtException(
+            UsernameNotFoundException ex, HttpServletRequest request) {
+        log.warn("Error con el servicio de Deudas: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error("Credenciales inválidas", request.getRequestURI()));
+    }
 }

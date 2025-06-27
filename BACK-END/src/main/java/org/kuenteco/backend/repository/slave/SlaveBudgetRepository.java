@@ -11,4 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(transactionManager = "slaveTransactionManager", readOnly = true)
 public interface SlaveBudgetRepository extends JpaRepository<Budget, Integer> {
     List<Budget> findByUser(User user);
+
+    Budget findBudgetByUser(User user);
 }

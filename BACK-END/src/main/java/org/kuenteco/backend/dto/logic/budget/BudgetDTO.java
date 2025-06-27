@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BudgetDTO {
     private Integer id;
+    private String name;
     private BigDecimal totalBudget;
     private BigDecimal remainingBudget;
 }

@@ -11,8 +11,7 @@ public interface BudgetEnrollmentMapper {
 
     @Mapping(target = "userEmail", source = "user.email")
     @Mapping(target = "profileEmail", source = "profile.email")
-    @Mapping(target = "totalBudget", source = "budget.totalBudget")
-    @Mapping(target = "remainingBudget", source = "budget.remainingBudget")
+    @Mapping(target = "budgetName", source = "budget.name")
     BudgetEnrollmentDTO toDTO(BudgetEnrollment budgetEnrollment);
 
     List<BudgetEnrollmentDTO> toDTOList(List<BudgetEnrollment> budgetEnrollments);

@@ -19,6 +19,8 @@ import org.kuenteco.backend.mapper.logic.transaction.ProfileWithTransactionsMapp
 import org.kuenteco.backend.mapper.logic.transaction.TransactionDetailMapper;
 import org.kuenteco.backend.mapper.logic.transaction.UpdateTransactionMapper;
 import org.kuenteco.backend.repository.master.MasterTransactionRepository;
+import org.kuenteco.backend.repository.slave.SlaveBudgetRepository;
+import org.kuenteco.backend.repository.slave.SlaveCategoryRepository;
 import org.kuenteco.backend.repository.slave.SlaveProfileRepository;
 import org.kuenteco.backend.repository.slave.SlaveTransactionRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
@@ -34,6 +36,8 @@ public class TransactionServiceImpl implements TransactionService {
     private final SlaveTransactionRepository slaveTransactionRepository;
     private final SlaveUserRepository slaveUserRepository;
     private final SlaveProfileRepository slaveProfileRepository;
+    private final SlaveCategoryRepository slaveCategoryRepository;
+    private final SlaveBudgetRepository slaveBudgetRepository;
     private final TransactionDetailMapper transactionDetailMapper;
     private final NewTransactionMapper newTransactionMapper;
     private final UpdateTransactionMapper updateTransactionMapper;
@@ -75,6 +79,29 @@ public class TransactionServiceImpl implements TransactionService {
 
         Transaction transaction = newTransactionMapper.toEntity(dto);
 
+        // Resolver Category y Budget desde los ID
+        if (dto.getCategoryId() != null) {
+            transaction.setCategory(
+                    slaveCategoryRepository
+                            .findById(dto.getCategoryId())
+                            .orElseThrow(
+                                    () ->
+                                            new TransactionException(
+                                                    "Categoría no encontrada con ID: "
+                                                            + dto.getCategoryId())));
+        }
+
+        if (dto.getBudgetId() != null) {
+            transaction.setBudget(
+                    slaveBudgetRepository
+                            .findById(dto.getBudgetId())
+                            .orElseThrow(
+                                    () ->
+                                            new TransactionException(
+                                                    "Presupuesto no encontrado con ID: "
+                                                            + dto.getBudgetId())));
+        }
+
         // Primero intenta buscar como usuario personal
         User user = slaveUserRepository.findByEmail(email).orElse(null);
         if (user != null) {
@@ -82,6 +109,7 @@ public class TransactionServiceImpl implements TransactionService {
             transaction.setUser(user);
             transaction.setTransactionDate(Timestamp.from(Instant.now()));
             masterTransactionRepository.save(transaction);
+            return;
         }
 
         // Si no es usuario personal, busca como perfil de negocio
@@ -91,6 +119,7 @@ public class TransactionServiceImpl implements TransactionService {
             transaction.setProfile(profile);
             transaction.setTransactionDate(Timestamp.from(Instant.now()));
             masterTransactionRepository.save(transaction);
+            return;
         }
 
         throw new TransactionException("Usuario o perfil no encontrado: " + email);
@@ -103,12 +132,36 @@ public class TransactionServiceImpl implements TransactionService {
 
         Transaction transaction = updateTransactionMapper.toEntity(dto);
 
+        // Resolver Category y Budget desde los ID
+        if (dto.getCategoryId() != null) {
+            transaction.setCategory(
+                    slaveCategoryRepository
+                            .findById(dto.getCategoryId())
+                            .orElseThrow(
+                                    () ->
+                                            new TransactionException(
+                                                    "Categoría no encontrada con ID: "
+                                                            + dto.getCategoryId())));
+        }
+
+        if (dto.getBudgetId() != null) {
+            transaction.setBudget(
+                    slaveBudgetRepository
+                            .findById(dto.getBudgetId())
+                            .orElseThrow(
+                                    () ->
+                                            new TransactionException(
+                                                    "Presupuesto no encontrado con ID: "
+                                                            + dto.getBudgetId())));
+        }
+
         // Primero intenta buscar como usuario personal
         User user = slaveUserRepository.findByEmail(email).orElse(null);
         if (user != null) {
             log.info("Actualizando transacción para usuario personal: {}", email);
             transaction.setUser(user);
             masterTransactionRepository.save(transaction);
+            return;
         }
 
         // Si no es usuario personal, busca como perfil de negocio
@@ -117,6 +170,7 @@ public class TransactionServiceImpl implements TransactionService {
             log.info("Actualizando transacción para perfil de negocio: {}", email);
             transaction.setProfile(profile);
             masterTransactionRepository.save(transaction);
+            return;
         }
 
         throw new TransactionException("Usuario o perfil no encontrado: " + email);
