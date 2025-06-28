@@ -1,5 +1,7 @@
 package org.kuenteco.backend.service.logic.transaction;
 
+import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
+
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
@@ -12,8 +14,10 @@ import org.kuenteco.backend.dto.logic.transaction.UserProfilesWithTransactionsDT
 import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.Transaction;
 import org.kuenteco.backend.entity.User;
+import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.UserType;
 import org.kuenteco.backend.exception.exceptions.TransactionException;
+import org.kuenteco.backend.jwt.AuthCredentials;
 import org.kuenteco.backend.mapper.logic.transaction.NewTransactionMapper;
 import org.kuenteco.backend.mapper.logic.transaction.ProfileWithTransactionsMapper;
 import org.kuenteco.backend.mapper.logic.transaction.TransactionDetailMapper;
@@ -24,8 +28,6 @@ import org.kuenteco.backend.repository.slave.SlaveCategoryRepository;
 import org.kuenteco.backend.repository.slave.SlaveProfileRepository;
 import org.kuenteco.backend.repository.slave.SlaveTransactionRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -45,135 +47,98 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Object getTransactions() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        RoleList role = credentials.role();
         log.info("Obteniendo transacciones para: {}", email);
-
-        // Primero intenta buscar como usuario
-        User user = slaveUserRepository.findByEmail(email).orElse(null);
-        if (user != null) {
-            if (user.getType().equals(UserType.BUSINESS)) {
-                log.info("Usuario encontrado {}", email);
-                return getUserProfilesWithTransactions(user);
-            } else if (user.getType().equals(UserType.PERSONAL)) {
-                log.info("Usuario encontrado: {}", email);
-                return getUserTransactions(user);
+        return switch (role) {
+            case ROLE_USER -> {
+                User user =
+                        slaveUserRepository
+                                .findByEmail(email)
+                                .orElseThrow(
+                                        () -> new TransactionException("Usuario no encontrado"));
+                if (user.getType().equals(UserType.BUSINESS)) {
+                    yield getUserProfilesWithTransactions(user);
+                } else if (user.getType().equals(UserType.PERSONAL)) {
+                    yield getUserTransactions(user);
+                } else {
+                    throw new TransactionException(
+                            "Tipo de usuario no soportado: " + user.getType());
+                }
             }
-        }
-
-        // Si no es usuario, busca como perfil
-        Profile profile = slaveProfileRepository.findByEmail(email).orElse(null);
-        if (profile != null) {
-            log.info("Perfil encontrado: {}", email);
-            return getProfileTransactions(profile);
-        }
-
-        throw new TransactionException("Usuario o perfil no encontrado: " + email);
+            case ROLE_PROFILE -> {
+                Profile profile =
+                        slaveProfileRepository
+                                .findByEmail(email)
+                                .orElseThrow(
+                                        () -> new TransactionException("Perfil no encontrado"));
+                yield getProfileTransactions(profile);
+            }
+        };
     }
 
     @Override
     public void addTransaction(NewTransactionDTO dto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        RoleList role = credentials.role();
+        log.info("Registrando transacciones para: {}", email);
+        Transaction transaction = prepareNewTransaction(dto);
 
-        Transaction transaction = newTransactionMapper.toEntity(dto);
-
-        // Resolver Category y Budget desde los ID
-        if (dto.getCategoryId() != null) {
-            transaction.setCategory(
-                    slaveCategoryRepository
-                            .findById(dto.getCategoryId())
-                            .orElseThrow(
-                                    () ->
-                                            new TransactionException(
-                                                    "Categoría no encontrada con ID: "
-                                                            + dto.getCategoryId())));
+        switch (role) {
+            case ROLE_USER -> {
+                User user =
+                        slaveUserRepository
+                                .findByEmail(email)
+                                .orElseThrow(
+                                        () -> new TransactionException("Usuario no encontrado"));
+                transaction.setUser(user);
+                masterTransactionRepository.save(transaction);
+            }
+            case ROLE_PROFILE -> {
+                Profile profile =
+                        slaveProfileRepository
+                                .findByEmail(email)
+                                .orElseThrow(
+                                        () -> new TransactionException("Perfil no encontrado"));
+                transaction.setProfile(profile);
+                masterTransactionRepository.save(transaction);
+            }
+            default -> throw new TransactionException("Role no encontrado " + role);
         }
-
-        if (dto.getBudgetId() != null) {
-            transaction.setBudget(
-                    slaveBudgetRepository
-                            .findById(dto.getBudgetId())
-                            .orElseThrow(
-                                    () ->
-                                            new TransactionException(
-                                                    "Presupuesto no encontrado con ID: "
-                                                            + dto.getBudgetId())));
-        }
-
-        // Primero intenta buscar como usuario personal
-        User user = slaveUserRepository.findByEmail(email).orElse(null);
-        if (user != null) {
-            log.info("Registrando transacción para usuario personal: {}", email);
-            transaction.setUser(user);
-            transaction.setTransactionDate(Timestamp.from(Instant.now()));
-            masterTransactionRepository.save(transaction);
-            return;
-        }
-
-        // Si no es usuario personal, busca como perfil de negocio
-        Profile profile = slaveProfileRepository.findByEmail(email).orElse(null);
-        if (profile != null) {
-            log.info("Registrando transacción para perfil de negocio: {}", email);
-            transaction.setProfile(profile);
-            transaction.setTransactionDate(Timestamp.from(Instant.now()));
-            masterTransactionRepository.save(transaction);
-            return;
-        }
-
-        throw new TransactionException("Usuario o perfil no encontrado: " + email);
     }
 
     @Override
     public void updateTransaction(UpdateTransactionDTO dto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        RoleList role = credentials.role();
+        log.info("Actualizando transacciones para: {}", email);
+        Transaction transaction = prepareUpdateTransaction(dto);
 
-        Transaction transaction = updateTransactionMapper.toEntity(dto);
+        switch (role) {
+            case ROLE_USER -> {
+                User user =
+                        slaveUserRepository
+                                .findByEmail(email)
+                                .orElseThrow(
+                                        () -> new TransactionException("Usuario no encontrado"));
+                transaction.setUser(user);
+                masterTransactionRepository.save(transaction);
+            }
 
-        // Resolver Category y Budget desde los ID
-        if (dto.getCategoryId() != null) {
-            transaction.setCategory(
-                    slaveCategoryRepository
-                            .findById(dto.getCategoryId())
-                            .orElseThrow(
-                                    () ->
-                                            new TransactionException(
-                                                    "Categoría no encontrada con ID: "
-                                                            + dto.getCategoryId())));
+            case ROLE_PROFILE -> {
+                Profile profile =
+                        slaveProfileRepository
+                                .findByEmail(email)
+                                .orElseThrow(
+                                        () -> new TransactionException("Perfil no encontrado"));
+                transaction.setProfile(profile);
+                masterTransactionRepository.save(transaction);
+            }
+            default -> throw new TransactionException("Rol no soportado: " + role);
         }
-
-        if (dto.getBudgetId() != null) {
-            transaction.setBudget(
-                    slaveBudgetRepository
-                            .findById(dto.getBudgetId())
-                            .orElseThrow(
-                                    () ->
-                                            new TransactionException(
-                                                    "Presupuesto no encontrado con ID: "
-                                                            + dto.getBudgetId())));
-        }
-
-        // Primero intenta buscar como usuario personal
-        User user = slaveUserRepository.findByEmail(email).orElse(null);
-        if (user != null) {
-            log.info("Actualizando transacción para usuario personal: {}", email);
-            transaction.setUser(user);
-            masterTransactionRepository.save(transaction);
-            return;
-        }
-
-        // Si no es usuario personal, busca como perfil de negocio
-        Profile profile = slaveProfileRepository.findByEmail(email).orElse(null);
-        if (profile != null) {
-            log.info("Actualizando transacción para perfil de negocio: {}", email);
-            transaction.setProfile(profile);
-            masterTransactionRepository.save(transaction);
-            return;
-        }
-
-        throw new TransactionException("Usuario o perfil no encontrado: " + email);
     }
 
     @Override
@@ -255,5 +220,43 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         return transactionDetailMapper.toDtoList(transactions);
+    }
+
+    private Transaction prepareNewTransaction(NewTransactionDTO dto) {
+        Transaction transaction = newTransactionMapper.toEntity(dto);
+        resolveCategoryAndBudget(dto.getCategoryId(), dto.getBudgetId(), transaction);
+        transaction.setTransactionDate(Timestamp.from(Instant.now()));
+        return transaction;
+    }
+
+    private Transaction prepareUpdateTransaction(UpdateTransactionDTO dto) {
+        Transaction transaction = updateTransactionMapper.toEntity(dto);
+        resolveCategoryAndBudget(dto.getCategoryId(), dto.getBudgetId(), transaction);
+        return transaction;
+    }
+
+    private void resolveCategoryAndBudget(
+            Integer categoryId, Integer budgetId, Transaction transaction) {
+        if (categoryId != null) {
+            transaction.setCategory(
+                    slaveCategoryRepository
+                            .findById(categoryId)
+                            .orElseThrow(
+                                    () ->
+                                            new TransactionException(
+                                                    "Categoría no encontrada con ID: "
+                                                            + categoryId)));
+        }
+
+        if (budgetId != null) {
+            transaction.setBudget(
+                    slaveBudgetRepository
+                            .findById(budgetId)
+                            .orElseThrow(
+                                    () ->
+                                            new TransactionException(
+                                                    "Presupuesto no encontrado con ID: "
+                                                            + budgetId)));
+        }
     }
 }

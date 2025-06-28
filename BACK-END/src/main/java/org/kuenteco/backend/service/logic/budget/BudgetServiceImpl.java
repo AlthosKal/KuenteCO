@@ -1,5 +1,7 @@
 package org.kuenteco.backend.service.logic.budget;
 
+import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,14 +11,13 @@ import org.kuenteco.backend.entity.Budget;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.exception.exceptions.BudgetException;
 import org.kuenteco.backend.exception.exceptions.CategoryException;
+import org.kuenteco.backend.jwt.AuthCredentials;
 import org.kuenteco.backend.mapper.logic.budget.BudgetDetailMapper;
 import org.kuenteco.backend.mapper.logic.budget.NewBudgetMapper;
 import org.kuenteco.backend.mapper.logic.budget.UpdateBudgetMapper;
 import org.kuenteco.backend.repository.master.MasterBudgetRepository;
 import org.kuenteco.backend.repository.slave.SlaveBudgetRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -32,8 +33,8 @@ public class BudgetServiceImpl implements BudgetService {
 
     @Override
     public Object getBudgets() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
 
         log.info("Buscando presupuestos para: {}", email);
 
@@ -47,8 +48,8 @@ public class BudgetServiceImpl implements BudgetService {
 
     @Override
     public void addBudget(NewBudgetDTO dto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
         User user =
                 slaveUserRepository
                         .findByEmail(email)
@@ -62,8 +63,8 @@ public class BudgetServiceImpl implements BudgetService {
 
     @Override
     public void updateBudget(BudgetDTO dto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
 
         User user =
                 slaveUserRepository

@@ -1,5 +1,7 @@
 package org.kuenteco.backend.service.logic.budget;
 
+import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
+
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
@@ -8,14 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.dto.logic.budget.BudgetEnrollmentDTO;
 import org.kuenteco.backend.entity.*;
 import org.kuenteco.backend.exception.exceptions.BudgetException;
+import org.kuenteco.backend.jwt.AuthCredentials;
 import org.kuenteco.backend.mapper.logic.budget.BudgetEnrollmentMapper;
 import org.kuenteco.backend.repository.master.MasterBudgetEnrollmentRepository;
 import org.kuenteco.backend.repository.slave.SlaveBudgetEnrollmentRepository;
 import org.kuenteco.backend.repository.slave.SlaveBudgetRepository;
 import org.kuenteco.backend.repository.slave.SlaveProfileRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -31,8 +32,8 @@ public class BudgetEnrollmentServiceImpl implements BudgetEnrollmentService {
 
     @Override
     public Object getAllBudgetEnrollments() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
 
         log.info("Obteniendo los presupuestos asociados de {}", email);
         Profile profile =
@@ -51,8 +52,8 @@ public class BudgetEnrollmentServiceImpl implements BudgetEnrollmentService {
 
     @Override
     public BudgetEnrollmentDTO enrollProfileToBudget(Integer profileId, Integer budgetId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
 
         User user =
                 slaveUserRepository

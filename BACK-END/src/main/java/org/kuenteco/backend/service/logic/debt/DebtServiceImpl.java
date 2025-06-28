@@ -1,5 +1,7 @@
 package org.kuenteco.backend.service.logic.debt;
 
+import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
+
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -15,6 +17,7 @@ import org.kuenteco.backend.entity.Debt;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.StateDebt;
 import org.kuenteco.backend.exception.exceptions.DebtException;
+import org.kuenteco.backend.jwt.AuthCredentials;
 import org.kuenteco.backend.mapper.logic.debt.DebtDetailMapper;
 import org.kuenteco.backend.mapper.logic.debt.NewDebtMapper;
 import org.kuenteco.backend.mapper.logic.debt.UpdateDebtMapper;
@@ -22,8 +25,6 @@ import org.kuenteco.backend.mapper.logic.debt.debtsByStateMapper;
 import org.kuenteco.backend.repository.master.MasterDebtRepository;
 import org.kuenteco.backend.repository.slave.SlaveDebtRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,8 +43,8 @@ public class DebtServiceImpl implements DebtService {
 
     @Override
     public Object getDebts() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
 
         log.info("Buscando deudas para: {}", email);
 
@@ -58,8 +59,8 @@ public class DebtServiceImpl implements DebtService {
 
     @Override
     public Object getDebtsByState(StateDebt state) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
         log.info("Buscando deudas por estado para: {}", email);
 
         User user =
@@ -76,8 +77,8 @@ public class DebtServiceImpl implements DebtService {
 
     @Override
     public Object getOverdueDebts() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
         log.info("Buscando deudas atrasadas para: {}", email);
 
         User user =
@@ -96,8 +97,8 @@ public class DebtServiceImpl implements DebtService {
 
     @Override
     public Object getDebtsExpiringInDays(Integer days) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
 
         User user =
                 slaveUserRepository
@@ -122,8 +123,8 @@ public class DebtServiceImpl implements DebtService {
 
     @Override
     public BigDecimal getTotalPendingAmount() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
         User user =
                 slaveUserRepository
                         .findByEmail(email)
@@ -138,8 +139,8 @@ public class DebtServiceImpl implements DebtService {
 
     @Transactional
     public void addDebt(NewDebtDTO dto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
 
         User user =
                 slaveUserRepository
@@ -165,8 +166,8 @@ public class DebtServiceImpl implements DebtService {
 
     @Override
     public void updateDebt(DebtDTO dto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
         User user =
                 slaveUserRepository
                         .findByEmail(email)

@@ -1,5 +1,7 @@
 package org.kuenteco.backend.service.notification;
 
+import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
+
 import java.sql.Timestamp;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -7,13 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.entity.Notification;
 import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.User;
+import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.exception.exceptions.NotificationException;
+import org.kuenteco.backend.jwt.AuthCredentials;
 import org.kuenteco.backend.mapper.NotificationMapper;
 import org.kuenteco.backend.repository.slave.SlaveNotificationRepository;
 import org.kuenteco.backend.repository.slave.SlaveProfileRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -27,73 +29,92 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public Object getAllNotifications() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        RoleList role = credentials.role();
 
-        log.info("Obteniendo notificaciones para: {}", email);
-
-        User user = slaveUserRepository.findByEmail(email).orElse(null);
-        if (user != null) {
-            log.info("Usuario encontrado: {}", email);
-            return getUserNotifications(user);
-        }
-
-        Profile profile = slaveProfileRepository.findByEmail(email).orElse(null);
-        if (profile != null) {
-            log.info("Perfil encontrado: {}", email);
-            return getProfileNotifications(profile);
-        }
-        throw new NotificationException("Usuario o perfil no encontrado" + email);
+        return switch (role) {
+            case ROLE_USER -> {
+                User user =
+                        slaveUserRepository
+                                .findByEmail(email)
+                                .orElseThrow(
+                                        () -> new NotificationException("Usuario no encontrado"));
+                yield getUserNotifications(user);
+            }
+            case ROLE_PROFILE -> {
+                Profile profile =
+                        slaveProfileRepository
+                                .findByEmail(email)
+                                .orElseThrow(
+                                        () -> new NotificationException("Perfil no encontrado"));
+                yield getProfileNotifications(profile);
+            }
+        };
     }
 
     @Override
     public Object getNotificationsByDateRange(Timestamp fromDate, Timestamp toDate) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        RoleList role = credentials.role();
 
         log.info("Obteniendo un rango especifico de notificaciones para: {}", email);
 
-        User user = slaveUserRepository.findByEmail(email).orElse(null);
-        if (user != null) {
-            log.info("Usuario encontrado: {}", email);
-            return getUserNotificationsByRangeDate(user, fromDate, toDate);
-        }
-
-        Profile profile = slaveProfileRepository.findByEmail(email).orElse(null);
-        if (profile != null) {
-            log.info("Perfil encontrado: {}", email);
-            return getProfileNotificationsByRangeDate(profile, fromDate, toDate);
-        }
-        throw new NotificationException("Usuario o perfil no encontrado" + email);
+        return switch (role) {
+            case ROLE_USER -> {
+                User user =
+                        slaveUserRepository
+                                .findByEmail(email)
+                                .orElseThrow(
+                                        () -> new NotificationException("Usuario no encontrado"));
+                yield getUserNotificationsByRangeDate(user, fromDate, toDate);
+            }
+            case ROLE_PROFILE -> {
+                Profile profile =
+                        slaveProfileRepository
+                                .findByEmail(email)
+                                .orElseThrow(
+                                        () -> new NotificationException("Perfil no encontrado"));
+                yield getProfileNotificationsByRangeDate(profile, fromDate, toDate);
+            }
+        };
     }
 
     @Override
     public Object searchNotifications(String keyword) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        RoleList role = credentials.role();
         log.info("Buscando notificaciones para: {}", email);
 
-        User user = slaveUserRepository.findByEmail(email).orElse(null);
-        if (user != null) {
-            log.info("Usuario encontrado: {}", email);
-            return getUserNotificationsByContentContaining(user, keyword);
-        }
-
-        Profile profile = slaveProfileRepository.findByEmail(email).orElse(null);
-        if (profile != null) {
-            log.info("Perfil encontrado: {}", email);
-            return getProfileNotificationsByContentContaining(profile, keyword);
-        }
-        throw new NotificationException("Usuario o perfil no encontrado" + email);
+        return switch (role) {
+            case ROLE_USER -> {
+                User user =
+                        slaveUserRepository
+                                .findByEmail(email)
+                                .orElseThrow(
+                                        () -> new NotificationException("Usuario no encontrado"));
+                yield getUserNotificationsByContentContaining(user, keyword);
+            }
+            case ROLE_PROFILE -> {
+                Profile profile =
+                        slaveProfileRepository
+                                .findByEmail(email)
+                                .orElseThrow(
+                                        () -> new NotificationException("Perfil no encontrado"));
+                yield getProfileNotificationsByContentContaining(profile, keyword);
+            }
+        };
     }
 
     // Método placeholder para integración con servicios externos
-    private void sendNotificationToExternalServices(Notification notification) {
-        // TODO: Implementar integración con:
-        // - Servicio de email (SendGrid)
-        // - Servicio de push notifications (Firebase)
-        // - Servicio de SMS (Twilio)
-    }
+    //    private void sendNotificationToExternalServices(Notification notification) {
+    // TODO: Implementar integración con:
+    // - Servicio de email (SendGrid)
+    // - Servicio de push notifications (Firebase)
+    // - Servicio de SMS (Twilio)
+    // }
 
     private Object getUserNotifications(User user) {
         List<Notification> notifications =

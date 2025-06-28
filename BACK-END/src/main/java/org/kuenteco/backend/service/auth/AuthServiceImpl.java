@@ -4,6 +4,7 @@ import static org.kuenteco.backend.service.auth.SendgridServiceImpl.verification
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Collection;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.dto.auth.*;
@@ -12,6 +13,7 @@ import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.exception.exceptions.AuthException;
+import org.kuenteco.backend.jwt.AuthCredentials;
 import org.kuenteco.backend.jwt.JwtUtil;
 import org.kuenteco.backend.mapper.auth.NewUserMapper;
 import org.kuenteco.backend.repository.master.MasterRoleRepository;
@@ -23,6 +25,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -226,5 +229,15 @@ public class AuthServiceImpl implements AuthService {
 
         // 3. Limpiar el contexto de seguridad
         SecurityContextHolder.clearContext();
+    }
+
+    public static AuthCredentials getCredentials() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        String roleName = authorities.iterator().next().getAuthority();
+        log.info("Obteniendo información para: {}, con el rol {}", email, roleName);
+        RoleList role = RoleList.valueOf(roleName);
+        return new AuthCredentials(email, role);
     }
 }

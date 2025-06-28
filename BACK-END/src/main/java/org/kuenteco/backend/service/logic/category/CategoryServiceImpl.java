@@ -1,5 +1,7 @@
 package org.kuenteco.backend.service.logic.category;
 
+import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
+
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
@@ -10,14 +12,13 @@ import org.kuenteco.backend.dto.logic.category.NewCategoryDTO;
 import org.kuenteco.backend.entity.Category;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.exception.exceptions.CategoryException;
+import org.kuenteco.backend.jwt.AuthCredentials;
 import org.kuenteco.backend.mapper.logic.category.CategoryDetailMapper;
 import org.kuenteco.backend.mapper.logic.category.NewCategoryMapper;
 import org.kuenteco.backend.mapper.logic.category.UpdateCategoryMapper;
 import org.kuenteco.backend.repository.master.MasterCategoryRepository;
 import org.kuenteco.backend.repository.slave.SlaveCategoryRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -33,8 +34,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Object getCategories() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
 
         log.info("Obteniendo Rubros para: {}", email);
 
@@ -48,8 +49,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void addCategory(NewCategoryDTO dto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
 
         Category category = newCategoryMapper.toEntity(dto);
 
@@ -69,8 +70,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void updateCategory(CategoryDTO dto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
 
         Category category = updateCategoryMapper.toEntity(dto);
         User user =
