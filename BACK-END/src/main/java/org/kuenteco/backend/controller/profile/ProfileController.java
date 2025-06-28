@@ -14,7 +14,7 @@ import org.kuenteco.backend.dto.profile.NewProfileDTO;
 import org.kuenteco.backend.dto.profile.ProfileDetailDTO;
 import org.kuenteco.backend.dto.profile.UpdateProfileDTO;
 import org.kuenteco.backend.exception.ApiResponse;
-import org.kuenteco.backend.service.image.profile.ProfileImageService;
+import org.kuenteco.backend.service.image.ImageService;
 import org.kuenteco.backend.service.profile.ProfileService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class ProfileController {
     private final ProfileService profileService;
-    private final ProfileImageService imageService;
+    private final ImageService imageService;
 
     @GetMapping
     public ResponseEntity<?> getAllProfiles(HttpServletRequest request) {
@@ -106,12 +106,10 @@ public class ProfileController {
 
     @PostMapping("/image/add")
     public ResponseEntity<?> uploadImage(
-            @RequestParam("image") MultipartFile image,
-            HttpServletRequest request,
-            HttpServletResponse response)
+            @RequestParam("image") MultipartFile image, HttpServletRequest request)
             throws IOException {
 
-        ImageDTO imageDTO = imageService.saveImage(image, request, response);
+        ImageDTO imageDTO = imageService.saveImage(image);
         return new ResponseEntity<>(
                 ApiResponse.ok("Imagen Guardada", imageDTO, request.getRequestURI()),
                 HttpStatus.CREATED);
@@ -119,22 +117,19 @@ public class ProfileController {
 
     @PatchMapping("/image/update")
     public ResponseEntity<?> updateImage(
-            @RequestParam("image") MultipartFile image,
-            HttpServletRequest request,
-            HttpServletResponse response)
+            @RequestParam("image") MultipartFile image, HttpServletRequest request)
             throws IOException {
 
-        ImageDTO imageDTO = imageService.updateImage(image, request, response);
+        ImageDTO imageDTO = imageService.updateImage(image);
         return new ResponseEntity<>(
                 ApiResponse.ok("Imagen Actualizada", imageDTO, request.getRequestURI()),
                 HttpStatus.OK);
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteImage(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+    public ResponseEntity<?> deleteImage(HttpServletResponse response) throws IOException {
 
-        imageService.deleteImage(request, response);
+        imageService.deleteImage(response);
         return ResponseEntity.noContent().build();
     }
 }

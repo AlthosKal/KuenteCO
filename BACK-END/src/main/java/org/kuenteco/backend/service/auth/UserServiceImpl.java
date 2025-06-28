@@ -10,7 +10,7 @@ import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.mapper.auth.UserDetailMapper;
 import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
-import org.kuenteco.backend.service.image.auth.UserImageService;
+import org.kuenteco.backend.service.image.ImageService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
     private final SlaveUserRepository slaveUserRepository;
     private final MasterUserRepository masterUserRepository;
-    private final UserImageService imageService;
+    private final ImageService imageService;
     private final UserDetailMapper userDetailMapper;
 
     @Override

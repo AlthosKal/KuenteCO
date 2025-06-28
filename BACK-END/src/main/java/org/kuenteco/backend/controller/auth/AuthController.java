@@ -12,7 +12,7 @@ import org.kuenteco.backend.exception.ApiResponse;
 import org.kuenteco.backend.service.auth.AuthService;
 import org.kuenteco.backend.service.auth.SendgridService;
 import org.kuenteco.backend.service.auth.UserService;
-import org.kuenteco.backend.service.image.auth.UserImageService;
+import org.kuenteco.backend.service.image.ImageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class AuthController implements AuthResource {
     private final UserService userService;
     private final AuthService authService;
-    private final UserImageService imageService;
+    private final ImageService imageService;
     private final SendgridService sendgridService;
 
     @GetMapping("/user/details")
@@ -106,13 +106,6 @@ public class AuthController implements AuthResource {
     @PatchMapping("/change-password")
     public ResponseEntity<?> changePassword(
             @Valid @RequestBody ChangePasswordDTO dto, HttpServletRequest request) {
-        if (dto.getCode() == null || dto.getCode().trim().isEmpty()) {
-            log.error("Error: Código de verificación vació");
-            return new ResponseEntity<>(
-                    ApiResponse.error(
-                            "Código de verificación es requerido", request.getRequestURI()),
-                    HttpStatus.BAD_REQUEST);
-        }
         String message = authService.changePasswordWithVerification(dto);
         log.info("Contraseña actualizada correctamente");
         return new ResponseEntity<>(
@@ -136,12 +129,10 @@ public class AuthController implements AuthResource {
 
     @PostMapping("/user/image/add")
     public ResponseEntity<?> uploadImage(
-            @RequestParam("image") MultipartFile image,
-            HttpServletRequest request,
-            HttpServletResponse response)
+            @RequestParam("image") MultipartFile image, HttpServletRequest request)
             throws IOException {
 
-        ImageDTO imageDTO = imageService.saveImage(image, request, response);
+        ImageDTO imageDTO = imageService.saveImage(image);
         return new ResponseEntity<>(
                 ApiResponse.ok("Imagen Guardada", imageDTO, request.getRequestURI()),
                 HttpStatus.CREATED);
@@ -149,22 +140,19 @@ public class AuthController implements AuthResource {
 
     @PatchMapping("/user/image/update")
     public ResponseEntity<?> updateImage(
-            @RequestParam("image") MultipartFile image,
-            HttpServletRequest request,
-            HttpServletResponse response)
+            @RequestParam("image") MultipartFile image, HttpServletRequest request)
             throws IOException {
 
-        ImageDTO imageDTO = imageService.updateImage(image, request, response);
+        ImageDTO imageDTO = imageService.updateImage(image);
         return new ResponseEntity<>(
                 ApiResponse.ok("Imagen Actualizada", imageDTO, request.getRequestURI()),
                 HttpStatus.OK);
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteImage(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+    public ResponseEntity<?> deleteImage(HttpServletResponse response) throws IOException {
 
-        imageService.deleteImage(request, response);
+        imageService.deleteImage(response);
         return ResponseEntity.noContent().build();
     }
 }

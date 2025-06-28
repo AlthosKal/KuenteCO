@@ -470,9 +470,7 @@ public interface AuthResource {
             })
     @PostMapping("/user/image/add")
     ResponseEntity<?> uploadImage(
-            @RequestParam("image") MultipartFile image,
-            HttpServletRequest request,
-            HttpServletResponse response)
+            @RequestParam("image") MultipartFile image, HttpServletRequest request)
             throws IOException;
 
     @Operation(
@@ -512,9 +510,7 @@ public interface AuthResource {
                                         example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."))
             })
     ResponseEntity<?> updateImage(
-            @RequestParam("image") MultipartFile image,
-            HttpServletRequest request,
-            HttpServletResponse response)
+            @RequestParam("image") MultipartFile image, HttpServletRequest request)
             throws IOException;
 
     @Operation(
@@ -538,8 +534,7 @@ public interface AuthResource {
                                         type = "string",
                                         example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."))
             })
-    ResponseEntity<?> deleteImage(HttpServletRequest request, HttpServletResponse response)
-            throws IOException;
+    ResponseEntity<?> deleteImage(HttpServletResponse response) throws IOException;
 
     @Operation(
             description = "Recupera los datos del usuario actualmente autenticado",

@@ -6,7 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.service.auth.TokenBlacklistService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +27,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
         String email = null;
-        String jwt = null;
+        String jwt;
         try {
             jwt = getJWT(request);
             if (jwt != null) {
@@ -57,16 +59,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            log.error(
-                    "JWT expired at {}. Current time: {}, a difference of {} milliseconds. Allowed clock skew: {} milliseconds.",
-                    e.getClaims().getExpiration(),
-                    new Date(),
-                    new Date().getTime() - e.getClaims().getExpiration().getTime(),
-                    0);
-            // No establecer autenticación, dejará que el endpoint protegido devuelva 401
+            log.warn("JWT expirado para token emitido: {}", e.getClaims().getId());
+            writeUnauthorizedResponse(response, "Token expirado");
+            return;
         } catch (Exception e) {
-            log.error("Error processing JWT: {}", e.getMessage());
+            log.error("Error procesando JWT: {}", e.getMessage());
+            writeUnauthorizedResponse(response, "Token inválido o error interno");
+            return;
         }
+
         filterChain.doFilter(request, response);
     }
 
@@ -80,5 +81,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Si no está en el header, intentar obtener de cookie
         Cookie cookie = WebUtils.getCookie(request, "jwt");
         return cookie != null ? cookie.getValue() : null;
+    }
+
+    private void writeUnauthorizedResponse(HttpServletResponse response, String message)
+            throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.getWriter().write(String.format("{\"error\":\"%s\"}", message));
     }
 }

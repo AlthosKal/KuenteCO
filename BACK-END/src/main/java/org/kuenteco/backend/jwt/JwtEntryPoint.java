@@ -1,6 +1,5 @@
 package org.kuenteco.backend.jwt;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -13,7 +12,7 @@ public class JwtEntryPoint implements AuthenticationEntryPoint {
             HttpServletRequest request,
             HttpServletResponse response,
             AuthenticationException authException)
-            throws IOException, ServletException {
+            throws IOException {
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "not authorized");
     }
 }
