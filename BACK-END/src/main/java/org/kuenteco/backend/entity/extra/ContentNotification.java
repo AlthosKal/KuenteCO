@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ContentNotification {
-    private String title;
     private String body;
     private String date;
 }

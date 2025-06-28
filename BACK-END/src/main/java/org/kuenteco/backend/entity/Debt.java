@@ -22,10 +22,6 @@ public class Debt {
     @JoinColumn(name = "id_user", unique = true)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "id_transaction")
-    private Transaction transaction;
-
     private String name;
 
     @Column(name = "total_amount")

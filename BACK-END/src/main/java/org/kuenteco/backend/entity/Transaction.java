@@ -40,6 +40,10 @@ public class Transaction {
     @JoinColumn(name = "id_budget")
     private Budget budget;
 
+    @ManyToOne
+    @JoinColumn(name = "id_debt")
+    private Debt debt;
+
     private BigDecimal amount;
 
     @Column(name = "transaction_date")

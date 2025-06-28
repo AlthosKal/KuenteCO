@@ -14,8 +14,9 @@ public interface UpdateTransactionMapper {
         @Mapping(target = "user", ignore = true),
         @Mapping(target = "transactionDate", ignore = true),
         // Mapear solo los IDs, las entidades completas se resuelven en el servicio
-        @Mapping(target = "category", ignore = true),
-        @Mapping(target = "budget", ignore = true)
+        @Mapping(target = "category.id", source = "categoryId"),
+        @Mapping(target = "budget.id", source = "budgetId"),
+        @Mapping(target = "debt.id", source = "debtId"),
     })
     Transaction toEntity(UpdateTransactionDTO dto);
 }

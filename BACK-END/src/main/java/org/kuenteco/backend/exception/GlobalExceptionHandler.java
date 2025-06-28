@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleProfileException(
             AuthException ex, HttpServletRequest request) {
         log.warn("Error de al listar los perfiles: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }
 
@@ -105,7 +105,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleSendgridException(
             AuthException ex, HttpServletRequest request) {
         log.warn("Error de al enviar correo: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }
 
@@ -113,7 +113,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleSubscriptionException(
             AuthException ex, HttpServletRequest request) {
         log.warn("Error con el servicio de Subscripción: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }
 
@@ -133,30 +133,38 @@ public class GlobalExceptionHandler {
             UsernameNotFoundException ex, HttpServletRequest request) {
         log.warn("Intento de autenticación fallido (Usuarío no encontrado): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ApiResponse.error("Credenciales inválidas", request.getRequestURI()));
+                .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }
 
     @ExceptionHandler(CategoryException.class)
     public ResponseEntity<ApiResponse<Void>> handleCategoryException(
             UsernameNotFoundException ex, HttpServletRequest request) {
         log.warn("Error con el servicio de Rubros: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ApiResponse.error("Credenciales inválidas", request.getRequestURI()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }
 
     @ExceptionHandler(BudgetException.class)
     public ResponseEntity<ApiResponse<Void>> handleBudgetException(
             UsernameNotFoundException ex, HttpServletRequest request) {
         log.warn("Error con el servicio de Presupuestos: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ApiResponse.error("Credenciales inválidas", request.getRequestURI()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }
 
     @ExceptionHandler(DebtException.class)
     public ResponseEntity<ApiResponse<Void>> handleDebtException(
             UsernameNotFoundException ex, HttpServletRequest request) {
         log.warn("Error con el servicio de Deudas: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ApiResponse.error("Credenciales inválidas", request.getRequestURI()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
+    }
+
+    @ExceptionHandler(NotificationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNotificationException(
+            UsernameNotFoundException ex, HttpServletRequest request) {
+        log.warn("Error con el servicio de Notificaciones: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }
 }

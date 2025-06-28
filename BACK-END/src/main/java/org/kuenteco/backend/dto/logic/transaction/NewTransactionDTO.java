@@ -13,6 +13,7 @@ import org.kuenteco.backend.entity.extra.DescriptionTransaction;
 public class NewTransactionDTO {
     @NotNull private Integer categoryId;
     @NotNull private Integer budgetId;
+    @NotNull private Integer debtId;
     @NotNull private DescriptionTransaction description;
     @NotNull private BigDecimal amount;
 }

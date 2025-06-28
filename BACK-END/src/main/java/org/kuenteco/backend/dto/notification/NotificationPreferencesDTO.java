@@ -1,4 +1,4 @@
-package org.kuenteco.backend.dto.logic.notification;
+package org.kuenteco.backend.dto.notification;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

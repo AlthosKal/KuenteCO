@@ -18,10 +18,6 @@ public class DebtDTO {
     @NotNull(message = "El ID de la deuda es obligatorio")
     private Integer id;
 
-    private String userId;
-
-    private Integer transactionId;
-
     @NotBlank(message = "El nombre de la deuda es obligatorio")
     private String name;
 

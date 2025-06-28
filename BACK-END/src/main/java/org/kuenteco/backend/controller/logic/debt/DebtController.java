@@ -52,8 +52,8 @@ public class DebtController {
     }
 
     @GetMapping("/expiring-soon")
-    public ResponseEntity<?> getDebtsExpiringIn3Days(
-            @Valid @RequestBody Integer days, HttpServletRequest request) {
+    public ResponseEntity<?> getDebtsExpiringInDays(
+            @RequestParam("days") Integer days, HttpServletRequest request) {
         Object debts = debtService.getDebtsExpiringInDays(days);
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -63,7 +63,7 @@ public class DebtController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/total-pending/user/")
+    @GetMapping("/total-pending")
     public ResponseEntity<?> getTotalPendingAmount(HttpServletRequest request) {
         BigDecimal totalPending = debtService.getTotalPendingAmount();
         return new ResponseEntity<>(
@@ -84,7 +84,7 @@ public class DebtController {
     }
 
     @PostMapping("/batch/add")
-    public ResponseEntity<?> createDebts(
+    public ResponseEntity<?> addDebts(
             @Valid @RequestBody List<NewDebtDTO> dto, HttpServletRequest request) {
         dto.forEach(debtService::addDebt);
         return new ResponseEntity<>(
@@ -141,11 +141,11 @@ public class DebtController {
 
     @DeleteMapping("/batch")
     public ResponseEntity<?> deleteDebts(
-            @RequestParam List<Integer> ids, HttpServletRequest request) {
-        ids.forEach(debtService::deleteDebt);
+            @RequestParam List<Integer> id, HttpServletRequest request) {
+        id.forEach(debtService::deleteDebt);
         return new ResponseEntity<>(
                 ApiResponse.ok(
-                        String.format("%d deudas eliminadas correctamente", ids.size()),
+                        String.format("%d deudas eliminadas correctamente", id.size()),
                         null,
                         request.getRequestURI()),
                 HttpStatus.NO_CONTENT);

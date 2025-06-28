@@ -34,6 +34,8 @@ public class Notification {
     @Column(name = "date_send")
     private Timestamp dateSend;
 
+    private String title;
+
     @Type(JsonBinaryType.class)
     @Column(columnDefinition = "jsonb")
     private ContentNotification content;

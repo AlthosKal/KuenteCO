@@ -1,4 +1,4 @@
-package org.kuenteco.backend.dto.logic.notification;
+package org.kuenteco.backend.dto.notification;
 
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -10,14 +10,19 @@ import org.kuenteco.backend.entity.extra.ContentNotification;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewNotificationDTO {
+public class NotificationDTO {
 
-    private String userId;
+    @NotNull(message = "El ID de la notificación es obligatorio")
+    private Integer id;
 
-    private Integer profileId;
+    /*
+        private String userId;
 
+        private Integer profileId;
+    */
     @NotNull(message = "El contenido de la notificación es obligatorio")
     private ContentNotification content;
 
-    private Timestamp dateSend = new Timestamp(System.currentTimeMillis());
+    @NotNull(message = "La fecha de envío es obligatoria")
+    private Timestamp dateSend;
 }

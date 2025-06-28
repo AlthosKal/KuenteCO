@@ -65,7 +65,7 @@ public class TransactionServiceImpl implements TransactionService {
         // Si no es usuario, busca como perfil
         Profile profile = slaveProfileRepository.findByEmail(email).orElse(null);
         if (profile != null) {
-            log.info("Perfil de negocio encontrado: {}", email);
+            log.info("Perfil encontrado: {}", email);
             return getProfileTransactions(profile);
         }
 

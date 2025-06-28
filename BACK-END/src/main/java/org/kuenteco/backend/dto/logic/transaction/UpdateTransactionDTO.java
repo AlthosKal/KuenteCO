@@ -14,6 +14,7 @@ public class UpdateTransactionDTO {
     @NotNull private Integer id;
     @NotNull private Integer categoryId;
     @NotNull private Integer budgetId;
+    @NotNull private Integer debtId;
     @NotNull private DescriptionTransaction description;
     @NotNull private BigDecimal amount;
 }

@@ -3,6 +3,8 @@ package org.kuenteco.backend.service.logic.debt;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,11 +67,11 @@ public class DebtServiceImpl implements DebtService {
                         .findByEmail(email)
                         .orElseThrow(() -> new DebtException("Usuarío no encontrado " + email));
 
-        state = slaveDebtRepository.getDebtsByStateAndUser(state, user);
-        if (state.describeConstable().isEmpty()) {
+        List<Debt> debts = slaveDebtRepository.findByStateAndUser(state, user);
+        if (debts.isEmpty()) {
             return "No tienes deudas registradas";
         }
-        return debtsByStateMapper.toDtoList(state);
+        return debtsByStateMapper.toDtoList(debts);
     }
 
     @Override
@@ -102,7 +104,16 @@ public class DebtServiceImpl implements DebtService {
                         .findByEmail(email)
                         .orElseThrow(() -> new DebtException("Usuario no encontrado " + email));
 
-        List<Debt> debts = slaveDebtRepository.findDebtsByExpirationDate_DayAndUser(days, user);
+        // Calcular la fecha objetivo a partir de hoy + days
+        LocalDate today = LocalDate.now();
+        LocalDate targetDate = today.plusDays(days);
+
+        Timestamp startOfDay = Timestamp.valueOf(targetDate.atStartOfDay());
+        Timestamp endOfDay = Timestamp.valueOf(targetDate.atTime(LocalTime.MAX));
+
+        List<Debt> debts =
+                slaveDebtRepository.findByUserAndExpirationDateBetween(user, startOfDay, endOfDay);
+
         if (debts.isEmpty()) {
             return "No tienes deudas por expirar a la fecha registrada";
         }
@@ -117,7 +128,12 @@ public class DebtServiceImpl implements DebtService {
                 slaveUserRepository
                         .findByEmail(email)
                         .orElseThrow(() -> new DebtException("Usuario no encontrado " + email));
-        return slaveDebtRepository.getTotalPendingAmountByUser(user);
+        // Aquí se especifica el estado deseado para el cálculo
+        BigDecimal total =
+                slaveDebtRepository.sumPendingAmountByStateAndUser(StateDebt.ACTIVE, user);
+
+        // Evitar que devuelva null cuando no hay deudas activas, se devuelve BigDecimal.ZERO
+        return total != null ? total : BigDecimal.ZERO;
     }
 
     @Transactional
