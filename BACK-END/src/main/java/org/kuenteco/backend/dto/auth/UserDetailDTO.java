@@ -17,6 +17,5 @@ public class UserDetailDTO {
     private String username;
     private String email;
     private UserType type;
-    private RoleDetailDTO role;
     private State state;
 }

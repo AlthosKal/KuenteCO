@@ -37,8 +37,6 @@ public class SlaveDataSourceConfig {
         slaveDataSource.setUrl(environment.getProperty("slave.datasource.url"));
         slaveDataSource.setUsername(environment.getProperty("slave.datasource.username"));
         slaveDataSource.setPassword(environment.getProperty("slave.datasource.password"));
-        slaveDataSource.setDriverClassName(
-                environment.getProperty("slave.datasource.driver-class-name"));
         return slaveDataSource;
     }
 
@@ -48,12 +46,6 @@ public class SlaveDataSourceConfig {
         log.info("Configurando entity Manager Factory para la replica");
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(
-                "hibernate.show_sql",
-                environment.getProperty("slave.jpa.properties.hibernate.show_sql", "false"));
-        properties.put(
-                "hibernate.format_sql",
-                environment.getProperty("slave.jpa.properties.hibernate.format_sql", "false"));
         properties.put("hibernate.hbm2ddl.auto", "none"); // Forzamos a none para el esclavo
 
         // Configuración explícita para modo sólo lectura

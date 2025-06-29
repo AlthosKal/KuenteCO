@@ -11,7 +11,13 @@ import lombok.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "exchange_rate")
+@Table(
+        name = "exchange_rate",
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "uk_exchange_rate_currencies",
+                    columnNames = {"base_currency", "target_currency"})
+        })
 public class ExchangeRate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

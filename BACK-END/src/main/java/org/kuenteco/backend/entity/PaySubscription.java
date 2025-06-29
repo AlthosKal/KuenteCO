@@ -2,7 +2,7 @@ package org.kuenteco.backend.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.*;
 import org.kuenteco.backend.entity.extra.PayMethodInfo;
 
@@ -25,7 +25,7 @@ public class PaySubscription {
     private BigDecimal amount;
 
     @Column(name = "pay_date")
-    private Timestamp payDate;
+    private LocalDateTime payDate;
 
     @Embedded private PayMethodInfo payMethod;
 }

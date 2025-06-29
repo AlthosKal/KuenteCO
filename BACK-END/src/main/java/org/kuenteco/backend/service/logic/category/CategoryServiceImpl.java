@@ -2,8 +2,7 @@ package org.kuenteco.backend.service.logic.category;
 
 import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
 
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +16,7 @@ import org.kuenteco.backend.mapper.logic.category.CategoryDetailMapper;
 import org.kuenteco.backend.mapper.logic.category.NewCategoryMapper;
 import org.kuenteco.backend.mapper.logic.category.UpdateCategoryMapper;
 import org.kuenteco.backend.repository.master.MasterCategoryRepository;
+import org.kuenteco.backend.repository.slave.SlaveBudgetRepository;
 import org.kuenteco.backend.repository.slave.SlaveCategoryRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.springframework.stereotype.Service;
@@ -31,6 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryDetailMapper categoryDetailMapper;
     private final UpdateCategoryMapper updateCategoryMapper;
     private final NewCategoryMapper newCategoryMapper;
+    private final SlaveBudgetRepository slaveBudgetRepository;
 
     @Override
     public Object getCategories() {
@@ -51,8 +52,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void addCategory(NewCategoryDTO dto) {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
-
-        Category category = newCategoryMapper.toEntity(dto);
+        Category category = prepareNewCategory(dto);
 
         User user =
                 slaveUserRepository
@@ -63,7 +63,7 @@ public class CategoryServiceImpl implements CategoryService {
         log.info("Registrando la categoria para: {}", email);
         category.setUser(user);
         if (dto.getStartDate() == null) {
-            category.setStartDate(Timestamp.from(Instant.now()));
+            category.setStartDate(LocalDateTime.now());
         }
         masterCategoryRepository.save(category);
     }
@@ -73,7 +73,7 @@ public class CategoryServiceImpl implements CategoryService {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
 
-        Category category = updateCategoryMapper.toEntity(dto);
+        Category category = prepareUpdateCategory(dto);
         User user =
                 slaveUserRepository
                         .findByEmail(email)
@@ -106,5 +106,32 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         return categoryDetailMapper.toDtoList(categories);
+    }
+
+    private Category prepareNewCategory(NewCategoryDTO dto) {
+        Category category = newCategoryMapper.toEntity(dto);
+        resolveBudget(dto.getBudgetId(), category);
+        return category;
+    }
+
+    private Category prepareUpdateCategory(CategoryDTO dto) {
+        Category category = updateCategoryMapper.toEntity(dto);
+        resolveBudget(dto.getBudgetId(), category);
+        return category;
+    }
+
+    private void resolveBudget(Integer budgetId, Category category) {
+        if (budgetId != null) {
+            category.setBudget(
+                    slaveBudgetRepository
+                            .findById(budgetId)
+                            .orElseThrow(
+                                    () ->
+                                            new CategoryException(
+                                                    "Budget no encontrado por el Id: "
+                                                            + budgetId)));
+        } else {
+            category.setBudget(null);
+        }
     }
 }

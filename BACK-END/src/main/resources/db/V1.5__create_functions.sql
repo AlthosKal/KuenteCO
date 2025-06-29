@@ -1,4 +1,4 @@
--- Extenciónes de PostgreSQL para la tarea programada y la ejecución de la solicitud HTTP
+-- Extenciones de PostgreSQL para la tarea programada y la ejecución de la solicitud HTTP
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 CREATE EXTENSION IF NOT EXISTS http;
 
@@ -107,6 +107,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Pruebas de las funciones y extensiones
 
-SELECT  update_exchange_rates();
+-- Pruebas de las funciones y extensiones
+--SELECT convert_currency(100, 'USD', 'EUR');
+
+--SELECT  update_exchange_rates();
+
+--SELECT * FROM cron.job;
+
+--SELECT  * FROM exchange_rate;
+
+--SELECT * FROM exchange_rate_logs;
+
+--ALTER TABLE exchange_rate ADD CONSTRAINT exchange_rate_unique UNIQUE (base_currency, target_currency);

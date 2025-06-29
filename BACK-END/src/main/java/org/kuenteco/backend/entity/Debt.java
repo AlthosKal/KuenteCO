@@ -2,7 +2,7 @@ package org.kuenteco.backend.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.*;
 import org.kuenteco.backend.enums.StateDebt;
 
@@ -19,7 +19,7 @@ public class Debt {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_user", unique = true)
+    @JoinColumn(name = "id_user")
     private User user;
 
     private String name;
@@ -31,10 +31,10 @@ public class Debt {
     private BigDecimal pendingAmount;
 
     @Column(name = "start_date")
-    private Timestamp startDate;
+    private LocalDateTime startDate;
 
     @Column(name = "expiration_date")
-    private Timestamp expirationDate;
+    private LocalDateTime expirationDate;
 
     @Enumerated(EnumType.STRING)
     private StateDebt state;

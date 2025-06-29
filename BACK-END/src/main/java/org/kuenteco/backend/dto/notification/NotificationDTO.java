@@ -1,7 +1,7 @@
 package org.kuenteco.backend.dto.notification;
 
 import jakarta.validation.constraints.NotNull;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,5 +24,5 @@ public class NotificationDTO {
     private ContentNotification content;
 
     @NotNull(message = "La fecha de envío es obligatoria")
-    private Timestamp dateSend;
+    private LocalDateTime dateSend;
 }

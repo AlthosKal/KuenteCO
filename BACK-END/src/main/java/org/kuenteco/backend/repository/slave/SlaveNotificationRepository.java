@@ -1,6 +1,6 @@
 package org.kuenteco.backend.repository.slave;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.kuenteco.backend.entity.Notification;
 import org.kuenteco.backend.entity.Profile;
@@ -20,10 +20,10 @@ public interface SlaveNotificationRepository extends JpaRepository<Notification,
     List<Notification> findByUserAndTitleContaining(User user, String contentTitle);
 
     List<Notification> findByUserAndDateSendBetween(
-            User user, Timestamp dateSendAfter, Timestamp dateSendBefore);
+            User user, LocalDateTime dateSendAfter, LocalDateTime dateSendBefore);
 
     List<Notification> findByProfileAfterAndDateSendBetween(
-            Profile profileAfter, Timestamp dateSendAfter, Timestamp dateSendBefore);
+            Profile profileAfter, LocalDateTime dateSendAfter, LocalDateTime dateSendBefore);
 
     List<Notification> findByProfileAndTitleContaining(Profile profile, String contentTitle);
 }

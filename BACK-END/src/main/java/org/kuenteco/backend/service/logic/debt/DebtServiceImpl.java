@@ -3,9 +3,8 @@ package org.kuenteco.backend.service.logic.debt;
 import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -88,7 +87,7 @@ public class DebtServiceImpl implements DebtService {
 
         List<Debt> debt =
                 slaveDebtRepository.getDebtsByExpirationDateBeforeAndUser(
-                        Timestamp.from(Instant.now()), user);
+                        LocalDateTime.now(), user);
         if (debt.isEmpty()) {
             return "No tienes deudas atrasadas";
         }
@@ -109,8 +108,8 @@ public class DebtServiceImpl implements DebtService {
         LocalDate today = LocalDate.now();
         LocalDate targetDate = today.plusDays(days);
 
-        Timestamp startOfDay = Timestamp.valueOf(targetDate.atStartOfDay());
-        Timestamp endOfDay = Timestamp.valueOf(targetDate.atTime(LocalTime.MAX));
+        LocalDateTime startOfDay = targetDate.atStartOfDay();
+        LocalDateTime endOfDay = targetDate.atTime(LocalTime.MAX);
 
         List<Debt> debts =
                 slaveDebtRepository.findByUserAndExpirationDateBetween(user, startOfDay, endOfDay);
@@ -148,7 +147,7 @@ public class DebtServiceImpl implements DebtService {
                         .orElseThrow(() -> new DebtException("Usuario no encontrado " + email));
 
         // Validar fechas
-        if (dto.getExpirationDate().before(dto.getStartDate())) {
+        if (dto.getExpirationDate().isBefore(dto.getStartDate())) {
             throw new DebtException(
                     "La fecha de vencimiento no puede ser anterior a la fecha de inicio");
         }

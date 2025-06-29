@@ -2,8 +2,7 @@ package org.kuenteco.backend.service.logic.category;
 
 import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
 
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +75,8 @@ public class CategoryEnrollmentServiceImpl implements CategoryEnrollmentService 
                         .orElseThrow(
                                 () ->
                                         new CategoryException(
-                                                "Categoría con encontrada: " + categoryId));
+                                                "Categoría no encontrada por el Id: "
+                                                        + categoryId));
 
         boolean alreadyEnrolled =
                 slaveCategoryEnrollmentRepository.existsByCategoryIdAndProfile_Id(
@@ -90,7 +90,7 @@ public class CategoryEnrollmentServiceImpl implements CategoryEnrollmentService 
                         .user(user)
                         .profile(profile)
                         .category(category)
-                        .enrollmentDate(Timestamp.from(Instant.now()))
+                        .enrollmentDate(LocalDateTime.now())
                         .build();
         masterCategoryEnrollmentRepository.save(categoryEnrollment);
 

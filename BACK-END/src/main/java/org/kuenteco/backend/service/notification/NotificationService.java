@@ -1,11 +1,11 @@
 package org.kuenteco.backend.service.notification;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public interface NotificationService {
     Object getAllNotifications();
 
-    Object getNotificationsByDateRange(Timestamp fromDate, Timestamp toDate);
+    Object getNotificationsByDateRange(LocalDateTime fromDate, LocalDateTime toDate);
 
     Object searchNotifications(String keyword);
 }

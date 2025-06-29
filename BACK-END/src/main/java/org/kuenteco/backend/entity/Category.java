@@ -2,7 +2,7 @@ package org.kuenteco.backend.entity;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.*;
 import org.hibernate.annotations.Type;
 import org.kuenteco.backend.entity.extra.DescriptionCategory;
@@ -20,7 +20,7 @@ public class Category {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_user", unique = true)
+    @JoinColumn(name = "id_user")
     private User user;
 
     @OneToOne
@@ -32,8 +32,8 @@ public class Category {
     private DescriptionCategory description;
 
     @Column(name = "start_date")
-    private Timestamp startDate;
+    private LocalDateTime startDate;
 
     @Column(name = "finish_date")
-    private Timestamp finishDate;
+    private LocalDateTime finishDate;
 }

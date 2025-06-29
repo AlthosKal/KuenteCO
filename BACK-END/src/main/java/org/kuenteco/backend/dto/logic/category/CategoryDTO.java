@@ -1,11 +1,10 @@
 package org.kuenteco.backend.dto.logic.category;
 
 import jakarta.validation.constraints.NotBlank;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.kuenteco.backend.dto.logic.budget.BudgetDTO;
 import org.kuenteco.backend.entity.extra.DescriptionCategory;
 
 @Data
@@ -13,8 +12,8 @@ import org.kuenteco.backend.entity.extra.DescriptionCategory;
 @AllArgsConstructor
 public class CategoryDTO {
     @NotBlank private Integer id;
-    @NotBlank private BudgetDTO budget;
+    @NotBlank private Integer budgetId;
     @NotBlank private DescriptionCategory description;
-    private Timestamp startDate;
-    private Timestamp finishDate;
+    private LocalDateTime startDate;
+    private LocalDateTime finishDate;
 }

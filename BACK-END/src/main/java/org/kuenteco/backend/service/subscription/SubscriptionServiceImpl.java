@@ -1,6 +1,7 @@
 package org.kuenteco.backend.service.subscription;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import lombok.RequiredArgsConstructor;
 import org.kuenteco.backend.dto.subscription.AddSubscriptionDTO;
@@ -70,14 +71,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         subscription.setType(addSubscriptionDTO.getType());
 
         // Establecer fechas de inicio y expiración
-        Timestamp now = new Timestamp(System.currentTimeMillis());
+        LocalDateTime now = LocalDateTime.now();
         subscription.setStartDate(now);
 
         // Calcular fecha de expiración (un mes)
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(now.getTime());
+        calendar.setTimeInMillis(now.getDayOfMonth());
         calendar.add(Calendar.MONTH, 1);
-        Timestamp expirationDate = new Timestamp(calendar.getTimeInMillis());
+        LocalDateTime expirationDate = LocalDateTime.now();
         subscription.setExpirationDate(expirationDate);
 
         // Establecer estado activo

@@ -2,8 +2,7 @@ package org.kuenteco.backend.service.logic.budget;
 
 import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
 
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,7 +72,8 @@ public class BudgetEnrollmentServiceImpl implements BudgetEnrollmentService {
                         .orElseThrow(
                                 () ->
                                         new BudgetException(
-                                                "Presupuesto no encontrado: " + budgetId));
+                                                "Presupuesto no encontrado por el Id: "
+                                                        + budgetId));
 
         boolean alreadyEnrolled =
                 slaveBudgetEnrollmentRepository.existsByBudget_IdAndProfile_Id(budgetId, profileId);
@@ -86,7 +86,7 @@ public class BudgetEnrollmentServiceImpl implements BudgetEnrollmentService {
                         .user(user)
                         .profile(profile)
                         .budget(budget)
-                        .enrollmentDate(Timestamp.from(Instant.now()))
+                        .enrollmentDate(LocalDateTime.now())
                         .build();
         masterBudgetEnrollmentRepository.save(budgetEnrollment);
 

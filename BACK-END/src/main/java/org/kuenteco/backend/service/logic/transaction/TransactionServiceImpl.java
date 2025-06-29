@@ -2,8 +2,7 @@ package org.kuenteco.backend.service.logic.transaction;
 
 import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
 
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,11 +22,7 @@ import org.kuenteco.backend.mapper.logic.transaction.ProfileWithTransactionsMapp
 import org.kuenteco.backend.mapper.logic.transaction.TransactionDetailMapper;
 import org.kuenteco.backend.mapper.logic.transaction.UpdateTransactionMapper;
 import org.kuenteco.backend.repository.master.MasterTransactionRepository;
-import org.kuenteco.backend.repository.slave.SlaveBudgetRepository;
-import org.kuenteco.backend.repository.slave.SlaveCategoryRepository;
-import org.kuenteco.backend.repository.slave.SlaveProfileRepository;
-import org.kuenteco.backend.repository.slave.SlaveTransactionRepository;
-import org.kuenteco.backend.repository.slave.SlaveUserRepository;
+import org.kuenteco.backend.repository.slave.*;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -44,6 +39,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final NewTransactionMapper newTransactionMapper;
     private final UpdateTransactionMapper updateTransactionMapper;
     private final ProfileWithTransactionsMapper profileWithTransactionsMapper;
+    private final SlaveDebtRepository slaveDebtRepository;
 
     @Override
     public Object getTransactions() {
@@ -224,19 +220,21 @@ public class TransactionServiceImpl implements TransactionService {
 
     private Transaction prepareNewTransaction(NewTransactionDTO dto) {
         Transaction transaction = newTransactionMapper.toEntity(dto);
-        resolveCategoryAndBudget(dto.getCategoryId(), dto.getBudgetId(), transaction);
-        transaction.setTransactionDate(Timestamp.from(Instant.now()));
+        resolveCategoryAndBudget(
+                dto.getCategoryId(), dto.getBudgetId(), dto.getDebtId(), transaction);
+        transaction.setTransactionDate(LocalDateTime.now());
         return transaction;
     }
 
     private Transaction prepareUpdateTransaction(UpdateTransactionDTO dto) {
         Transaction transaction = updateTransactionMapper.toEntity(dto);
-        resolveCategoryAndBudget(dto.getCategoryId(), dto.getBudgetId(), transaction);
+        resolveCategoryAndBudget(
+                dto.getCategoryId(), dto.getBudgetId(), dto.getDebtId(), transaction);
         return transaction;
     }
 
     private void resolveCategoryAndBudget(
-            Integer categoryId, Integer budgetId, Transaction transaction) {
+            Integer categoryId, Integer budgetId, Integer debtId, Transaction transaction) {
         if (categoryId != null) {
             transaction.setCategory(
                     slaveCategoryRepository
@@ -246,6 +244,8 @@ public class TransactionServiceImpl implements TransactionService {
                                             new TransactionException(
                                                     "Categoría no encontrada con ID: "
                                                             + categoryId)));
+        } else {
+            transaction.setCategory(null);
         }
 
         if (budgetId != null) {
@@ -257,6 +257,19 @@ public class TransactionServiceImpl implements TransactionService {
                                             new TransactionException(
                                                     "Presupuesto no encontrado con ID: "
                                                             + budgetId)));
+        } else {
+            transaction.setBudget(null);
+        }
+        if (debtId != null) {
+            transaction.setDebt(
+                    slaveDebtRepository
+                            .findById(debtId)
+                            .orElseThrow(
+                                    () ->
+                                            new TransactionException(
+                                                    "Deuda no encontrado con ID: " + debtId)));
+        } else {
+            transaction.setDebt(null);
         }
     }
 }

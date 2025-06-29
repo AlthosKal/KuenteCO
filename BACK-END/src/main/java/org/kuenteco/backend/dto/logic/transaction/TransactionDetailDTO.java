@@ -1,7 +1,7 @@
 package org.kuenteco.backend.dto.logic.transaction;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,6 +17,6 @@ public class TransactionDetailDTO {
     private Integer budgetId;
     private TransactionType type;
     private BigDecimal amount;
-    private Timestamp timestamp;
+    private LocalDateTime timestamp;
     private DescriptionTransaction description;
 }

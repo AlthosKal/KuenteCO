@@ -5,7 +5,7 @@
 		"description": "Collección de Postman para testear los controladores del backend Kuenteco",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "40305044",
-		"_collection_link": "https://kuenteco.postman.co/workspace/970c5daf-2edb-4c5d-8e8d-7fd78229512b/collection/40305044-676caaa8-5ce3-4e6d-9269-121184db6302?action=share&source=collection_link&creator=40305044"
+		"_collection_link": "https://kuenteco.postman.co/workspace/KuenteCO-Workspace~970c5daf-2edb-4c5d-8e8d-7fd78229512b/collection/40305044-676caaa8-5ce3-4e6d-9269-121184db6302?action=share&source=collection_link&creator=40305044"
 	},
 	"item": [
 		{
@@ -160,7 +160,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"agudelocastanoyeferson270@gmail.com\",\n    \"code\": \"075575\"\n}"
+							"raw": "{\n    \"email\": \"agudelocastanoyeferson270@gmail.com\",\n    \"code\": \"152886\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/v1/auth/activate-user",
@@ -746,7 +746,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/v1/notification/range?fromDate=2024-01-01 00:00:00&toDate=2024-12-31 23:59:59",
+							"raw": "{{base_url}}/v1/notification/range?fromDate=2024-01-01T00:00:00&toDate=2024-12-31T23:59:59",
 							"host": [
 								"{{base_url}}"
 							],
@@ -758,11 +758,11 @@
 							"query": [
 								{
 									"key": "fromDate",
-									"value": "2024-01-01 00:00:00"
+									"value": "2024-01-01T00:00:00"
 								},
 								{
 									"key": "toDate",
-									"value": "2024-12-31 23:59:59"
+									"value": "2024-12-31T23:59:59"
 								}
 							]
 						}
@@ -1181,7 +1181,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"budget\": {\n    \"id\": 1,\n    \"name\": \"Presupuesto Mensual\",\n    \"totalBudget\": 5000.00,\n    \"remainingBudget\": 4500.00\n  },\n  \"description\": {\n    \"name\": \"Alimentación\",\n    \"assignedBudget\": 1500.00,\n    \"state\": \"ACTIVE\"\n  },\n  \"startDate\": \"2024-01-01 00:00:00\",\n  \"finishDate\": \"2024-01-31 23:59:59\"\n}"
+							"raw": "{\n  \"budgetId\": null,\n  \"description\": {\n    \"name\": \"Alimentación\",\n    \"assignedBudget\": 1500.00,\n    \"state\": \"ACTIVE\"\n  },\n  \"startDate\": \"2024-01-01T00:00:00\",\n  \"finishDate\": \"2024-01-31T23:59:59\"\n}\n"
 						},
 						"url": {
 							"raw": "{{base_url}}/v1/category/add",
@@ -1214,7 +1214,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n  {\n    \"budget\": {\n      \"id\": 1,\n      \"name\": \"Presupuesto Mensual\",\n      \"totalBudget\": 5000.00,\n      \"remainingBudget\": 4500.00\n    },\n    \"description\": {\n      \"name\": \"Transporte\",\n      \"assignedBudget\": 800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01 00:00:00\",\n    \"finishDate\": \"2024-01-31 23:59:59\"\n  },\n  {\n    \"budget\": {\n      \"id\": 1,\n      \"name\": \"Presupuesto Mensual\",\n      \"totalBudget\": 5000.00,\n      \"remainingBudget\": 4500.00\n    },\n    \"description\": {\n      \"name\": \"Entretenimiento\",\n      \"assignedBudget\": 500.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01 00:00:00\",\n    \"finishDate\": \"2024-01-31 23:59:59\"\n  }\n]"
+							"raw": "[\n  {\n    \"budgetId\": null,\n    \"description\": {\n      \"name\": \"Transporte\",\n      \"assignedBudget\": 800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": null,\n    \"description\": {\n      \"name\": \"Entretenimiento\",\n      \"assignedBudget\": 500.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  }\n]"
 						},
 						"url": {
 							"raw": "{{base_url}}/v1/category/batch/add",
@@ -1248,7 +1248,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"id\": 1,\n  \"budget\": {\n    \"id\": 1,\n    \"name\": \"Presupuesto Mensual\",\n    \"totalBudget\": 5000.00,\n    \"remainingBudget\": 4200.00\n  },\n  \"description\": {\n    \"name\": \"Alimentación y Comestibles\",\n    \"assignedBudget\": 1800.00,\n    \"state\": \"ACTIVE\"\n  },\n  \"startDate\": \"2024-01-01 00:00:00\",\n  \"finishDate\": \"2024-01-31 23:59:59\"\n}"
+							"raw": "{\n  \"id\": 1,\n  \"budget\": {\n    \"id\": 1,\n    \"name\": \"Presupuesto Mensual\",\n    \"totalBudget\": 5000.00,\n    \"remainingBudget\": 4200.00\n  },\n  \"description\": {\n    \"name\": \"Alimentación y Comestibles\",\n    \"assignedBudget\": 1800.00,\n    \"state\": \"ACTIVE\"\n  },\n  \"startDate\": \"2024-01-01T00:00:00\",\n  \"finishDate\": \"2024-01-31T23:59:59\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/v1/category/update",
@@ -1281,7 +1281,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n  {\n    \"id\": 1,\n    \"budget\": {\n      \"id\": 1,\n      \"name\": \"Presupuesto Mensual\",\n      \"totalBudget\": 5000.00,\n      \"remainingBudget\": 4200.00\n    },\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01 00:00:00\",\n    \"finishDate\": \"2024-01-31 23:59:59\"\n  }\n]"
+							"raw": "[\n  {\n    \"id\": 1,\n    \"budgetId\": null,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  }\n]"
 						},
 						"url": {
 							"raw": "{{base_url}}/v1/category/batch/update",
@@ -1573,7 +1573,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"transactionId\": 1,\n  \"name\": \"Préstamo Personal\",\n  \"totalAmount\": 10000.00,\n  \"pendingAmount\": 8500.00,\n  \"startDate\": \"2024-01-15 10:00:00\",\n  \"expirationDate\": \"2024-12-15 23:59:59\",\n  \"state\": \"ACTIVE\"\n}"
+							"raw": "{\n  \"transactionId\": 1,\n  \"name\": \"Préstamo Personal\",\n  \"totalAmount\": 10000.00,\n  \"pendingAmount\": 8500.00,\n  \"startDate\": \"2024-01-15T10:00:00\",\n  \"expirationDate\": \"2024-12-15T23:59:59\",\n  \"state\": \"ACTIVE\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/v1/debt/add",
@@ -1606,7 +1606,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n  {\n    \"transactionId\": 2,\n    \"name\": \"Tarjeta de Crédito\",\n    \"totalAmount\": 3500.00,\n    \"pendingAmount\": 2800.00,\n    \"startDate\": \"2024-01-01 00:00:00\",\n    \"expirationDate\": \"2024-03-01 23:59:59\",\n    \"state\": \"ACTIVE\"\n  },\n  {\n    \"transactionId\": 3,\n    \"name\": \"Préstamo Vehicular\",\n    \"totalAmount\": 25000.00,\n    \"pendingAmount\": 22000.00,\n    \"startDate\": \"2024-01-10 09:00:00\",\n    \"expirationDate\": \"2026-01-10 23:59:59\",\n    \"state\": \"ACTIVE\"\n  }\n]"
+							"raw": "[\n  {\n    \"transactionId\": 2,\n    \"name\": \"Tarjeta de Crédito\",\n    \"totalAmount\": 3500.00,\n    \"pendingAmount\": 2800.00,\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"expirationDate\": \"2024-03-01T23:59:59\",\n    \"state\": \"ACTIVE\"\n  },\n  {\n    \"transactionId\": 3,\n    \"name\": \"Préstamo Vehicular\",\n    \"totalAmount\": 25000.00,\n    \"pendingAmount\": 22000.00,\n    \"startDate\": \"2024-01-10T09:00:00\",\n    \"expirationDate\": \"2026-01-10T23:59:59\",\n    \"state\": \"ACTIVE\"\n  }\n]"
 						},
 						"url": {
 							"raw": "{{base_url}}/v1/debt/batch/add",
@@ -1640,7 +1640,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"id\": 1,\n  \"name\": \"Préstamo Personal Actualizado\",\n  \"totalAmount\": 10000.00,\n  \"pendingAmount\": 8000.00,\n  \"startDate\": \"2024-01-15 10:00:00\",\n  \"expirationDate\": \"2024-12-15 23:59:59\",\n  \"state\": \"ACTIVE\"\n}"
+							"raw": "{\n  \"id\": 1,\n  \"name\": \"Préstamo Personal Actualizado\",\n  \"totalAmount\": 10000.00,\n  \"pendingAmount\": 8000.00,\n  \"startDate\": \"2024-01-15T10:00:00\",\n  \"expirationDate\": \"2024-12-15T23:59:59\",\n  \"state\": \"ACTIVE\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/v1/debt/update",
@@ -1673,7 +1673,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n  {\n    \"id\": 1,\n    \"name\": \"Préstamo Personal - Cuota Enero\",\n    \"totalAmount\": 10000.00,\n    \"pendingAmount\": 7500.00,\n    \"startDate\": \"2024-01-15 10:00:00\",\n    \"expirationDate\": \"2024-12-15 23:59:59\",\n    \"state\": \"ACTIVE\"\n  }\n]"
+							"raw": "[\n  {\n    \"id\": 1,\n    \"name\": \"Préstamo Personal - Cuota Enero\",\n    \"totalAmount\": 10000.00,\n    \"pendingAmount\": 7500.00,\n    \"startDate\": \"2024-01-15T10:00:00\",\n    \"expirationDate\": \"2024-12-15T23:59:59\",\n    \"state\": \"ACTIVE\"\n  }\n]"
 						},
 						"url": {
 							"raw": "{{base_url}}/v1/debt/batch/update",
@@ -1707,7 +1707,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"debtId\": 1,\n  \"paymentAmount\": 500.00,\n  \"description\": \"Pago mensual de enero\",\n  \"paymentDate\": \"2024-01-30 14:30:00\"\n}"
+							"raw": "{\n  \"debtId\": 1,\n  \"paymentAmount\": 500.00,\n  \"description\": \"Pago mensual de enero\",\n  \"paymentDate\": \"2024-01-30T14:30:00\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/v1/debt/payment",
@@ -1856,7 +1856,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"categoryId\": 1,\n  \"budgetId\": 1,\n  \"debtId\": 1,\n  \"description\": {\n    \"name\": \"Compra Supermercado\",\n    \"description\": \"Compra semanal de alimentos\",\n    \"type\": \"EXPENSE\"\n  },\n  \"amount\": 250.00\n}"
+							"raw": "{\n  \"categoryId\": null,\n  \"budgetId\": null,\n  \"debtId\": null,\n  \"description\": {\n    \"name\": \"Compra Supermercado\",\n    \"description\": \"Compra semanal de alimentos\",\n    \"type\": \"EXPENSE\"\n  },\n  \"amount\": 25000\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/v1/transaction/add",
@@ -1889,7 +1889,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n  {\n    \"categoryId\": 1,\n    \"budgetId\": 1,\n    \"debtId\": 1,\n    \"description\": {\n      \"name\": \"Gasolina\",\n      \"description\": \"Tanqueada semanal\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 80.00\n  },\n  {\n    \"categoryId\": 2,\n    \"budgetId\": 1,\n    \"debtId\": null,\n    \"description\": {\n      \"name\": \"Salario\",\n      \"description\": \"Pago mensual salario\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 3000.00\n  }\n]"
+							"raw": "[\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"description\": {\n      \"name\": \"Gasolina\",\n      \"description\": \"Tanqueada semanal\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 80.00\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"description\": {\n      \"name\": \"Salario\",\n      \"description\": \"Pago mensual salario\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 3000.00\n  }\n]"
 						},
 						"url": {
 							"raw": "{{base_url}}/v1/transaction/batch/add",
@@ -2084,16 +2084,6 @@
 		{
 			"key": "jwt_token",
 			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "user_id",
-			"value": "1",
-			"type": "string"
-		},
-		{
-			"key": "profile_id",
-			"value": "1",
 			"type": "string"
 		}
 	]

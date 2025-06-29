@@ -17,7 +17,7 @@ public class Budget {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_user", unique = true)
+    @JoinColumn(name = "id_user")
     private User user;
 
     private String name;

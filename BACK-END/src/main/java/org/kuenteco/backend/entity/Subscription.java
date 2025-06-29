@@ -1,7 +1,7 @@
 package org.kuenteco.backend.entity;
 
 import jakarta.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.*;
 import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.enums.SubscriptionType;
@@ -26,10 +26,10 @@ public class Subscription {
     private SubscriptionType type;
 
     @Column(name = "start_date")
-    private Timestamp startDate;
+    private LocalDateTime startDate;
 
     @Column(name = "expiration_date")
-    private Timestamp expirationDate;
+    private LocalDateTime expirationDate;
 
     @Enumerated(EnumType.STRING)
     private State state;

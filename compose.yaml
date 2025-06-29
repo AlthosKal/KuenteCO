@@ -10,11 +10,12 @@ services:
     - .env-docker
     depends_on:
       postgres-master-database:
-        condition: service_healthy
+        condition: service_started
       postgres-replica-database:
         condition: service_started
     networks:
       - kuenteco-network
+    restart: always
 
   postgres-master-database:
     build:
@@ -38,6 +39,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
+    restart: always
 
   postgres-replica-database:
     build:
@@ -62,6 +65,7 @@ services:
     depends_on:
       postgres-master-database:
         condition: service_healthy
+    restart: always
 
 volumes:
   postgres-master-data:

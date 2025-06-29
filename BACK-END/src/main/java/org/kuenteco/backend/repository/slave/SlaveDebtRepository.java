@@ -1,7 +1,7 @@
 package org.kuenteco.backend.repository.slave;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.kuenteco.backend.entity.Debt;
 import org.kuenteco.backend.entity.User;
@@ -25,9 +25,10 @@ public interface SlaveDebtRepository extends JpaRepository<Debt, Integer> {
 
     List<Debt> findByStateAndUser(StateDebt state, User user);
 
-    List<Debt> getDebtsByExpirationDateBeforeAndUser(Timestamp expirationDateBefore, User user);
+    List<Debt> getDebtsByExpirationDateBeforeAndUser(LocalDateTime expirationDateBefore, User user);
 
-    List<Debt> findByUserAndExpirationDateBetween(User user, Timestamp start, Timestamp end);
+    List<Debt> findByUserAndExpirationDateBetween(
+            User user, LocalDateTime start, LocalDateTime end);
 
     Debt findDebtByUser(User user);
 }

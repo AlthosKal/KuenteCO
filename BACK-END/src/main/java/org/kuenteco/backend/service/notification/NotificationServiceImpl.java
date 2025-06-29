@@ -2,7 +2,7 @@ package org.kuenteco.backend.service.notification;
 
 import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +54,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public Object getNotificationsByDateRange(Timestamp fromDate, Timestamp toDate) {
+    public Object getNotificationsByDateRange(LocalDateTime fromDate, LocalDateTime toDate) {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
         RoleList role = credentials.role();
@@ -127,7 +127,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private Object getUserNotificationsByRangeDate(
-            User user, Timestamp fromDate, Timestamp toDate) {
+            User user, LocalDateTime fromDate, LocalDateTime toDate) {
         List<Notification> notifications =
                 slaveNotificationRepository.findByUserAndDateSendBetween(
                         user, fromDate, toDate); // findByUserAndDateBetween
@@ -159,7 +159,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private Object getProfileNotificationsByRangeDate(
-            Profile profile, Timestamp fromDate, Timestamp toDate) {
+            Profile profile, LocalDateTime fromDate, LocalDateTime toDate) {
         List<Notification> notifications =
                 slaveNotificationRepository.findByProfileAfterAndDateSendBetween(
                         profile, fromDate, toDate);

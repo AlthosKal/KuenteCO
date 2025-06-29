@@ -3,7 +3,7 @@ package org.kuenteco.backend.entity;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.*;
 import org.hibernate.annotations.Check;
 import org.hibernate.annotations.Type;
@@ -47,7 +47,7 @@ public class Transaction {
     private BigDecimal amount;
 
     @Column(name = "transaction_date")
-    private Timestamp transactionDate;
+    private LocalDateTime transactionDate;
 
     @Type(JsonBinaryType.class)
     @Column(columnDefinition = "jsonb")

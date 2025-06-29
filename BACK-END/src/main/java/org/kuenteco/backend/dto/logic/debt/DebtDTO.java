@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,10 +29,10 @@ public class DebtDTO {
     private BigDecimal pendingAmount;
 
     @NotNull(message = "La fecha de inicio es obligatoria")
-    private Timestamp startDate;
+    private LocalDateTime startDate;
 
     @NotNull(message = "La fecha de vencimiento es obligatoria")
-    private Timestamp expirationDate;
+    private LocalDateTime expirationDate;
 
     @NotNull(message = "El estado de la deuda es obligatorio")
     private StateDebt state;

@@ -11,6 +11,6 @@ import org.mapstruct.Mapping;
         uses = {UpdateBudgetMapper.class})
 public interface UpdateCategoryMapper {
     @Mapping(target = "user", ignore = true)
-    @Mapping(target = "budget", source = "budget")
+    @Mapping(target = "budget.id", source = "budgetId")
     Category toEntity(CategoryDTO dto);
 }

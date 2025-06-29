@@ -1,7 +1,7 @@
 package org.kuenteco.backend.entity;
 
 import jakarta.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.*;
 
 @Getter
@@ -28,5 +28,5 @@ public class BudgetEnrollment {
     @JoinColumn(name = "id_budget", referencedColumnName = "id")
     private Budget budget;
 
-    private Timestamp enrollmentDate;
+    private LocalDateTime enrollmentDate;
 }

@@ -1,7 +1,7 @@
 package org.kuenteco.backend.controller.notification;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import org.kuenteco.backend.exception.ApiResponse;
 import org.kuenteco.backend.service.notification.NotificationService;
@@ -29,8 +29,8 @@ public class NotificationController {
 
     @GetMapping("/range")
     public ResponseEntity<?> getNotificationsByDateRange(
-            @RequestParam Timestamp fromDate,
-            @RequestParam Timestamp toDate,
+            @RequestParam LocalDateTime fromDate,
+            @RequestParam LocalDateTime toDate,
             HttpServletRequest request) {
 
         Object notifications = notificationService.getNotificationsByDateRange(fromDate, toDate);

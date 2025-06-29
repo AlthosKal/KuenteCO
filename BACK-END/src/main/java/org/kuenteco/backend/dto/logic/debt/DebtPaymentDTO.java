@@ -3,7 +3,7 @@ package org.kuenteco.backend.dto.logic.debt;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,5 +22,5 @@ public class DebtPaymentDTO {
 
     private String description;
 
-    private Timestamp paymentDate = new Timestamp(System.currentTimeMillis());
+    private LocalDateTime paymentDate;
 }

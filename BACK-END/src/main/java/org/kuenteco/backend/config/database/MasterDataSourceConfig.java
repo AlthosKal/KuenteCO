@@ -40,8 +40,6 @@ public class MasterDataSourceConfig {
         masterDataSource.setUrl(environment.getProperty("spring.datasource.url"));
         masterDataSource.setUsername(environment.getProperty("spring.datasource.username"));
         masterDataSource.setPassword(environment.getProperty("spring.datasource.password"));
-        masterDataSource.setDriverClassName(
-                environment.getProperty("spring.datasource.driver-class-name"));
         return masterDataSource;
     }
 
@@ -52,15 +50,6 @@ public class MasterDataSourceConfig {
         log.info("Configurando entity Manager Factory para la base de datos maestra");
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(
-                "hibernate.show_sql",
-                environment.getProperty("spring.jpa.properties.hibernate.show_sql", "false"));
-        properties.put(
-                "hibernate.format_sql",
-                environment.getProperty("spring.jpa.properties.hibernate.format_sql", "false"));
-        properties.put(
-                "hibernate.hbm2ddl.auto",
-                environment.getProperty("spring.jpa.hibernate.ddl-auto", "validate"));
         properties.put(
                 "hibernate.jdbc.lob.non_contextual_creation",
                 environment.getProperty(
