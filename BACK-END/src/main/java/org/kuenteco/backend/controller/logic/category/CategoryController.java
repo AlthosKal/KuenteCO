@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import org.kuenteco.backend.dto.logic.category.CategoryDTO;
 import org.kuenteco.backend.dto.logic.category.CategoryEnrollmentDTO;
+import org.kuenteco.backend.dto.logic.category.CategoryReportDTO;
 import org.kuenteco.backend.dto.logic.category.NewCategoryDTO;
 import org.kuenteco.backend.exception.ApiResponse;
 import org.kuenteco.backend.service.logic.category.CategoryEnrollmentService;
@@ -36,6 +37,15 @@ public class CategoryController {
         return new ResponseEntity<>(
                 ApiResponse.ok(
                         "Categorías obtenidas correctamente", result, request.getRequestURI()),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/report/{categoryId}")
+    public ResponseEntity<?> getCategoryReport(@PathVariable Integer categoryId, HttpServletRequest request) {
+        CategoryReportDTO dto = categoryService.getCategoryReport(categoryId);
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Reporte de categoría generado exitosamente", dto, request.getRequestURI()),
                 HttpStatus.OK);
     }
 

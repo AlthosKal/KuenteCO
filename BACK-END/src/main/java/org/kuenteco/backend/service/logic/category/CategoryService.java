@@ -1,10 +1,13 @@
 package org.kuenteco.backend.service.logic.category;
 
 import org.kuenteco.backend.dto.logic.category.CategoryDTO;
+import org.kuenteco.backend.dto.logic.category.CategoryReportDTO;
 import org.kuenteco.backend.dto.logic.category.NewCategoryDTO;
 
 public interface CategoryService {
     Object getCategories();
+
+    CategoryReportDTO getCategoryReport(Integer categoryId);
 
     void addCategory(NewCategoryDTO dto);
 

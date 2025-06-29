@@ -1140,6 +1140,32 @@
 					"response": []
 				},
 				{
+					"name": "Get Category Report",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/category/report/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"category",
+								"report",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Category Enrollments",
 					"request": {
 						"method": "GET",
