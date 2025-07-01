@@ -8,6 +8,7 @@ KuenteCO/BACK-END/target/
 !KuenteCO/BACK-END/**/src/main/**/target/
 !KuenteCO/BACK-END/**/src/test/**/target/
 .env-docker
+requerimientos.txt
 # Spring Tool Suite (STS)
 KuenteCO/BACK-END/.apt_generated
 KuenteCO/BACK-END/.classpath
