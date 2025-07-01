@@ -7,12 +7,13 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.dto.logic.category.CategoryEnrollmentDTO;
+import org.kuenteco.backend.dto.logic.category.CategoryEnrollmentSummaryDTO;
 import org.kuenteco.backend.entity.Category;
 import org.kuenteco.backend.entity.CategoryEnrollment;
 import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.exception.exceptions.CategoryException;
-import org.kuenteco.backend.jwt.AuthCredentials;
+import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.mapper.logic.category.CategoryEnrollmentMapper;
 import org.kuenteco.backend.repository.master.MasterCategoryEnrollmentRepository;
 import org.kuenteco.backend.repository.slave.SlaveCategoryEnrollmentRepository;
@@ -50,6 +51,18 @@ public class CategoryEnrollmentServiceImpl implements CategoryEnrollmentService 
             return "No tienes categorías asignadas";
         }
         return categoryEnrollmentMapper.toDTOList(categoryEnrollments);
+    }
+
+    @Override
+    public Object getBusinessUserCategoryEnrollments() {
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+
+        List<CategoryEnrollmentSummaryDTO> dto = slaveCategoryEnrollmentRepository.findCategoryEnrollmentsByUserEmail(email);
+        if (dto.isEmpty()) {
+            return "No tienes Perfiles con Categorías asociadas";
+        }
+        return dto;
     }
 
     @Override

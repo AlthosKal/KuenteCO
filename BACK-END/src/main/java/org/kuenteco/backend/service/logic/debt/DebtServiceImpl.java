@@ -11,12 +11,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.dto.logic.debt.DebtDTO;
 import org.kuenteco.backend.dto.logic.debt.DebtPaymentDTO;
+import org.kuenteco.backend.dto.logic.debt.DebtSummaryDTO;
 import org.kuenteco.backend.dto.logic.debt.NewDebtDTO;
 import org.kuenteco.backend.entity.Debt;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.StateDebt;
 import org.kuenteco.backend.exception.exceptions.DebtException;
-import org.kuenteco.backend.jwt.AuthCredentials;
+import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.mapper.logic.debt.DebtDetailMapper;
 import org.kuenteco.backend.mapper.logic.debt.NewDebtMapper;
 import org.kuenteco.backend.mapper.logic.debt.UpdateDebtMapper;
@@ -25,7 +26,6 @@ import org.kuenteco.backend.repository.master.MasterDebtRepository;
 import org.kuenteco.backend.repository.slave.SlaveDebtRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -136,7 +136,18 @@ public class DebtServiceImpl implements DebtService {
         return total != null ? total : BigDecimal.ZERO;
     }
 
-    @Transactional
+    @Override
+    public Object getDebtSummaryReport() {
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        List<DebtSummaryDTO> dto = slaveDebtRepository.findByUserEmailDebtSummaries(email);
+        if (dto.isEmpty()) {
+            return "No tienes deudas registradas";
+        }
+        return dto;
+    }
+
+    @Override
     public void addDebt(NewDebtDTO dto) {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();

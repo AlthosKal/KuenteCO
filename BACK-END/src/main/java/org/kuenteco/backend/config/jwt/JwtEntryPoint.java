@@ -1,4 +1,4 @@
-package org.kuenteco.backend.jwt;
+package org.kuenteco.backend.config.jwt;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

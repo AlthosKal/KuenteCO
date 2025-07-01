@@ -13,8 +13,8 @@ import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.exception.exceptions.AuthException;
-import org.kuenteco.backend.jwt.AuthCredentials;
-import org.kuenteco.backend.jwt.JwtUtil;
+import org.kuenteco.backend.config.jwt.AuthCredentials;
+import org.kuenteco.backend.config.jwt.JwtUtil;
 import org.kuenteco.backend.mapper.auth.NewUserMapper;
 import org.kuenteco.backend.repository.master.MasterRoleRepository;
 import org.kuenteco.backend.repository.master.MasterUserRepository;
@@ -233,11 +233,25 @@ public class AuthServiceImpl implements AuthService {
 
     public static AuthCredentials getCredentials() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("No hay usuario autenticado en el contexto de seguridad");
+        }
+
         String email = authentication.getName();
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        if (authorities.isEmpty()) {
+            throw new IllegalStateException("No se encontraron roles en las credenciales");
+        }
+
         String roleName = authorities.iterator().next().getAuthority();
+        RoleList role;
+        try {
+            role = RoleList.valueOf(roleName);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStateException("Rol desconocido: " + roleName);
+        }
+
         log.info("Obteniendo información para: {}, con el rol {}", email, roleName);
-        RoleList role = RoleList.valueOf(roleName);
         return new AuthCredentials(email, role);
     }
 }

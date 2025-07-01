@@ -167,4 +167,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }
+
+    @ExceptionHandler(ExchangeRateException.class)
+    public ResponseEntity<ApiResponse<Void>> handleExchangeRateException(
+            UsernameNotFoundException ex, HttpServletRequest request) {
+        log.warn("Error con el servicio de Tazas de Cambio: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
+    }
 }

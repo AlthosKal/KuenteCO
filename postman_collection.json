@@ -830,6 +830,58 @@
 					"response": []
 				},
 				{
+					"name": "Get Budget Comparison",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/budget/report/comparison",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"budget",
+								"report",
+								"comparison"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Budget Summary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/budget/report/summary",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"budget",
+								"report",
+								"summary"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Budget Enrollments",
 					"request": {
 						"method": "GET",
@@ -1140,6 +1192,32 @@
 					"response": []
 				},
 				{
+					"name": "Get Transaction by Category",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/category/report/summary",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"category",
+								"report",
+								"summary"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Category Report",
 					"request": {
 						"method": "GET",
@@ -1184,6 +1262,32 @@
 							"path": [
 								"v1",
 								"category",
+								"enroll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Business UserCategory Enrollments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/category/report/enroll",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"category",
+								"report",
 								"enroll"
 							]
 						}
@@ -1583,6 +1687,32 @@
 					"response": []
 				},
 				{
+					"name": "Get Debt Summary Report",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/debt/report/summary",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"debt",
+								"report",
+								"summary"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create Debt",
 					"request": {
 						"method": "POST",
@@ -1866,6 +1996,32 @@
 					"response": []
 				},
 				{
+					"name": "Get Transactions Summary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/transaction/report/summary",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"transaction",
+								"report",
+								"summary"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create Transaction",
 					"request": {
 						"method": "POST",
@@ -2075,6 +2231,57 @@
 							]
 						},
 						"description": "Elimina múltiples transacciones especificando sus IDs como parámetros de consulta"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📌 Echange Rate",
+			"item": [
+				{
+					"name": "Get All Rates",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/v1/exchange-rates",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"exchange-rates"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Convert",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 100.00,\n  \"baseCurrency\": \"USD\",\n  \"targetCurrency\": \"EUR\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/exchange-rates/convert",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"exchange-rates",
+								"convert"
+							]
+						}
 					},
 					"response": []
 				}

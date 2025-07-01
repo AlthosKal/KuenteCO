@@ -17,6 +17,8 @@ public interface DebtService {
 
     BigDecimal getTotalPendingAmount();
 
+    Object getDebtSummaryReport();
+
     void addDebt(NewDebtDTO dto);
 
     void updateDebt(DebtDTO debtDTO);

@@ -11,13 +11,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.dto.logic.category.CategoryDTO;
 import org.kuenteco.backend.dto.logic.category.CategoryReportDTO;
 import org.kuenteco.backend.dto.logic.category.NewCategoryDTO;
+import org.kuenteco.backend.dto.logic.category.TransactionsByCategoryDTO;
 import org.kuenteco.backend.dto.logic.transaction.TransactionDetailDTO;
 import org.kuenteco.backend.entity.Category;
 import org.kuenteco.backend.entity.Transaction;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.TransactionType;
 import org.kuenteco.backend.exception.exceptions.CategoryException;
-import org.kuenteco.backend.jwt.AuthCredentials;
+import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.mapper.logic.category.CategoryDetailMapper;
 import org.kuenteco.backend.mapper.logic.category.CategoryReportMapper;
 import org.kuenteco.backend.mapper.logic.category.NewCategoryMapper;
@@ -93,6 +94,17 @@ public class CategoryServiceImpl implements CategoryService {
         dto.setTransactions(dtos);
 
         log.info("Reporte generado exitosamente para la categoría: {}", categoryId);
+        return dto;
+    }
+
+    @Override
+    public Object getTransactionsByCategory(){
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        List<TransactionsByCategoryDTO> dto = slaveCategoryRepository.getTransactionsByCategoryAndUserEmail(email);
+        if (dto.isEmpty()){
+            return "No tienes categorías registradas";
+        }
         return dto;
     }
 

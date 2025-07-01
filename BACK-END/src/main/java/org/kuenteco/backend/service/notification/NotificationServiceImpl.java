@@ -11,7 +11,7 @@ import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.exception.exceptions.NotificationException;
-import org.kuenteco.backend.jwt.AuthCredentials;
+import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.mapper.NotificationMapper;
 import org.kuenteco.backend.repository.slave.SlaveNotificationRepository;
 import org.kuenteco.backend.repository.slave.SlaveProfileRepository;

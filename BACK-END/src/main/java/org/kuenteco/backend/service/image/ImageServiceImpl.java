@@ -12,7 +12,7 @@ import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.entity.extra.Image;
 import org.kuenteco.backend.enums.RoleList;
-import org.kuenteco.backend.jwt.AuthCredentials;
+import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.mapper.image.ImageMapper;
 import org.kuenteco.backend.repository.master.MasterImageRepository;
 import org.kuenteco.backend.repository.master.MasterProfileRepository;

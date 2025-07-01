@@ -74,6 +74,17 @@ public class DebtController {
                 HttpStatus.OK);
     }
 
+    @GetMapping("/report/summary")
+    public ResponseEntity<?> getDebtSummaryReport(HttpServletRequest request) {
+        Object result = debtService.getDebtSummaryReport();
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Resumen de deudas generado correctamente",
+                        result,
+                        request.getRequestURI()),
+                HttpStatus.OK);
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> createDebt(
             @Valid @RequestBody NewDebtDTO dto, HttpServletRequest request) {

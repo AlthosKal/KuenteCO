@@ -6,17 +6,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.kuenteco.backend.dto.logic.transaction.NewTransactionDTO;
-import org.kuenteco.backend.dto.logic.transaction.ProfileWithTransactionsDTO;
-import org.kuenteco.backend.dto.logic.transaction.UpdateTransactionDTO;
-import org.kuenteco.backend.dto.logic.transaction.UserProfilesWithTransactionsDTO;
+import org.kuenteco.backend.dto.logic.transaction.*;
 import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.Transaction;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.UserType;
 import org.kuenteco.backend.exception.exceptions.TransactionException;
-import org.kuenteco.backend.jwt.AuthCredentials;
+import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.mapper.logic.transaction.NewTransactionMapper;
 import org.kuenteco.backend.mapper.logic.transaction.ProfileWithTransactionsMapper;
 import org.kuenteco.backend.mapper.logic.transaction.TransactionDetailMapper;
@@ -47,6 +44,7 @@ public class TransactionServiceImpl implements TransactionService {
         String email = credentials.email();
         RoleList role = credentials.role();
         log.info("Obteniendo transacciones para: {}", email);
+
         return switch (role) {
             case ROLE_USER -> {
                 User user =
@@ -75,6 +73,17 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    public Object getTransactionSummary(){
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        List<TransactionSummaryDTO> dto = slaveTransactionRepository.findAllTransactionsSummaries(email);
+        if (dto.isEmpty()) {
+            return "No tiene transacciones registradas";
+        }
+        return dto;
+    }
+
+    @Override
     public void addTransaction(NewTransactionDTO dto) {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
@@ -90,7 +99,6 @@ public class TransactionServiceImpl implements TransactionService {
                                 .orElseThrow(
                                         () -> new TransactionException("Usuario no encontrado"));
                 transaction.setUser(user);
-                masterTransactionRepository.save(transaction);
             }
             case ROLE_PROFILE -> {
                 Profile profile =
@@ -99,10 +107,10 @@ public class TransactionServiceImpl implements TransactionService {
                                 .orElseThrow(
                                         () -> new TransactionException("Perfil no encontrado"));
                 transaction.setProfile(profile);
-                masterTransactionRepository.save(transaction);
             }
             default -> throw new TransactionException("Role no encontrado " + role);
         }
+        masterTransactionRepository.save(transaction);
     }
 
     @Override
@@ -121,7 +129,6 @@ public class TransactionServiceImpl implements TransactionService {
                                 .orElseThrow(
                                         () -> new TransactionException("Usuario no encontrado"));
                 transaction.setUser(user);
-                masterTransactionRepository.save(transaction);
             }
 
             case ROLE_PROFILE -> {
@@ -131,10 +138,10 @@ public class TransactionServiceImpl implements TransactionService {
                                 .orElseThrow(
                                         () -> new TransactionException("Perfil no encontrado"));
                 transaction.setProfile(profile);
-                masterTransactionRepository.save(transaction);
             }
             default -> throw new TransactionException("Rol no soportado: " + role);
         }
+        masterTransactionRepository.save(transaction);
     }
 
     @Override

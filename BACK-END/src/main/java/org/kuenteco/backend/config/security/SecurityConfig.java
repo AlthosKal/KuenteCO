@@ -1,9 +1,9 @@
 package org.kuenteco.backend.config.security;
 
 import java.util.List;
-import org.kuenteco.backend.jwt.AuthenticatedUser;
-import org.kuenteco.backend.jwt.JwtAuthenticationFilter;
-import org.kuenteco.backend.jwt.JwtEntryPoint;
+import org.kuenteco.backend.config.jwt.AuthenticatedUser;
+import org.kuenteco.backend.config.jwt.JwtAuthenticationFilter;
+import org.kuenteco.backend.config.jwt.JwtEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,8 +49,6 @@ public class SecurityConfig {
                                                 "/v3/api-docs/**",
                                                 "/webjars/**")
                                         .permitAll()
-                                        .requestMatchers("/v1/account/**")
-                                        .authenticated()
                                         .anyRequest()
                                         .authenticated())
                 .httpBasic(Customizer.withDefaults())

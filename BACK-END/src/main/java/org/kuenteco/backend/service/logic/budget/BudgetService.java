@@ -6,6 +6,10 @@ import org.kuenteco.backend.dto.logic.budget.NewBudgetDTO;
 public interface BudgetService {
     Object getBudgets();
 
+    Object getBudgetVsActualReport();
+
+    Object getBudgetSummary();
+
     void addBudget(NewBudgetDTO dto);
 
     void updateBudget(BudgetDTO dto);

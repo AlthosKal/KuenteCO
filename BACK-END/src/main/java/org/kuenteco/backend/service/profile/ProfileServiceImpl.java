@@ -21,7 +21,7 @@ import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.UserType;
 import org.kuenteco.backend.exception.exceptions.AuthException;
 import org.kuenteco.backend.exception.exceptions.ProfileException;
-import org.kuenteco.backend.jwt.JwtUtil;
+import org.kuenteco.backend.config.jwt.JwtUtil;
 import org.kuenteco.backend.mapper.profile.NewProfileMapper;
 import org.kuenteco.backend.mapper.profile.ProfileDetailMapper;
 import org.kuenteco.backend.mapper.profile.UpdateProfileMapper;

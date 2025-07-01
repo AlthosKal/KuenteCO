@@ -3,6 +3,8 @@ package org.kuenteco.backend.repository.slave;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.kuenteco.backend.dto.logic.debt.DebtSummaryDTO;
 import org.kuenteco.backend.entity.Debt;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.StateDebt;
@@ -25,6 +27,11 @@ public interface SlaveDebtRepository extends JpaRepository<Debt, Integer> {
 
     List<Debt> findByStateAndUser(StateDebt state, User user);
 
+    @Query(value = """
+    SELECT v.* FROM vw_debt_summary v
+    WHERE v.owner_user_id = (SELECT id FROM kuentecouser WHERE email = :email)
+    """, nativeQuery = true)
+    List<DebtSummaryDTO> findByUserEmailDebtSummaries(@Param("email") String email);
     List<Debt> getDebtsByExpirationDateBeforeAndUser(LocalDateTime expirationDateBefore, User user);
 
     List<Debt> findByUserAndExpirationDateBetween(

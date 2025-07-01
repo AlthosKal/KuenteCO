@@ -1,4 +1,4 @@
-package org.kuenteco.backend.jwt;
+package org.kuenteco.backend.config.jwt;
 
 import java.util.Collection;
 import java.util.Collections;

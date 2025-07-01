@@ -1,4 +1,4 @@
-package org.kuenteco.backend.jwt;
+package org.kuenteco.backend.config.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

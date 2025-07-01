@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.dto.logic.budget.BudgetEnrollmentDTO;
 import org.kuenteco.backend.entity.*;
 import org.kuenteco.backend.exception.exceptions.BudgetException;
-import org.kuenteco.backend.jwt.AuthCredentials;
+import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.mapper.logic.budget.BudgetEnrollmentMapper;
 import org.kuenteco.backend.repository.master.MasterBudgetEnrollmentRepository;
 import org.kuenteco.backend.repository.slave.SlaveBudgetEnrollmentRepository;

@@ -2,16 +2,19 @@ package org.kuenteco.backend.service.logic.budget;
 
 import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
 
+import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.dto.logic.budget.BudgetDTO;
+import org.kuenteco.backend.dto.logic.budget.BudgetSummaryDTO;
+import org.kuenteco.backend.dto.logic.budget.BudgetVsActualDTO;
 import org.kuenteco.backend.dto.logic.budget.NewBudgetDTO;
 import org.kuenteco.backend.entity.Budget;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.exception.exceptions.BudgetException;
 import org.kuenteco.backend.exception.exceptions.CategoryException;
-import org.kuenteco.backend.jwt.AuthCredentials;
+import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.mapper.logic.budget.BudgetDetailMapper;
 import org.kuenteco.backend.mapper.logic.budget.NewBudgetMapper;
 import org.kuenteco.backend.mapper.logic.budget.UpdateBudgetMapper;
@@ -45,6 +48,29 @@ public class BudgetServiceImpl implements BudgetService {
                                 () -> new CategoryException("Usuario no encontrado: " + email));
         return getUserBudgets(user);
     }
+
+    @Override
+    public Object getBudgetVsActualReport(){
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        List<BudgetVsActualDTO> dto = slaveBudgetRepository.findAllBudgetVsActual(email);
+        if(dto.isEmpty()){
+            return "No tienes presupuestos registrados";
+        }
+        return dto;
+    }
+
+    @Override
+    public Object getBudgetSummary(){
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        List<BudgetSummaryDTO> dto = slaveBudgetRepository.getBudgetSummaries(email);
+        if(dto.isEmpty()){
+            return "No tienes presupuestos registrados";
+        }
+        return dto;
+    }
+
 
     @Override
     public void addBudget(NewBudgetDTO dto) {

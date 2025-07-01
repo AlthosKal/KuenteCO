@@ -6,6 +6,8 @@ import org.kuenteco.backend.dto.logic.transaction.UpdateTransactionDTO;
 public interface TransactionService {
     Object getTransactions();
 
+    Object getTransactionSummary();
+
     void addTransaction(NewTransactionDTO dto);
 
     void updateTransaction(UpdateTransactionDTO dto);

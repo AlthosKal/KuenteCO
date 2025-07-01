@@ -39,6 +39,24 @@ public class BudgetController {
                 HttpStatus.OK);
     }
 
+    @GetMapping("/report/comparison")
+    public ResponseEntity<?> getBudgetComparison(HttpServletRequest request) {
+        Object result = budgetService.getBudgetVsActualReport();
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Reporte de presupuestos vs gastos generado correctamente", result, request.getRequestURI()),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/report/summary")
+    public ResponseEntity<?> getBudgetSummary(HttpServletRequest request) {
+        Object result = budgetService.getBudgetSummary();
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Resumen de presupuestos generado correctamente", result, request.getRequestURI()),
+                HttpStatus.OK);
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> addBudget(
             @Valid @RequestBody NewBudgetDTO dto, HttpServletRequest request) {

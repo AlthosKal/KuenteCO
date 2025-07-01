@@ -27,6 +27,15 @@ public class TransactionController {
                 HttpStatus.OK);
     }
 
+    @GetMapping("/report/summary")
+    public ResponseEntity<?> getTransactionSummary(HttpServletRequest request) {
+        Object result = transactionService.getTransactionSummary();
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                            "Resumen de transacciones obtenida correctamente", result, request.getRequestURI()),
+                HttpStatus.OK);
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> addTransaction(
             @Valid @RequestBody NewTransactionDTO dto, HttpServletRequest request) {

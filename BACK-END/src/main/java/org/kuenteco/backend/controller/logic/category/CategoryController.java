@@ -49,6 +49,24 @@ public class CategoryController {
                 HttpStatus.OK);
     }
 
+    @GetMapping("/report/summary")
+    public ResponseEntity<?> getTransactionsByCategory(HttpServletRequest request) {
+        Object result = categoryService.getTransactionsByCategory();
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Resumen de transacciones por categoría obtenido correctamente", result, request.getRequestURI()),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/report/enroll")
+    public ResponseEntity<?> getBusinessUserCategoryEnrollments(HttpServletRequest request) {
+        Object result = categoryService.getTransactionsByCategory();
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Resumen de transacciones por categoría obtenido correctamente", result, request.getRequestURI()),
+                HttpStatus.OK);
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> addCategory(
             @Valid @RequestBody NewCategoryDTO dto, HttpServletRequest request) {
