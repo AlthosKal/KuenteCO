@@ -1,0 +1,254 @@
+14:51:57.234 [main] DEBUG com.intuit.karate.Suite - [config] classpath:karate-config.js
+14:51:57.984 [main] INFO  com.intuit.karate - karate.env system property was: null 
+14:51:58.015 [main] ERROR com.intuit.karate - classpath:com/twa/login.feature:4
+* url 'http://172.26.0.2:8080/api/app/v1/auth/login'  # Ajusta si usas otro puerto en Docker
+js failed:
+>>>>
+01: 'http://172.26.0.2:8080/api/app/v1/auth/login'  # Ajusta si usas otro puerto en Docker
+<<<<
+org.graalvm.polyglot.PolyglotException: SyntaxError: Unnamed:1:48 Expected ; but found error
+'http://172.26.0.2:8080/api/app/v1/auth/login'  # Ajusta si usas otro puerto en Docker
+                                                ^
+
+- org.graalvm.polyglot.Context.eval(Context.java:425)
+- com.intuit.karate.graal.JsEngine.evalForValue(JsEngine.java:169)
+- com.intuit.karate.graal.JsEngine.eval(JsEngine.java:165)
+- com.intuit.karate.core.ScenarioEngine.evalJs(ScenarioEngine.java:1286)
+- com.intuit.karate.core.ScenarioEngine.evalKarateExpression(ScenarioEngine.java:2238)
+- com.intuit.karate.core.ScenarioEngine.evalKarateExpression(ScenarioEngine.java:2157)
+- com.intuit.karate.core.ScenarioEngine.url(ScenarioEngine.java:379)
+
+classpath:com/twa/login.feature:4
+14:52:49.373 [main] DEBUG com.intuit.karate.Suite - [config] classpath:karate-config.js
+14:52:49.943 [main] INFO  com.intuit.karate - karate.env system property was: null 
+14:52:50.196 [main] DEBUG com.intuit.karate - request:
+1 > POST http://172.26.0.2:8080/api/app/v1/auth/login/login
+1 > Content-Type: application/json; charset=UTF-8
+1 > Content-Length: 62
+1 > Host: 172.26.0.2:8080
+1 > Connection: Keep-Alive
+1 > User-Agent: Apache-HttpClient/4.5.14 (Java/21.0.7)
+1 > Accept-Encoding: gzip,deflate
+{"nameOrEmail":"juan@ejemplo.com","password":"contraseña123"}
+
+14:52:50.306 [main] DEBUG com.intuit.karate - response time in milliseconds: 105
+1 < 401
+1 < Vary: Origin
+1 < Vary: Access-Control-Request-Method
+1 < Vary: Access-Control-Request-Headers
+1 < Set-Cookie: JSESSIONID=668CD19CDC2A8A96C1E2FEB1F062D0A7; Path=/api/app; HttpOnly
+1 < X-Content-Type-Options: nosniff
+1 < X-XSS-Protection: 0
+1 < Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+1 < Pragma: no-cache
+1 < Expires: 0
+1 < X-Frame-Options: DENY
+1 < Content-Length: 0
+1 < Date: Wed, 04 Jun 2025 19:52:50 GMT
+1 < Keep-Alive: timeout=20
+1 < Connection: keep-alive
+
+
+14:52:50.316 [main] ERROR com.intuit.karate - classpath:com/twa/login.feature:17
+Then status 200
+status code was: 401, expected: 200, response time in milliseconds: 105, url: http://172.26.0.2:8080/api/app/v1/auth/login/login, response: 
+
+classpath:com/twa/login.feature:17
+14:54:13.410 [main] DEBUG com.intuit.karate.Suite - [config] classpath:karate-config.js
+14:54:14.009 [main] INFO  com.intuit.karate - karate.env system property was: null 
+14:54:14.218 [main] DEBUG com.intuit.karate - request:
+1 > POST http://172.26.0.2:8080/api/app/v1/auth/login
+1 > Content-Type: application/json; charset=UTF-8
+1 > Content-Length: 62
+1 > Host: 172.26.0.2:8080
+1 > Connection: Keep-Alive
+1 > User-Agent: Apache-HttpClient/4.5.14 (Java/21.0.7)
+1 > Accept-Encoding: gzip,deflate
+{"nameOrEmail":"juan@ejemplo.com","password":"contraseña123"}
+
+14:54:14.425 [main] DEBUG com.intuit.karate - response time in milliseconds: 205
+1 < 500
+1 < Vary: origin,access-control-request-method,access-control-request-headers,accept-encoding
+1 < X-Content-Type-Options: nosniff
+1 < X-XSS-Protection: 0
+1 < Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+1 < Pragma: no-cache
+1 < Expires: 0
+1 < X-Frame-Options: DENY
+1 < Content-Type: application/json
+1 < Transfer-Encoding: chunked
+1 < Date: Wed, 04 Jun 2025 19:54:14 GMT
+1 < Connection: close
+{"success":false,"message":"Ocurrió un error inesperado","data":null,"timestamp":"2025-06-04T19:54:14.399283544","path":"/api/app/v1/auth/login"}
+
+14:54:14.434 [main] ERROR com.intuit.karate - classpath:com/twa/login.feature:17
+Then status 200
+status code was: 500, expected: 200, response time in milliseconds: 205, url: http://172.26.0.2:8080/api/app/v1/auth/login, response: 
+{"success":false,"message":"Ocurrió un error inesperado","data":null,"timestamp":"2025-06-04T19:54:14.399283544","path":"/api/app/v1/auth/login"}
+classpath:com/twa/login.feature:17
+15:00:18.482 [main] DEBUG com.intuit.karate.Suite - [config] classpath:karate-config.js
+15:00:19.099 [main] INFO  com.intuit.karate - karate.env system property was: null 
+15:00:19.357 [main] DEBUG com.intuit.karate - request:
+1 > POST http://172.26.0.2:8080/api/app/v1/auth/login
+1 > Content-Type: application/json; charset=UTF-8
+1 > Content-Length: 62
+1 > Host: 172.26.0.2:8080
+1 > Connection: Keep-Alive
+1 > User-Agent: Apache-HttpClient/4.5.14 (Java/21.0.7)
+1 > Accept-Encoding: gzip,deflate
+{"nameOrEmail":"juan@ejemplo.com","password":"contraseña123"}
+
+15:00:19.384 [main] DEBUG com.intuit.karate - response time in milliseconds: 23
+1 < 500
+1 < Vary: origin,access-control-request-method,access-control-request-headers,accept-encoding
+1 < X-Content-Type-Options: nosniff
+1 < X-XSS-Protection: 0
+1 < Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+1 < Pragma: no-cache
+1 < Expires: 0
+1 < X-Frame-Options: DENY
+1 < Content-Type: application/json
+1 < Transfer-Encoding: chunked
+1 < Date: Wed, 04 Jun 2025 20:00:19 GMT
+1 < Connection: close
+{"success":false,"message":"Ocurrió un error inesperado","data":null,"timestamp":"2025-06-04T20:00:19.377245654","path":"/api/app/v1/auth/login"}
+
+15:00:19.394 [main] ERROR com.intuit.karate - classpath:com/twa/login.feature:17
+Then status 200
+status code was: 500, expected: 200, response time in milliseconds: 23, url: http://172.26.0.2:8080/api/app/v1/auth/login, response: 
+{"success":false,"message":"Ocurrió un error inesperado","data":null,"timestamp":"2025-06-04T20:00:19.377245654","path":"/api/app/v1/auth/login"}
+classpath:com/twa/login.feature:17
+15:01:37.635 [main] DEBUG com.intuit.karate.Suite - [config] classpath:karate-config.js
+15:01:38.245 [main] INFO  com.intuit.karate - karate.env system property was: null 
+15:01:38.456 [main] DEBUG com.intuit.karate - request:
+1 > POST http://172.26.0.2:8080/api/app/v1/auth/login
+1 > Content-Type: application/json; charset=UTF-8
+1 > Content-Length: 62
+1 > Host: 172.26.0.2:8080
+1 > Connection: Keep-Alive
+1 > User-Agent: Apache-HttpClient/4.5.14 (Java/21.0.7)
+1 > Accept-Encoding: gzip,deflate
+{"nameOrEmail":"juan@ejemplo.com","password":"contraseña123"}
+
+15:01:38.654 [main] DEBUG com.intuit.karate - response time in milliseconds: 194
+1 < 200
+1 < Vary: origin,access-control-request-method,access-control-request-headers,accept-encoding
+1 < Set-Cookie: jwt=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqdWFuQGVqZW1wbG8uY29tIiwiaWF0IjoxNzQ5MDY3Mjk4LCJleHAiOjE3NDkxNTM2OTh9.JEUixkc_Z4vaVAhw5evYDHVC8P2AEStmEMhLys4DgN4; Max-Age=604800; Expires=Wed, 11 Jun 2025 20:01:38 GMT; Path=/; Secure; HttpOnly
+1 < X-Content-Type-Options: nosniff
+1 < X-XSS-Protection: 0
+1 < Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+1 < Pragma: no-cache
+1 < Expires: 0
+1 < X-Frame-Options: DENY
+1 < Content-Type: application/json
+1 < Transfer-Encoding: chunked
+1 < Date: Wed, 04 Jun 2025 20:01:38 GMT
+1 < Keep-Alive: timeout=20
+1 < Connection: keep-alive
+{"success":true,"message":"Login exitoso","data":{"token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqdWFuQGVqZW1wbG8uY29tIiwiaWF0IjoxNzQ5MDY3Mjk4LCJleHAiOjE3NDkxNTM2OTh9.JEUixkc_Z4vaVAhw5evYDHVC8P2AEStmEMhLys4DgN4","role":"Juan Pérez"},"timestamp":"2025-06-04T20:01:38.641600567","path":"/api/app/v1/auth/login"}
+
+15:02:34.730 [main] DEBUG com.intuit.karate.Suite - [config] classpath:karate-config.js
+15:02:35.311 [main] INFO  com.intuit.karate - karate.env system property was: null 
+15:02:35.526 [main] DEBUG com.intuit.karate - request:
+1 > POST http://172.26.0.2:8080/api/app/v1/auth/login
+1 > Content-Type: application/json; charset=UTF-8
+1 > Content-Length: 62
+1 > Host: 172.26.0.2:8080
+1 > Connection: Keep-Alive
+1 > User-Agent: Apache-HttpClient/4.5.14 (Java/21.0.7)
+1 > Accept-Encoding: gzip,deflate
+{"nameOrEmail":"juan@ejemplo.com","password":"contraseña123"}
+
+15:02:35.619 [main] DEBUG com.intuit.karate - response time in milliseconds: 89
+1 < 200
+1 < Vary: origin,access-control-request-method,access-control-request-headers,accept-encoding
+1 < Set-Cookie: jwt=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqdWFuQGVqZW1wbG8uY29tIiwiaWF0IjoxNzQ5MDY3MzU1LCJleHAiOjE3NDkxNTM3NTV9.Iw56dww-xs3H-mBWi5O2DO39RqHxHkWNZXrpBuTpDAQ; Max-Age=604800; Expires=Wed, 11 Jun 2025 20:02:35 GMT; Path=/; Secure; HttpOnly
+1 < X-Content-Type-Options: nosniff
+1 < X-XSS-Protection: 0
+1 < Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+1 < Pragma: no-cache
+1 < Expires: 0
+1 < X-Frame-Options: DENY
+1 < Content-Type: application/json
+1 < Transfer-Encoding: chunked
+1 < Date: Wed, 04 Jun 2025 20:02:35 GMT
+1 < Keep-Alive: timeout=20
+1 < Connection: keep-alive
+{"success":true,"message":"Login exitoso","data":{"token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqdWFuQGVqZW1wbG8uY29tIiwiaWF0IjoxNzQ5MDY3MzU1LCJleHAiOjE3NDkxNTM3NTV9.Iw56dww-xs3H-mBWi5O2DO39RqHxHkWNZXrpBuTpDAQ","role":"Juan Pérez"},"timestamp":"2025-06-04T20:02:35.607205736","path":"/api/app/v1/auth/login"}
+
+15:04:06.742 [main] DEBUG com.intuit.karate.Suite - [config] classpath:karate-config.js
+15:04:07.373 [main] INFO  com.intuit.karate - karate.env system property was: null 
+15:04:07.586 [main] DEBUG com.intuit.karate - request:
+1 > POST http://172.26.0.2:8080/api/app/v1/auth/login
+1 > Content-Type: application/json; charset=UTF-8
+1 > Content-Length: 62
+1 > Host: 172.26.0.2:8080
+1 > Connection: Keep-Alive
+1 > User-Agent: Apache-HttpClient/4.5.14 (Java/21.0.7)
+1 > Accept-Encoding: gzip,deflate
+{"nameOrEmail":"juan@ejemplo.com","password":"contraseña123"}
+
+15:04:07.674 [main] DEBUG com.intuit.karate - response time in milliseconds: 85
+1 < 200
+1 < Vary: origin,access-control-request-method,access-control-request-headers,accept-encoding
+1 < Set-Cookie: jwt=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqdWFuQGVqZW1wbG8uY29tIiwiaWF0IjoxNzQ5MDY3NDQ3LCJleHAiOjE3NDkxNTM4NDd9.PTRosWgd4j_upcPSKsNwp5WvGXAK6bDp4jCUD1yiH9U; Max-Age=604800; Expires=Wed, 11 Jun 2025 20:04:07 GMT; Path=/; Secure; HttpOnly
+1 < X-Content-Type-Options: nosniff
+1 < X-XSS-Protection: 0
+1 < Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+1 < Pragma: no-cache
+1 < Expires: 0
+1 < X-Frame-Options: DENY
+1 < Content-Type: application/json
+1 < Transfer-Encoding: chunked
+1 < Date: Wed, 04 Jun 2025 20:04:07 GMT
+1 < Keep-Alive: timeout=20
+1 < Connection: keep-alive
+{"success":true,"message":"Login exitoso","data":{"token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqdWFuQGVqZW1wbG8uY29tIiwiaWF0IjoxNzQ5MDY3NDQ3LCJleHAiOjE3NDkxNTM4NDd9.PTRosWgd4j_upcPSKsNwp5WvGXAK6bDp4jCUD1yiH9U","role":"Juan Pérez"},"timestamp":"2025-06-04T20:04:07.665173815","path":"/api/app/v1/auth/login"}
+
+15:40:42.707 [main] DEBUG com.intuit.karate.Suite - [config] classpath:karate-config.js
+15:40:43.470 [main] INFO  com.intuit.karate - karate.env system property was: null 
+15:40:43.746 [main] DEBUG com.intuit.karate - request:
+1 > POST http://172.26.0.2:8080/api/app/v1/auth/login
+1 > Content-Type: application/json; charset=UTF-8
+1 > Content-Length: 62
+1 > Host: 172.26.0.2:8080
+1 > Connection: Keep-Alive
+1 > User-Agent: Apache-HttpClient/4.5.14 (Java/21.0.7)
+1 > Accept-Encoding: gzip,deflate
+{"nameOrEmail":"juan@ejemplo.com","password":"contraseña123"}
+
+15:40:43.761 [main] ERROR com.intuit.karate - org.apache.http.conn.HttpHostConnectException: Connect to 172.26.0.2:8080 [/172.26.0.2] failed: Conexión rehusada, http call failed after 204 milliseconds for url: http://172.26.0.2:8080/api/app/v1/auth/login
+15:40:43.762 [main] ERROR com.intuit.karate - classpath:com/twa/login.feature:16
+When method post
+http call failed after 204 milliseconds for url: http://172.26.0.2:8080/api/app/v1/auth/login
+org.apache.http.conn.HttpHostConnectException: Connect to 172.26.0.2:8080 [/172.26.0.2] failed: Conexión rehusada
+classpath:com/twa/login.feature:16
+15:41:12.929 [main] DEBUG com.intuit.karate.Suite - [config] classpath:karate-config.js
+15:41:13.597 [main] INFO  com.intuit.karate - karate.env system property was: null 
+15:41:13.848 [main] DEBUG com.intuit.karate - request:
+1 > POST http://172.26.0.3:8080/api/app/v1/auth/login
+1 > Content-Type: application/json; charset=UTF-8
+1 > Content-Length: 62
+1 > Host: 172.26.0.3:8080
+1 > Connection: Keep-Alive
+1 > User-Agent: Apache-HttpClient/4.5.14 (Java/21.0.7)
+1 > Accept-Encoding: gzip,deflate
+{"nameOrEmail":"juan@ejemplo.com","password":"contraseña123"}
+
+15:41:14.297 [main] DEBUG com.intuit.karate - response time in milliseconds: 445
+1 < 200
+1 < Vary: origin,access-control-request-method,access-control-request-headers,accept-encoding
+1 < Set-Cookie: jwt=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqdWFuQGVqZW1wbG8uY29tIiwiaWF0IjoxNzQ5MDY5Njc0LCJleHAiOjE3NDkxNTYwNzR9.YO3HXF_oEhpXVbTvEz3AU6_AWZ-zTN004P7LfrNErNY; Max-Age=604800; Expires=Wed, 11 Jun 2025 20:41:14 GMT; Path=/; Secure; HttpOnly
+1 < X-Content-Type-Options: nosniff
+1 < X-XSS-Protection: 0
+1 < Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+1 < Pragma: no-cache
+1 < Expires: 0
+1 < X-Frame-Options: DENY
+1 < Content-Type: application/json
+1 < Transfer-Encoding: chunked
+1 < Date: Wed, 04 Jun 2025 20:41:14 GMT
+1 < Keep-Alive: timeout=20
+1 < Connection: keep-alive
+{"success":true,"message":"Login exitoso","data":{"token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqdWFuQGVqZW1wbG8uY29tIiwiaWF0IjoxNzQ5MDY5Njc0LCJleHAiOjE3NDkxNTYwNzR9.YO3HXF_oEhpXVbTvEz3AU6_AWZ-zTN004P7LfrNErNY","role":"Juan Pérez"},"timestamp":"2025-06-04T20:41:14.267511758","path":"/api/app/v1/auth/login"}
+
