@@ -52,9 +52,9 @@ public class SubscriptionPaymentServiceImpl implements SubscriptionPaymentServic
     // Precios de suscripciones
     private static final Map<SubscriptionType, BigDecimal> SUBSCRIPTION_PRICES =
             Map.of(
-                    SubscriptionType.BASIC, new BigDecimal("29900"),
-                    SubscriptionType.STANDARD, new BigDecimal("49900"),
-                    SubscriptionType.PREMIUM, new BigDecimal("79900"));
+                    SubscriptionType.BASIC, new BigDecimal("7"),
+                    SubscriptionType.STANDARD, new BigDecimal("13"),
+                    SubscriptionType.PREMIUM, new BigDecimal("20"));
 
     @Override
     public SubscriptionPaymentResponseDTO createSubscriptionPayment(
@@ -197,7 +197,7 @@ public class SubscriptionPaymentServiceImpl implements SubscriptionPaymentServic
 
         String signature =
                 wompiService.generateSignature(
-                        reference, amount, CurrencyType.COP, wompiConfig.getIntegritySecret());
+                        reference, amount, CurrencyType.USD, wompiConfig.getIntegritySecret());
 
         return wompiMapper.toWompiTransactionRequest(
                 subscription,
@@ -205,7 +205,7 @@ public class SubscriptionPaymentServiceImpl implements SubscriptionPaymentServic
                 amount,
                 reference,
                 signature,
-                CurrencyType.COP,
+                CurrencyType.USD,
                 subscriptionRequest);
     }
 

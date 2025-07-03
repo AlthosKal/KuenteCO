@@ -21,7 +21,7 @@ public interface WompiMapper {
     @Mapping(source = "cardNumber", target = "number")
     @Mapping(source = "cvc", target = "cvc")
     @Mapping(source = "expiryMonth", target = "expMonth")
-    @Mapping(source = "expiryYear", target = "expYear")
+    @Mapping(target = "expYear", expression = "java(convertToTwoDigitYear(request.getExpiryYear()))")
     @Mapping(source = "cardHolder", target = "cardHolder")
     WompiTokenizeCardRequestDTO toWompiTokenizeRequest(TokenizeCardRequestDTO request);
 
@@ -46,6 +46,15 @@ public interface WompiMapper {
             String signature,
             CurrencyType currency,
             CreateSubscriptionRequestDTO subscriptionRequest);
+
+    /**Selecciona los dos últimos dígitos de la fecha registrada**/
+
+    default String convertToTwoDigitYear(String year) {
+        if (year != null && year.length() == 4) {
+            return year.substring(2); // e.g., "2025" -> "25"
+        }
+        return year; // deja como está si no es de 4 dígitos
+    }
 
     /** Convierte BigDecimal a centavos (Long) */
     default Long convertToAmountInCents(BigDecimal amount) {
