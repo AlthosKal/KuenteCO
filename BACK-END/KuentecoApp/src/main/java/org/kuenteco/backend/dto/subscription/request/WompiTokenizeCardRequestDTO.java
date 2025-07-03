@@ -13,10 +13,13 @@ import lombok.NoArgsConstructor;
 public class WompiTokenizeCardRequestDTO {
     private String number;
     private String cvc;
+
     @JsonProperty("exp_month")
     private String expMonth;
+
     @JsonProperty("exp_year")
     private String expYear;
+
     @JsonProperty("card_holder")
     private String cardHolder;
 }

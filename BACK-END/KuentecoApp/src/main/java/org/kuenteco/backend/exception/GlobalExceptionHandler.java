@@ -178,20 +178,32 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(WompiException.class)
-    public ResponseEntity<ApiResponse<Void>> handleWompiException(WompiException ex, WebRequest req) {
+    public ResponseEntity<ApiResponse<Void>> handleWompiException(
+            WompiException ex, WebRequest req) {
         return ResponseEntity.badRequest()
-                .body(ApiResponse.error("Error con el servicio de Wompi: "+ex.getMessage(), req.getDescription(false)));
+                .body(
+                        ApiResponse.error(
+                                "Error con el servicio de Wompi: " + ex.getMessage(),
+                                req.getDescription(false)));
     }
 
     @ExceptionHandler(PaymentProcessingException.class)
-    public ResponseEntity<ApiResponse<Void>> handlePaymentProcessingException(WompiException ex, WebRequest req) {
+    public ResponseEntity<ApiResponse<Void>> handlePaymentProcessingException(
+            WompiException ex, WebRequest req) {
         return ResponseEntity.badRequest()
-                .body(ApiResponse.error("Error con el servicio de Proceso de Pago: "+ex.getMessage(), req.getDescription(false)));
+                .body(
+                        ApiResponse.error(
+                                "Error con el servicio de Proceso de Pago: " + ex.getMessage(),
+                                req.getDescription(false)));
     }
 
     @ExceptionHandler(TokenizationException.class)
-    public ResponseEntity<ApiResponse<Void>> handleTokenizationException(TokenizationException ex, WebRequest req) {
+    public ResponseEntity<ApiResponse<Void>> handleTokenizationException(
+            TokenizationException ex, WebRequest req) {
         return ResponseEntity.badRequest()
-                .body(ApiResponse.error("Error con el servicio de Tokenización: "+ex.getMessage(), req.getDescription(false)));
+                .body(
+                        ApiResponse.error(
+                                "Error con el servicio de Tokenización: " + ex.getMessage(),
+                                req.getDescription(false)));
     }
 }

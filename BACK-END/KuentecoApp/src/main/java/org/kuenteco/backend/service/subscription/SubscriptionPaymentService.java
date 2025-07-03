@@ -1,11 +1,12 @@
 package org.kuenteco.backend.service.subscription;
 
+import java.security.NoSuchAlgorithmException;
 import org.kuenteco.backend.dto.subscription.request.api.CreateSubscriptionRequestDTO;
 import org.kuenteco.backend.dto.subscription.response.api.SubscriptionPaymentResponseDTO;
-import org.kuenteco.backend.entity.User;
 
 public interface SubscriptionPaymentService {
-    SubscriptionPaymentResponseDTO createSubscriptionPayment(User user, CreateSubscriptionRequestDTO request);
+    SubscriptionPaymentResponseDTO createSubscriptionPayment(CreateSubscriptionRequestDTO request)
+            throws NoSuchAlgorithmException;
 
-    SubscriptionPaymentResponseDTO getSubscriptionStatus(Integer subscriptionId, User user);
+    SubscriptionPaymentResponseDTO getSubscriptionStatus(Integer subscriptionId);
 }

@@ -13,6 +13,7 @@ import org.kuenteco.backend.enums.PaymentMethod;
 public class PayMethodInfo {
     @Enumerated(EnumType.STRING)
     private PaymentMethod method;
+
     private String cardLastFour;
     private String paymentEmail;
 }

@@ -11,11 +11,13 @@ import lombok.NoArgsConstructor;
 public class MerchantData {
     private String name;
     private String email;
+
     @JsonProperty("contact_name")
     private String contactName;
+
     @JsonProperty("phone_number")
     private String phoneNumber;
+
     @JsonProperty("active_ecommerce")
     private Boolean activeEcommerce;
 }
-

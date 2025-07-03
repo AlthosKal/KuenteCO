@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.kuenteco.backend.dto.subscription.request.extra.WompiCustomerData;
-import org.kuenteco.backend.dto.subscription.request.extra.WompiPaymentMethod;
-import org.kuenteco.backend.dto.subscription.request.extra.WompiShippingAddress;
+import org.kuenteco.backend.dto.subscription.request.extra.WompiCustomerDataDTO;
+import org.kuenteco.backend.dto.subscription.request.extra.WompiPaymentMethodDTO;
+import org.kuenteco.backend.dto.subscription.request.extra.WompiShippingAddressDTO;
 import org.kuenteco.backend.enums.CurrencyType;
 
 @Data
@@ -17,17 +17,21 @@ import org.kuenteco.backend.enums.CurrencyType;
 public class WompiTransactionRequestDTO {
     @JsonProperty("amount_in_cents")
     private Long amountInCents;
+
     private CurrencyType currency;
     private String signature;
+
     @JsonProperty("customer_email")
     private String customerEmail;
+
     private String reference;
+
     @JsonProperty("payment_method")
-    private WompiPaymentMethod paymentMethod;
-    @JsonProperty("redirect_url")
-    private String redirectUrl;
+    private WompiPaymentMethodDTO paymentMethod;
+
     @JsonProperty("shipping_address")
-    private WompiShippingAddress shippingAddress;
+    private WompiShippingAddressDTO shippingAddress;
+
     @JsonProperty("customer_data")
-    private WompiCustomerData customerData;
+    private WompiCustomerDataDTO customerData;
 }

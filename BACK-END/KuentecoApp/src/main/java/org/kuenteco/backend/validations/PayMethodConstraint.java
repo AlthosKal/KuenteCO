@@ -10,6 +10,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PayMethodConstraint {
     String message() default "Información de método de pago inválida";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

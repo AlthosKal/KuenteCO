@@ -12,6 +12,7 @@ public class PaymentMethodData {
     private String type;
     private String extra;
     private Integer installments;
+
     @JsonProperty("payment_description")
     private String paymentDescription;
 }

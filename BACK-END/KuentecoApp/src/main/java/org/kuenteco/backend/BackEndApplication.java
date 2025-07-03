@@ -27,6 +27,7 @@ public class BackEndApplication {
         System.setProperty("WOMPI_PUBLIC_KEY", dotenv.get("WOMPI_PUBLIC_KEY"));
         System.setProperty("WOMPI_PRIVATE_KEY", dotenv.get("WOMPI_PRIVATE_KEY"));
         System.setProperty("WOMPI_EVENTS_SECRET", dotenv.get("WOMPI_EVENTS_SECRET"));
+        System.setProperty("WOMPI_INTEGRITY_SECRET", dotenv.get("WOMPI_INTEGRITY_SECRET"));
 
         // Secret de Jwt
         System.setProperty("JWT_SECRET", dotenv.get("JWT_SECRET"));

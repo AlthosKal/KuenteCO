@@ -22,6 +22,9 @@ public class WompiConfig {
     @Value("${wompi.events-secret}")
     private String eventsSecret;
 
+    @Value("${wompi.integrity-secret}")
+    private String integritySecret;
+
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();

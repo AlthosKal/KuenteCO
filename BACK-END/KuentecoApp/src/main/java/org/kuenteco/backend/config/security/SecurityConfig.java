@@ -34,12 +34,12 @@ public class SecurityConfig {
                         auth ->
                                 auth.requestMatchers(
                                                 "/v1/auth/login",
-                                                "/v1/profile/login",
                                                 "/v1/auth/register",
                                                 "/v1/auth/validate-verification-code",
                                                 "/v1/auth/send-verification-code",
                                                 "/v1/auth/activate-user",
                                                 "/v1/auth/change-password",
+                                                "/v1/profile/login",
                                                 "/v1/documentation/**",
                                                 "/swagger-ui.html",
                                                 "/swagger-resources/**",

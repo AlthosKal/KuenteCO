@@ -28,9 +28,10 @@ cloudinary:
 
 wompi:
   public-key: ${WOMPI_PUBLIC_KEY}
-  pivate-key: ${WOMPI_PRIVATE_KEY}
+  private-key: ${WOMPI_PRIVATE_KEY}
   base-url: ${WOMPI_BASE_URL}
   events-secret: ${WOMPI_EVENTS_SECRET}
+  integrity-secret: ${WOMPI_INTEGRITY_SECRET}
 
 resilience4j:
   circuitbreaker:
