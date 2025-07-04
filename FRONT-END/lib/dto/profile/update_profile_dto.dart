@@ -17,6 +17,7 @@ class UpdateProfileDTO {
 
   Map<String, dynamic> toJson() {
     return {
+      'id':id,
       'username': username,
       'email': email,
       'password': password,

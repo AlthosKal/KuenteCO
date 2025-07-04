@@ -5,7 +5,7 @@ import '../../../dto/auth/response/user_detail_dto.dart';
 import '../../exceptions/api_response.dart';
 import '../api_client.dart';
 
-class ProfileService {
+class ProfileImageService {
   final _api = ApiClient();
 
   Future<ImageDTO> uploadProfileImage(File imageFile) async {

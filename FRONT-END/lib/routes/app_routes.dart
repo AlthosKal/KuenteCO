@@ -8,5 +8,6 @@ class AppRoutes {
   static const chat = '/chat';
   static const chatHistory = '/chat-history';
   static const userDetail = '/user-detail';
+  static const profile = '/profile';
 
 }

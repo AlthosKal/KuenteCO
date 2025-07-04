@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:kuenteco/core/services/app/auth_service.dart';
+import 'package:kuenteco/dto/auth/response/user_detail_dto.dart';
+import '../../core/services/app/profile_service.dart';
+import '../../dto/profile/profile_detail_dto.dart';
 
-class KuentecoNavbar extends StatelessWidget {
+class KuentecoNavbar extends StatefulWidget {
   final String currentRoute;
   final double? logoWidth;
   final double? logoHeight;
@@ -18,8 +22,20 @@ class KuentecoNavbar extends StatelessWidget {
     this.logoPlaceholderText = 'Logo no disponible',
     this.useDefaultLogoSize = true,
     required this.onLogout,
-    required this.authRepository,
   });
+
+  @override
+  State<KuentecoNavbar> createState() => _KuentecoNavbarState();
+}
+
+class _KuentecoNavbarState extends State<KuentecoNavbar> {
+  final AuthService _userService = AuthService();
+  UserDetailDTO? _selectedProfile;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,22 +87,22 @@ class KuentecoNavbar extends StatelessWidget {
   Widget _buildLogo(BuildContext context, bool isSmallScreen) {
     final double defaultWidth = isSmallScreen ? 220.0 : 250.0;
     final double defaultHeight = isSmallScreen ? 55.0 : 62.5;
-    final double width = logoWidth ?? defaultWidth;
-    final double height = useDefaultLogoSize ? defaultHeight : (logoHeight ?? defaultHeight);
+    final double width = widget.logoWidth ?? defaultWidth;
+    final double height = widget.useDefaultLogoSize ? defaultHeight : (widget.logoHeight ?? defaultHeight);
 
     return GestureDetector(
       onTap: () => _navigateToRoute(context, '/home'),
       child: Image.asset(
-        logoPath,
+        widget.logoPath,
         width: width,
-        height: useDefaultLogoSize ? null : height,
+        height: widget.useDefaultLogoSize ? null : height,
         fit: BoxFit.contain,
         errorBuilder: (_, __, ___) => SizedBox(
           width: width,
           height: height,
           child: Center(
             child: Text(
-              logoPlaceholderText,
+              widget.logoPlaceholderText,
               style: const TextStyle(color: Colors.white),
             ),
           ),
@@ -97,9 +113,14 @@ class KuentecoNavbar extends StatelessWidget {
 
   Widget _buildProfileButton(BuildContext context) {
     return PopupMenuButton<String>(
-      child: CircleAvatar(
+      tooltip: 'Opciones de cuenta',
+      child: _selectedProfile?.imageUrl != null
+          ? CircleAvatar(
+        backgroundImage: NetworkImage(_selectedProfile!.imageUrl!),
+      )
+          : const CircleAvatar(
         backgroundColor: Colors.white,
-        child: Icon(Icons.person, color: Theme.of(context).primaryColor),
+        child: Icon(Icons.person),
       ),
       itemBuilder: (BuildContext context) => const [
         PopupMenuItem<String>(value: 'account', child: Text('Mi cuenta')),
@@ -122,17 +143,13 @@ class KuentecoNavbar extends StatelessWidget {
             builder: (context) => const Center(child: CircularProgressIndicator()),
           );
 
-          await authRepository.logout();
+          await _userService.logout();
 
           if (context.mounted) Navigator.of(context).pop();
-          onLogout();
+          widget.onLogout();
 
           if (context.mounted) {
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/login',
-                  (route) => false,
-            );
+            Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
           }
         } catch (e) {
           if (context.mounted) Navigator.of(context).pop();
@@ -161,14 +178,9 @@ class KuentecoNavbar extends StatelessWidget {
     }
   }
 
-  Widget _buildButton(
-      BuildContext context,
-      String text,
-      String route, {
-        Color textColor = Colors.white,
-        bool isLarge = false,
-      }) {
-    final bool isActive = currentRoute == route;
+  Widget _buildButton(BuildContext context, String text, String route,
+      {Color textColor = Colors.white, bool isLarge = false}) {
+    final bool isActive = widget.currentRoute == route;
 
     return Material(
       color: Colors.transparent,
@@ -209,7 +221,7 @@ class KuentecoNavbar extends StatelessWidget {
   }
 
   void _navigateToRoute(BuildContext context, String route) {
-    if (route == currentRoute) return;
+    if (route == widget.currentRoute) return;
     Navigator.pushNamedAndRemoveUntil(context, route, (r) => false);
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kuenteco/screens/home/Logged_home_view.dart';
+import 'package:kuenteco/screens/home/logged_home_business_view.dart';
 
 import '../screens/auth/Login_view.dart';
 import '../screens/auth/code_recovery_view.dart';
@@ -25,7 +25,9 @@ class RouteGenerator {
         final email = settings.arguments as String;
         return MaterialPageRoute(builder: (_) => ValidateCodeScreen(email: email));
       case AppRoutes.home:
-        return MaterialPageRoute(builder: (_) => const LoggedInHomePage(title: title, onLogout: onLogout));
+        return MaterialPageRoute(builder: (_) => const LoggedInPersonalPage(onLogout: onLogout));
+        case AppRoutes.home:
+        return MaterialPageRoute(builder: (_) => const LoggedInBusinessPage(onLogout: onLogout));
       case AppRoutes.chat:
         return MaterialPageRoute(builder: (_) => const ChatAiScreen());
       case AppRoutes.chatHistory:

@@ -43,5 +43,4 @@ class ToastHelper {
     );
   }
 
-// Puedes agregar más variantes: info, warning, etc.
 }

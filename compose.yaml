@@ -12,9 +12,10 @@ services:
       postgres-master-database:
         condition: service_healthy
       postgres-replica-database:
-        condition: service_started
+        condition: service_healthy
     networks:
       - kuenteco-network
+    restart: unless-stopped
 
   postgres-master-database:
     build:
@@ -26,6 +27,8 @@ services:
       POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME_MASTER}
       POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD_MASTER}
       POSTGRES_DB: KuenteCO
+      REPLICATOR_USER: replicator
+      REPLICATOR_PASSWORD: ${SPRING_DATASOURCE_PASSWORD_SLAVE}
     volumes:
       - postgres-master-data:/var/lib/postgresql/data
       - ./Database/db:/db
@@ -34,10 +37,12 @@ services:
     networks:
       - kuenteco-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U master -d KuenteCO"]
+      test: ["CMD-SHELL", "pg_isready -U ${SPRING_DATASOURCE_USERNAME_MASTER} -d KuenteCO"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
+    restart: unless-stopped
 
   postgres-replica-database:
     build:
@@ -53,6 +58,7 @@ services:
       MASTER_PORT: 5432
       REPLICATOR_USER: replicator
       REPLICATOR_PASSWORD: ${SPRING_DATASOURCE_PASSWORD_SLAVE}
+      PGUSER: ${SPRING_DATASOURCE_USERNAME_SLAVE}
     volumes:
       - postgres-replica-data:/var/lib/postgresql/data
     ports:
@@ -62,6 +68,13 @@ services:
     depends_on:
       postgres-master-database:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${SPRING_DATASOURCE_USERNAME_SLAVE} -d KuenteCO || pg_isready"]
+      interval: 15s
+      timeout: 10s
+      retries: 8
+      start_period: 90s
+    restart: unless-stopped
 
 volumes:
   postgres-master-data:

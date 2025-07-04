@@ -1,10 +1,15 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../dto/auth/request/change_password_dto.dart';
 import '../../../dto/auth/request/login_user_dto.dart';
 import '../../../dto/auth/request/new_user_dto.dart';
 import '../../../dto/auth/request/send_verification_code_dto.dart';
 import '../../../dto/auth/request/validate_verification_code_dto.dart';
+import '../../../dto/auth/response/image_dto.dart';
 import '../../../dto/auth/response/token_response_dto.dart';
+import '../../../dto/auth/response/user_detail_dto.dart';
 import '../../exceptions/api_response.dart';
 import '../api_client.dart';
 
@@ -58,5 +63,39 @@ class AuthService {
 
   Future<void> deleteUser(String userId) async {
     await _api.deleteApp('/auth/$userId');
+  }
+
+  Future<ImageDTO> uploadProfileImage(File imageFile) async {
+    final formData = FormData.fromMap({
+      'image': await MultipartFile.fromFile(imageFile.path),
+    });
+    final response = await _api.postApp('/auth/user/image/add', {formData});
+    final json = response.data;
+    final apiResponse = ApiResponse<ImageDTO>.fromJson(
+      json,
+          (data) => ImageDTO.fromJson(data),
+    );
+    return apiResponse.data;
+  }
+  Future<ImageDTO> updateProfileImage(File imageFile) async {
+    final formData = FormData.fromMap({
+      'image': await MultipartFile.fromFile(imageFile.path),
+    });
+    final response = await _api.postApp('/auth/user/image/update', {formData});
+    final json = response.data;
+    final apiResponse = ApiResponse<ImageDTO>.fromJson(
+      json,
+          (data) => ImageDTO.fromJson(data),
+    );
+    return apiResponse.data;
+  }
+  Future<UserDetailDTO> getAuthenticatedUser() async {
+    final response = await _api.getApp('/auth/user/details');
+    final json = response.data;
+    final apiResponse = ApiResponse<UserDetailDTO>.fromJson(
+      json,
+          (data) => UserDetailDTO.fromJson(data),
+    );
+    return apiResponse.data;
   }
 }

@@ -1,21 +1,13 @@
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:kuenteco/utils/enum/account_type_enum.dart';
+import 'package:flutter/services.dart';
+import '../../core/services/app/profile_service.dart';
+import '../../dto/profile/new_profile_dto.dart';
+
 
 class CreateProfileWidget extends StatefulWidget {
-  final VoidCallback onAccountCreated;
-  final String authToken;
-  final String baseUrl;
-  final AuthRepository authRepository;
+  final VoidCallback onProfileCreated;
 
-
-
-  const CreateProfileWidget({
-    super.key,
-    required this.onAccountCreated,
-    required this.authToken,
-    required this.baseUrl, required this.authRepository,
-  });
+  const CreateProfileWidget({super.key, required this.onProfileCreated});
 
   @override
   State<CreateProfileWidget> createState() => _CreateProfileWidgetState();
@@ -23,207 +15,107 @@ class CreateProfileWidget extends StatefulWidget {
 
 class _CreateProfileWidgetState extends State<CreateProfileWidget> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  AccountType _selectedType = AccountType.PERSONAL;
-  bool _isSubmitting = false;
-  String _errorMessage = '';
+  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  final _profileService = ProfileService();
+
+  bool _isLoading = false;
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final dto = NewProfileDTO(
+        username: _usernameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      await _profileService.createProfile(dto);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Perfil creado exitosamente')),
+      );
+
+      widget.onProfileCreated();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al crear el perfil: $e')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
-  }
-
-  Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() {
-      _isSubmitting = true;
-      _errorMessage = '';
-    });
-
-    try {
-      final response = await widget.authRepository.registerAccount(
-        name: _nameController.text.trim(),
-        type: _selectedType,
-      );
-
-      if (response['status'] == 'success') {
-        _handleSuccess();
-      } else {
-        _handleError(response['message'] ?? 'Error al crear perfil');
-      }
-    } catch (e) {
-      _handleError('Error: ${e.toString()}');
-    } finally {
-      if (mounted) {
-        setState(() => _isSubmitting = false);
-      }
-    }
-  }
-
-  void _handleSuccess() {
-    widget.onAccountCreated();
-    if (mounted) {
-      Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Perfil creado correctamente'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
-  }
-
-  void _handleError(String message) {
-    if (mounted) {
-      setState(() => _errorMessage = message);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = Theme.of(context).textTheme;
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.all(20),
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-        child: Container(
-          padding: const EdgeInsets.all(20.0),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(15.0),
-            boxShadow: [
-              BoxShadow(
-                color: theme.colorScheme.primary.withOpacity(0.2),
-                blurRadius: 6,
-                spreadRadius: 1,
+    return Scaffold(
+      appBar: AppBar(title: const Text('Nuevo Perfil')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              Text("Crear nuevo perfil", style: theme.titleLarge),
+
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _usernameController,
+                decoration: const InputDecoration(labelText: 'Nombre de usuario'),
+                validator: (value) =>
+                value == null || value.isEmpty ? 'Este campo es obligatorio' : null,
+              ),
+
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(labelText: 'Correo electrónico'),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Este campo es obligatorio';
+                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    return 'Correo inválido';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _passwordController,
+                decoration: const InputDecoration(labelText: 'Contraseña'),
+                obscureText: true,
+                validator: (value) =>
+                value == null || value.length < 6 ? 'Mínimo 6 caracteres' : null,
+              ),
+
+              const SizedBox(height: 32),
+              _isLoading
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton.icon(
+                icon: const Icon(Icons.check),
+                label: const Text('Crear Perfil'),
+                onPressed: _submit,
               ),
             ],
-          ),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Crear Nuevo Perfil',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                if (_errorMessage.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Text(
-                      _errorMessage,
-                      style: const TextStyle(color: Colors.red),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _nameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Nombre del Perfil',
-                    labelStyle: const TextStyle(color: Colors.white),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: Colors.white),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  validator: (value) =>
-                      value?.isEmpty ?? true ? 'Ingresa un nombre' : null,
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<AccountType>(
-                      value: _selectedType,
-                      dropdownColor: Colors.black.withOpacity(0.8),
-                      isExpanded: true,
-                      icon: const Icon(Icons.arrow_drop_down,
-                          color: Colors.white),
-                      style: const TextStyle(color: Colors.white),
-                      hint: const Text(
-                        'Selecciona el tipo de cuenta',
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                      items: AccountType.values.map((AccountType type) {
-                        return DropdownMenuItem<AccountType>(
-                          value: type,
-                          child: Text(
-                            _getAccountTypeDisplayName(type),
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (AccountType? newValue) {
-                        if (newValue != null) {
-                          setState(() {
-                            _selectedType = newValue;
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _isSubmitting ? null : _submitForm,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 14, horizontal: 40),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: _isSubmitting
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.black,
-                          ),
-                        )
-                      : const Text(
-                          'CREAR PERFIL',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                ),
-              ],
-            ),
           ),
         ),
       ),
     );
-  }
-
-  String _getAccountTypeDisplayName(AccountType type) {
-    switch (type) {
-      case AccountType.PERSONAL:
-        return 'Personal';
-      case AccountType.BUSINESS:
-        return 'Negocio';
-      default:
-        return 'Personal';
-    }
   }
 }

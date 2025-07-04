@@ -1,0 +1,37 @@
+slave:
+  config:
+    activate:
+      on-profile: slave
+  datasource:
+    url: ${SPRING_DATASOURCE_URL_SLAVE}
+    username: ${SPRING_DATASOURCE_USERNAME_SLAVE}
+    password: ${SPRING_DATASOURCE_PASSWORD_SLAVE}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 5
+      idle-timeout: 20000
+      connection-timeout: 90000  # Aún más tiempo para la réplica
+      max-lifetime: 1800000
+      initialization-fail-timeout: 90000  # Más tiempo para la réplica
+      validation-timeout: 5000
+      leak-detection-threshold: 60000
+
+  jpa:
+    hibernate:
+      ddl-auto: none # Deshabilitamos DDL automático en el slave
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+        format_sql: true
+        connection:
+          read_only: true
+
+    # Deshabilitamos Flyway en el perfil esclavo
+    flyway:
+      enabled: false
+
+#logging:
+#  level:
+#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

@@ -1,5 +1,4 @@
-import '../../../dto/subscription_plan_dto.dart';
-
+/*
 class SubscriptionConstants {
   static const List<SubscriptionPlan> plans = [
     SubscriptionPlan(
@@ -31,4 +30,4 @@ class SubscriptionConstants {
       price: '29.900 COP',
     ),
   ];
-}
+}*/

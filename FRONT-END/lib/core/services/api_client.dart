@@ -95,6 +95,9 @@ class ApiClient {
 
   Future<Response> deleteApp(String path) => _dioApp.delete(path);
 
+  Future<Response> patchApp(String path, [dynamic data]) =>
+      _dioApp.patch(path, data: data);
+
   Future<Response> downloadFile(String path, String savePath) {
     return _dioApp.download(
       path,
