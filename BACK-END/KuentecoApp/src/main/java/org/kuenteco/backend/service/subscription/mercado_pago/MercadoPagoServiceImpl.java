@@ -1,16 +1,13 @@
 package org.kuenteco.backend.service.subscription.mercado_pago;
 
-import com.mercadopago.MercadoPagoConfig;
 import com.mercadopago.client.preapproval.PreApprovalAutoRecurringCreateRequest;
 import com.mercadopago.client.preapproval.PreapprovalClient;
 import com.mercadopago.client.preapproval.PreapprovalCreateRequest;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
-import com.mercadopago.net.MPResource;
 import com.mercadopago.resources.preapproval.Preapproval;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -87,7 +84,8 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
                                                     "Usuario no encontrado"));
 
             // Validar que no tenga una suscripción activa hasActiveSubscription
-            if (slaveMercadoPagoPreapprovalRepository.existsByUserAndSubscriptionState(user, State.ACTIVE)) {
+            if (slaveMercadoPagoPreapprovalRepository.existsByUserAndSubscriptionState(
+                    user, State.ACTIVE)) {
                 throw new SubscriptionMercadoPagoException(
                         "El usuario ya tiene una suscripción activa");
             }
@@ -108,7 +106,7 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
                     saveMercadoPagoPreapproval(preapproval, user, priceConfig);
 
             // Crear suscripción asociada
-                    createSubscription(user, savedPreapproval, request.getSubscriptionType());
+            createSubscription(user, savedPreapproval, request.getSubscriptionType());
 
             log.info(
                     "Suscripción creada exitosamente para usuario: {}, preapproval ID: {}",
@@ -120,7 +118,8 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
         } catch (MPApiException e) {
             log.error("Error al crear preapproval en MercadoPago: {}", e.getMessage(), e);
             if (e.getApiResponse() != null) {
-                log.error("Detalles del error de MercadoPago - Status: {}, Body: {}",
+                log.error(
+                        "Detalles del error de MercadoPago - Status: {}, Body: {}",
                         e.getApiResponse().getStatusCode(),
                         e.getApiResponse().getContent());
             }
@@ -135,7 +134,6 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
             throw new SubscriptionMercadoPagoException(
                     "Error al crear suscripción: " + e.getMessage());
         }
-
     }
 
     @Override
@@ -192,22 +190,23 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
 
         PreapprovalClient client = new PreapprovalClient();
 
-        PreapprovalCreateRequest createRequest = PreapprovalCreateRequest.builder()
-                .reason(priceConfig.getDescription())
-                .externalReference(externalReference)
-                .payerEmail(userEmail)
-                .backUrl(defaultBackUrl) // AQUÍ va el back_url, obligatorio
-                .autoRecurring(PreApprovalAutoRecurringCreateRequest.builder()
-                        .frequency(30)
-                        .frequencyType("days")
-                        .transactionAmount(priceConfig.getMonthlyPrice())
-                        .currencyId(priceConfig.getCurrencyId())
-                        .build())
-                .build();
+        PreapprovalCreateRequest createRequest =
+                PreapprovalCreateRequest.builder()
+                        .reason(priceConfig.getDescription())
+                        .externalReference(externalReference)
+                        .payerEmail(userEmail)
+                        .backUrl(defaultBackUrl) // AQUÍ va el back_url, obligatorio
+                        .autoRecurring(
+                                PreApprovalAutoRecurringCreateRequest.builder()
+                                        .frequency(30)
+                                        .frequencyType("days")
+                                        .transactionAmount(priceConfig.getMonthlyPrice())
+                                        .currencyId(priceConfig.getCurrencyId())
+                                        .build())
+                        .build();
 
         return client.create(createRequest);
     }
-
 
     private MercadoPagoPreapproval saveMercadoPagoPreapproval(
             Preapproval preapproval, User user, SubscriptionPriceConfigDTO priceConfig) {
@@ -253,6 +252,5 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
         // Actualizar la referencia bidireccional
         preapproval.setSubscription(subscription);
         masterMercadoPagoPreapprovalRepository.save(preapproval);
-
     }
 }

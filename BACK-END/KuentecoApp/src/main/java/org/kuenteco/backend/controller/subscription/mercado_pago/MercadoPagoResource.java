@@ -3,7 +3,6 @@ package org.kuenteco.backend.controller.subscription.mercado_pago;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.security.Principal;
-
 import org.kuenteco.backend.dto.subscription.mercado_pago.request.CreateSubscriptionRequestDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +21,6 @@ public interface MercadoPagoResource {
     @GetMapping("/subscription/{preapprovalId}")
     ResponseEntity<?> getSubscription(
             @PathVariable String preapprovalId, Principal principal, HttpServletRequest request);
-
 
     /** Obtiene el historial de pagos de una suscripción específica */
     @GetMapping("/subscription/{preapprovalId}/payment-history")
