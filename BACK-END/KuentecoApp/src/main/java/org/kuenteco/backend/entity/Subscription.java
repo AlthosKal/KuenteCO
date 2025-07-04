@@ -33,4 +33,18 @@ public class Subscription {
 
     @Enumerated(EnumType.STRING)
     private State state;
+
+    // Relación con MercadoPago Preapproval
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_mercadopago_preapproval")
+    private MercadoPagoPreapproval mercadoPagoPreapproval;
+
+    @Column(name = "is_auto_renewable")
+    private Boolean isAutoRenewable;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }

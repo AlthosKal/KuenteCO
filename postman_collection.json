@@ -2296,200 +2296,289 @@
 			"name": "📌 Payment Subscription",
 			"item": [
 				{
-					"name": "Tokenize Card",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"cardNumber\": \"4111111111111111\",\n  \"cvc\": \"123\",\n  \"expiryMonth\": \"12\",\n  \"expiryYear\": \"2025\",\n  \"cardHolder\": \"Juan Pérez\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/payments/tokenize-card",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"payments",
-								"tokenize-card"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get User Tokens",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/payments/tokens",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"payments",
-								"tokens"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Subscription Payment using a existing token",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"subscriptionType\": \"PREMIUM\",\n  \"paymentTokenId\": 123,\n  \"shippingAddress\": {\n    \"address_line_1\": \"Calle 123 #45-67\",\n    \"country\": \"CO\",\n    \"region\": \"Cundinamarca\",\n    \"city\": \"Bogotá\",\n    \"name\": \"Juan Pérez\",\n    \"phone_number\": \"+573001234567\"\n  },\n  \"customerData\": {\n    \"phone_number\": \"+573001234567\",\n    \"full_name\": \"Juan Pérez\"\n  },\n  \"paymentOptions\": {\n    \"installments\": 1\n  }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+					"name": "Wompi",
+					"item": [
+						{
+							"name": "Tokenize Card",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"cardNumber\": \"4111111111111111\",\n  \"cvc\": \"123\",\n  \"expiryMonth\": \"12\",\n  \"expiryYear\": \"2025\",\n  \"cardHolder\": \"Juan Pérez\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/wompi/payments/tokenize-card",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"wompi",
+										"payments",
+										"tokenize-card"
+									]
 								}
-							}
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/payments/subscription",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"payments",
-								"subscription"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Subscription Payment tokenized a new target card",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
 							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"subscriptionType\": \"STANDARD\",\n  \"cardInfo\": {\n    \"cardNumber\": \"4111111111111111\",\n    \"cvc\": \"123\",\n    \"expiryMonth\": \"12\",\n    \"expiryYear\": \"2025\",\n    \"cardHolder\": \"Juan Pérez\"\n  },\n  \"shippingAddress\": {\n    \"address_line_1\": \"Carrera 15 #93-07\",\n    \"country\": \"CO\",\n    \"region\": \"Cundinamarca\", \n    \"city\": \"Bogotá\",\n    \"name\": \"María González\",\n    \"phone_number\": \"+573009876543\"\n  },\n  \"customerData\": {\n    \"phone_number\": \"+573009876543\",\n    \"full_name\": \"María González\"\n  },\n  \"paymentOptions\": {\n    \"installments\": 3\n  }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							"response": []
 						},
-						"url": {
-							"raw": "{{base_url}}/v1/payments/subscription",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"payments",
-								"subscription"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Subscription Status",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/payments/subscription/1",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"payments",
-								"subscription",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Subscription Status Copy",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
+						{
+							"name": "Get User Tokens",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/wompi/payments/tokens",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"wompi",
+										"payments",
+										"tokens"
+									]
+								}
 							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"event\": \"transaction.updated\",\n  \"data\": {\n    \"id\": \"12345-abc-67890\",\n    \"status\": \"APPROVED\",\n    \"amount_in_cents\": 2990000,\n    \"currency\": \"COP\"\n  }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							"response": []
 						},
-						"url": {
-							"raw": "{{base_url}}/v1/payments/webhook/wompi",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"payments",
-								"webhook",
-								"wompi"
-							]
+						{
+							"name": "Create Subscription Payment using a existing token",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"subscriptionType\": \"PREMIUM\",\n  \"paymentTokenId\": 1,\n  \"shippingAddress\": {\n    \"address_line_1\": \"Calle 123 #45-67\",\n    \"country\": \"CO\",\n    \"region\": \"Cundinamarca\",\n    \"city\": \"Bogotá\",\n    \"name\": \"Juan Pérez\",\n    \"phone_number\": \"+573001234567\"\n  },\n  \"customerData\": {\n    \"phone_number\": \"+573001234567\",\n    \"full_name\": \"Juan Pérez\"\n  },\n  \"paymentOptions\": {\n    \"installments\": 1\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/wompi/payments/subscription",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"wompi",
+										"payments",
+										"subscription"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Subscription Payment tokenized a new target card",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"subscriptionType\": \"STANDARD\",\n  \"cardInfo\": {\n    \"cardNumber\": \"4111111111111111\",\n    \"cvc\": \"123\",\n    \"expiryMonth\": \"12\",\n    \"expiryYear\": \"2025\",\n    \"cardHolder\": \"Juan Pérez\"\n  },\n  \"shippingAddress\": {\n    \"address_line_1\": \"Carrera 15 #93-07\",\n    \"country\": \"CO\",\n    \"region\": \"Cundinamarca\", \n    \"city\": \"Bogotá\",\n    \"name\": \"María González\",\n    \"phone_number\": \"+573009876543\"\n  },\n  \"customerData\": {\n    \"phone_number\": \"+573009876543\",\n    \"full_name\": \"María González\"\n  },\n  \"paymentOptions\": {\n    \"installments\": 3\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/wompi/payments/subscription",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"wompi",
+										"payments",
+										"subscription"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Subscription Status",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/wompi/payments/subscription/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"wompi",
+										"payments",
+										"subscription",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Handle Wompi Webhook",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"event\": \"transaction.updated\",\n  \"data\": {\n    \"id\": \"12345-abc-67890\",\n    \"status\": \"APPROVED\",\n    \"amount_in_cents\": 2990000,\n    \"currency\": \"COP\"\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/wompi/payments/webhook",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"wompi",
+										"payments",
+										"webhook"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
+				},
+				{
+					"name": "Mercado Pago",
+					"item": [
+						{
+							"name": "Create Subscription",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"subscriptionType\": \"BASIC\",\n  \"backUrl\": \"https://github.com/AlthosKal/KuenteCO\"\n}\n"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/mercado-pago/subscription",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"mercado-pago",
+										"subscription"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Subscription",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/v1/mercado-pago/subscription/3c6183ee17d4492db87e133d47afee0e",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"mercado-pago",
+										"subscription",
+										"3c6183ee17d4492db87e133d47afee0e"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Payment History",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/v1/mercado-pago/subscription/3c6183ee17d4492db87e133d47afee0e/payment-history",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"mercado-pago",
+										"subscription",
+										"3c6183ee17d4492db87e133d47afee0e",
+										"payment-history"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		}

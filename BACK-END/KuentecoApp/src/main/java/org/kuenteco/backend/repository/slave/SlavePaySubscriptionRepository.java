@@ -10,7 +10,5 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional(transactionManager = "slaveTransactionManager", readOnly = true)
 public interface SlavePaySubscriptionRepository extends JpaRepository<PaySubscription, Integer> {
-    PaySubscription findBySubscription(Subscription subscription);
-
     Optional<PaySubscription> findByTransactionId(String transactionId);
 }

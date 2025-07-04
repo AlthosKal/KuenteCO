@@ -21,7 +21,7 @@
         <resilience4j.version>2.1.0</resilience4j.version>
         <springdoc-openapi.version>2.7.0</springdoc-openapi.version>
         <jansi.version>2.4.0</jansi.version>
-        <junit.version>5.11.4</junit.version>
+        <junit.jupiter.version>5.11.4</junit.jupiter.version>
         <mockito.version>5.4.0</mockito.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <lombok.version>1.18.32</lombok.version>
@@ -38,6 +38,9 @@
         <jakarta-validation.version>3.0.2</jakarta-validation.version>
         <poi-ooxml.version>5.3.0</poi-ooxml.version>
         <http.version>4.5.13</http.version>
+        <mercadopago.version>2.5.0</mercadopago.version>
+        <commons-beanutils.version>1.9.4</commons-beanutils.version>
+        <commons-logging.version>1.2</commons-logging.version>
 
         <!-- Plugin Versions -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
@@ -49,6 +52,18 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
+
+    <!-- Gestión de versiones de dependencias -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${commons-beanutils.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -198,10 +213,18 @@
             <version>${poi-ooxml.version}</version>
         </dependency>
 
+        <!-- API para escribir tests -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.version}</version>
+            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Motor para ejecutar los tests -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -258,16 +281,115 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>${http.version}</version> <!-- o la versión que prefieras unificar -->
+            <version>${http.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
-            <version>${http.version}</version> <!-- para garantizar también la convergencia de httpmime -->
+            <version>${http.version}</version>
+        </dependency>
+
+        <!-- MercadoPago SDK con exclusiones para evitar conflictos -->
+        <dependency>
+            <groupId>com.mercadopago</groupId>
+            <artifactId>sdk-java</artifactId>
+            <version>${mercadopago.version}</version>
+            <exclusions>
+                <!-- Excluir dependencias de Maven que no son necesarias en runtime -->
+                <exclusion>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.maven</groupId>
+                    <artifactId>maven-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.maven</groupId>
+                    <artifactId>maven-artifact</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.maven</groupId>
+                    <artifactId>maven-model</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.maven</groupId>
+                    <artifactId>maven-plugin-api</artifactId>
+                </exclusion>
+                <!-- Excluir dependencias de Plexus -->
+                <exclusion>
+                    <groupId>org.codehaus.plexus</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <!-- Excluir Maven Doxia (documentación) -->
+                <exclusion>
+                    <groupId>org.apache.maven.doxia</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <!-- Excluir Maven Wagon -->
+                <exclusion>
+                    <groupId>org.apache.maven.wagon</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <!-- Excluir Maven Resolver -->
+                <exclusion>
+                    <groupId>org.apache.maven.resolver</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <!-- Excluir Maven Reporting -->
+                <exclusion>
+                    <groupId>org.apache.maven.reporting</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <!-- Excluir Maven Shared -->
+                <exclusion>
+                    <groupId>org.apache.maven.shared</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <!-- Excluir JUnit 4 que viene como transitiva -->
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+                <!-- Excluir versiones antiguas de commons-beanutils -->
+                <exclusion>
+                    <groupId>commons-beanutils</groupId>
+                    <artifactId>commons-beanutils</artifactId>
+                </exclusion>
+                <!-- Excluir Apache Commons Digester que trae la versión antigua -->
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-digester3</artifactId>
+                </exclusion>
+                <!-- Excluir Velocity Tools si no las necesitas -->
+                <exclusion>
+                    <groupId>org.apache.velocity.tools</groupId>
+                    <artifactId>velocity-tools-generic</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Agregar explícitamente commons-beanutils con la versión deseada -->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>${commons-beanutils.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>${commons-logging.version}</version>
+        </dependency>
+
+        <!-- Agregar las dependencias necesarias para Velocity que podrían haber sido excluidas -->
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-engine-core</artifactId>
+            <version>2.3</version>
         </dependency>
     </dependencies>
-
 
     <!-- Sección de configuración de construcción del proyecto -->
     <build>
@@ -286,7 +408,7 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>repackage</goal> <!-- Reempaquetado para hacer un JAR ejecutable -->
+                            <goal>repackage</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -301,7 +423,7 @@
                     <execution>
                         <id>enforce</id>
                         <goals>
-                            <goal>enforce</goal> <!-- Impone reglas sobre versiones de dependencias y Java -->
+                            <goal>enforce</goal>
                         </goals>
                         <configuration>
                             <rules>
@@ -327,8 +449,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>${java.version}</source> <!-- Versión de Java para el código fuente -->
-                    <target>${java.version}</target> <!-- Versión de Java para el código compilado -->
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.mapstruct</groupId>
@@ -356,13 +478,13 @@
                 <configuration>
                     <java>
                         <includes>
-                            <include>src/main/java/**/*.java</include> <!-- Check application code -->
-                            <include>src/test/java/**/*.java</include> <!-- Check application tests code -->
+                            <include>src/main/java/**/*.java</include>
+                            <include>src/test/java/**/*.java</include>
                         </includes>
-                        <importOrder /> <!-- standard import order -->
-                        <removeUnusedImports /> <!-- remove unused imports -->
+                        <importOrder />
+                        <removeUnusedImports />
                         <googleJavaFormat>
-                            <style>AOSP</style> <!-- or GOOGLE (optional) -->
+                            <style>AOSP</style>
                         </googleJavaFormat>
                     </java>
                 </configuration>

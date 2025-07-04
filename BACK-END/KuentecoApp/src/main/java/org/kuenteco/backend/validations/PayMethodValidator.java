@@ -3,7 +3,7 @@ package org.kuenteco.backend.validations;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
-import org.kuenteco.backend.dto.subscription.request.api.TokenizeCardRequestDTO;
+import org.kuenteco.backend.dto.subscription.wompi.request.api.TokenizeCardRequestDTO;
 
 public class PayMethodValidator
         implements ConstraintValidator<PayMethodConstraint, TokenizeCardRequestDTO> {

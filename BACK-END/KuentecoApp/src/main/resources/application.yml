@@ -33,6 +33,9 @@ wompi:
   events-secret: ${WOMPI_EVENTS_SECRET}
   integrity-secret: ${WOMPI_INTEGRITY_SECRET}
 
+mercadopago:
+  access-token: ${MERCADOPAGO_ACCESS_TOKEN}
+
 resilience4j:
   circuitbreaker:
     configs:

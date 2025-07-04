@@ -6,7 +6,7 @@ import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
 import java.lang.annotation.*;
 import java.time.YearMonth;
-import org.kuenteco.backend.dto.subscription.request.api.TokenizeCardRequestDTO;
+import org.kuenteco.backend.dto.subscription.wompi.request.api.TokenizeCardRequestDTO;
 
 /** Anotación para validar que la fecha de expiración de la tarjeta no esté vencida */
 @Documented

@@ -22,6 +22,9 @@ public class BackEndApplication {
         System.setProperty("CLOUDINARY_API_KEY", dotenv.get("CLOUDINARY_API_KEY"));
         System.setProperty("CLOUDINARY_API_SECRET", dotenv.get("CLOUDINARY_API_SECRET"));
 
+        // API de MercadoPago
+        System.setProperty("MERCADOPAGO_ACCESS_TOKEN", dotenv.get("MERCADOPAGO_ACCESS_TOKEN"));
+
         // API de Wompi
         System.setProperty("WOMPI_BASE_URL", dotenv.get("WOMPI_BASE_URL"));
         System.setProperty("WOMPI_PUBLIC_KEY", dotenv.get("WOMPI_PUBLIC_KEY"));

@@ -206,4 +206,59 @@ public class GlobalExceptionHandler {
                                 "Error con el servicio de Tokenización: " + ex.getMessage(),
                                 req.getDescription(false)));
     }
+
+    @ExceptionHandler(MercadoPagoException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMercadoPagoException(
+            MercadoPagoException ex, HttpServletRequest request) {
+        log.error("Error en MercadoPago: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ApiResponse.error(
+                                "Error en el procesamiento del pago: " + ex.getMessage(),
+                                request.getRequestURI()));
+    }
+
+    @ExceptionHandler(SubscriptionMercadoPagoException.class)
+    public ResponseEntity<ApiResponse<Void>> handleSubscriptionMercadoPagoException(
+            SubscriptionMercadoPagoException ex, HttpServletRequest request) {
+        log.error("Error en suscripción MercadoPago: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ApiResponse.error(
+                                "Error en la suscripción: " + ex.getMessage(),
+                                request.getRequestURI()));
+    }
+
+    @ExceptionHandler(PreapprovalException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePreapprovalException(
+            PreapprovalException ex, HttpServletRequest request) {
+        log.error("Error en preapproval: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ApiResponse.error(
+                                "Error en la autorización de pago recurrente: " + ex.getMessage(),
+                                request.getRequestURI()));
+    }
+
+    @ExceptionHandler(WebhookException.class)
+    public ResponseEntity<ApiResponse<Void>> handleWebhookException(
+            WebhookException ex, HttpServletRequest request) {
+        log.error("Error en webhook: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ApiResponse.error(
+                                "Error en el procesamiento de notificación: " + ex.getMessage(),
+                                request.getRequestURI()));
+    }
+
+    @ExceptionHandler(SubscriptionPriceException.class)
+    public ResponseEntity<ApiResponse<Void>> handleSubscriptionPriceException(
+            SubscriptionPriceException ex, HttpServletRequest request) {
+        log.error("Error en precio de suscripción: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ApiResponse.error(
+                                "Error en la configuración de precios: " + ex.getMessage(),
+                                request.getRequestURI()));
+    }
 }
