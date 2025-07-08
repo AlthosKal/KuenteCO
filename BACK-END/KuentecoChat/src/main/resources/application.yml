@@ -1,0 +1,62 @@
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400
+
+spring:
+  application:
+    name: AiProfileChat
+
+  data:
+    mongodb:
+      uri: ${MONGO_URI}
+      auto-index-creation: true
+  ai:
+    deepseek:
+      base-url: ${DEEPSEEK_BASE_URL}
+      api-key: ${DEEPSEEK_KEY}
+      chat:
+        options:
+          model: ${DEEPSEEK_MODEL}
+          temperature: 0.7
+
+    openai:
+      api-key: ${OPENAI_KEY}
+      chat:
+        options:
+          model: ${OPENAI_MODEL}
+          temperature: 0.7
+  cache:
+    type: caffeine
+server:
+  port: 7070
+  error:
+    include-stacktrace: never
+  servlet:
+    context-path: /api/chat
+
+management:
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: never
+
+http-connector:
+  hosts:
+    ai-profile-app:
+      host: ${AI_PROFILE_APP_URL}
+      endpoints:
+        get-ai-profile-info:
+          url: "/v1/transaction"
+          readTimeout: 5000
+          writeTimeout: 5000
+          connectionTimeout: 5000
+
+logging:
+  level:
+    com.example.back_end.AiProfileChat.connector: DEBUG
+    org.springframework.web.reactive.function.client: DEBUG
+    org.springframework: INFO

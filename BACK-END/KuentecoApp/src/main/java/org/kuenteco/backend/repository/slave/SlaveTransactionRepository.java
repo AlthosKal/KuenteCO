@@ -1,7 +1,7 @@
 package org.kuenteco.backend.repository.slave;
 
 import java.util.List;
-import org.kuenteco.backend.dto.logic.transaction.TransactionSummaryDTO;
+import org.kuenteco.backend.dto.logic.transaction.kuenteco.TransactionSummaryDTO;
 import org.kuenteco.backend.entity.Category;
 import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.Transaction;

@@ -26,15 +26,32 @@ cloudinary:
   api_key: ${CLOUDINARY_API_KEY}
   api_secret: ${CLOUDINARY_API_SECRET}
 
-wompi:
-  public-key: ${WOMPI_PUBLIC_KEY}
-  private-key: ${WOMPI_PRIVATE_KEY}
-  base-url: ${WOMPI_BASE_URL}
-  events-secret: ${WOMPI_EVENTS_SECRET}
-  integrity-secret: ${WOMPI_INTEGRITY_SECRET}
-
 mercadopago:
   access-token: ${MERCADOPAGO_ACCESS_TOKEN}
+
+bancolombia:
+  sandbox:
+    base-url: https://sandbox.conecta.bancolombia.com
+    auth:
+      token-url: https://sandbox.conecta.bancolombia.com/oauth2/v1/token
+      client-id: ${BANCOLOMBIA_CLIENT_ID}
+      client-secret: ${BANCOLOMBIA_CLIENT_SECRET}
+      scope: "accounts transactions"
+      token-expiration-buffer-seconds: 300
+    api:
+      endpoints:
+        accounts: /conecta/v1/accounts
+        transactions: /conecta/v1/accounts/{accountId}/transactions
+      timeout-seconds: 30
+      max-retries: 3
+    ssl:
+      enabled: false
+      keystore-path: ""
+      keystore-password: ""
+      keystore-type: "PKCS12"
+      trust-store-path: ""
+      trust-store-password: ""
+
 
 resilience4j:
   circuitbreaker:

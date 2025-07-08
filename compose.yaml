@@ -3,11 +3,11 @@ services:
     image: yefff/image-backend-kuenteco:1.1.0
     container_name: BackendKuenteCO
     volumes:
-      - ./.env-docker:/workspace/.env
+      - ./.env.docker:/workspace/.env
     ports:
       - "8080:8080"
     env_file:
-    - .env-docker
+    - .env.docker
     depends_on:
       postgres-master-database:
         condition: service_healthy

@@ -7,7 +7,7 @@ KuenteCO/BACK-END/target/
 !KuenteCO/BACK-END/.mvn/wrapper/maven-wrapper.jar
 !KuenteCO/BACK-END/**/src/main/**/target/
 !KuenteCO/BACK-END/**/src/test/**/target/
-.env-docker
+.env.docker
 requerimientos.txt
 # Spring Tool Suite (STS)
 KuenteCO/BACK-END/.apt_generated
@@ -96,3 +96,8 @@ FRONT-END/pubspec.lock
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
 # KuenteCO/FRONT-END/.vscode/
+
+# Certificates
+private.key
+public.cert
+public.pem

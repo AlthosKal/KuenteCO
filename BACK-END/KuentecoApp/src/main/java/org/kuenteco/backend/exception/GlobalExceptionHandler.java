@@ -15,7 +15,6 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 
 @Slf4j
 @RestControllerAdvice
@@ -110,14 +109,6 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }
 
-    @ExceptionHandler(SubscriptionException.class)
-    public ResponseEntity<ApiResponse<Void>> handleSubscriptionException(
-            SubscriptionException ex, HttpServletRequest request) {
-        log.warn("Error con el servicio de Subscripción: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
-    }
-
     // Maneja directamente BadCredentialsException de Spring Security
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadCredentials(
@@ -177,36 +168,6 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }
 
-    @ExceptionHandler(WompiException.class)
-    public ResponseEntity<ApiResponse<Void>> handleWompiException(
-            WompiException ex, WebRequest req) {
-        return ResponseEntity.badRequest()
-                .body(
-                        ApiResponse.error(
-                                "Error con el servicio de Wompi: " + ex.getMessage(),
-                                req.getDescription(false)));
-    }
-
-    @ExceptionHandler(PaymentProcessingException.class)
-    public ResponseEntity<ApiResponse<Void>> handlePaymentProcessingException(
-            WompiException ex, WebRequest req) {
-        return ResponseEntity.badRequest()
-                .body(
-                        ApiResponse.error(
-                                "Error con el servicio de Proceso de Pago: " + ex.getMessage(),
-                                req.getDescription(false)));
-    }
-
-    @ExceptionHandler(TokenizationException.class)
-    public ResponseEntity<ApiResponse<Void>> handleTokenizationException(
-            TokenizationException ex, WebRequest req) {
-        return ResponseEntity.badRequest()
-                .body(
-                        ApiResponse.error(
-                                "Error con el servicio de Tokenización: " + ex.getMessage(),
-                                req.getDescription(false)));
-    }
-
     @ExceptionHandler(MercadoPagoException.class)
     public ResponseEntity<ApiResponse<Void>> handleMercadoPagoException(
             MercadoPagoException ex, HttpServletRequest request) {
@@ -229,28 +190,6 @@ public class GlobalExceptionHandler {
                                 request.getRequestURI()));
     }
 
-    @ExceptionHandler(PreapprovalException.class)
-    public ResponseEntity<ApiResponse<Void>> handlePreapprovalException(
-            PreapprovalException ex, HttpServletRequest request) {
-        log.error("Error en preapproval: {}", ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(
-                        ApiResponse.error(
-                                "Error en la autorización de pago recurrente: " + ex.getMessage(),
-                                request.getRequestURI()));
-    }
-
-    @ExceptionHandler(WebhookException.class)
-    public ResponseEntity<ApiResponse<Void>> handleWebhookException(
-            WebhookException ex, HttpServletRequest request) {
-        log.error("Error en webhook: {}", ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(
-                        ApiResponse.error(
-                                "Error en el procesamiento de notificación: " + ex.getMessage(),
-                                request.getRequestURI()));
-    }
-
     @ExceptionHandler(SubscriptionPriceException.class)
     public ResponseEntity<ApiResponse<Void>> handleSubscriptionPriceException(
             SubscriptionPriceException ex, HttpServletRequest request) {
@@ -260,5 +199,91 @@ public class GlobalExceptionHandler {
                         ApiResponse.error(
                                 "Error en la configuración de precios: " + ex.getMessage(),
                                 request.getRequestURI()));
+    }
+
+    // Manejo de excepciones específicas de Bancolombia
+    @ExceptionHandler(BancolombiaAuthenticationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBancolombiaAuthenticationException(
+            BancolombiaAuthenticationException ex, HttpServletRequest request) {
+        log.error("Error de autenticación con Bancolombia: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error("Error de autenticación con Bancolombia: " + ex.getMessage(),
+                        request.getRequestURI()));
+    }
+
+    @ExceptionHandler(BancolombiaAuthorizationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBancolombiaAuthorizationException(
+            BancolombiaAuthorizationException ex, HttpServletRequest request) {
+        log.error("Error de autorización con Bancolombia: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error("Error de autorización con Bancolombia: " + ex.getMessage(),
+                        request.getRequestURI()));
+    }
+
+    @ExceptionHandler(BancolombiaRateLimitException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBancolombiaRateLimitException(
+            BancolombiaRateLimitException ex, HttpServletRequest request) {
+        log.error("Límite de tasa excedido en Bancolombia: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(ApiResponse.error("Límite de tasa excedido. Por favor, intente más tarde.",
+                        request.getRequestURI()));
+    }
+
+    @ExceptionHandler(BancolombiaTimeoutException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBancolombiaTimeoutException(
+            BancolombiaTimeoutException ex, HttpServletRequest request) {
+        log.error("Timeout en Bancolombia: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT)
+                .body(ApiResponse.error("Timeout en la conexión con Bancolombia. Por favor, intente más tarde.",
+                        request.getRequestURI()));
+    }
+
+    @ExceptionHandler(BancolombiaApiException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBancolombiaApiException(
+            BancolombiaApiException ex, HttpServletRequest request) {
+        log.error("Error en API de Bancolombia: {}", ex.getMessage());
+
+        HttpStatus status;
+        String message = switch (ex.getHttpStatus()) {
+            case 404 -> {
+                status = HttpStatus.NOT_FOUND;
+                yield "Recurso no encontrado en Bancolombia";
+            }
+            case 400 -> {
+                status = HttpStatus.BAD_REQUEST;
+                yield "Solicitud inválida a Bancolombia";
+            }
+            case 503 -> {
+                status = HttpStatus.SERVICE_UNAVAILABLE;
+                yield "Servicio de Bancolombia no disponible";
+            }
+            default -> {
+                status = HttpStatus.INTERNAL_SERVER_ERROR;
+                yield "Error en el servicio de Bancolombia";
+            }
+        };
+
+        return ResponseEntity.status(status)
+                .body(ApiResponse.error(message, request.getRequestURI()));
+    }
+
+    @ExceptionHandler(BancolombiaConfigurationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBancolombiaConfigurationException(
+            BancolombiaConfigurationException ex, HttpServletRequest request) {
+        log.error("Error de configuración de Bancolombia: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("Error de configuración del servicio",
+                        request.getRequestURI()));
+    }
+
+    @ExceptionHandler(BancolombiaException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBancolombiaException(
+            BancolombiaException ex, HttpServletRequest request) {
+        log.error("Error general de Bancolombia: {}", ex.getMessage());
+
+        HttpStatus status = HttpStatus.valueOf(ex.getHttpStatus());
+        return ResponseEntity.status(status)
+                .body(ApiResponse.error("Error en el servicio de Bancolombia: " + ex.getMessage(),
+                        request.getRequestURI()));
     }
 }

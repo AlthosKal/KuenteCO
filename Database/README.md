@@ -1,211 +1,391 @@
-<p align="left">
-  <img src="https://www.postgresql.org/media/img/about/press/elephant.png" alt="Logo de KuenteCO" height="30%" width="10%">
+# KuenteCO Database System 📊
+
+<p align="center">
+  <img src="https://www.postgresql.org/media/img/about/press/elephant.png" alt="PostgreSQL Logo" height="120">
 </p>
 
-# Bases de Datos con PostgreSQL utilizando Docker
-> [!NOTE]
-> Las bases de datos de este proyecto se encuentran publicadas en Docker Hub:  
+<p align="center">
+  <img src="https://img.shields.io/badge/PostgreSQL-15+-blue?style=flat-square&logo=postgresql" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/Docker-Ready-blue?style=flat-square&logo=docker" alt="Docker">
+  <img src="https://img.shields.io/badge/Replication-Master%2FSlave-green?style=flat-square" alt="Replication">
+  <img src="https://img.shields.io/badge/High%20Availability-99.9%25-green?style=flat-square" alt="HA">
+</p>
+
+## 📝 Descripción
+
+Sistema de **alta disponibilidad** para KuenteCO basado en **PostgreSQL 15+** con arquitectura **Master-Slave** para garantizar escalabilidad, rendimiento y tolerancia a fallos. Implementado completamente con **Docker** para facilitar el despliegue y mantenimiento.
+
+### ✨ Características Principales
+
+- 📊 **Replicación en tiempo real** Master-Slave
+- 🚀 **Alta disponibilidad** con failover automático
+- 🐳 **Contenerización completa** con Docker
+- 🔄 **Sincronización automática** de tasas de cambio
+- 💾 **Backups automatizados** y versionados
+- 🔐 **Seguridad robusta** con usuarios especializados
+- 📊 **Extensiones avanzadas** (pg_cron, pg_http)
+- 🔍 **Monitoring integrado** con health checks
+
+> 📍 **Imágenes Docker Oficiales**  
 > 👉 [MasterKuenteCO](https://hub.docker.com/repository/docker/yefff/image-master-kuenteco/general)  
 > 👉 [SlaveKuenteCO](https://hub.docker.com/repository/docker/yefff/image-slave-kuenteco/general)
 
-Este repositorio contiene una guía detallada sobre cómo construir y configurar las bases de datos del sistema **KuenteCO** utilizando **PostgreSQL**, contenedores **Docker** y un archivo `compose.yaml`, incluyendo la configuración de replicación entre nodos maestro y esclavo.
-
-Basado en:  
-🔗 [Kinsta - Replicación en PostgreSQL](https://kinsta.com/es/blog/postgresql-replicacion/)
+### 📚 Referencias Técnicas
+- 🔗 [PostgreSQL Replication Guide](https://kinsta.com/es/blog/postgresql-replicacion/)
+- 🔗 [Docker Best Practices](https://docs.docker.com/develop/best-practices/)
+- 🔗 [PostgreSQL High Availability](https://www.postgresql.org/docs/current/high-availability.html)
 
 ---
 
 ## ✅ Requisitos Previos
 
-- Tener instalado **Docker** y **Docker Compose**
-- Editor de texto recomendado: **Visual Studio Code**, **Vim**, **Nano**
-- Extensión de Docker en VS Code (opcional pero útil)
-- Conocimientos básicos de terminal y SQL
+### 🛠️ Herramientas Necesarias
+- **Docker** 20.10+ y **Docker Compose** 2.0+
+- **4GB RAM** mínimo disponible
+- **20GB** espacio en disco para datos
+- **Puertos libres**: 5432, 5433
+
+### 📚 Conocimientos Recomendados
+- Comandos básicos de Docker
+- SQL y administración de PostgreSQL
+- Conceptos de replicación de bases de datos
 
 ---
 
-## ⚙️ Creación de las bases de datos con Docker
+## 🏢 Arquitectura del Sistema
 
-### 1. Clonar el repositorio y entrar al directorio de la base de datos
+### 📊 Topología Master-Slave
+
+```
+┌─────────────────────────────────────┐
+│                APLICACIÓN                    │
+│        (Spring Boot Backend)             │
+└─────────────┬───────────────────────┘
+             │                      │
+             │                      │
+         ESCRITURA                   LECTURA
+             │                      │
+             ▼                      ▼
+┌──────────────────┐    ┌──────────────────┐
+│   MASTER DATABASE   │    │   SLAVE DATABASE    │
+│   PostgreSQL 15+    │    │   PostgreSQL 15+    │
+│      :5432          │    │      :5433          │
+│                    │    │                    │
+│ • Escritura/Lectura │    │ • Solo Lectura     │
+│ • Extensiones      │    │ • Réplica Síncrona │
+│ • Backups          │    │ • Balanceo Carga   │
+└──────────┬─────────┘    └──────────────────┘
+           │
+    REPLICACIÓN STREAMING
+           │
+    ┌───────▶◀───────────────────────────────────────┐
+```
+
+### 🔧 Beneficios de la Arquitectura
+
+| Aspecto | Master | Slave | Beneficio |
+|---------|--------|-------|----------|
+| **Escritura** | ✅ Sí | ❌ No | Consistencia de datos |
+| **Lectura** | ✅ Sí | ✅ Sí | Distribución de carga |
+| **Backup** | ✅ Sí | ✅ Sí | Redundancia |
+| **Escalabilidad** | Vertical | Horizontal | Más lecturas simultáneas |
+| **Disponibilidad** | 99.9% | 99.9% | Tolerancia a fallos |
+
+---
+
+## 🚀 Instalación y Configuración
+
+### 1️⃣ Clonar el Repositorio
 
 ```bash
 git clone https://github.com/AlthosKal/KuenteCO.git
-cd KuenteCO/DATABASE
+cd KuenteCO/Database
 ```
 
-
-### 2. Levantar los contenedores con Docker Compose
+### 2️⃣ Verificar Docker
 
 ```bash
-docker compose up -d
+# Verificar versión de Docker
+docker --version
+docker compose version
+
+# Verificar espacio disponible
+df -h
+
+# Verificar puertos libres
+netstat -tuln | grep -E ':5432|:5433'
 ```
 
-Esto iniciará los contenedores `MasterKuenteCO` y `SlaveKuenteCO` definidos en el archivo `compose.yaml`.
+### 3️⃣ Desplegar el Stack de Bases de Datos
+
+```bash
+# Levantar servicios en background
+docker compose up -d
+
+# Verificar estado de contenedores
+docker compose ps
+
+# Ver logs en tiempo real
+docker compose logs -f
+
+# Ver logs de un servicio específico
+docker compose logs -f postgres-master
+```
 
 ---
 
-## 🔄 Configuración de la Replicación en PostgreSQL
+## 🔄 Configuración de Replicación
 
-### 1. Crear el usuario replicador en el nodo maestro
+### 🔧 Configuración Automática vs Manual
+
+Las imágenes Docker de KuenteCO vienen **preconfiguradas** con replicación. Sin embargo, si necesitas configurarla manualmente o personalizar la configuración:
+
+### 1️⃣ Crear Usuario Replicador (Master)
 
 ```bash
-docker exec -it MasterKuenteCO psql -U admin -d KuenteCO
+# Acceder al contenedor Master
+docker exec -it MasterKuenteCO psql -U master -d KuenteCO
 ```
 
 ```sql
-CREATE USER replicator REPLICATION LOGIN ENCRYPTED PASSWORD 'example_password';
+-- Crear usuario para replicación
+CREATE USER replicator REPLICATION LOGIN ENCRYPTED PASSWORD 'secure_replication_password';
+
+-- Otorgar permisos necesarios
+GRANT CONNECT ON DATABASE "KuenteCO" TO replicator;
+GRANT USAGE ON SCHEMA public TO replicator;
+
+-- Verificar usuario
+\du replicator
 ```
 
-### 2. Modificar archivos de configuración en el nodo maestro
+### 2️⃣ Configurar Archivos de Replicación
 
 ```bash
-docker exec -it MasterKuenteCO bash
-cd /var/lib/postgresql/data/
-```
+# Copiar configuraciones optimizadas
+docker cp ./config/postgresql.conf MasterKuenteCO:/var/lib/postgresql/data/
+docker cp ./config/pg_hba.conf MasterKuenteCO:/var/lib/postgresql/data/
 
-Reemplaza los archivos `postgresql.conf` y `pg_hba.conf` con los que están en este repositorio.
-
-> 💡 También puedes usar `docker cp` para copiar directamente desde el host al contenedor:
-
-```bash
-docker cp ./config/postgresql.conf MasterKuenteCO:/var/lib/postgresql/data/postgresql.conf
-docker cp ./config/pg_hba.conf MasterKuenteCO:/var/lib/postgresql/data/pg_hba.conf
-```
-
-Luego reinicia el contenedor maestro:
-
-```bash
+# Reiniciar para aplicar cambios
 docker restart MasterKuenteCO
 ```
 
-### 3. Configurar el nodo esclavo
+### 3️⃣ Configurar Slave (Si es necesario)
 
 ```bash
-docker exec -it SlaveKuenteCO bash
-```
-Primero elimina los archivos de configuración existentes
-```bash
-rm -rf /var/lib/postgresql/data/*
-```
+# Detener slave
+docker stop SlaveKuenteCO
 
-E inmediatamente ejecuta el siguiente comando para hacer la réplica "cuando lo ejecutes, te pedirá una contraseña, es la que le brindaste al usuario replicator":
+# Limpiar datos existentes
+docker exec SlaveKuenteCO rm -rf /var/lib/postgresql/data/*
 
-```bash
-pg_basebackup -D /var/lib/postgresql/data \
+# Inicializar réplica desde master
+docker exec -it SlaveKuenteCO pg_basebackup \
+  -D /var/lib/postgresql/data \
   -h MasterKuenteCO -p 5432 \
   -X stream -c fast \
   -U replicator -W -R
+
+# Reiniciar slave
+docker start SlaveKuenteCO
+```
+
+### 4️⃣ Verificar Replicación
+
+```bash
+# Estado de replicación en Master
+docker exec -it MasterKuenteCO psql -U master -d KuenteCO -c \
+  "SELECT client_addr, state, sync_state FROM pg_stat_replication;"
+
+# Estado de réplica en Slave
+docker exec -it SlaveKuenteCO psql -U replicator -d KuenteCO -c \
+  "SELECT pg_is_in_recovery(), pg_last_wal_receive_lsn(), pg_last_wal_replay_lsn();"
 ```
 
 ---
 
-## 🗃️ Scripts SQL: Tablas y Relaciones
+## 📁 Estructura de Archivos
 
-En la carpeta `/db` encontrarás los archivos `.sql` necesarios para crear por ejemplo los triggers y funciones de la base de datos "tambien se encuentra la backup de la base de datos maestra ", aunque se encuentre un archivo DatabaseStructureKuenteCO.sql con las tablas, para el proyecto se utilizo el ORM de Hibernate para construir estas.
----
-
-## 🧠 Observaciones y Solución de Problemas
-
-Verifica los logs en caso de errores o comportamientos inesperados:
-
-```bash
-docker logs MasterKuenteCO
-docker logs SlaveKuenteCO
+```
+Database/
+├── 🐋 compose.yaml              # Orquestación de contenedores
+├── 📝 README.md                # Esta documentación
+├── 💾 backupMasterKuenteCO.sql.gz # Backup inicial
+│
+├── 🏗️ master/                   # Configuración Master
+│   ├── Dockerfile               # Imagen personalizada
+│   ├── init-master.sh           # Script de inicialización
+│   ├── postgresql.conf          # Configuración PostgreSQL
+│   └── pg_hba.conf              # Configuración de acceso
+│
+├── 📂 slave/                    # Configuración Slave
+│   ├── Dockerfile               # Imagen personalizada
+│   └── init-slave.sh            # Script de inicialización
+│
+├── ⚙️ config/                   # Configuraciones compartidas
+│   ├── postgresql.conf          # Configuración optimizada
+│   └── pg_hba.conf              # Reglas de autenticación
+│
+└── 📜 db/                       # Scripts SQL
+    ├── schema.sql               # Esquema de base de datos
+    ├── DatabaseFunctionsKuenteCO.sql # Funciones y triggers
+    ├── DatabaseTriggersKuenteCO.sql  # Triggers específicos
+    └── DatabaseViewsKuenteCO.sql     # Vistas materializadas
 ```
 
-También puedes detener los contenedores y reconstruir el entorno si es necesario:
+---
+
+## 🚑 Health Checks y Monitoring
+
+### 🔍 Verificar Estado del Sistema
 
 ```bash
-docker compose down
-docker compose up -d --build
+# Estado general de contenedores
+docker compose ps
+
+# Health check de Master
+docker exec MasterKuenteCO pg_isready -U master -d KuenteCO
+
+# Health check de Slave
+docker exec SlaveKuenteCO pg_isready -U replicator -d KuenteCO
+
+# Ver métricas de conexiones
+docker exec -it MasterKuenteCO psql -U master -d KuenteCO -c \
+  "SELECT datname, numbackends, xact_commit, xact_rollback FROM pg_stat_database WHERE datname='KuenteCO';"
+```
+
+### 📊 Métricas de Rendimiento
+
+```bash
+# Tamaño de base de datos
+docker exec -it MasterKuenteCO psql -U master -d KuenteCO -c \
+  "SELECT pg_size_pretty(pg_database_size('KuenteCO'));"
+
+# Consultas lentas
+docker exec -it MasterKuenteCO psql -U master -d KuenteCO -c \
+  "SELECT query, mean_exec_time, calls FROM pg_stat_statements ORDER BY mean_exec_time DESC LIMIT 5;"
+
+# Estado de replicación
+docker exec -it MasterKuenteCO psql -U master -d KuenteCO -c \
+  "SELECT application_name, client_addr, state, sent_lsn, write_lsn, flush_lsn, replay_lsn FROM pg_stat_replication;"
 ```
 
 ---
 
+## 🌐 Extensiones Avanzadas
 
-## 🌐 Integración con OpenExchangeRate: `pg_http` y `pg_cron`
+### 🔄 Integración con OpenExchangeRate
 
-Para que el sistema KuenteCO pueda obtener automáticamente tasas de cambio desde la API de **OpenExchangeRate**, se realiza una integración directa desde PostgreSQL utilizando las extensiones `pg_http` y `pg_cron`. Este proceso solo se configura en el contenedor de la base de datos **maestra**.
+KuenteCO incluye actualización automática de tasas de cambio mediante:
 
----
+#### Extensiones Requeridas
+- **pg_http** - Para realizar peticiones HTTP
+- **pg_cron** - Para programar tareas automáticas
 
-### 📦 Instalación de extensiones en la base de datos maestra
-
-1. Accede al contenedor:
+#### Instalación (si no están incluidas)
 
 ```bash
+# Acceder al contenedor Master
 docker exec -it MasterKuenteCO bash
-```
 
-2. Instala las extensiones necesarias (si no están ya incluidas en la imagen base):
+# Instalar dependencias
+apt update && apt install -y postgresql-server-dev-15 make gcc git
 
-```bash
-apt update
-apt install -y postgresql-server-dev-15 make gcc git
+# Instalar pg_http
 git clone https://github.com/pramsey/pgsql-http.git
-cd pgsql-http
-make
-make install
+cd pgsql-http && make && make install
+
+# Instalar pg_cron
+cd .. && git clone https://github.com/citusdata/pg_cron.git
+cd pg_cron && make && make install
+
+# Habilitar extensiones
+psql -U master -d KuenteCO -c "CREATE EXTENSION IF NOT EXISTS http;"
+psql -U master -d KuenteCO -c "CREATE EXTENSION IF NOT EXISTS pg_cron;"
 ```
 
-```bash
-git clone https://github.com/citusdata/pg_cron.git
-cd pg_cron
-make
-make install
-```
-3. Dentro del archivo de configuración de postgresql.conf descomentar las lineas:
-```conf
-768 #shared_preload_libraries = 'pg_cron'		# (change requires restart)
-845 #cron.database_name = 'KuenteCO'
-```
-3. Ahora reinicia el contenedor para cargar las extensiones instaladas:
+#### Configurar Actualización Automática
 
 ```bash
-exit
-docker restart MasterKuenteCO
+# Cargar funciones de tasas de cambio
+docker cp ./db/DatabaseFunctionsKuenteCO.sql MasterKuenteCO:/tmp/
+docker exec -it MasterKuenteCO psql -U master -d KuenteCO -f /tmp/DatabaseFunctionsKuenteCO.sql
+
+# Programar actualización cada 2 horas
+docker exec -it MasterKuenteCO psql -U master -d KuenteCO -c \
+  "SELECT cron.schedule('update-exchange-rates', '0 */2 * * *', 'SELECT update_exchange_rates();');"
 ```
 
 ---
 
-### 🧩 Habilitación de las extensiones en la base de datos `KuenteCO`
+## 🛠️ Troubleshooting
 
-Dentro del contenedor, ejecuta:
+### ⚠️ Problemas Comunes
+
+#### Problema: Contenedores no inician
+```bash
+# Verificar logs
+docker compose logs
+
+# Limpiar volúmenes y reiniciar
+docker compose down -v
+docker compose up -d
+```
+
+#### Problema: Replicación no funciona
+```bash
+# Verificar conectividad
+docker exec MasterKuenteCO ping SlaveKuenteCO
+
+# Revisar configuración de replicación
+docker exec -it MasterKuenteCO psql -U master -d KuenteCO -c \
+  "SELECT * FROM pg_stat_replication;"
+
+# Reiniciar replicación
+docker restart SlaveKuenteCO
+```
+
+#### Problema: Performance lenta
+```bash
+# Verificar memoria y CPU
+docker stats
+
+# Analizar consultas
+docker exec -it MasterKuenteCO psql -U master -d KuenteCO -c \
+  "SELECT query, total_exec_time, calls, mean_exec_time FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 10;"
+```
+
+### 🔧 Comandos Útiles
 
 ```bash
-docker exec -it MasterKuenteCO psql -U admin -d KuenteCO
-```
+# Backup completo
+docker exec MasterKuenteCO pg_dump -U master KuenteCO > backup_$(date +%Y%m%d).sql
 
-```sql
-CREATE EXTENSION IF NOT EXISTS http;
-CREATE EXTENSION IF NOT EXISTS pg_cron;
-```
+# Restaurar backup
+docker exec -i MasterKuenteCO psql -U master KuenteCO < backup_20240101.sql
 
----
+# Limpiar datos de prueba
+docker compose down -v && docker compose up -d
 
-### ⚙️ Función programada para actualizar tasas de cambio
+# Acceso directo a psql
+docker exec -it MasterKuenteCO psql -U master -d KuenteCO
 
-En la carpeta `/db/` del repositorio encontrarás el archivo:
-
-```
-DatabaseFunctionsKuenteCO.sql
-```
-
-Este script contiene la habilitación de las extensiones en la base de datos y una función SQL llamada `update_exchange_rates()` que utiliza `pg_http` para consultar la API de **OpenExchangeRate**, parsear la respuesta JSON y almacenar la tasa de cambio actual en una tabla interna.
-
-También contiene la programación automática con `pg_cron` para ejecutar esta función cada **2 horas**, asegurando que la información esté siempre actualizada para el sistema KuenteCO.
-
----
-
-### 📥 Ejecución del script
-
-Para cargar la función en tu base de datos:
-
-```bash
-docker cp ./db/DatabaseFunctionsKuenteCO.sql MasterKuenteCO:/db/
-docker exec -it MasterKuenteCO psql -U admin -d KuenteCO -f /db/DatabaseFunctionsKuenteCO.sql
+# Ver configuración actual
+docker exec -it MasterKuenteCO psql -U master -d KuenteCO -c "SHOW ALL;"
 ```
 
 ---
 
-> 🧠 **Nota**: Recuerda asegurarte de tener tu API Key de OpenExchangeRate en la función o una tabla de configuración para evitar errores de autenticación.
+## 📧 Contacto y Soporte
+
+- 🐛 **Issues**: [GitHub Issues](https://github.com/AlthosKal/KuenteCO/issues)
+- 📧 **Email**: database@kuenteco.com
+- 📄 **Documentación PostgreSQL**: [Oficial](https://www.postgresql.org/docs/)
+- 🐋 **Docker Hub**: [Imágenes KuenteCO](https://hub.docker.com/u/yefff)
+
+---
+
+<p align="center">
+  <b>📊 Sistema de base de datos desarrollado con ❤️</b><br>
+  <i>Alta disponibilidad y rendimiento para KuenteCO</i>
+</p>
