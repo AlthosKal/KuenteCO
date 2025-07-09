@@ -1,9 +1,9 @@
 package org.kuenteco.backend.dto.logic.transaction.bancolombia.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-import lombok.Builder;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 // DTO para token de autenticación

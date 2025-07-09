@@ -23,7 +23,7 @@ import org.kuenteco.backend.mapper.logic.category.CategoryDetailMapper;
 import org.kuenteco.backend.mapper.logic.category.CategoryReportMapper;
 import org.kuenteco.backend.mapper.logic.category.NewCategoryMapper;
 import org.kuenteco.backend.mapper.logic.category.UpdateCategoryMapper;
-import org.kuenteco.backend.mapper.logic.transaction.kuenteco.TransactionDetailMapper;
+import org.kuenteco.backend.mapper.logic.transaction.TransactionDetailMapper;
 import org.kuenteco.backend.repository.master.MasterCategoryRepository;
 import org.kuenteco.backend.repository.slave.SlaveBudgetRepository;
 import org.kuenteco.backend.repository.slave.SlaveCategoryRepository;

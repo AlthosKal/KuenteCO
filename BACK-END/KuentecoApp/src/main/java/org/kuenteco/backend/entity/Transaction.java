@@ -44,6 +44,8 @@ public class Transaction {
     @JoinColumn(name = "id_debt")
     private Debt debt;
 
+    private String name;
+
     private BigDecimal amount;
 
     @Column(name = "transaction_date")

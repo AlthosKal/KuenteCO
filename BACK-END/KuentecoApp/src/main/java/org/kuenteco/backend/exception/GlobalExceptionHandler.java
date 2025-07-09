@@ -207,8 +207,10 @@ public class GlobalExceptionHandler {
             BancolombiaAuthenticationException ex, HttpServletRequest request) {
         log.error("Error de autenticación con Bancolombia: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ApiResponse.error("Error de autenticación con Bancolombia: " + ex.getMessage(),
-                        request.getRequestURI()));
+                .body(
+                        ApiResponse.error(
+                                "Error de autenticación con Bancolombia: " + ex.getMessage(),
+                                request.getRequestURI()));
     }
 
     @ExceptionHandler(BancolombiaAuthorizationException.class)
@@ -216,8 +218,10 @@ public class GlobalExceptionHandler {
             BancolombiaAuthorizationException ex, HttpServletRequest request) {
         log.error("Error de autorización con Bancolombia: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(ApiResponse.error("Error de autorización con Bancolombia: " + ex.getMessage(),
-                        request.getRequestURI()));
+                .body(
+                        ApiResponse.error(
+                                "Error de autorización con Bancolombia: " + ex.getMessage(),
+                                request.getRequestURI()));
     }
 
     @ExceptionHandler(BancolombiaRateLimitException.class)
@@ -225,8 +229,10 @@ public class GlobalExceptionHandler {
             BancolombiaRateLimitException ex, HttpServletRequest request) {
         log.error("Límite de tasa excedido en Bancolombia: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                .body(ApiResponse.error("Límite de tasa excedido. Por favor, intente más tarde.",
-                        request.getRequestURI()));
+                .body(
+                        ApiResponse.error(
+                                "Límite de tasa excedido. Por favor, intente más tarde.",
+                                request.getRequestURI()));
     }
 
     @ExceptionHandler(BancolombiaTimeoutException.class)
@@ -234,8 +240,10 @@ public class GlobalExceptionHandler {
             BancolombiaTimeoutException ex, HttpServletRequest request) {
         log.error("Timeout en Bancolombia: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT)
-                .body(ApiResponse.error("Timeout en la conexión con Bancolombia. Por favor, intente más tarde.",
-                        request.getRequestURI()));
+                .body(
+                        ApiResponse.error(
+                                "Timeout en la conexión con Bancolombia. Por favor, intente más tarde.",
+                                request.getRequestURI()));
     }
 
     @ExceptionHandler(BancolombiaApiException.class)
@@ -244,24 +252,25 @@ public class GlobalExceptionHandler {
         log.error("Error en API de Bancolombia: {}", ex.getMessage());
 
         HttpStatus status;
-        String message = switch (ex.getHttpStatus()) {
-            case 404 -> {
-                status = HttpStatus.NOT_FOUND;
-                yield "Recurso no encontrado en Bancolombia";
-            }
-            case 400 -> {
-                status = HttpStatus.BAD_REQUEST;
-                yield "Solicitud inválida a Bancolombia";
-            }
-            case 503 -> {
-                status = HttpStatus.SERVICE_UNAVAILABLE;
-                yield "Servicio de Bancolombia no disponible";
-            }
-            default -> {
-                status = HttpStatus.INTERNAL_SERVER_ERROR;
-                yield "Error en el servicio de Bancolombia";
-            }
-        };
+        String message =
+                switch (ex.getHttpStatus()) {
+                    case 404 -> {
+                        status = HttpStatus.NOT_FOUND;
+                        yield "Recurso no encontrado en Bancolombia";
+                    }
+                    case 400 -> {
+                        status = HttpStatus.BAD_REQUEST;
+                        yield "Solicitud inválida a Bancolombia";
+                    }
+                    case 503 -> {
+                        status = HttpStatus.SERVICE_UNAVAILABLE;
+                        yield "Servicio de Bancolombia no disponible";
+                    }
+                    default -> {
+                        status = HttpStatus.INTERNAL_SERVER_ERROR;
+                        yield "Error en el servicio de Bancolombia";
+                    }
+                };
 
         return ResponseEntity.status(status)
                 .body(ApiResponse.error(message, request.getRequestURI()));
@@ -272,8 +281,9 @@ public class GlobalExceptionHandler {
             BancolombiaConfigurationException ex, HttpServletRequest request) {
         log.error("Error de configuración de Bancolombia: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error("Error de configuración del servicio",
-                        request.getRequestURI()));
+                .body(
+                        ApiResponse.error(
+                                "Error de configuración del servicio", request.getRequestURI()));
     }
 
     @ExceptionHandler(BancolombiaException.class)
@@ -283,7 +293,9 @@ public class GlobalExceptionHandler {
 
         HttpStatus status = HttpStatus.valueOf(ex.getHttpStatus());
         return ResponseEntity.status(status)
-                .body(ApiResponse.error("Error en el servicio de Bancolombia: " + ex.getMessage(),
-                        request.getRequestURI()));
+                .body(
+                        ApiResponse.error(
+                                "Error en el servicio de Bancolombia: " + ex.getMessage(),
+                                request.getRequestURI()));
     }
 }

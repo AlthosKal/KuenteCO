@@ -1,4 +1,4 @@
-package org.kuenteco.backend.mapper.logic.transaction.kuenteco;
+package org.kuenteco.backend.mapper.logic.transaction;
 
 import java.math.BigDecimal;
 import java.util.List;

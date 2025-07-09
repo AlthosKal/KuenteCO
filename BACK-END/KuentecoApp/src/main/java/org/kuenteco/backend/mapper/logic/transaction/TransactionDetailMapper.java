@@ -1,4 +1,4 @@
-package org.kuenteco.backend.mapper.logic.transaction.kuenteco;
+package org.kuenteco.backend.mapper.logic.transaction;
 
 import java.util.List;
 import org.kuenteco.backend.dto.logic.transaction.kuenteco.TransactionDetailDTO;

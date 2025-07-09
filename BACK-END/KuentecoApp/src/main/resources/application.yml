@@ -31,17 +31,16 @@ mercadopago:
 
 bancolombia:
   sandbox:
-    base-url: https://sandbox.conecta.bancolombia.com
+    base-url: ${BANCOLOMBIA_BASE_URL}
     auth:
-      token-url: https://sandbox.conecta.bancolombia.com/oauth2/v1/token
+      token-url-base-path: /public-bancolombia/sb/security/oauth-provider/oauth2
       client-id: ${BANCOLOMBIA_CLIENT_ID}
       client-secret: ${BANCOLOMBIA_CLIENT_SECRET}
-      scope: "accounts transactions"
-      token-expiration-buffer-seconds: 300
+      scope: transactional-information
     api:
+      base-path: /public-bancolombia/sb/v1/operations/cross-product/account-management/transaction-engine/transactional-information/information
       endpoints:
-        accounts: /conecta/v1/accounts
-        transactions: /conecta/v1/accounts/{accountId}/transactions
+        transactions: /retrieve/transactional/info
       timeout-seconds: 30
       max-retries: 3
     ssl:
@@ -51,6 +50,8 @@ bancolombia:
       keystore-type: "PKCS12"
       trust-store-path: ""
       trust-store-password: ""
+
+
 
 
 resilience4j:

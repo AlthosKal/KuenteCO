@@ -9,4 +9,3 @@ public class BancolombiaApiException extends BancolombiaException {
         super(message, "BANCOLOMBIA_API_ERROR", httpStatus, cause);
     }
 }
-

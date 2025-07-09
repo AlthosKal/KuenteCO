@@ -3,7 +3,9 @@ package org.kuenteco.backend;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableScheduling
 @SpringBootApplication
 public class BackEndApplication {
 
@@ -26,6 +28,7 @@ public class BackEndApplication {
         System.setProperty("MERCADOPAGO_ACCESS_TOKEN", dotenv.get("MERCADOPAGO_ACCESS_TOKEN"));
 
         // API de Bancolombia
+        System.setProperty("BANCOLOMBIA_BASE_URL", dotenv.get("BANCOLOMBIA_BASE_URL"));
         System.setProperty("BANCOLOMBIA_CLIENT_ID", dotenv.get("BANCOLOMBIA_CLIENT_ID"));
         System.setProperty("BANCOLOMBIA_CLIENT_SECRET", dotenv.get("BANCOLOMBIA_CLIENT_SECRET"));
 
