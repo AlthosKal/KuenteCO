@@ -2027,6 +2027,50 @@
 					"response": []
 				},
 				{
+					"name": "Get  Bancolombia Transactions",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"product\": \"bnpl\",\n  \"identificationType\": \"nit\",\n  \"identificationNumber\": \"1999012334-6\",\n  \"initialDate\": \"01/03/2023\",\n  \"finalDate\": \"31/03/2023\",\n  \"timeSpan\": \"D\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/transaction/bancolombia",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"transaction",
+								"bancolombia"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create Transaction",
 					"request": {
 						"method": "POST",
@@ -2521,7 +2565,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"subscriptionType\": \"BASIC\",\n  \"backUrl\": \"https://github.com/AlthosKal/KuenteCO\"\n}\n"
+									"raw": "{\n  \"subscriptionType\": \"PREMIUM\",\n  \"backUrl\": \"https://github.com/AlthosKal/KuenteCO\"\n}\n"
 								},
 								"url": {
 									"raw": "{{base_url}}/v1/mercado-pago/subscription",

@@ -33,6 +33,7 @@ bancolombia:
   sandbox:
     base-url: ${BANCOLOMBIA_BASE_URL}
     auth:
+      token-expiration-buffer-seconds: 300
       token-url-base-path: /public-bancolombia/sb/security/oauth-provider/oauth2
       client-id: ${BANCOLOMBIA_CLIENT_ID}
       client-secret: ${BANCOLOMBIA_CLIENT_SECRET}
@@ -41,8 +42,8 @@ bancolombia:
       base-path: /public-bancolombia/sb/v1/operations/cross-product/account-management/transaction-engine/transactional-information/information
       endpoints:
         transactions: /retrieve/transactional/info
-      timeout-seconds: 30
-      max-retries: 3
+      timeout-seconds: 45
+      max-retries: 5
     ssl:
       enabled: false
       keystore-path: ""

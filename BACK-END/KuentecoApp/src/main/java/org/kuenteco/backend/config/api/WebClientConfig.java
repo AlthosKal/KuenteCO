@@ -17,15 +17,14 @@ public class WebClientConfig {
     @Bean("authWebClient")
     public WebClient authWebClient() {
         return WebClient.builder()
-                .baseUrl(
-                        props.getSandbox().getBaseUrl()
-                                + props.getSandbox().getAuth().getTokenUrlBasePath())
+                .baseUrl(props.getSandbox().getBaseUrl()) // 👈 solo dominio
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(
                         "X-IBM-Client-Secret", props.getSandbox().getAuth().getClientSecret())
                 .defaultHeader("message-id", UUID.randomUUID().toString())
                 .build();
     }
+
 
     @Bean("apiWebClient")
     public WebClient apiWebClient() {
