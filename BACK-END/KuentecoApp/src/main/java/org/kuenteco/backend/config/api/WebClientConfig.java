@@ -25,7 +25,6 @@ public class WebClientConfig {
                 .build();
     }
 
-
     @Bean("apiWebClient")
     public WebClient apiWebClient() {
         return WebClient.builder()

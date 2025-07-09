@@ -12,7 +12,6 @@ import org.kuenteco.backend.exception.ApiResponse;
 import org.kuenteco.backend.service.logic.transaction.bancolombia.ConectaService;
 import org.kuenteco.backend.service.logic.transaction.kuenteco.TransactionService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

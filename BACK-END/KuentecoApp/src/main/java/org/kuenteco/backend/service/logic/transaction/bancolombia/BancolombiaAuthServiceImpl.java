@@ -50,8 +50,12 @@ public class BancolombiaAuthServiceImpl implements BancolombiaAuthService {
         LocalDateTime now = LocalDateTime.now();
         return slaveRepo
                 .findFirstByIsActiveTrueAndExpiresAtAfterOrderByCreatedAtDesc(now)
-                .filter(token -> !token.isExpiredWithBuffer(
-                        props.getSandbox().getAuth().getTokenExpirationBufferSeconds()))
+                .filter(
+                        token ->
+                                !token.isExpiredWithBuffer(
+                                        props.getSandbox()
+                                                .getAuth()
+                                                .getTokenExpirationBufferSeconds()))
                 .map(BancolombiaToken::getAccessToken)
                 .orElseGet(this::requestNewToken);
     }
@@ -61,11 +65,13 @@ public class BancolombiaAuthServiceImpl implements BancolombiaAuthService {
         log.info("Solicitando nuevo token a Bancolombia");
 
         // Desactivar tokens anteriores
-        slaveRepo.findAllByIsActiveTrue()
-                .forEach(t -> {
-                    t.setIsActive(false);
-                    masterRepo.save(t);
-                });
+        slaveRepo
+                .findAllByIsActiveTrue()
+                .forEach(
+                        t -> {
+                            t.setIsActive(false);
+                            masterRepo.save(t);
+                        });
 
         // 🔧 CORRECCIÓN: Usar form-urlencoded en lugar de JSON
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
@@ -73,46 +79,81 @@ public class BancolombiaAuthServiceImpl implements BancolombiaAuthService {
         body.add("scope", props.getSandbox().getAuth().getScope());
 
         // Construir Basic Auth header
-        String creds = props.getSandbox().getAuth().getClientId() + ":" +
-                props.getSandbox().getAuth().getClientSecret();
+        String creds =
+                props.getSandbox().getAuth().getClientId()
+                        + ":"
+                        + props.getSandbox().getAuth().getClientSecret();
         String basicAuth = "Basic " + Base64.getEncoder().encodeToString(creds.getBytes());
 
         TokenResponseDTO tr;
         try {
-            tr = authWebClient
-                    .post()
-                    .uri(uriBuilder -> uriBuilder
-                            .path(props.getSandbox().getAuth().getTokenUrlBasePath())
-                            .path("/token")
-                            .build())
-                    .header("Authorization", basicAuth)
-                    // 🔧 CORRECCIÓN: Agregar X-IBM-Client-Secret
-                    .header("X-IBM-Client-Secret", props.getSandbox().getAuth().getClientSecret())
-                    // 🔧 CORRECCIÓN: Cambiar a APPLICATION_FORM_URLENCODED
-                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                    .bodyValue(body)
-                    .retrieve()
-                    .bodyToMono(TokenResponseDTO.class)
-                    .retryWhen(Retry.backoff(
-                                    props.getSandbox().getApi().getMaxRetries(),
-                                    Duration.ofSeconds(1))
-                            .filter(ex -> !(ex instanceof WebClientResponseException.Unauthorized)))
-                    .timeout(Duration.ofSeconds(props.getSandbox().getApi().getTimeoutSeconds()))
-                    .onErrorMap(TimeoutException.class, ex ->
-                            new BancolombiaTimeoutException("Timeout solicitando token", ex))
-                    .onErrorMap(WebClientResponseException.Unauthorized.class, ex ->
-                            new BancolombiaAuthenticationException("Credenciales inválidas", ex))
-                    .onErrorMap(WebClientResponseException.Forbidden.class, ex ->
-                            new BancolombiaAuthorizationException("Acceso denegado", ex))
-                    .onErrorMap(WebClientResponseException.TooManyRequests.class, ex ->
-                            new BancolombiaRateLimitException("Rate limit excedido", ex))
-                    .onErrorMap(WebClientResponseException.class, ex ->
-                            new BancolombiaApiException("Error API Bancolombia: " + ex.getMessage(),
-                                    ex.getStatusCode().value(), ex))
-                    .block();
+            tr =
+                    authWebClient
+                            .post()
+                            .uri(
+                                    uriBuilder ->
+                                            uriBuilder
+                                                    .path(
+                                                            props.getSandbox()
+                                                                    .getAuth()
+                                                                    .getTokenUrlBasePath())
+                                                    .path("/token")
+                                                    .build())
+                            .header("Authorization", basicAuth)
+                            // 🔧 CORRECCIÓN: Agregar X-IBM-Client-Secret
+                            .header(
+                                    "X-IBM-Client-Secret",
+                                    props.getSandbox().getAuth().getClientSecret())
+                            // 🔧 CORRECCIÓN: Cambiar a APPLICATION_FORM_URLENCODED
+                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                            .bodyValue(body)
+                            .retrieve()
+                            .bodyToMono(TokenResponseDTO.class)
+                            .retryWhen(
+                                    Retry.backoff(
+                                                    props.getSandbox().getApi().getMaxRetries(),
+                                                    Duration.ofSeconds(1))
+                                            .filter(
+                                                    ex ->
+                                                            !(ex
+                                                                    instanceof
+                                                                    WebClientResponseException
+                                                                            .Unauthorized)))
+                            .timeout(
+                                    Duration.ofSeconds(
+                                            props.getSandbox().getApi().getTimeoutSeconds()))
+                            .onErrorMap(
+                                    TimeoutException.class,
+                                    ex ->
+                                            new BancolombiaTimeoutException(
+                                                    "Timeout solicitando token", ex))
+                            .onErrorMap(
+                                    WebClientResponseException.Unauthorized.class,
+                                    ex ->
+                                            new BancolombiaAuthenticationException(
+                                                    "Credenciales inválidas", ex))
+                            .onErrorMap(
+                                    WebClientResponseException.Forbidden.class,
+                                    ex ->
+                                            new BancolombiaAuthorizationException(
+                                                    "Acceso denegado", ex))
+                            .onErrorMap(
+                                    WebClientResponseException.TooManyRequests.class,
+                                    ex ->
+                                            new BancolombiaRateLimitException(
+                                                    "Rate limit excedido", ex))
+                            .onErrorMap(
+                                    WebClientResponseException.class,
+                                    ex ->
+                                            new BancolombiaApiException(
+                                                    "Error API Bancolombia: " + ex.getMessage(),
+                                                    ex.getStatusCode().value(),
+                                                    ex))
+                            .block();
         } catch (Exception e) {
-            throw (e instanceof BancolombiaException) ? (BancolombiaException) e :
-                    new BancolombiaApiException("Error inesperado al solicitar token", 500, e);
+            throw (e instanceof BancolombiaException)
+                    ? (BancolombiaException) e
+                    : new BancolombiaApiException("Error inesperado al solicitar token", 500, e);
         }
 
         if (tr == null || tr.getAccessToken() == null) {
@@ -120,14 +161,15 @@ public class BancolombiaAuthServiceImpl implements BancolombiaAuthService {
         }
 
         // Guardar en BD
-        BancolombiaToken token = BancolombiaToken.builder()
-                .accessToken(tr.getAccessToken())
-                .tokenType(tr.getTokenType())
-                .expiresIn(tr.getExpiresIn())
-                .scope(tr.getScope())
-                .refreshToken(tr.getRefreshToken())
-                .isActive(true)
-                .build();
+        BancolombiaToken token =
+                BancolombiaToken.builder()
+                        .accessToken(tr.getAccessToken())
+                        .tokenType(tr.getTokenType())
+                        .expiresIn(tr.getExpiresIn())
+                        .scope(tr.getScope())
+                        .refreshToken(tr.getRefreshToken())
+                        .isActive(true)
+                        .build();
         masterRepo.save(token);
 
         log.info("Token guardado y activo hasta {}", token.getExpiresAt());
@@ -136,11 +178,13 @@ public class BancolombiaAuthServiceImpl implements BancolombiaAuthService {
 
     @Override
     public void invalidateToken() {
-        slaveRepo.findAllByIsActiveTrue()
-                .forEach(t -> {
-                    t.setIsActive(false);
-                    masterRepo.save(t);
-                });
+        slaveRepo
+                .findAllByIsActiveTrue()
+                .forEach(
+                        t -> {
+                            t.setIsActive(false);
+                            masterRepo.save(t);
+                        });
     }
 
     @Override
@@ -157,21 +201,25 @@ public class BancolombiaAuthServiceImpl implements BancolombiaAuthService {
         List<BancolombiaToken> antiquos = masterRepo.findAllByCreatedAtBefore(cutoff);
         masterRepo.deleteAll(antiquos);
 
-        log.info("Tokens expirados desactivados: {}, eliminados: {}",
-                expirados.size(), antiquos.size());
+        log.info(
+                "Tokens expirados desactivados: {}, eliminados: {}",
+                expirados.size(),
+                antiquos.size());
     }
 
     @Override
     public boolean hasValidToken() {
         LocalDateTime now = LocalDateTime.now();
-        return slaveRepo.findFirstByIsActiveTrueAndExpiresAtAfterOrderByCreatedAtDesc(now)
+        return slaveRepo
+                .findFirstByIsActiveTrueAndExpiresAtAfterOrderByCreatedAtDesc(now)
                 .isPresent();
     }
 
     @Override
     public BancolombiaToken getCurrentToken() {
         LocalDateTime now = LocalDateTime.now();
-        return slaveRepo.findFirstByIsActiveTrueAndExpiresAtAfterOrderByCreatedAtDesc(now)
+        return slaveRepo
+                .findFirstByIsActiveTrueAndExpiresAtAfterOrderByCreatedAtDesc(now)
                 .orElse(null);
     }
 }
