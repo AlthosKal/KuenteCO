@@ -98,7 +98,7 @@ server:
       min-spare: 50
     connection-timeout: 20000
   servlet:
-    context-path: /api
+    context-path: /api/app
 
 
 spring:

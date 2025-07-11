@@ -34,7 +34,7 @@ public class SubscriptionController implements SubscriptionResource {
      * @param request Información de la petición HTTP
      * @return Respuesta con los datos de la suscripción creada
      */
-    @PostMapping("/subscription")
+    @PostMapping()
     public ResponseEntity<?> createSubscription(
             @Valid @RequestBody CreateSubscriptionRequestDTO dto,
             Principal principal,

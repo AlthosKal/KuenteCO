@@ -1,0 +1,16 @@
+package com.example.back_end.connector.rest.budget;
+
+import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class BudgetDTO {
+    private Integer id;
+    private String name;
+    private BigDecimal totalBudget;
+    private BigDecimal remainingBudget;
+}

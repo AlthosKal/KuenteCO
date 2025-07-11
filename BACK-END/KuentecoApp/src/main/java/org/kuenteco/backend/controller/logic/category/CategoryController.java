@@ -61,9 +61,9 @@ public class CategoryController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/report/enroll")
+    @GetMapping("/enroll/user")
     public ResponseEntity<?> getBusinessUserCategoryEnrollments(HttpServletRequest request) {
-        Object result = categoryService.getTransactionsByCategory();
+        Object result = categoryEnrollmentService.getBusinessUserCategoryEnrollments();
         return new ResponseEntity<>(
                 ApiResponse.ok(
                         "Resumen de transacciones por categoría obtenido correctamente",

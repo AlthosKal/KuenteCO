@@ -1,4 +1,4 @@
-# KuenteCO Backend API ⚙️
+# KuenteCO App ⚙️
 
 <p align="center">
   <img src="https://upload.wikimedia.org/wikipedia/commons/7/79/Spring_Boot.svg" alt="Spring Boot Logo" height="120">
@@ -15,18 +15,20 @@
 
 ## 📝 Descripción
 
-**API REST empresarial** de KuenteCO desarrollada con **Spring Boot 3.5.0**, diseñada siguiendo **principios SOLID** y **arquitectura hexagonal**. Proporciona servicios seguros, escalables y de alto rendimiento para la gestión financiera integral.
+**API REST empresarial** de KuenteCO desarrollada con **Spring Boot 3.5.0**, diseñada siguiendo **principios SOLID** y **arquitectura de capas**. Proporciona servicios seguros, escalables y de alto rendimiento para la gestión financiera integral.
 
 ### ✨ Características Principales
 
 - 🛡️ **Seguridad robusta** con JWT y Spring Security
-- 📊 **Alta disponibilidad** con replicación de base de datos
-- 🚀 **Performance optimizado** con cache y pool de conexiones
+- 📊 **Alta disponibilidad** con replicación de base de datos Master-Slave
+- 🚀 **Performance optimizado** con HikariCP y pool de conexiones
 - 📄 **Documentación automática** con OpenAPI 3.0 (Swagger)
-- 🔄 **Resilencia** con Circuit Breaker y Rate Limiting
+- 🔄 **Resilencia** con Circuit Breaker y Rate Limiting (Resilience4j)
 - 📧 **Notificaciones** vía SendGrid con templates dinámicos
 - 🖼️ **Gestión de archivos** con Cloudinary CDN
-- 🌐 **Tasas de cambio** actualizadas vía OpenExchangeRate
+- 🌐 **Tasas de cambio** actualizadas en tiempo real
+- 💳 **Integración bancaria** con Bancolombia API
+- 💰 **Pagos online** con MercadoPago SDK
 - 📊 **Métricas y monitoring** con Spring Actuator
 - 🧪 **Testing** exhaustivo con JUnit 5 y Mockito
 
@@ -36,7 +38,7 @@
 
 ### Core Framework
 - **Spring Boot 3.5.0** - Framework base con configuración automática
-- **Java 17** - Versión LTS con características modernas
+- **Java 21** - Versión LTS más reciente con características modernas
 - **Maven 3.8+** - Gestión de dependencias y build automation
 
 ### Seguridad y Autenticación
@@ -55,16 +57,17 @@
 ### Servicios Externos
 - **SendGrid** - Servicio de email transaccional
 - **Cloudinary** - CDN y procesamiento de imágenes
-- **OpenExchangeRate** - API de tasas de cambio
-- **MercadoPago SDK** - Procesamiento de pagos
+- **Bancolombia API** - Integración bancaria para transacciones
+- **MercadoPago SDK** - Procesamiento de pagos y suscripciones
 
 ### Documentación y Testing
-- **OpenAPI 3.0** - Especificación estándar de APIs
+- **OpenAPI 2.7** - Especificación estándar de APIs
 - **Swagger UI** - Interfaz interactiva de documentación
 - **JUnit 5** - Framework de testing unitario
 - **Mockito** - Mocking para tests
 - **QuickPerf** - Análisis de performance
 - **JaCoCo** - Cobertura de código
+- **End-to-End Tests** - Tests de integración completos
 
 ### Resilencia y Monitoring
 - **Resilience4j** - Circuit Breaker, Rate Limiter, Bulkhead
@@ -82,45 +85,100 @@
 
 ## 🏢 Arquitectura del Sistema
 
-### 🎯 Arquitectura Hexagonal (Ports & Adapters)
+### 🎯 Arquitectura de Capas (MVC + Service Layer)
 
 ```
-┌───────────────────────────────────┐
-│             ADAPTERS (Infrastructure)        │
-│   🌐 REST     📧 Email    🖼️ Cloud    📊 DB     │
-│ Controllers  SendGrid   Cloudinary  PostgreSQL │
-├───────────────────────────────────┤
-│                  PORTS                       │
-│  🔌 Input Ports    |    Output Ports 🔌   │
-├───────────────────────────────────┤
-│                DOMAIN CORE                  │
-│   🎨 Entities   🏢 Use Cases  💼 Services  │
-│   🎯 Domain Logic  📝 Business Rules    │
-└───────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    PRESENTATION LAYER                       │
+│  🌐 REST Controllers    📑 DTOs    📋 Resources    🔒 Security │
+│     AuthController    TransactionDTO   AuthResource  JwtFilter │
+│   ProfileController   CategoryDTO    ProfileResource  CORS     │
+│ SubscriptionController  BudgetDTO   NotificationResource       │
+├─────────────────────────────────────────────────────────────┤
+│                      SERVICE LAYER                          │
+│  💼 Business Services    🔄 External Services    📧 Email     │
+│   TransactionService     BancolombiaService     SendGrid     │
+│    CategoryService       MercadoPagoService     Templates    │
+│     BudgetService        CloudinaryService      Notifications │
+│      DebtService         ExchangeRateService    🔐 Security   │
+├─────────────────────────────────────────────────────────────┤
+│                   PERSISTENCE LAYER                         │
+│  📊 Master DB (Write)    📑 Slave DB (Read)    🗃️ Repositories │
+│    UserRepository        UserSlaveRepository    JPA/Hibernate │
+│ TransactionRepository  TransactionSlaveRepository  HikariCP   │
+│  CategoryRepository     CategorySlaveRepository   Connection   │
+│   BudgetRepository      BudgetSlaveRepository      Pooling    │
+├─────────────────────────────────────────────────────────────┤
+│                      DOMAIN LAYER                           │
+│  🎨 Entities    📋 Enums    🔧 Utils    ⚙️ Configuration     │
+│     User         Role      DateUtils    DatabaseConfig      │
+│  Transaction   Status     SecurityUtils  SecurityConfig      │
+│   Category    Currency   ValidationUtils  JwtConfig         │
+│    Budget     Type       StringUtils     EmailConfig        │
+│     Debt      State      JsonUtils      CloudinaryConfig    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 🔄 Flujo de Datos y Comunicación
+
+```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   Client    │───▶│ Controller  │───▶│   Service   │───▶│ Repository  │
+│             │    │             │    │             │    │             │
+│ 🌐 Frontend │    │ 🎯 REST API │    │ 💼 Business │    │ 📊 Database │
+│ 📱 Mobile   │    │ 🔒 Security │    │ 🔄 External │    │ 🗃️ Master   │
+│ 🔧 Postman  │    │ 📋 Validation│    │ 📧 Email    │    │ 📑 Slave    │
+└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
+       │                   │                   │                   │
+       │                   │                   │                   │
+       ▼                   ▼                   ▼                   ▼
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   Response  │◀───│   DTO       │◀───│   Entity    │◀───│   Query     │
+│             │    │             │    │             │    │             │
+│ 📄 JSON     │    │ 🔄 Mapping  │    │ 🎨 Domain   │    │ 📊 SQL      │
+│ 🔒 Secured  │    │ ✅ Validated│    │ 💾 Persisted│    │ 🚀 Optimized│
+│ 📊 Paginated│    │ 📋 Formatted│    │ 🔗 Relations│    │ 🔄 Replicated│
+└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
 ```
 
 ### 📁 Estructura de Packages
 
 ```
-src/main/java/org/kuenteco/
-├── 🎨 domain/                    # Lógica de dominio pura
-│   ├── entities/                # Entidades de negocio
-│   ├── valueobjects/            # Objetos de valor
-│   ├── services/                # Servicios de dominio
-│   └── repositories/            # Interfaces de repositorio
-├── 🏢 application/               # Lógica de aplicación
-│   ├── usecases/                # Casos de uso
-│   ├── dto/                     # Data Transfer Objects
-│   └── mappers/                 # Mappers con MapStruct
-├── 🔌 infrastructure/            # Infraestructura
-│   ├── web/                     # Controladores REST
-│   ├── persistence/             # Implementación JPA
-│   ├── external/                # Servicios externos
-│   └── config/                  # Configuraciones
-└── ⚙️ shared/                    # Componentes compartidos
-    ├── exceptions/              # Manejo de excepciones
-    ├── utils/                   # Utilidades comunes
-    └── constants/               # Constantes globales
+src/main/java/org/kuenteco/backend/
+├── 🎨 entity/                    # Entidades JPA
+│   ├── User.java                # Entidad Usuario
+│   ├── Transaction.java         # Entidad Transacción
+│   ├── Category.java            # Entidad Categoría
+│   ├── Budget.java              # Entidad Presupuesto
+│   ├── Debt.java                # Entidad Deuda
+│   └── Subscription.java        # Entidad Suscripción
+├── 🏢 dto/                      # Data Transfer Objects
+│   ├── auth/                    # DTOs de autenticación
+│   ├── logic/                   # DTOs de lógica de negocio
+│   ├── subscription/            # DTOs de suscripciones
+│   └── notification/            # DTOs de notificaciones
+├── 🔌 controller/               # Controladores REST
+│   ├── auth/                    # Controladores de autenticación
+│   ├── logic/                   # Controladores de lógica
+│   ├── profile/                 # Controladores de perfil
+│   └── subscription/            # Controladores de suscripciones
+├── 🗃️ repository/               # Repositorios JPA
+│   ├── master/                  # Repositorios de escritura
+│   └── slave/                   # Repositorios de lectura
+├── 🔧 service/                  # Servicios de negocio
+│   ├── auth/                    # Servicios de autenticación
+│   ├── logic/                   # Servicios de lógica
+│   └── external/                # Servicios externos
+├── 🛡️ security/                 # Configuración de seguridad
+│   ├── jwt/                     # JWT Token handling
+│   └── filter/                  # Filtros de seguridad
+├── 📧 email/                    # Servicios de email
+├── 🖼️ cloudinary/              # Servicios de Cloudinary
+├── 🔄 job/                      # Trabajos programados
+└── ⚙️ config/                   # Configuraciones
+    ├── database/                # Configuración de BD
+    ├── security/                # Configuración de seguridad
+    └── external/                # Configuración de servicios externos
 ```
 
 ---
@@ -129,11 +187,12 @@ src/main/java/org/kuenteco/
 
 ### 📋 Requisitos Previos
 
-- **Java 17+** (OpenJDK o Oracle JDK)
+- **Java 21+** (OpenJDK o Oracle JDK)
 - **Maven 3.8+** para gestión de dependencias
 - **PostgreSQL 15+** (puede usar Docker)
 - **IDE recomendado**: IntelliJ IDEA o VS Code
 - **Docker** (opcional, para base de datos)
+- **Git** para control de versiones
 
 ---
 
@@ -151,7 +210,7 @@ cd KuenteCO/BACK-END/KuentecoApp
 ```bash
 # Verificar Java
 java -version
-# Debe mostrar: openjdk version "17.x.x" o superior
+# Debe mostrar: openjdk version "21.x.x" o superior
 
 # Verificar Maven
 mvn -version
@@ -190,12 +249,14 @@ SPRING_DATASOURCE_URL_SLAVE=jdbc:postgresql://localhost:5433/KuenteCO
 SPRING_DATASOURCE_USERNAME_SLAVE=replicator
 SPRING_DATASOURCE_PASSWORD_SLAVE=secure_password
 
-# 🌐 OpenExchangeRate API
-OPEN_EXCHANGE_RATE_API_KEY=your_oxr_api_key
+# 🏦 Bancolombia API
+BANCOLOMBIA_BASE_URL=https://api.bancolombia.com
+BANCOLOMBIA_CLIENT_ID=your_bancolombia_client_id
+BANCOLOMBIA_CLIENT_SECRET=your_bancolombia_client_secret
 
-# 💳 MercadoPago (opcional)
-MERCADO_PAGO_ACCESS_TOKEN=your_mp_access_token
-MERCADO_PAGO_PUBLIC_KEY=your_mp_public_key
+# 💳 MercadoPago
+MERCADOPAGO_ACCESS_TOKEN=your_mp_access_token
+MERCADOPAGO_PUBLIC_KEY=your_mp_public_key
 ```
 
 ### 4️⃣ Preparar Base de Datos
@@ -203,7 +264,7 @@ MERCADO_PAGO_PUBLIC_KEY=your_mp_public_key
 #### Opción A: Usar Docker (Recomendado)
 ```bash
 # Desde la raíz del proyecto KuenteCO
-cd ../../../Database
+cd ../../../KuenteCO/Database
 docker compose up -d
 
 # Verificar que las bases estén funcionando
@@ -325,6 +386,7 @@ Todas las rutas están documentadas automáticamente con **OpenAPI 3.0**:
 | `GET` | `/api/transactions/{id}` | Obtener transacción por ID | ✅ |
 | `PUT` | `/api/transactions/{id}` | Actualizar transacción | ✅ |
 | `DELETE` | `/api/transactions/{id}` | Eliminar transacción | ✅ |
+| `GET` | `/api/transactions/bancolombia` | Obtener transacciones de Bancolombia | ✅ |
 | `GET` | `/api/transactions/export` | Exportar a Excel/PDF | ✅ |
 | `POST` | `/api/transactions/import` | Importar desde archivo | ✅ |
 
@@ -337,6 +399,40 @@ Todas las rutas están documentadas automáticamente con **OpenAPI 3.0**:
 | `PUT` | `/api/categories/{id}` | Actualizar categoría | ✅ |
 | `DELETE` | `/api/categories/{id}` | Eliminar categoría | ✅ |
 
+### 💳 Endpoints de Suscripciones
+
+| Método | Endpoint | Descripción | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET` | `/api/subscriptions` | Listar suscripciones | ✅ |
+| `POST` | `/api/subscriptions` | Crear suscripción | ✅ |
+| `PUT` | `/api/subscriptions/{id}` | Actualizar suscripción | ✅ |
+| `DELETE` | `/api/subscriptions/{id}` | Cancelar suscripción | ✅ |
+
+### 💰 Endpoints de Presupuestos
+
+| Método | Endpoint | Descripción | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET` | `/api/budgets` | Listar presupuestos | ✅ |
+| `POST` | `/api/budgets` | Crear presupuesto | ✅ |
+| `PUT` | `/api/budgets/{id}` | Actualizar presupuesto | ✅ |
+| `DELETE` | `/api/budgets/{id}` | Eliminar presupuesto | ✅ |
+
+### 📊 Endpoints de Deudas
+
+| Método | Endpoint | Descripción | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET` | `/api/debts` | Listar deudas | ✅ |
+| `POST` | `/api/debts` | Crear deuda | ✅ |
+| `PUT` | `/api/debts/{id}` | Actualizar deuda | ✅ |
+| `DELETE` | `/api/debts/{id}` | Eliminar deuda | ✅ |
+
+### 🔄 Endpoints de Tasas de Cambio
+
+| Método | Endpoint | Descripción | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET` | `/api/exchange-rates` | Obtener tasas actuales | ✅ |
+| `GET` | `/api/exchange-rates/history` | Historial de tasas | ✅ |
+
 ### 📊 Endpoints de Reportes
 
 | Método | Endpoint | Descripción | Auth Required |
@@ -347,6 +443,15 @@ Todas las rutas están documentadas automáticamente con **OpenAPI 3.0**:
 | `GET` | `/api/reports/categories` | Análisis por categorías | ✅ |
 | `GET` | `/api/reports/trends` | Tendencias financieras | ✅ |
 
+### 📬 Endpoints de Notificaciones
+
+| Método | Endpoint | Descripción | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET` | `/api/notifications` | Listar notificaciones | ✅ |
+| `POST` | `/api/notifications` | Crear notificación | ✅ |
+| `PUT` | `/api/notifications/{id}/read` | Marcar como leída | ✅ |
+| `DELETE` | `/api/notifications/{id}` | Eliminar notificación | ✅ |
+
 ### 🔧 Endpoints de Administración
 
 | Método | Endpoint | Descripción | Auth Required |
@@ -355,6 +460,74 @@ Todas las rutas están documentadas automáticamente con **OpenAPI 3.0**:
 | `GET` | `/actuator/info` | Información de la app | ❌ |
 | `GET` | `/actuator/metrics` | Métricas del sistema | 🔒 Admin |
 | `GET` | `/actuator/loggers` | Configuración de logs | 🔒 Admin |
+
+---
+
+## 🆕 Cambios Recientes
+
+### Versión Actual (2025-01-09)
+- ✅ **Integración con Bancolombia API** - Sincronización automática de transacciones
+- ✅ **Mejoras en MercadoPago** - Soporte completo para suscripciones
+- ✅ **Configuración Multi-Base** - Implementación Master-Slave optimizada
+- ✅ **Jobs programados** - Mantenimiento automático de tokens
+- ✅ **Tests End-to-End** - Cobertura completa de casos de uso
+- ✅ **Migraciones Flyway** - Versionado de esquema con triggers y funciones
+- ✅ **Optimización de Performance** - Configuración avanzada de HikariCP
+- ✅ **Logging mejorado** - Sistema de logs estructurado con Logback
+
+### Próximas Funcionalidades
+- 🚧 **Dashboard Analytics** - Visualización avanzada de métricas
+- 🚧 **Notificaciones Push** - Integración con Firebase
+- 🚧 **API Mobile** - Endpoints optimizados para apps móviles
+- 🚧 **Reportes PDF** - Generación automática de reportes
+- 🚧 **Backup automático** - Respaldo programado de datos
+
+---
+
+## 🏗️ Arquitectura Específica
+
+### 🔄 Replicación Master-Slave
+La aplicación implementa un patrón de replicación para optimizar el rendimiento:
+
+```yaml
+# Configuración Master (Escritura)
+spring:
+  datasource:
+    master:
+      url: jdbc:postgresql://localhost:5432/KuenteCO
+      username: master
+      password: secure_password
+      
+# Configuración Slave (Lectura)
+  datasource:
+    slave:
+      url: jdbc:postgresql://localhost:5433/KuenteCO
+      username: replicator
+      password: secure_password
+```
+
+### 🔐 Seguridad JWT
+Implementación de autenticación stateless con JWT:
+
+```java
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    // Filtro personalizado para validación de tokens
+    // Integración con Spring Security
+}
+```
+
+### 🏦 Integración Bancolombia
+Conexión segura con la API de Bancolombia para sincronización de transacciones:
+
+```java
+@Service
+public class BancolombiaService {
+    // Autenticación OAuth2
+    // Sincronización automática de transacciones
+    // Manejo de tokens con renovación automática
+}
+```
 
 ---
 
@@ -401,6 +574,75 @@ open target/spotbugsXml.xml
 
 # Métricas de Maven
 mvn dependency:analyze
+```
+
+---
+
+## 👨‍💻 Desarrollo
+
+### 🛠️ Configuración del IDE
+
+#### IntelliJ IDEA (Recomendado)
+```bash
+# Plugins recomendados
+- Lombok Plugin
+- MapStruct Support
+- OpenAPI (Swagger) Editor
+- Docker
+- Database Navigator
+```
+
+#### VS Code
+```bash
+# Extensiones recomendadas
+- Extension Pack for Java
+- Spring Boot Extension Pack
+- Lombok Annotations Support
+- REST Client
+- Database Client
+```
+
+### 📊 Perfiles de Aplicación
+
+```yaml
+# Desarrollo
+spring:
+  profiles:
+    active: dev,master,slave
+    
+# Producción
+spring:
+  profiles:
+    active: prod,master,slave
+```
+
+### 📝 Variables de Entorno por Ambiente
+
+```bash
+# Desarrollo (.env.dev)
+JWT_SECRET=dev_secret_key_for_development_only
+SPRING_DATASOURCE_URL_MASTER=jdbc:postgresql://localhost:5432/KuenteCO_dev
+
+# Producción (.env.prod)
+JWT_SECRET=production_super_secure_secret_key
+SPRING_DATASOURCE_URL_MASTER=jdbc:postgresql://prod-db:5432/KuenteCO
+```
+
+### 📊 Monitoreo en Desarrollo
+
+```bash
+# Activar debug de consultas SQL
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    
+# Actuator endpoints habilitados
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,loggers,env"
 ```
 
 ---
@@ -522,19 +764,3 @@ curl http://localhost:8080/actuator/metrics/http.server.requests
 - ✅ Índices de base de datos optimizados
 - ✅ Pool de conexiones configurado
 - ✅ Compression de respuestas
-
----
-
-## 📧 Contacto y Soporte
-
-- 🐛 **Issues**: [GitHub Issues](https://github.com/AlthosKal/KuenteCO/issues)
-- 📫 **Email Técnico**: dev@kuenteco.com
-- 📄 **Documentación**: [Wiki del Proyecto](https://github.com/AlthosKal/KuenteCO/wiki)
-- 👥 **Comunidad**: [Discord](https://discord.gg/kuenteco)
-
----
-
-<p align="center">
-  <b>⚙️ Backend desarrollado con ❤️ usando Spring Boot</b><br>
-  <i>API robusta, segura y escalable para KuenteCO</i>
-</p>

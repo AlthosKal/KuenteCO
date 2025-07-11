@@ -31,7 +31,7 @@ Este repositorio contiene el código fuente completo de KuenteCO, estructurado e
 - ✅ **Presupuestos inteligentes** con alertas y seguimiento en tiempo real
 - ✅ **Metas de ahorro** con visualización de progreso y proyecciones
 - ✅ **Informes financieros** con gráficos interactivos y análisis de tendencias
-- ✅ **Gestión multi-cuenta** para diferentes actividades y proyectos
+- ✅ **Gestión multi-cuenta** para el manejo de negocios
 - ✅ **Importación automática** de transacciones bancarias
 - ✅ **Análisis predictivo** para optimizar la toma de decisiones
 
@@ -74,7 +74,7 @@ Este repositorio contiene el código fuente completo de KuenteCO, estructurado e
 - **SendGrid** - Sistema de notificaciones por email
 - **Cloudinary** - Gestión y optimización de imágenes
 - **OpenExchangeRate** - Tasas de cambio actualizadas
-- **MercadoPago** - Procesamiento de pagos (próximamente)
+- **MercadoPago** - Procesamiento de pagos
 
 ---
 
@@ -148,7 +148,7 @@ KuenteCO/
 
 | Componente | Tecnología | Puerto | Descripción |
 |------------|-------------|---------|-------------|
-| **Frontend** | Flutter 3.0+ | :80 | Interfaz multiplataforma (móvil/web) |
+| **Frontend** | Flutter 3.0+ | :5000 | Interfaz multiplataforma (móvil/web) |
 | **Backend** | Spring Boot 3.5 | :8080 | API REST con autenticación JWT |
 | **DB Master** | PostgreSQL 15 | :5432 | Base de datos principal (R/W) |
 | **DB Slave** | PostgreSQL 15 | :5433 | Réplica para lectura (R) |
@@ -183,7 +183,7 @@ cd KuenteCO
 ```
 
 #### 2️⃣ Configurar variables de entorno
-Crea un archivo `.env-docker` basado en la siguiente plantilla:
+Crea un archivo `.env.docker` basado en la siguiente plantilla:
 
 ```bash
 # 📧 Configuración de Email (SendGrid)
@@ -299,18 +299,15 @@ docker compose down -v
 - ✅ Base de datos con replicación Master-Slave
 - ✅ Aplicación móvil Flutter multiplataforma
 - ✅ Integración con servicios externos (SendGrid, Cloudinary)
-- ✅ Tests automatizados E2E
 
 ### 🔜 Próximas Funcionalidades (v1.1)
 - 🔄 Frontend web responsivo
 - 🔄 Proxy Nginx con SSL/TLS
 - 🔄 Notificaciones push en tiempo real
 - 🔄 Importación automática de transacciones bancarias
-- 🔄 Módulo de facturación electrónica
 
 ### 🔮 Futuro (v2.0+)
 - 🤖 Inteligencia artificial para predicciones financieras
-- 📊 Analytics avanzados con Machine Learning
 - 🌐 Multi-tenancy para empresas
 - 🚫integrations con más plataformas de pago
 - 📱 Aplicación de escritorio (Electron)

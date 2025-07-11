@@ -4,7 +4,7 @@ jwt:
 
 spring:
   application:
-    name: AiProfileChat
+    name: KuentecoChat
 
   data:
     mongodb:
@@ -46,14 +46,56 @@ management:
 
 http-connector:
   hosts:
-    ai-profile-app:
-      host: ${AI_PROFILE_APP_URL}
+    kuenteco-app:
+      host: ${KUENTECO_APP_URL}
       endpoints:
-        get-ai-profile-info:
-          url: "/v1/transaction"
+
+        base-timeout:
           readTimeout: 5000
           writeTimeout: 5000
           connectionTimeout: 5000
+
+        budget:
+          base-path: "/budget"
+          get-budgets: ""
+          get-all-budgets-enrollments:
+            url: "/enroll"
+          get-budget-comparison:
+            url: "/report/comparison"
+          get-budget-summary:
+            url: "/report/summary"
+
+        category:
+          base-path: "/category"
+          get-categories: ""
+          get-all-category-enrollments:
+            url: "/enroll"
+          get-category-report:
+            url: "/report/{categoryId}"
+          get-transactions-by-category:
+            url: "/report/summary"
+          get-business-user-category-enrollments:
+            url: "/enroll/user"
+
+        debt:
+          base-path: "/debt"
+          get-all-debts: ""
+          get-debts-by-state:
+            url: "/state/{state}"
+          get-overdue-debts:
+            url: "/overdue"
+          get-debts-expiring-in-days:
+            url: "/expiring-soon"
+          get-total-pending-amount:
+            url: "/total-pending"
+          get-debt-summary-report:
+            url: "report/summary"
+
+        transaction:
+          base-path: "/transaction"
+          get-transactions: ""
+          get-transactions-summary:
+            url: "/report/summary"
 
 logging:
   level:

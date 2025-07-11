@@ -1,7 +1,7 @@
 services:
-  backend:
-    image: yefff/image-backend-kuenteco:1.1.0
-    container_name: BackendKuenteCO
+  kuenteco-app:
+    image: yefff/image-backend-kuenteco-app:1.0.0
+    container_name: KuentecoApp
     volumes:
       - ./.env.docker:/workspace/.env
     ports:
@@ -16,6 +16,7 @@ services:
     networks:
       - kuenteco-network
     restart: unless-stopped
+
 
   postgres-master-database:
     build:
@@ -76,9 +77,47 @@ services:
       start_period: 90s
     restart: unless-stopped
 
+  kuenteco-chat:
+    image: yefff/image-backend-kuenteco-chat:1.0.0
+    container_name: KuentecoChat
+    volumes:
+      - ./.env.docker:/workspace/.env
+    ports:
+      - "7070:7070"
+    env_file:
+      - .env.docker
+    depends_on:
+      mongo-database:
+        condition: service_healthy
+    networks:
+      - kuenteco-network
+    restart: unless-stopped
+
+  mongo-database:
+    image: mongo:latest
+    container_name: MongoDatabase
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    volumes:
+      - mongo-kuenteco-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - kuenteco-network
+    command: ["mongod", "--bind_ip_all"]
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand({ ping: 1 })"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
 volumes:
   postgres-master-data:
   postgres-replica-data:
+  mongo-kuenteco-data:
 
 networks:
   kuenteco-network:
