@@ -22,7 +22,8 @@ public class BudgetController {
     private BudgetEnrollmentService budgetEnrollmentService;
 
     @GetMapping
-    public ResponseEntity<?> getBudgets(HttpServletRequest request) {
+    public ResponseEntity<?> getBudgets(HttpServletRequest request,  @RequestParam(required = false) String from,
+                                        @RequestParam(required = false) String to, @RequestParam(required = false) String kind) {
         Object result = budgetService.getBudgets();
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -31,7 +32,8 @@ public class BudgetController {
     }
 
     @GetMapping("/enroll")
-    public ResponseEntity<?> getAllBudgetEnrollments(HttpServletRequest request) {
+    public ResponseEntity<?> getAllBudgetEnrollments(HttpServletRequest request,  @RequestParam(required = false) String from,
+                                                     @RequestParam(required = false) String to, @RequestParam(required = false) String kind) {
         Object result = budgetEnrollmentService.getAllBudgetEnrollments();
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -40,7 +42,8 @@ public class BudgetController {
     }
 
     @GetMapping("/report/comparison")
-    public ResponseEntity<?> getBudgetComparison(HttpServletRequest request) {
+    public ResponseEntity<?> getBudgetComparison(HttpServletRequest request,  @RequestParam(required = false) String from,
+                                                 @RequestParam(required = false) String to, @RequestParam(required = false) String kind) {
         Object result = budgetService.getBudgetVsActualReport();
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -51,7 +54,8 @@ public class BudgetController {
     }
 
     @GetMapping("/report/summary")
-    public ResponseEntity<?> getBudgetSummary(HttpServletRequest request) {
+    public ResponseEntity<?> getBudgetSummary(HttpServletRequest request,  @RequestParam(required = false) String from,
+                                              @RequestParam(required = false) String to, @RequestParam(required = false) String kind) {
         Object result = budgetService.getBudgetSummary();
         return new ResponseEntity<>(
                 ApiResponse.ok(

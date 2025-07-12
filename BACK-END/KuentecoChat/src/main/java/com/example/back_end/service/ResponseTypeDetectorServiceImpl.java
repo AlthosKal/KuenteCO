@@ -1,12 +1,12 @@
 package com.example.back_end.service;
 
+import com.example.back_end.connector.rest.transaction.UserProfilesWithTransactionsDTO;
 import com.example.back_end.dto.response.ai.BaseDynamicResponseDTO;
 import com.example.back_end.mapper.TransactionMapper;
 import com.example.back_end.service.factory.DynamicResponseFactory;
 import com.example.back_end.connector.rest.budget.BudgetSummaryDTO;
 import com.example.back_end.connector.rest.budget.BudgetVsActualDTO;
 import com.example.back_end.connector.rest.debt.DebtDTO;
-import com.example.back_end.connector.rest.transaction.GetTransactionDTO;
 import com.example.back_end.connector.rest.transaction.TransactionSummaryDTO;
 import org.springframework.stereotype.Service;
 
@@ -42,12 +42,12 @@ public class ResponseTypeDetectorServiceImpl implements ResponseTypeDetectorServ
 
         map.put("analyzeDebtRisk", listHandler(DebtDTO.class, responseFactory::createDebtAnalysisResponse));
 
-        map.put("analyzeUserSpendingPatterns", listHandler(GetTransactionDTO.class,
+        map.put("analyzeUserSpendingPatterns", listHandler(UserProfilesWithTransactionsDTO.class,
                 (prompt, list) -> responseFactory.createSpendingPatternsResponse(
                         prompt,
                         transactionMapper.convertToTransactionSummaryList(list))));
 
-        map.put("calculateFinancialHealthScore", listHandler(GetTransactionDTO.class,
+        map.put("calculateFinancialHealthScore", listHandler(UserProfilesWithTransactionsDTO.class,
                 (prompt, list) -> responseFactory.createFinancialHealthResponse(
                         prompt,
                         transactionMapper.convertToTransactionSummaryList(list))));

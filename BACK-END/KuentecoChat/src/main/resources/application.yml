@@ -46,59 +46,62 @@ management:
 
 http-connector:
   hosts:
-    kuenteco-app:
+    # Configuración para transacciones
+    transaction:
       host: ${KUENTECO_APP_URL}
+      base-path: "/api/app/v1/transaction"
       endpoints:
-
-        base-timeout:
-          readTimeout: 5000
+        get-transactions-summary:
+          url: "/report/summary"
+          readTimeout: 10000
+          writeTimeout: 5000
+          connectionTimeout: 5000
+        get-user-transactions:
+          url: ""
+          readTimeout: 10000
           writeTimeout: 5000
           connectionTimeout: 5000
 
-        budget:
-          base-path: "/budget"
-          get-budgets: ""
-          get-all-budgets-enrollments:
-            url: "/enroll"
-          get-budget-comparison:
-            url: "/report/comparison"
-          get-budget-summary:
-            url: "/report/summary"
+    # Configuración para presupuestos
+    budget:
+      host: ${KUENTECO_APP_URL}
+      base-path: "/api/app/v1/budget"
+      endpoints:
+        get-budget-summary:
+          url: "/report/summary"
+          readTimeout: 10000
+          writeTimeout: 5000
+          connectionTimeout: 5000
+        get-budget-comparison:
+          url: "/report/comparison"
+          readTimeout: 10000
+          writeTimeout: 5000
+          connectionTimeout: 5000
 
-        category:
-          base-path: "/category"
-          get-categories: ""
-          get-all-category-enrollments:
-            url: "/enroll"
-          get-category-report:
-            url: "/report/{categoryId}"
-          get-transactions-by-category:
-            url: "/report/summary"
-          get-business-user-category-enrollments:
-            url: "/enroll/user"
+    # Configuración para deudas
+    debt:
+      host: ${KUENTECO_APP_URL}
+      base-path: "/api/app/v1/debt"
+      endpoints:
+        get-user-debts:
+          url: ""
+          readTimeout: 10000
+          writeTimeout: 5000
+          connectionTimeout: 5000
 
-        debt:
-          base-path: "/debt"
-          get-all-debts: ""
-          get-debts-by-state:
-            url: "/state/{state}"
-          get-overdue-debts:
-            url: "/overdue"
-          get-debts-expiring-in-days:
-            url: "/expiring-soon"
-          get-total-pending-amount:
-            url: "/total-pending"
-          get-debt-summary-report:
-            url: "report/summary"
-
-        transaction:
-          base-path: "/transaction"
-          get-transactions: ""
-          get-transactions-summary:
-            url: "/report/summary"
+    # Configuración para categorías
+    category:
+      host: ${KUENTECO_APP_URL}
+      base-path: "/api/app/v1/category"
+      endpoints:
+        get-categories:
+          url: ""
+          readTimeout: 10000
+          writeTimeout: 5000
+          connectionTimeout: 5000
 
 logging:
   level:
-    com.example.back_end.AiProfileChat.connector: DEBUG
+    com.example.back_end.connector: DEBUG
     org.springframework.web.reactive.function.client: DEBUG
     org.springframework: INFO

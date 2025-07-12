@@ -12,9 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionSummaryDTO {
-    private Integer ownerUserId;
+    private String ownerUserId;
     private String transactionOwnerType;
     private Integer profileId;
+    private String transactionName;
     private String categoryName;
     private String budgetName;
     private String debtName;

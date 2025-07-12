@@ -14,10 +14,7 @@ import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.UserType;
 import org.kuenteco.backend.exception.exceptions.TransactionException;
-import org.kuenteco.backend.mapper.logic.transaction.NewTransactionMapper;
-import org.kuenteco.backend.mapper.logic.transaction.ProfileWithTransactionsMapper;
-import org.kuenteco.backend.mapper.logic.transaction.TransactionDetailMapper;
-import org.kuenteco.backend.mapper.logic.transaction.UpdateTransactionMapper;
+import org.kuenteco.backend.mapper.logic.transaction.*;
 import org.kuenteco.backend.repository.master.MasterTransactionRepository;
 import org.kuenteco.backend.repository.slave.*;
 import org.springframework.stereotype.Service;
@@ -37,6 +34,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final UpdateTransactionMapper updateTransactionMapper;
     private final ProfileWithTransactionsMapper profileWithTransactionsMapper;
     private final SlaveDebtRepository slaveDebtRepository;
+    private final TransactionSummaryMapper transactionSummaryMapper;
 
     @Override
     public Object getTransactions() {
@@ -76,11 +74,13 @@ public class TransactionServiceImpl implements TransactionService {
     public Object getTransactionSummary() {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
-        List<TransactionSummaryDTO> dto =
-                slaveTransactionRepository.findAllTransactionsSummaries(email);
-        if (dto.isEmpty()) {
+        List<Object[]> rawData = slaveTransactionRepository.findAllTransactionsSummariesRaw(email);
+
+        if (rawData.isEmpty()) {
             return "No tiene transacciones registradas";
         }
+
+        List<TransactionSummaryDTO> dto = transactionSummaryMapper.fromObjectArrayList(rawData);
         return dto;
     }
 

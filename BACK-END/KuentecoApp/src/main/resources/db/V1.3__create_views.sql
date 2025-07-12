@@ -140,6 +140,7 @@ SELECT
         ELSE 'UNKNOWN'
         END AS transaction_owner_type,
     t.id_profile,
+    COALESCE(t.name, 'Sin nombre') AS transaction_name,
     COALESCE(c.description->>'name', 'Sin categoría') AS category_name,
     COALESCE(b.name, 'Sin presupuesto') AS budget_name,
     COALESCE(d.name, 'Sin deuda') AS debt_name,
@@ -171,6 +172,7 @@ GROUP BY
         ELSE 'UNKNOWN'
         END,
     t.id_profile,
+    t.name,
     c.description->>'name',
     b.name,
     d.name

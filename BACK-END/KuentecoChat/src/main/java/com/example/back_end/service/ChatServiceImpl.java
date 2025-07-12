@@ -5,6 +5,8 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 
 import com.example.back_end.configuration.security.JwtUtil;
 import com.example.back_end.connector.KuentecoAppConnector;
+import com.example.back_end.connector.rest.transaction.TransactionResponseWrapper;
+import com.example.back_end.connector.rest.transaction.UserProfilesWithTransactionsDTO;
 import com.example.back_end.dto.request.ChatDTO;
 import com.example.back_end.dto.request.ChatFilesDTO;
 import com.example.back_end.dto.request.ChatHistoryDTO;
@@ -89,7 +91,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    @Cacheable(value = "chats", key = "#request.model + '-' + #request.prompt")
+    @Cacheable(value = "chats", key = "#dto.model + '-' + #dto.prompt")
     public DynamicAnalysisResponseDTO queryAi(ChatDTO dto, HttpServletRequest request) {
         try {
             String token = jwtUtil.resolveToken(request);
@@ -133,31 +135,39 @@ public class ChatServiceImpl implements ChatService {
         }
     }
 
-    // Método auxiliar para detectar función desde el prompt
+    // Método auxiliar para dete    ctar función desde el prompt
     private String detectFunctionFromPrompt(String prompt) {
         String lowerPrompt = prompt.toLowerCase();
+        String detectedFunction = "general";
 
         if (lowerPrompt.contains("balance") || lowerPrompt.contains("saldo")) {
-            return "BalanceOverTime";
+            detectedFunction = "BalanceOverTime";
         } else if (lowerPrompt.contains("deuda") || lowerPrompt.contains("debt")) {
-            return "analyzeDebtRisk";
+            detectedFunction = "analyzeDebtRisk";
         } else if (lowerPrompt.contains("gasto") || lowerPrompt.contains("patrón")) {
-            return "analyzeUserSpendingPatterns";
+            detectedFunction = "analyzeUserSpendingPatterns";
         } else if (lowerPrompt.contains("salud financiera") || lowerPrompt.contains("score")) {
-            return "calculateFinancialHealthScore";
+            detectedFunction = "calculateFinancialHealthScore";
         } else if (lowerPrompt.contains("ingreso") && lowerPrompt.contains("gasto")) {
-            return "IncomesAndExpensesByPeriod";
+            detectedFunction = "IncomesAndExpensesByPeriod";
         } else if (lowerPrompt.contains("proyección") || lowerPrompt.contains("projection")) {
-            return "projectFinancialBalance";
+            detectedFunction = "projectFinancialBalance";
         } else if (lowerPrompt.contains("reducir gastos") || lowerPrompt.contains("expense reduction")) {
-            return "suggestExpenseReductions";
+            detectedFunction = "suggestExpenseReductions";
         } else if (lowerPrompt.contains("comparar") || lowerPrompt.contains("compare")) {
-            return "compareFinancialPeriods";
+            detectedFunction = "compareFinancialPeriods";
         } else if (lowerPrompt.contains("reporte") || lowerPrompt.contains("statement")) {
-            return "financialStatement";
+            detectedFunction = "financialStatement";
+        } else if (lowerPrompt.contains("transacciones") || lowerPrompt.contains("transactions")) {
+            detectedFunction = "analyzeUserSpendingPatterns";
+        } else if (lowerPrompt.contains("presupuesto") || lowerPrompt.contains("budget")) {
+            detectedFunction = "compareFinancialPeriods";
+        } else if (lowerPrompt.contains("performance") || lowerPrompt.contains("rendimiento")) {
+            detectedFunction = "calculateFinancialHealthScore";
         }
 
-        return "general";
+        LOGGER.info("Detected function '{}' from prompt: '{}'", detectedFunction, prompt);
+        return detectedFunction;
     }
 
     private Object getFunctionData(String functionName, ChatDTO request) {
@@ -193,15 +203,31 @@ public class ChatServiceImpl implements ChatService {
     // Métodos auxiliares para ejecutar funciones específicas
     private Object executeBalanceFunction(ChatDTO request) {
         try {
+            LOGGER.info("Executing balance function for prompt: {}", request.getPrompt());
+
             Map<String, String> params = extractDateParameters(request.getPrompt());
+            LOGGER.info("Extracted parameters: {}", params);
+
             BalanceOverTimeFunction.Request functionRequest = new BalanceOverTimeFunction.Request(
                     params.get("from"),
                     params.get("to"),
                     params.get("kind")
             );
 
+            LOGGER.info("Created function request: {}", functionRequest);
+
             BalanceOverTimeFunction function = new BalanceOverTimeFunction(getConnector());
+            LOGGER.info("Calling balance function...");
+
             var response = function.apply(functionRequest);
+            LOGGER.info("Function response received: success={}, data={}",
+                    response.isSuccess(), response.getData());
+
+            if (!response.isSuccess()) {
+                LOGGER.error("Function call failed: {}", response.getMessage());
+                return null;
+            }
+
             return response.getData();
         } catch (Exception e) {
             LOGGER.error("Error executing balance function", e);
@@ -237,7 +263,14 @@ public class ChatServiceImpl implements ChatService {
 
             AnalyzeUserSpendingPatternsFunction function = new AnalyzeUserSpendingPatternsFunction(getConnector());
             var response = function.apply(functionRequest);
-            return response.getData();
+            
+            if (!response.isSuccess()) {
+                LOGGER.error("Function call failed: {}", response.getMessage());
+                return null;
+            }
+            
+            // Extraer datos del TransactionResponseWrapper
+            return extractDataFromWrapper(response.getData(), "spending patterns");
         } catch (Exception e) {
             LOGGER.error("Error executing spending patterns function", e);
             return null;
@@ -256,7 +289,14 @@ public class ChatServiceImpl implements ChatService {
             CalculateFinancialHealthScoreWithTransactionsFunction function =
                     new CalculateFinancialHealthScoreWithTransactionsFunction(getConnector());
             var response = function.apply(functionRequest);
-            return response.getData();
+            
+            if (!response.isSuccess()) {
+                LOGGER.error("Function call failed: {}", response.getMessage());
+                return null;
+            }
+            
+            // Extraer datos del TransactionResponseWrapper
+            return extractDataFromWrapper(response.getData(), "financial health");
         } catch (Exception e) {
             LOGGER.error("Error executing financial health function", e);
             return null;
@@ -445,7 +485,7 @@ public class ChatServiceImpl implements ChatService {
 
     private String loadPromptFromClasspath(String filename) {
         try (InputStream inputStream =
-                getClass().getClassLoader().getResourceAsStream("prompts/" + filename)) {
+                     getClass().getClassLoader().getResourceAsStream("prompts/" + filename)) {
             if (inputStream == null) throw new FileNotFoundException("Prompt file not found");
             return StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
@@ -538,5 +578,60 @@ public class ChatServiceImpl implements ChatService {
 
         LOGGER.info("Extracted parameters from prompt '{}': {}", prompt, params);
         return params;
+    }
+
+    /**
+     * Extrae los datos reales del TransactionResponseWrapper
+     * 
+     * @param data El objeto que puede ser un TransactionResponseWrapper
+     * @param functionContext Contexto de la función para logging
+     * @return Los datos extraídos o una lista con el UserProfilesWithTransactionsDTO
+     */
+    private Object extractDataFromWrapper(Object data, String functionContext) {
+        try {
+            if (data instanceof TransactionResponseWrapper wrapper) {
+                LOGGER.info("Extracting data from TransactionResponseWrapper for {}, type: {}", 
+                        functionContext, wrapper.getType());
+                
+                switch (wrapper.getType()) {
+                    case USER_PROFILES -> {
+                        // Para usuarios BUSINESS, devolver una lista con el UserProfilesWithTransactionsDTO
+                        UserProfilesWithTransactionsDTO userProfiles = wrapper.getUserProfiles();
+                        if (userProfiles != null) {
+                            LOGGER.info("Found user profiles data for {}: {} profiles, {} transactions", 
+                                    functionContext, userProfiles.getTotalProfiles(), userProfiles.getTotalTransactions());
+                            return List.of(userProfiles);
+                        }
+                        break;
+                    }
+                    case TRANSACTION_LIST -> {
+                        // Para usuarios PERSONAL, devolver directamente la lista de transacciones
+                        if (wrapper.getTransactionList() != null && !wrapper.getTransactionList().isEmpty()) {
+                            LOGGER.info("Found transaction list for {}: {} transactions", 
+                                    functionContext, wrapper.getTransactionList().size());
+                            return wrapper.getTransactionList();
+                        }
+                        break;
+                    }
+                    case MESSAGE -> {
+                        LOGGER.info("Received message response for {}: {}", functionContext, wrapper.getMessage());
+                        return Collections.emptyList();
+                    }
+                    case UNKNOWN -> {
+                        LOGGER.warn("Unknown wrapper type for {}: {}", functionContext, wrapper.getType());
+                        return Collections.emptyList();
+                    }
+                }
+            } else {
+                LOGGER.debug("Data is not a TransactionResponseWrapper for {}, returning as-is: {}", 
+                        functionContext, data != null ? data.getClass().getSimpleName() : "null");
+                return data;
+            }
+            
+            return Collections.emptyList();
+        } catch (Exception e) {
+            LOGGER.error("Error extracting data from wrapper for {}: {}", functionContext, e.getMessage(), e);
+            return Collections.emptyList();
+        }
     }
 }

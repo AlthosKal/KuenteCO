@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class TransactionsByCategoryDTO {
     private Integer categoryId;
     private String categoryName;
-    private Integer ownerUserId;
+    private String ownerUserId;
     private BigDecimal totalIncome;
     private BigDecimal totalExpenses;
     private BigDecimal netAmount;
