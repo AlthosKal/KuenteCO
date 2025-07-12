@@ -1,13 +1,12 @@
 package org.kuenteco.backend.mapper.logic.transaction;
 
-import org.kuenteco.backend.dto.logic.transaction.kuenteco.TransactionSummaryDTO;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.kuenteco.backend.dto.logic.transaction.kuenteco.TransactionSummaryDTO;
+import org.springframework.stereotype.Component;
 
 @Component
 public class TransactionSummaryMapper {
@@ -33,16 +32,15 @@ public class TransactionSummaryMapper {
     }
 
     public List<TransactionSummaryDTO> fromObjectArrayList(List<Object[]> rows) {
-        return rows.stream()
-                .map(this::fromObjectArray)
-                .collect(Collectors.toList());
+        return rows.stream().map(this::fromObjectArray).collect(Collectors.toList());
     }
 
     private LocalDateTime convertToLocalDateTime(Object value) {
         if (value == null) return null;
         if (value instanceof LocalDateTime) return (LocalDateTime) value;
         if (value instanceof Timestamp) return ((Timestamp) value).toLocalDateTime();
-        if (value instanceof java.sql.Date) return ((java.sql.Date) value).toLocalDate().atStartOfDay();
+        if (value instanceof java.sql.Date)
+            return ((java.sql.Date) value).toLocalDate().atStartOfDay();
         return null;
     }
 }

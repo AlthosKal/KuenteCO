@@ -1,7 +1,6 @@
 package org.kuenteco.backend.repository.slave;
 
 import java.util.List;
-import org.kuenteco.backend.dto.logic.transaction.kuenteco.TransactionSummaryDTO;
 import org.kuenteco.backend.entity.Category;
 import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.Transaction;
@@ -24,7 +23,7 @@ public interface SlaveTransactionRepository extends JpaRepository<Transaction, I
     @Query(
             value =
                     """
-    SELECT 
+    SELECT
         v.owner_user_id,
         v.transaction_owner_type,
         v.id_profile,

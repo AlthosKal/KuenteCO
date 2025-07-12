@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.kuenteco.backend.dto.image.ImageDTO;
 import org.kuenteco.backend.enums.State;
+import org.kuenteco.backend.enums.SubscriptionType;
 import org.kuenteco.backend.enums.UserType;
 
 @Data
@@ -16,6 +17,7 @@ public class UserDetailDTO {
     private ImageDTO image;
     private String username;
     private String email;
-    private UserType type;
+    private UserType userType;
+    private SubscriptionType subscriptionType;
     private State state;
 }

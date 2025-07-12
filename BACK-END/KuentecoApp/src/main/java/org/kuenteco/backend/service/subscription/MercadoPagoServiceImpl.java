@@ -1,5 +1,7 @@
 package org.kuenteco.backend.service.subscription;
 
+import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
+
 import com.mercadopago.client.preapproval.PreApprovalAutoRecurringCreateRequest;
 import com.mercadopago.client.preapproval.PreapprovalClient;
 import com.mercadopago.client.preapproval.PreapprovalCreateRequest;
@@ -12,6 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.dto.subscription.SubscriptionPriceConfigDTO;
 import org.kuenteco.backend.dto.subscription.request.CreateSubscriptionRequestDTO;
 import org.kuenteco.backend.dto.subscription.response.CreateSubscriptionResponseDTO;
@@ -20,11 +23,13 @@ import org.kuenteco.backend.entity.MercadoPagoPreapproval;
 import org.kuenteco.backend.entity.Subscription;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.PreapprovalStatus;
+import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.enums.SubscriptionType;
 import org.kuenteco.backend.exception.exceptions.MercadoPagoException;
 import org.kuenteco.backend.exception.exceptions.SubscriptionMercadoPagoException;
 import org.kuenteco.backend.exception.exceptions.SubscriptionPriceException;
+import org.kuenteco.backend.exception.exceptions.TransactionException;
 import org.kuenteco.backend.mapper.subscription.MercadoPagoPreapprovalMapper;
 import org.kuenteco.backend.repository.master.MasterMercadoPagoPreapprovalRepository;
 import org.kuenteco.backend.repository.master.MasterSubscriptionRepository;
@@ -71,6 +76,12 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
     @Override
     public CreateSubscriptionResponseDTO createSubscription(
             CreateSubscriptionRequestDTO request, String userEmail) {
+        AuthCredentials credentials = getCredentials();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new TransactionException("Endpoint solo disponible para usuarios");
+        }
         try {
             log.info("Iniciando creación de suscripción para usuario: {}", userEmail);
 
@@ -138,6 +149,12 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
 
     @Override
     public SubscriptionResponseDTO getSubscription(String preapprovalId, String userEmail) {
+        AuthCredentials credentials = getCredentials();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new TransactionException("Endpoint solo disponible para usuarios");
+        }
         log.info(
                 "Obteniendo suscripción para usuario: {}, preapproval ID: {}",
                 userEmail,

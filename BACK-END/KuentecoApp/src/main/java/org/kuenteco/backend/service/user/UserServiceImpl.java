@@ -5,10 +5,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.dto.auth.DeleteUserDTO;
 import org.kuenteco.backend.dto.auth.UserDetailDTO;
+import org.kuenteco.backend.entity.Subscription;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.mapper.auth.UserDetailMapper;
 import org.kuenteco.backend.repository.master.MasterUserRepository;
+import org.kuenteco.backend.repository.slave.SlaveSubscriptionRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.kuenteco.backend.service.image.ImageService;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private final MasterUserRepository masterUserRepository;
     private final ImageService imageService;
     private final UserDetailMapper userDetailMapper;
+    private final SlaveSubscriptionRepository slaveSubscriptionRepository;
 
     @Override
     public User findByNameOrEmail(String nameOrEmail) {
@@ -64,7 +67,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetailDTO getUserDetails() {
         User user = getDetails();
-        return userDetailMapper.toDto(user);
+        Subscription subscription = slaveSubscriptionRepository.findByUser(user).orElseThrow(() -> new UsernameNotFoundException("Subscripción no encontrada"));
+        return userDetailMapper.toDto(user, subscription.getType());
     }
 
     @Override

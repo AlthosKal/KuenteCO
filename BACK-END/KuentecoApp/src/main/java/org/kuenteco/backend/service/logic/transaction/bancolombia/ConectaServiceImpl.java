@@ -1,16 +1,18 @@
 package org.kuenteco.backend.service.logic.transaction.bancolombia;
 
+import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
+
 import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
+import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.config.properties.BancolombiaProperties;
 import org.kuenteco.backend.dto.logic.transaction.bancolombia.BancolombiaTransactionRequestDTO;
 import org.kuenteco.backend.dto.logic.transaction.bancolombia.response.TransactionalInfoResponse;
-import org.kuenteco.backend.exception.exceptions.BancolombiaApiException;
-import org.kuenteco.backend.exception.exceptions.BancolombiaAuthenticationException;
-import org.kuenteco.backend.exception.exceptions.BancolombiaTimeoutException;
+import org.kuenteco.backend.enums.RoleList;
+import org.kuenteco.backend.exception.exceptions.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -36,6 +38,12 @@ public class ConectaServiceImpl implements ConectaService {
 
     @Override
     public String getTransactionsFromRequest(BancolombiaTransactionRequestDTO dto) {
+        AuthCredentials credentials = getCredentials();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new TransactionException("Endpoint solo disponible para usuarios");
+        }
         // 1. Construir payload según especificación
         Map<String, Object> payload =
                 Map.of(

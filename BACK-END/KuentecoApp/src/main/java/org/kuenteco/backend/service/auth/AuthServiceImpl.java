@@ -11,12 +11,15 @@ import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.config.jwt.JwtUtil;
 import org.kuenteco.backend.dto.auth.*;
 import org.kuenteco.backend.entity.Role;
+import org.kuenteco.backend.entity.Subscription;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.State;
+import org.kuenteco.backend.enums.SubscriptionType;
 import org.kuenteco.backend.exception.exceptions.AuthException;
 import org.kuenteco.backend.mapper.auth.NewUserMapper;
 import org.kuenteco.backend.repository.master.MasterRoleRepository;
+import org.kuenteco.backend.repository.master.MasterSubscriptionRepository;
 import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveRoleRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
@@ -51,6 +54,7 @@ public class AuthServiceImpl implements AuthService {
     private final TransactionTemplate transactionTemplate;
     private final NewUserMapper newUserMapper;
     private final SendgridService sendgridService;
+    private final MasterSubscriptionRepository masterSubscriptionRepository;
 
     @Autowired
     public AuthServiceImpl(
@@ -67,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
             @Qualifier("masterTransactionManager")
                     PlatformTransactionManager masterTransactionManager,
             NewUserMapper newUserMapper,
-            SendgridService sendgridService) {
+            SendgridService sendgridService, MasterSubscriptionRepository masterSubscriptionRepository) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
@@ -86,6 +90,7 @@ public class AuthServiceImpl implements AuthService {
         this.transactionTemplate.setTimeout(30); // 30 segundos
         this.transactionTemplate.setPropagationBehavior(
                 TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        this.masterSubscriptionRepository = masterSubscriptionRepository;
     }
 
     @Override
@@ -145,8 +150,14 @@ public class AuthServiceImpl implements AuthService {
                     user.setRole(masterRole);
                     user.setState(State.PENDING);
                     user.setVersion(0); // Inicializar versión para bloqueo optimista
+                    Subscription subscription = Subscription.builder()
+                            .user(user)
+                            .state(State.INACTIVE)
+                            .type(SubscriptionType.FREE)
+                            .build();
 
                     masterUserRepository.save(user);
+                    masterSubscriptionRepository.save(subscription);
                     return "Usuarío registrado correctamente";
                 });
 

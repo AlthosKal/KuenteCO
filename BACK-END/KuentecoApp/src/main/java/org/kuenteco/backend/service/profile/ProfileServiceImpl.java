@@ -1,5 +1,6 @@
 package org.kuenteco.backend.service.profile;
 
+import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
 import static org.kuenteco.backend.service.user.SendgridServiceImpl.verificationCodes;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.config.jwt.JwtUtil;
 import org.kuenteco.backend.dto.auth.ChangePasswordDTO;
 import org.kuenteco.backend.dto.auth.LoginDTO;
@@ -17,8 +19,10 @@ import org.kuenteco.backend.dto.profile.ProfileDetailDTO;
 import org.kuenteco.backend.dto.profile.UpdateProfileDTO;
 import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.Role;
+import org.kuenteco.backend.entity.Subscription;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.RoleList;
+import org.kuenteco.backend.enums.SubscriptionType;
 import org.kuenteco.backend.enums.UserType;
 import org.kuenteco.backend.exception.exceptions.AuthException;
 import org.kuenteco.backend.exception.exceptions.ProfileException;
@@ -29,6 +33,7 @@ import org.kuenteco.backend.repository.master.MasterProfileRepository;
 import org.kuenteco.backend.repository.master.MasterRoleRepository;
 import org.kuenteco.backend.repository.slave.SlaveProfileRepository;
 import org.kuenteco.backend.repository.slave.SlaveRoleRepository;
+import org.kuenteco.backend.repository.slave.SlaveSubscriptionRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.kuenteco.backend.service.auth.CookieService;
 import org.kuenteco.backend.service.auth.TokenBlacklistService;
@@ -58,6 +63,7 @@ public class ProfileServiceImpl implements ProfileService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final CookieService cookieService;
+    private final SlaveSubscriptionRepository slaveSubscriptionRepository;
 
     @Override
     public TokenResponseDTO authenticate(LoginDTO dto, HttpServletResponse response) {
@@ -84,10 +90,16 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public Object getProfiles() {
         // Obtener el usuario autenticado
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new ProfileException("Endpoint solo disponible para usuarios");
+        }
         User user =
                 slaveUserRepository
-                        .findByEmail(authentication.getName())
+                        .findByEmail(email)
                         .orElseThrow(() -> new ProfileException("Usuario no encontrado"));
 
         // Obtener las cuentas del usuario
@@ -111,11 +123,27 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public void registerProfile(NewProfileDTO dto) {
         // Obtener el usuario autenticado
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        RoleList roleList = credentials.role();
+
+        if (roleList == RoleList.ROLE_PROFILE) {
+            throw new ProfileException("Endpoint solo disponible para usuarios");
+        }
         User user =
                 slaveUserRepository
-                        .findByEmail(authentication.getName())
+                        .findByEmail(email)
                         .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        Subscription subscription = slaveSubscriptionRepository
+                .findByUser(user)
+                .orElseThrow(
+                        () -> new IllegalArgumentException("Subscription no encontrada")
+                );
+        if (slaveProfileRepository.count() > 3 && subscription.getType() == SubscriptionType.FREE){
+            throw new ProfileException("No puedes registrar mas de 3 perfiles, tienes que actualizar tu plan de subscripción");
+        }
+
         if (user.getType().equals(UserType.PERSONAL)) {
             throw new ProfileException(
                     "Los usuarios con cuenta personal no pueden registrar perfiles");
@@ -148,10 +176,11 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void updateProfile(UpdateProfileDTO dto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
         User user =
                 slaveUserRepository
-                        .findByEmail(authentication.getName())
+                        .findByEmail(email)
                         .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         if (existsByProfileName(dto.getUsername()))
             throw new ProfileException("Cuenta con este nombre ya existente");

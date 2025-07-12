@@ -12,6 +12,7 @@ import org.kuenteco.backend.dto.logic.budget.BudgetVsActualDTO;
 import org.kuenteco.backend.dto.logic.budget.NewBudgetDTO;
 import org.kuenteco.backend.entity.Budget;
 import org.kuenteco.backend.entity.User;
+import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.exception.exceptions.BudgetException;
 import org.kuenteco.backend.exception.exceptions.CategoryException;
 import org.kuenteco.backend.mapper.logic.budget.BudgetDetailMapper;
@@ -37,7 +38,11 @@ public class BudgetServiceImpl implements BudgetService {
     public Object getBudgets() {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
 
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new BudgetException("Endpoint solo disponible para usuarios");
+        }
         log.info("Buscando presupuestos para: {}", email);
 
         User user =
@@ -52,6 +57,11 @@ public class BudgetServiceImpl implements BudgetService {
     public Object getBudgetVsActualReport() {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new BudgetException("Endpoint solo disponible para usuarios");
+        }
         List<BudgetVsActualDTO> dto = slaveBudgetRepository.findAllBudgetVsActual(email);
         if (dto.isEmpty()) {
             return "No tienes presupuestos registrados";
@@ -63,6 +73,11 @@ public class BudgetServiceImpl implements BudgetService {
     public Object getBudgetSummary() {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new BudgetException("Endpoint solo disponible para usuarios");
+        }
         List<BudgetSummaryDTO> dto = slaveBudgetRepository.getBudgetSummaries(email);
         if (dto.isEmpty()) {
             return "No tienes presupuestos registrados";
@@ -74,6 +89,11 @@ public class BudgetServiceImpl implements BudgetService {
     public void addBudget(NewBudgetDTO dto) {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new BudgetException("Endpoint solo disponible para usuarios");
+        }
         User user =
                 slaveUserRepository
                         .findByEmail(email)
@@ -89,7 +109,11 @@ public class BudgetServiceImpl implements BudgetService {
     public void updateBudget(BudgetDTO dto) {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
 
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new BudgetException("Endpoint solo disponible para usuarios");
+        }
         User user =
                 slaveUserRepository
                         .findByEmail(email)
@@ -102,6 +126,12 @@ public class BudgetServiceImpl implements BudgetService {
 
     @Override
     public void deleteBudget(Integer id) {
+        AuthCredentials credentials = getCredentials();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new BudgetException("Endpoint solo disponible para usuarios");
+        }
         if (id == null) {
             throw new BudgetException("ID del presupuesto no puede ser nulo");
         }

@@ -10,9 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional(transactionManager = "masterTransactionManager")
 public interface MasterBancolombiaTokenRepository extends JpaRepository<BancolombiaToken, Long> {
-    /** Desactiva tokens activos (hazlo con método en el servicio) */
-    List<BancolombiaToken> findAllByIsActiveTrue();
-
     /** Desactiva tokens expirados (hazlo con método en el servicio) */
     List<BancolombiaToken> findAllByIsActiveTrueAndExpiresAtBefore(LocalDateTime currentTime);
 

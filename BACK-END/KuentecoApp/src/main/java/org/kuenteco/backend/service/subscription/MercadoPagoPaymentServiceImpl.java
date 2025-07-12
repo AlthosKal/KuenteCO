@@ -1,13 +1,18 @@
 package org.kuenteco.backend.service.subscription;
 
+import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.dto.subscription.response.PaymentHistoryResponseDTO;
 import org.kuenteco.backend.entity.MercadoPagoPayment;
 import org.kuenteco.backend.entity.MercadoPagoPreapproval;
 import org.kuenteco.backend.entity.User;
+import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.exception.exceptions.SubscriptionMercadoPagoException;
+import org.kuenteco.backend.exception.exceptions.TransactionException;
 import org.kuenteco.backend.mapper.subscription.MercadoPagoPaymentMapper;
 import org.kuenteco.backend.repository.slave.SlaveMercadoPagoPaymentRepository;
 import org.kuenteco.backend.repository.slave.SlaveMercadoPagoPreapprovalRepository;
@@ -27,6 +32,12 @@ public class MercadoPagoPaymentServiceImpl implements MercadoPagoPaymentService 
     @Override
     public List<PaymentHistoryResponseDTO> getPaymentHistory(
             String preapprovalId, String userEmail) {
+        AuthCredentials credentials = getCredentials();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new TransactionException("Endpoint solo disponible para usuarios");
+        }
         log.info(
                 "Obteniendo historial de pagos para preapproval: {}, usuario: {}",
                 preapprovalId,

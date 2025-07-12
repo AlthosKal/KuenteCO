@@ -17,6 +17,7 @@ import org.kuenteco.backend.dto.logic.transaction.kuenteco.TransactionDetailDTO;
 import org.kuenteco.backend.entity.Category;
 import org.kuenteco.backend.entity.Transaction;
 import org.kuenteco.backend.entity.User;
+import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.TransactionType;
 import org.kuenteco.backend.exception.exceptions.CategoryException;
 import org.kuenteco.backend.mapper.logic.category.CategoryDetailMapper;
@@ -50,6 +51,11 @@ public class CategoryServiceImpl implements CategoryService {
     public Object getCategories() {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new CategoryException("Endpoint solo disponible para usuarios");
+        }
 
         log.info("Obteniendo Rubros para: {}", email);
 
@@ -65,6 +71,11 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryReportDTO getCategoryReport(Integer categoryId) {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new CategoryException("Endpoint solo disponible para usuarios");
+        }
 
         log.info("Generando reporte para la categoría {} del usuario: {}", categoryId, email);
 
@@ -101,6 +112,11 @@ public class CategoryServiceImpl implements CategoryService {
     public Object getTransactionsByCategory() {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new CategoryException("Endpoint solo disponible para usuarios");
+        }
         List<TransactionsByCategoryDTO> dto =
                 slaveCategoryRepository.getTransactionsByCategoryAndUserEmail(email);
         if (dto.isEmpty()) {
@@ -113,6 +129,11 @@ public class CategoryServiceImpl implements CategoryService {
     public void addCategory(NewCategoryDTO dto) {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new CategoryException("Endpoint solo disponible para usuarios");
+        }
         Category category = prepareNewCategory(dto);
 
         User user =
@@ -133,7 +154,11 @@ public class CategoryServiceImpl implements CategoryService {
     public void updateCategory(CategoryDTO dto) {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
 
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new CategoryException("Endpoint solo disponible para usuarios");
+        }
         Category category = prepareUpdateCategory(dto);
         User user =
                 slaveUserRepository
@@ -147,6 +172,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(Integer id) {
+        AuthCredentials credentials = getCredentials();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new CategoryException("Endpoint solo disponible para usuarios");
+        }
         if (id == null) {
             throw new CategoryException("Id del rubro no puede ser nulo");
         }

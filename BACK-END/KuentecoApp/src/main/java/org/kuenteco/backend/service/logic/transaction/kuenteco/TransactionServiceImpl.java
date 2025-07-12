@@ -74,6 +74,11 @@ public class TransactionServiceImpl implements TransactionService {
     public Object getTransactionSummary() {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new TransactionException("Endpoint solo disponible para usuarios");
+        }
         List<Object[]> rawData = slaveTransactionRepository.findAllTransactionsSummariesRaw(email);
 
         if (rawData.isEmpty()) {

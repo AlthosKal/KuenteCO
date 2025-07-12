@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.dto.logic.budget.BudgetEnrollmentDTO;
 import org.kuenteco.backend.entity.*;
+import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.exception.exceptions.BudgetException;
 import org.kuenteco.backend.mapper.logic.budget.BudgetEnrollmentMapper;
 import org.kuenteco.backend.repository.master.MasterBudgetEnrollmentRepository;
@@ -33,6 +34,11 @@ public class BudgetEnrollmentServiceImpl implements BudgetEnrollmentService {
     public Object getAllBudgetEnrollments() {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_USER) {
+            throw new BudgetException("Endpoint solo disponible para perfiles");
+        }
 
         log.info("Obteniendo los presupuestos asociados de {}", email);
         Profile profile =
@@ -53,7 +59,11 @@ public class BudgetEnrollmentServiceImpl implements BudgetEnrollmentService {
     public BudgetEnrollmentDTO enrollProfileToBudget(Integer profileId, Integer budgetId) {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
 
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new BudgetException("Endpoint solo disponible para usuarios");
+        }
         User user =
                 slaveUserRepository
                         .findByEmail(email)

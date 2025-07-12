@@ -1,12 +1,12 @@
 package org.kuenteco.backend.dto.logic.debt;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.kuenteco.backend.validation.ValidCurrency;
 
 @Data
 @NoArgsConstructor
@@ -17,7 +17,10 @@ public class DebtPaymentDTO {
     private Integer debtId;
 
     @NotNull(message = "El monto del pago es obligatorio")
-    @Positive(message = "El monto del pago debe ser positivo")
+    @ValidCurrency(
+            min = 0.01,
+            max = 999999999.99,
+            message = "El monto del pago debe ser un valor monetario válido")
     private BigDecimal paymentAmount;
 
     private String description;

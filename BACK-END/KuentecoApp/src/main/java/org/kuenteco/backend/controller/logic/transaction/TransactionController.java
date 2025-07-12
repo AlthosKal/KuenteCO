@@ -23,8 +23,11 @@ public class TransactionController {
     private ConectaService conectaService;
 
     @GetMapping
-    public ResponseEntity<?> getTransactions(HttpServletRequest request,  @RequestParam(required = false) String from,
-                                             @RequestParam(required = false) String to, @RequestParam(required = false) String kind) {
+    public ResponseEntity<?> getTransactions(
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
         Object result = transactionService.getTransactions();
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -33,8 +36,11 @@ public class TransactionController {
     }
 
     @GetMapping("/report/summary")
-    public ResponseEntity<?> getTransactionSummary(HttpServletRequest request,  @RequestParam(required = false) String from,
-                                                   @RequestParam(required = false) String to, @RequestParam(required = false) String kind) {
+    public ResponseEntity<?> getTransactionSummary(
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
         Object result = transactionService.getTransactionSummary();
         return new ResponseEntity<>(
                 ApiResponse.ok(
