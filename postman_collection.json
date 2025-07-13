@@ -30,7 +30,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"model\": \"OPENAI\",\n  \"conversationId\": \"conv_cc7fc1ece096\",\n  \"prompt\": \"Perfecto ahora haz el reporte en un archivo excel pero solo de mis transacciones\"\n}"
+									"raw": "{\n  \"model\": \"OPENAI\",\n  \"conversationId\": \"\",\n  \"prompt\": \"Elabora un informe detallado en un archivo PDF de mis transacciones y presupuestos, en el cual evalues del 1 al 10 mi salud financiera\"\n}"
 								},
 								"url": {
 									"raw": "{{base_url_chat}}/v1/chat",
@@ -130,31 +130,6 @@
 					"name": "📚 Chat History",
 					"item": [
 						{
-							"name": "Get Conversation History by Id",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{jwt_token}}"
-									}
-								],
-								"url": {
-									"raw": "{{base_url_chat}}/v1/chat/history/{{conversation_id}}",
-									"host": [
-										"{{base_url_chat}}"
-									],
-									"path": [
-										"v1",
-										"chat",
-										"history",
-										"{{conversation_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
 							"name": "Get Conversation History",
 							"request": {
 								"method": "GET",
@@ -174,6 +149,31 @@
 										"chat",
 										"history",
 										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Conversation History by Id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_chat}}/v1/chat/history/{{conversation_id}}",
+									"host": [
+										"{{base_url_chat}}"
+									],
+									"path": [
+										"v1",
+										"chat",
+										"history",
+										"{{conversation_id}}"
 									]
 								}
 							},
@@ -227,7 +227,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url_chat}}/v1/reports/download/073f1d19-93a0-4122-9c7a-ca823adaccd7",
+									"raw": "{{base_url_chat}}/v1/reports/download/cfdd1b0e-add7-471d-b89f-bdd6e4eb87f7",
 									"host": [
 										"{{base_url_chat}}"
 									],
@@ -235,7 +235,7 @@
 										"v1",
 										"reports",
 										"download",
-										"073f1d19-93a0-4122-9c7a-ca823adaccd7"
+										"cfdd1b0e-add7-471d-b89f-bdd6e4eb87f7"
 									]
 								}
 							},
