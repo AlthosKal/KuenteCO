@@ -16,8 +16,6 @@ services:
     networks:
       - kuenteco-network
     restart: unless-stopped
-
-
   postgres-master-database:
     build:
       context: ./Database/master
@@ -44,7 +42,6 @@ services:
       retries: 5
       start_period: 30s
     restart: unless-stopped
-
   postgres-replica-database:
     build:
       context: ./Database/slave
@@ -76,7 +73,6 @@ services:
       retries: 8
       start_period: 90s
     restart: unless-stopped
-
   kuenteco-chat:
     image: yefff/image-backend-kuenteco-chat:1.0.0
     container_name: KuentecoChat
@@ -92,7 +88,6 @@ services:
     networks:
       - kuenteco-network
     restart: unless-stopped
-
   mongo-database:
     image: mongo:latest
     container_name: MongoDatabase
@@ -113,12 +108,10 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
-
 volumes:
   postgres-master-data:
   postgres-replica-data:
   mongo-kuenteco-data:
-
 networks:
   kuenteco-network:
     driver: bridge

@@ -130,38 +130,39 @@ public class AuthServiceImpl implements AuthService {
         }
         log.info("Registrando nuevo usuario: {}", dto.getEmail());
 
-        Role role =
-                slaveRoleRepository
-                        .findByName(RoleList.ROLE_USER)
-                        .orElseThrow(() -> new AuthException("Role no encontrado"));
+        Role role = slaveRoleRepository
+                .findByName(RoleList.ROLE_USER)
+                .orElseThrow(() -> new AuthException("Role no encontrado"));
 
         // Asegurar que el rol existe en la base de datos maestra
-        Role masterRole =
-                slaveRoleRepository
-                        .findByName(RoleList.ROLE_USER)
-                        .orElseGet(() -> masterRoleRepository.save(role));
+        Role masterRole = slaveRoleRepository
+                .findByName(RoleList.ROLE_USER)
+                .orElseGet(() -> masterRoleRepository.save(role));
 
         // Utilizar transacción explícita para guardar el usuario
-        transactionTemplate.execute(
-                status -> {
+        transactionTemplate.execute(status -> {
+            // Crear y configurar el usuario
+            User user = newUserMapper.toEntity(dto);
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+            user.setRole(masterRole);
+            user.setState(State.PENDING);
+            user.setVersion(0);
 
-                    // Nuevo usuario se crea con estado PENDING
-                    User user = newUserMapper.toEntity(dto);
-                    user.setPassword(passwordEncoder.encode(dto.getPassword()));
-                    user.setRole(masterRole);
-                    user.setState(State.PENDING);
-                    user.setVersion(0); // Inicializar versión para bloqueo optimista
-                    Subscription subscription =
-                            Subscription.builder()
-                                    .user(user)
-                                    .state(State.INACTIVE)
-                                    .type(SubscriptionType.FREE)
-                                    .build();
+            // PRIMERO: Guardar el usuario para que obtenga su ID
+            User savedUser = masterUserRepository.save(user);
 
-                    masterUserRepository.save(user);
-                    masterSubscriptionRepository.save(subscription);
-                    return "Usuarío registrado correctamente";
-                });
+            // SEGUNDO: Crear la subscription con el usuario ya persistido
+            Subscription subscription = Subscription.builder()
+                    .user(savedUser)  // ← Ahora el user tiene ID
+                    .state(State.INACTIVE)
+                    .type(SubscriptionType.FREE)
+                    .build();
+
+            // TERCERO: Guardar la subscription
+            masterSubscriptionRepository.save(subscription);
+
+            return "Usuario registrado correctamente";
+        });
 
         // Enviar código de verificación automáticamente
         sendgridService.sendVerificationEmail(new SendVerificationCodeDTO(dto.getEmail()), true);
