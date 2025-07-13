@@ -5,8 +5,12 @@ import com.example.back_end.enums.Model;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.example.back_end.exception.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +23,7 @@ public class ModelController implements ModelResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(ModelController.class);
 
     @GetMapping
-    public ResponseEntity<List<String>> getAllModels() {
+    public ResponseEntity<?> getAllModels(HttpServletRequest request) {
         LOGGER.info("Get available models");
 
         List<String> models =
@@ -27,6 +31,6 @@ public class ModelController implements ModelResource {
                         .map(Enum::name) // o model -> model.toString()
                         .collect(Collectors.toList());
 
-        return ResponseEntity.ok(models);
+        return new ResponseEntity<>(ApiResponse.ok("Modelos obtenidos correctamente", models, request.getRequestURI()), HttpStatus.OK);
     }
 }

@@ -168,6 +168,13 @@
 			<version>5.2.4</version>
 		</dependency>
 
+		<!-- JFreeChart para generación de gráficos -->
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+			<version>1.5.3</version>
+		</dependency>
+
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
