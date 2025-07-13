@@ -18,7 +18,8 @@ import lombok.NoArgsConstructor;
     @JsonSubTypes.Type(value = SpendingPatternResponseDTO.class, name = "SPENDING_PATTERNS"),
     @JsonSubTypes.Type(value = FinancialHealthResponseDTO.class, name = "FINANCIAL_HEALTH"),
     @JsonSubTypes.Type(value = ExpenseReductionResponseDTO.class, name = "EXPENSE_SUGGESTIONS"),
-    @JsonSubTypes.Type(value = FinancialProjectionResponseDTO.class, name = "FINANCIAL_PROJECTION")
+    @JsonSubTypes.Type(value = FinancialProjectionResponseDTO.class, name = "FINANCIAL_PROJECTION"),
+    @JsonSubTypes.Type(value = ReportDownloadResponseDTO.class, name = "REPORT_DOWNLOAD")
 })
 public abstract class BaseDynamicResponseDTO {
     private ResponseType type;

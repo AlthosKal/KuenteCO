@@ -30,7 +30,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"model\": \"OPENAI\",\n  \"conversationId\": \"conv-123\",\n  \"prompt\": \"Analiza mis transacciones y presupuestos y dame recomendaciones para tener un mejor performance\"\n}"
+									"raw": "{\n  \"model\": \"OPENAI\",\n  \"conversationId\": \"conv_cc7fc1ece096\",\n  \"prompt\": \"Perfecto ahora haz el reporte en un archivo excel pero solo de mis transacciones\"\n}"
 								},
 								"url": {
 									"raw": "{{base_url_chat}}/v1/chat",
@@ -130,7 +130,7 @@
 					"name": "📚 Chat History",
 					"item": [
 						{
-							"name": "Get Conversation History",
+							"name": "Get Conversation History by Id",
 							"request": {
 								"method": "GET",
 								"header": [
@@ -149,6 +149,31 @@
 										"chat",
 										"history",
 										"{{conversation_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Conversation History",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_chat}}/v1/chat/history/user",
+									"host": [
+										"{{base_url_chat}}"
+									],
+									"path": [
+										"v1",
+										"chat",
+										"history",
+										"user"
 									]
 								}
 							},
@@ -177,6 +202,40 @@
 									"path": [
 										"v1",
 										"model"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Reports",
+					"item": [
+						{
+							"name": "Get Report",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_chat}}/v1/reports/download/073f1d19-93a0-4122-9c7a-ca823adaccd7",
+									"host": [
+										"{{base_url_chat}}"
+									],
+									"path": [
+										"v1",
+										"reports",
+										"download",
+										"073f1d19-93a0-4122-9c7a-ca823adaccd7"
 									]
 								}
 							},

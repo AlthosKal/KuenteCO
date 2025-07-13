@@ -1,11 +1,12 @@
+# Configuración JWT
 jwt:
   secret: ${JWT_SECRET}
   expiration: 86400
 
+# Configuración Spring
 spring:
   application:
     name: KuentecoChat
-
   data:
     mongodb:
       uri: ${MONGO_URI}
@@ -18,7 +19,6 @@ spring:
         options:
           model: ${DEEPSEEK_MODEL}
           temperature: 0.7
-
     openai:
       api-key: ${OPENAI_KEY}
       chat:
@@ -27,6 +27,8 @@ spring:
           temperature: 0.7
   cache:
     type: caffeine
+
+# Configuración del servidor
 server:
   port: 7070
   error:
@@ -34,6 +36,7 @@ server:
   servlet:
     context-path: /api/chat
 
+# Configuración de actuator
 management:
   endpoints:
     web:
@@ -44,6 +47,15 @@ management:
     health:
       show-details: never
 
+# Configuración para reportes
+app:
+  reports:
+    storage:
+      path: ./reports  # Carpeta dentro del proyecto
+    expiration:
+      hours: 24
+
+# Configuración de conectores HTTP
 http-connector:
   hosts:
     # Configuración para transacciones
@@ -100,6 +112,7 @@ http-connector:
           writeTimeout: 5000
           connectionTimeout: 5000
 
+# Configuración de logging
 logging:
   level:
     com.example.back_end.connector: DEBUG

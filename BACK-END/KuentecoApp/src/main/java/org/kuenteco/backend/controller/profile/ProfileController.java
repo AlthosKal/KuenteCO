@@ -21,11 +21,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Controlador para la gestión de perfiles de usuario.
+ *
+ * <p>Proporciona endpoints para: - Obtener perfiles - Autenticación de perfiles - Registro y
+ * actualización de perfiles - Gestión de imágenes de perfil - Cambio de contraseñas
+ */
 @Slf4j
 @RestController
 @RequestMapping("/v1/profile")
 @AllArgsConstructor
-public class ProfileController {
+public class ProfileController implements ProfileResource {
     private final ProfileService profileService;
     private final ImageService imageService;
 

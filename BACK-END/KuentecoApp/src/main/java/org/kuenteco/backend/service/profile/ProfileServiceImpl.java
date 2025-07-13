@@ -135,13 +135,14 @@ public class ProfileServiceImpl implements ProfileService {
                         .findByEmail(email)
                         .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        Subscription subscription = slaveSubscriptionRepository
-                .findByUser(user)
-                .orElseThrow(
-                        () -> new IllegalArgumentException("Subscription no encontrada")
-                );
-        if (slaveProfileRepository.count() > 3 && subscription.getType() == SubscriptionType.FREE){
-            throw new ProfileException("No puedes registrar mas de 3 perfiles, tienes que actualizar tu plan de subscripción");
+        Subscription subscription =
+                slaveSubscriptionRepository
+                        .findByUser(user)
+                        .orElseThrow(
+                                () -> new IllegalArgumentException("Subscription no encontrada"));
+        if (slaveProfileRepository.count() > 3 && subscription.getType() == SubscriptionType.FREE) {
+            throw new ProfileException(
+                    "No puedes registrar mas de 3 perfiles, tienes que actualizar tu plan de subscripción");
         }
 
         if (user.getType().equals(UserType.PERSONAL)) {

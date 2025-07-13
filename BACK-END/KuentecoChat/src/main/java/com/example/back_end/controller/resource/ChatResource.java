@@ -4,8 +4,6 @@ import com.example.back_end.dto.request.ChatDTO;
 import com.example.back_end.dto.request.ChatFilesDTO;
 import com.example.back_end.dto.request.ChatMultipartDTO;
 import com.example.back_end.dto.request.ErrorDTO;
-import com.example.back_end.dto.response.ChatResponseDTO;
-import com.example.back_end.dto.response.StringChatResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -46,7 +44,8 @@ public interface ChatResource {
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                         schema = @Schema(implementation = ErrorDTO.class)))
             })
-    ResponseEntity<StringChatResponseDTO> askAiWithUrl(@RequestBody @Valid ChatFilesDTO dto, HttpServletRequest request);
+    ResponseEntity<?> askAiWithUrl(
+            @RequestBody @Valid ChatFilesDTO dto, HttpServletRequest request);
 
     @Operation(
             description = "Process the information from one file",
@@ -72,8 +71,9 @@ public interface ChatResource {
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                         schema = @Schema(implementation = ErrorDTO.class)))
-            })@PostMapping(value = "/chat-with-file")
-    ResponseEntity<StringChatResponseDTO> askAiWithFile(
+            })
+    @PostMapping(value = "/chat-with-file")
+    ResponseEntity<?> askAiWithFile(
             @ModelAttribute @Valid ChatMultipartDTO dto, HttpServletRequest request);
 
     @Operation(
@@ -101,5 +101,5 @@ public interface ChatResource {
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                         schema = @Schema(implementation = ErrorDTO.class)))
             })
-    ResponseEntity<ChatResponseDTO> askAi(@RequestBody @Valid ChatDTO dto,  HttpServletRequest request);
+    ResponseEntity<?> askAi(@RequestBody @Valid ChatDTO dto, HttpServletRequest request);
 }

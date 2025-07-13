@@ -9,14 +9,30 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controlador REST para la gestión de notificaciones
+ *
+ * <p>Este controlador maneja las operaciones relacionadas con las notificaciones, incluyendo la
+ * consulta, búsqueda y filtrado por fechas.
+ *
+ * @author KuenteCO Team
+ * @version 1.0
+ * @since 2024
+ */
 @RestController
 @RequestMapping("/v1/notification")
 @AllArgsConstructor
-public class NotificationController {
+public class NotificationController implements NotificationResource {
 
     private final NotificationService notificationService;
 
-    @GetMapping
+    /**
+     * Obtiene todas las notificaciones del usuario autenticado
+     *
+     * @param request La petición HTTP que contiene el token de autenticación
+     * @return ResponseEntity con la lista de notificaciones
+     */
+    @Override
     public ResponseEntity<?> getAllNotifications(HttpServletRequest request) {
         Object notifications = notificationService.getAllNotifications();
         return new ResponseEntity<>(
@@ -27,7 +43,15 @@ public class NotificationController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/range")
+    /**
+     * Obtiene notificaciones del usuario filtradas por rango de fechas
+     *
+     * @param fromDate Fecha de inicio del rango
+     * @param toDate Fecha final del rango
+     * @param request La petición HTTP que contiene el token de autenticación
+     * @return ResponseEntity con las notificaciones del rango especificado
+     */
+    @Override
     public ResponseEntity<?> getNotificationsByDateRange(
             @RequestParam LocalDateTime fromDate,
             @RequestParam LocalDateTime toDate,
@@ -42,7 +66,14 @@ public class NotificationController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/search")
+    /**
+     * Busca notificaciones del usuario por palabra clave
+     *
+     * @param keyword Palabra clave para buscar en las notificaciones
+     * @param request La petición HTTP que contiene el token de autenticación
+     * @return ResponseEntity con los resultados de la búsqueda
+     */
+    @Override
     public ResponseEntity<?> searchNotificationsByUserId(
             @RequestParam String keyword, HttpServletRequest request) {
 

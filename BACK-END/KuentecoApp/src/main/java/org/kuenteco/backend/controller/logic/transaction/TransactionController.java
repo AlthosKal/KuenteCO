@@ -1,5 +1,6 @@
 package org.kuenteco.backend.controller.logic.transaction;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -15,6 +16,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controlador para gestionar las transacciones de la aplicación.
+ *
+ * <p>Provee endpoints para: - Obtener transacciones - Resúmenes de transacciones - Operaciones de
+ * transacciones desde Bancolombia - Adición, actualización y eliminación de transacciones
+ */
 @RestController
 @RequestMapping("/v1/transaction")
 @AllArgsConstructor
@@ -22,6 +29,10 @@ public class TransactionController {
     private TransactionService transactionService;
     private ConectaService conectaService;
 
+    @Operation(
+            summary = "Obtener transacciones",
+            description =
+                    "Recupera una lista de transacciones basadas en los parámetros proporcionados")
     @GetMapping
     public ResponseEntity<?> getTransactions(
             HttpServletRequest request,
@@ -50,6 +61,10 @@ public class TransactionController {
                 HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Obtener transacciones de Bancolombia",
+            description =
+                    "Genera una URL de archivo con transacciones filtradas por los criterios de Bancolombia")
     @PostMapping("/bancolombia")
     public ResponseEntity<?> getBancolombiaTransactions(
             @Valid @RequestBody BancolombiaTransactionRequestDTO request,
@@ -64,6 +79,9 @@ public class TransactionController {
                         servletRequest.getRequestURI()));
     }
 
+    @Operation(
+            summary = "Agregar nueva transacción",
+            description = "Registra una nueva transacción en el sistema")
     @PostMapping("/add")
     public ResponseEntity<?> addTransaction(
             @Valid @RequestBody NewTransactionDTO dto, HttpServletRequest request) {
@@ -86,6 +104,9 @@ public class TransactionController {
                 HttpStatus.CREATED);
     }
 
+    @Operation(
+            summary = "Actualizar transacción",
+            description = "Actualiza una transacción existente en el sistema")
     @PatchMapping("/update")
     public ResponseEntity<?> updateTransaction(
             @Valid @RequestBody UpdateTransactionDTO dto, HttpServletRequest request) {
@@ -106,6 +127,7 @@ public class TransactionController {
                 HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Eliminar transacción", description = "Elimina una transacción por su ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTransaction(
             @PathVariable Integer id, HttpServletRequest request) {

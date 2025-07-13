@@ -1,8 +1,6 @@
 package org.kuenteco.backend.repository.slave;
 
-import java.util.List;
 import java.util.Optional;
-
 import org.kuenteco.backend.entity.Subscription;
 import org.kuenteco.backend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

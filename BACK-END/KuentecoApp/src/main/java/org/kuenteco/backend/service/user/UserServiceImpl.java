@@ -67,7 +67,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetailDTO getUserDetails() {
         User user = getDetails();
-        Subscription subscription = slaveSubscriptionRepository.findByUser(user).orElseThrow(() -> new UsernameNotFoundException("Subscripción no encontrada"));
+        Subscription subscription =
+                slaveSubscriptionRepository
+                        .findByUser(user)
+                        .orElseThrow(
+                                () -> new UsernameNotFoundException("Subscripción no encontrada"));
         return userDetailMapper.toDto(user, subscription.getType());
     }
 

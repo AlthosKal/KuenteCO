@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DynamicAnalysisResponseDTO {
-    private String conversationId;
+    private StringChatResponseDTO body;
     private BaseDynamicResponseDTO response;
 }

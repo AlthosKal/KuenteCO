@@ -4,16 +4,18 @@ import com.example.back_end.controller.resource.ChatResource;
 import com.example.back_end.dto.request.ChatDTO;
 import com.example.back_end.dto.request.ChatFilesDTO;
 import com.example.back_end.dto.request.ChatMultipartDTO;
-import com.example.back_end.dto.response.ChatResponseDTO;
 import com.example.back_end.dto.response.DynamicAnalysisResponseDTO;
 import com.example.back_end.dto.response.StringChatResponseDTO;
+import com.example.back_end.exception.ApiResponse;
 import com.example.back_end.service.ChatService;
+import com.example.back_end.service.ReportGenerationService;
 import com.example.back_end.service.functions.ConversationIdService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,25 +27,27 @@ public class ChatController implements ChatResource {
 
     private final ChatService chatService;
     private final ConversationIdService conversationIdService;
+    private final ReportGenerationService reportGenerationService;
 
     @Override
     @PostMapping(value = "/chat")
-    public ResponseEntity<ChatResponseDTO> askAi(@RequestBody @Valid ChatDTO dto,  HttpServletRequest request) {
+    public ResponseEntity<?> askAi(@RequestBody @Valid ChatDTO dto, HttpServletRequest request) {
         if (dto.needsConversationId()) {
             dto.setConversationId(conversationIdService.generateConversationId());
-            LOGGER.info("Generated conversationId: {}", dto.getConversationId());
         }
 
         LOGGER.info("Processing the prompt with {}", dto);
-        DynamicAnalysisResponseDTO analysis = chatService.queryAi(dto,request);
+        DynamicAnalysisResponseDTO response = chatService.queryAi(dto, request);
 
-        ChatResponseDTO response = new ChatResponseDTO(dto.getConversationId(), analysis);
-        return ResponseEntity.ok().body(response);
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Respuesta generada correctamente", response, request.getRequestURI()),
+                HttpStatus.OK);
     }
 
     @Override
     @PostMapping(value = "/chat-with-url")
-    public ResponseEntity<StringChatResponseDTO> askAiWithUrl(
+    public ResponseEntity<?> askAiWithUrl(
             @RequestBody @Valid ChatFilesDTO dto, HttpServletRequest request) {
         if (dto.needsConversationId()) {
             dto.setConversationId(conversationIdService.generateConversationId());
@@ -54,12 +58,15 @@ public class ChatController implements ChatResource {
 
         StringChatResponseDTO response =
                 new StringChatResponseDTO(dto.getConversationId(), aiResponse);
-        return ResponseEntity.ok().body(response);
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Respuesta generada correctamente", response, request.getRequestURI()),
+                HttpStatus.OK);
     }
 
     @PostMapping(value = "/chat-with-file")
     @Override
-    public ResponseEntity<StringChatResponseDTO> askAiWithFile(
+    public ResponseEntity<?> askAiWithFile(
             @ModelAttribute @Valid ChatMultipartDTO dto, HttpServletRequest request) {
         if (dto.needsConversationId()) {
             dto.setConversationId(conversationIdService.generateConversationId());
@@ -70,6 +77,14 @@ public class ChatController implements ChatResource {
 
         StringChatResponseDTO response =
                 new StringChatResponseDTO(dto.getConversationId(), aiResponse);
-        return ResponseEntity.ok().body(response);
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Respuesta generada correctamente", response, request.getRequestURI()),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/reports/download/{reportId}")
+    public ResponseEntity<?> downloadReport(@PathVariable String reportId) {
+        return reportGenerationService.downloadReport(reportId);
     }
 }

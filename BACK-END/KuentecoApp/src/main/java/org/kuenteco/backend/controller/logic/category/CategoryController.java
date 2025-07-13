@@ -15,10 +15,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controlador para la gestión de categorías.
+ *
+ * <p>Proporciona endpoints para: - Obtener categorías y sus asignaciones - Crear, actualizar y
+ * eliminar categorías - Generar reportes por categoría
+ */
 @RestController
 @RequestMapping("v1/category")
 @AllArgsConstructor
-public class CategoryController {
+public class CategoryController implements CategoryResource {
     private CategoryService categoryService;
     private CategoryEnrollmentService categoryEnrollmentService;
 

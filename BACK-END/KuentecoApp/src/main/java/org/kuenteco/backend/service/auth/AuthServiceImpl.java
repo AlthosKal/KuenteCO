@@ -71,7 +71,8 @@ public class AuthServiceImpl implements AuthService {
             @Qualifier("masterTransactionManager")
                     PlatformTransactionManager masterTransactionManager,
             NewUserMapper newUserMapper,
-            SendgridService sendgridService, MasterSubscriptionRepository masterSubscriptionRepository) {
+            SendgridService sendgridService,
+            MasterSubscriptionRepository masterSubscriptionRepository) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
@@ -150,11 +151,12 @@ public class AuthServiceImpl implements AuthService {
                     user.setRole(masterRole);
                     user.setState(State.PENDING);
                     user.setVersion(0); // Inicializar versión para bloqueo optimista
-                    Subscription subscription = Subscription.builder()
-                            .user(user)
-                            .state(State.INACTIVE)
-                            .type(SubscriptionType.FREE)
-                            .build();
+                    Subscription subscription =
+                            Subscription.builder()
+                                    .user(user)
+                                    .state(State.INACTIVE)
+                                    .type(SubscriptionType.FREE)
+                                    .build();
 
                     masterUserRepository.save(user);
                     masterSubscriptionRepository.save(subscription);

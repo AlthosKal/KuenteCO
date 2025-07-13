@@ -1,11 +1,10 @@
 package com.example.back_end.connector.rest.category;
 
+import com.example.back_end.connector.rest.budget.BudgetDTO;
+import com.example.back_end.connector.rest.transaction.TransactionDetailDTO;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import com.example.back_end.connector.rest.budget.BudgetDTO;
-import com.example.back_end.connector.rest.transaction.TransactionDetailDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,4 +24,3 @@ public class CategoryReportDTO {
     private List<TransactionDetailDTO> transactions;
     private LocalDateTime reportGeneratedAt;
 }
-

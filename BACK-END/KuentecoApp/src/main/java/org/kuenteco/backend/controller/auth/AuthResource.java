@@ -41,7 +41,7 @@ public interface AuthResource {
                                                         value =
                                                                 """
                         {
-                          "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                           "role": "ROLE_USER"
                         }
                     """))),
@@ -138,9 +138,10 @@ public interface AuthResource {
                                                             value =
                                                                     """
                         {
-                          "name": "usuario123",
+                          "username": "usuario123",
                           "email": "usuario@example.com",
-                          "password": "contraseña123"
+                          "password": "MiPassword123@",
+                          "type": "PERSONAL"
                         }
                     """))))
     ResponseEntity<?> register(
@@ -430,6 +431,42 @@ public interface AuthResource {
             })
     ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response);
 
+    @Operation(
+            description = "Elimina un usuario del sistema por su ID",
+            responses = {
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "204",
+                        description = "Usuario eliminado correctamente"),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "404",
+                        description = "Usuario no encontrado",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "message": "Usuario no encontrado"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "500",
+                        description = "Error interno del servidor")
+            },
+            parameters = {
+                @Parameter(
+                        in = ParameterIn.PATH,
+                        name = "id",
+                        description = "ID del usuario a eliminar",
+                        required = true,
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        example = "123e4567-e89b-12d3-a456-426614174000"))
+            })
     ResponseEntity<?> delete(@PathVariable String id) throws IOException;
 
     @Operation(

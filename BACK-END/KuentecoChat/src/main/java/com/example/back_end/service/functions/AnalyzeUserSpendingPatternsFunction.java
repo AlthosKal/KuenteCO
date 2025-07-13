@@ -6,13 +6,13 @@ import com.example.back_end.connector.rest.transaction.TransactionResponseWrappe
 import com.example.back_end.exception.ApiResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-
 import java.util.Map;
 import java.util.function.Function;
 
 public class AnalyzeUserSpendingPatternsFunction
         implements Function<
-                AnalyzeUserSpendingPatternsFunction.Request, ApiResponse<TransactionResponseWrapper>> {
+                AnalyzeUserSpendingPatternsFunction.Request,
+                ApiResponse<TransactionResponseWrapper>> {
 
     public record Request(
             @JsonProperty(required = true)
@@ -30,13 +30,11 @@ public class AnalyzeUserSpendingPatternsFunction
 
     @Override
     public ApiResponse<TransactionResponseWrapper> apply(Request request) {
-        return (ApiResponse<TransactionResponseWrapper>) connector.callTransactionEndpoint(
-                KuentecoEndpoint.GET_USER_TRANSACTIONS,
-                Map.of(
-                        "from", request.startDate(),
-                        "to", request.endDate()
-                )
-        );
+        return (ApiResponse<TransactionResponseWrapper>)
+                connector.callTransactionEndpoint(
+                        KuentecoEndpoint.GET_USER_TRANSACTIONS,
+                        Map.of(
+                                "from", request.startDate(),
+                                "to", request.endDate()));
     }
-
 }

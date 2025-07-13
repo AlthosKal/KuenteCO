@@ -7,7 +7,6 @@ import com.example.back_end.exception.ApiResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.core.type.TypeReference;
-
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -40,7 +39,6 @@ public class CalculateFinancialHealthScoreWithBudgetsFunction
         return connector.call(
                 KuentecoEndpoint.GET_BUDGET_SUMMARY,
                 Map.of("from", request.from(), "to", request.to(), "kind", request.kind()),
-                new TypeReference<>() {}
-        );
+                new TypeReference<>() {});
     }
 }

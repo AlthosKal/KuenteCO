@@ -35,8 +35,6 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         return exchangeRateMapper.toDTOList(rates);
     }
 
-
-
     public ConvertCurrencyResponseDTO convert(ConvertCurrencyRequestDTO dto) {
         ExchangeRate rate =
                 slaveExchangeRateRepository

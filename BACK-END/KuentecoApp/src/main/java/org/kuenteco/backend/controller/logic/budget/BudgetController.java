@@ -14,10 +14,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controlador para la gestión de presupuestos.
+ *
+ * <p>Proporciona endpoints para: - Obtener presupuestos y comparaciones - Manejar asignaciones a
+ * perfiles - Crear, actualizar, y eliminar presupuestos
+ */
 @RestController
 @RequestMapping("/v1/budget")
 @AllArgsConstructor
-public class BudgetController {
+public class BudgetController implements BudgetResource {
     private BudgetService budgetService;
     private BudgetEnrollmentService budgetEnrollmentService;
 
@@ -148,9 +154,8 @@ public class BudgetController {
                 HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/enroll/{id}")
-    public ResponseEntity<?> removeBudgetEnrollment(
-            @PathVariable Integer id, HttpServletRequest request) {
+    @Override
+    public ResponseEntity<?> unenrollBudget(Integer id, HttpServletRequest request) {
         budgetEnrollmentService.removeBudgetEnrollment(id);
         return new ResponseEntity<>(
                 ApiResponse.ok("Asignación eliminada correctamente", null, request.getRequestURI()),
