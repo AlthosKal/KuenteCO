@@ -13,6 +13,8 @@ import com.example.back_end.dto.request.ChatHistoryDTO;
 import com.example.back_end.dto.request.ChatMultipartDTO;
 import com.example.back_end.dto.response.DynamicAnalysisResponseDTO;
 import com.example.back_end.dto.response.StringChatResponseDTO;
+import com.example.back_end.dto.response.CharDataDTO;
+import com.example.back_end.dto.response.ai.ChartDataResponseDTO;
 import com.example.back_end.dto.response.ai.BaseDynamicResponseDTO;
 import com.example.back_end.entity.ChatHistory;
 import com.example.back_end.enums.ApiError;
@@ -141,14 +143,16 @@ public class ChatServiceImpl implements ChatService {
                                     email));
                 }
 
+                ChartDataResponseDTO chartData = generateChartData(detectedFunction, functionData);
                 StringChatResponseDTO dtoResponse =
-                        new StringChatResponseDTO(dto.getConversationId(), response);
+                        new StringChatResponseDTO(dto.getConversationId(), response, chartData);
                 return new DynamicAnalysisResponseDTO(dtoResponse, reportResponse);
             }
 
             // Si no es una solicitud de reporte, crear respuesta de análisis normal
+            ChartDataResponseDTO chartData = generateChartData(detectedFunction, functionData);
             StringChatResponseDTO dtoResponse =
-                    new StringChatResponseDTO(dto.getConversationId(), response);
+                    new StringChatResponseDTO(dto.getConversationId(), response, chartData);
 
             // Guardar historial
             if (Objects.nonNull(dto.getConversationId())) {
@@ -772,5 +776,296 @@ public class ChatServiceImpl implements ChatService {
                     e);
             return Collections.emptyList();
         }
+    }
+
+    /**
+     * Genera datos de gráfico basados en la función detectada y los datos disponibles
+     *
+     * @param functionName La función detectada
+     * @param functionData Los datos obtenidos de la función
+     * @return ChartDataResponseDTO con los datos del gráfico o null si no aplica
+     */
+    private ChartDataResponseDTO generateChartData(String functionName, Object functionData) {
+        try {
+            if (functionData == null) {
+                return null;
+            }
+
+            switch (functionName) {
+                case "BalanceOverTime":
+                    return generateBalanceChart(functionData);
+                case "IncomesAndExpensesByPeriod":
+                    return generateIncomeExpenseChart(functionData);
+                case "analyzeUserSpendingPatterns":
+                case "calculateFinancialHealthScore":
+                    return generateTransactionChart(functionData);
+                case "analyzeDebtRisk":
+                    return generateDebtChart(functionData);
+                case "compareFinancialPeriods":
+                    return generateBudgetComparisonChart(functionData);
+                default:
+                    return null;
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Error generating chart data for function {}: {}", functionName, e.getMessage());
+            return null;
+        }
+    }
+
+    private ChartDataResponseDTO generateBalanceChart(Object data) {
+        if (!(data instanceof List<?> list)) {
+            return null;
+        }
+
+        List<CharDataDTO> chartData = new ArrayList<>();
+        for (Object item : list) {
+            try {
+                String category = getFieldValue(item, "categoryName", String.class, "N/A");
+                Double amount = getFieldValue(item, "netAmount", Double.class, 0.0);
+                if (amount == null) {
+                    Object amountObj = getFieldValue(item, "netAmount", Object.class, null);
+                    if (amountObj != null) {
+                        amount = Double.parseDouble(amountObj.toString());
+                    } else {
+                        amount = 0.0;
+                    }
+                }
+                chartData.add(new CharDataDTO(category, amount));
+            } catch (Exception e) {
+                LOGGER.debug("Error processing balance item: {}", e.getMessage());
+            }
+        }
+
+        return new ChartDataResponseDTO(
+                "Balance por Categoría",
+                "Distribución del balance neto por categoría de transacciones",
+                "bar",
+                chartData,
+                "Categorías",
+                "Balance ($)"
+        );
+    }
+
+    private ChartDataResponseDTO generateIncomeExpenseChart(Object data) {
+        if (!(data instanceof List<?> list)) {
+            return null;
+        }
+
+        List<CharDataDTO> chartData = new ArrayList<>();
+        for (Object item : list) {
+            try {
+                String category = getFieldValue(item, "categoryName", String.class, "N/A");
+                Double expenses = getFieldValue(item, "totalExpenses", Double.class, 0.0);
+                if (expenses == null) {
+                    Object expensesObj = getFieldValue(item, "totalExpenses", Object.class, null);
+                    if (expensesObj != null) {
+                        expenses = Double.parseDouble(expensesObj.toString());
+                    } else {
+                        expenses = 0.0;
+                    }
+                }
+                if (expenses > 0) {
+                    chartData.add(new CharDataDTO(category, expenses));
+                }
+            } catch (Exception e) {
+                LOGGER.debug("Error processing income/expense item: {}", e.getMessage());
+            }
+        }
+
+        return new ChartDataResponseDTO(
+                "Gastos por Categoría",
+                "Distribución de gastos por categoría durante el período seleccionado",
+                "pie",
+                chartData,
+                "Categorías",
+                "Gastos ($)"
+        );
+    }
+
+    private ChartDataResponseDTO generateTransactionChart(Object data) {
+        if (!(data instanceof List<?> list)) {
+            return null;
+        }
+
+        Map<String, Double> categoryTotals = new HashMap<>();
+        
+        for (Object userProfile : list) {
+            try {
+                // Extraer transacciones del perfil de usuario
+                List<?> profiles = getFieldValue(userProfile, "profiles", List.class, Collections.emptyList());
+                
+                for (Object profile : profiles) {
+                    List<?> transactions = getFieldValue(profile, "transactions", List.class, Collections.emptyList());
+                    
+                    for (Object transaction : transactions) {
+                        Double amount = getFieldValue(transaction, "amount", Double.class, 0.0);
+                        if (amount == null) {
+                            Object amountObj = getFieldValue(transaction, "amount", Object.class, null);
+                            if (amountObj != null) {
+                                amount = Double.parseDouble(amountObj.toString());
+                            } else {
+                                continue;
+                            }
+                        }
+                        
+                        Object description = getFieldValue(transaction, "description", Object.class, null);
+                        String category = "Otros";
+                        
+                        if (description != null) {
+                            category = getFieldValue(description, "description", String.class, "Otros");
+                        }
+                        
+                        categoryTotals.merge(category, Math.abs(amount), Double::sum);
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.debug("Error processing transaction data: {}", e.getMessage());
+            }
+        }
+
+        List<CharDataDTO> chartData = categoryTotals.entrySet().stream()
+                .map(entry -> new CharDataDTO(entry.getKey(), entry.getValue()))
+                .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
+                .limit(10) // Top 10 categorías
+                .collect(Collectors.toList());
+
+        return new ChartDataResponseDTO(
+                "Transacciones por Categoría",
+                "Las 10 principales categorías de transacciones por monto",
+                "doughnut",
+                chartData,
+                "Categorías",
+                "Monto ($)"
+        );
+    }
+
+    private ChartDataResponseDTO generateDebtChart(Object data) {
+        if (!(data instanceof List<?> list)) {
+            return null;
+        }
+
+        List<CharDataDTO> chartData = new ArrayList<>();
+        for (Object debt : list) {
+            try {
+                String debtId = getFieldValue(debt, "id", String.class, "Deuda");
+                Double pendingAmount = getFieldValue(debt, "pendingAmount", Double.class, 0.0);
+                if (pendingAmount == null) {
+                    Object amountObj = getFieldValue(debt, "pendingAmount", Object.class, null);
+                    if (amountObj != null) {
+                        pendingAmount = Double.parseDouble(amountObj.toString());
+                    } else {
+                        pendingAmount = 0.0;
+                    }
+                }
+                
+                if (pendingAmount > 0) {
+                    chartData.add(new CharDataDTO("Deuda " + debtId, pendingAmount));
+                }
+            } catch (Exception e) {
+                LOGGER.debug("Error processing debt item: {}", e.getMessage());
+            }
+        }
+
+        return new ChartDataResponseDTO(
+                "Distribución de Deudas",
+                "Montos pendientes por deuda activa",
+                "bar",
+                chartData,
+                "Deudas",
+                "Monto Pendiente ($)"
+        );
+    }
+
+    private ChartDataResponseDTO generateBudgetComparisonChart(Object data) {
+        if (!(data instanceof List<?> list)) {
+            return null;
+        }
+
+        List<CharDataDTO> chartData = new ArrayList<>();
+        for (Object budget : list) {
+            try {
+                String category = getFieldValue(budget, "categoryName", String.class, "N/A");
+                Double assigned = getFieldValue(budget, "assignedAmount", Double.class, 0.0);
+                Double spent = getFieldValue(budget, "actualSpent", Double.class, 0.0);
+                
+                if (assigned == null) {
+                    Object assignedObj = getFieldValue(budget, "assignedAmount", Object.class, null);
+                    if (assignedObj != null) {
+                        assigned = Double.parseDouble(assignedObj.toString());
+                    } else {
+                        assigned = 0.0;
+                    }
+                }
+                
+                if (spent == null) {
+                    Object spentObj = getFieldValue(budget, "actualSpent", Object.class, null);
+                    if (spentObj != null) {
+                        spent = Double.parseDouble(spentObj.toString());
+                    } else {
+                        spent = 0.0;
+                    }
+                }
+                
+                // Calcular utilización del presupuesto como porcentaje
+                double utilization = assigned > 0 ? (spent / assigned) * 100 : 0;
+                chartData.add(new CharDataDTO(category, utilization));
+            } catch (Exception e) {
+                LOGGER.debug("Error processing budget item: {}", e.getMessage());
+            }
+        }
+
+        return new ChartDataResponseDTO(
+                "Utilización del Presupuesto",
+                "Porcentaje de utilización del presupuesto por categoría",
+                "horizontalBar",
+                chartData,
+                "Categorías",
+                "Utilización (%)"
+        );
+    }
+
+    /**
+     * Método auxiliar para extraer valores de campos usando reflexión de forma segura
+     */
+    @SuppressWarnings("unchecked")
+    private <T> T getFieldValue(Object object, String fieldName, Class<T> expectedType, T defaultValue) {
+        try {
+            Class<?> clazz = object.getClass();
+            
+            // Intentar primero con el campo directo
+            try {
+                java.lang.reflect.Field field = clazz.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                Object value = field.get(object);
+                
+                if (value != null && expectedType.isAssignableFrom(value.getClass())) {
+                    return (T) value;
+                } else if (value != null && expectedType == Double.class && value instanceof Number) {
+                    return (T) Double.valueOf(((Number) value).doubleValue());
+                } else if (value != null && expectedType == String.class) {
+                    return (T) value.toString();
+                }
+            } catch (NoSuchFieldException e) {
+                // Intentar con getter method
+                String getterName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+                try {
+                    java.lang.reflect.Method getter = clazz.getMethod(getterName);
+                    Object value = getter.invoke(object);
+                    
+                    if (value != null && expectedType.isAssignableFrom(value.getClass())) {
+                        return (T) value;
+                    } else if (value != null && expectedType == Double.class && value instanceof Number) {
+                        return (T) Double.valueOf(((Number) value).doubleValue());
+                    } else if (value != null && expectedType == String.class) {
+                        return (T) value.toString();
+                    }
+                } catch (Exception me) {
+                    LOGGER.debug("No se pudo acceder al getter '{}': {}", getterName, me.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.debug("No se pudo extraer el campo '{}': {}", fieldName, e.getMessage());
+        }
+        return defaultValue;
     }
 }

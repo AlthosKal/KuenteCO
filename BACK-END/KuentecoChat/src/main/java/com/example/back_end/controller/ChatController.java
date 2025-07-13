@@ -57,7 +57,7 @@ public class ChatController implements ChatResource {
         String aiResponse = chatService.queryAi(dto, request);
 
         StringChatResponseDTO response =
-                new StringChatResponseDTO(dto.getConversationId(), aiResponse);
+                new StringChatResponseDTO(dto.getConversationId(), aiResponse, null);
         return new ResponseEntity<>(
                 ApiResponse.ok(
                         "Respuesta generada correctamente", response, request.getRequestURI()),
@@ -76,7 +76,7 @@ public class ChatController implements ChatResource {
         String aiResponse = chatService.queryAi(dto, request);
 
         StringChatResponseDTO response =
-                new StringChatResponseDTO(dto.getConversationId(), aiResponse);
+                new StringChatResponseDTO(dto.getConversationId(), aiResponse, null);
         return new ResponseEntity<>(
                 ApiResponse.ok(
                         "Respuesta generada correctamente", response, request.getRequestURI()),

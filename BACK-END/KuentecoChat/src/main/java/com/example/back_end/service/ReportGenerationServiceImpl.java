@@ -282,8 +282,12 @@ document.add(new Paragraph("\n"));
             case "financialStatement":
                 generateBudgetSummaryPDF(document, (List<BudgetSummaryDTO>) data);
                 break;
+            case "calculateFinancialHealthScore":
+            case "analyzeUserSpendingPatterns":
+                generateUserProfilesPDF(document, data);
+                break;
             default:
-                document.add(new Paragraph("Datos del análisis: " + data.toString()));
+                generateGenericDataPDF(document, data);
         }
     }
 
@@ -304,10 +308,12 @@ document.add(new Paragraph("\n"));
             case "financialStatement":
                 generateBudgetSummaryExcel(sheet, (List<BudgetSummaryDTO>) data, headerStyle);
                 break;
+            case "calculateFinancialHealthScore":
+            case "analyzeUserSpendingPatterns":
+                generateUserProfilesExcel(sheet, data, headerStyle);
+                break;
             default:
-                Row row = sheet.createRow(3);
-                row.createCell(0).setCellValue("Datos del análisis:");
-                row.createCell(1).setCellValue(data.toString());
+                generateGenericDataExcel(sheet, data);
         }
     }
 
@@ -850,5 +856,552 @@ document.add(new Paragraph("\n"));
         public LocalDateTime getExpirationDate() {
             return expirationDate;
         }
+    }
+    
+    // Métodos para manejar UserProfilesWithTransactionsDTO
+    private void generateUserProfilesPDF(Document document, Object data) throws DocumentException {
+        if (data instanceof List<?>) {
+            List<?> userProfiles = (List<?>) data;
+            if (!userProfiles.isEmpty() && userProfiles.get(0).getClass().getSimpleName().contains("UserProfiles")) {
+                generateFormattedUserProfilesPDF(document, userProfiles);
+                return;
+            }
+        }
+        // Fallback a formato genérico si no es el tipo esperado
+        generateGenericDataPDF(document, data);
+    }
+    
+    private void generateUserProfilesExcel(Sheet sheet, Object data, CellStyle headerStyle) {
+        if (data instanceof List<?>) {
+            List<?> userProfiles = (List<?>) data;
+            if (!userProfiles.isEmpty() && userProfiles.get(0).getClass().getSimpleName().contains("UserProfiles")) {
+                generateFormattedUserProfilesExcel(sheet, userProfiles, headerStyle);
+                return;
+            }
+        }
+        // Fallback a formato genérico si no es el tipo esperado
+        generateGenericDataExcel(sheet, data);
+    }
+    
+    private void generateFormattedUserProfilesPDF(Document document, List<?> userProfiles) throws DocumentException {
+        // Título de sección
+        com.itextpdf.text.Font sectionFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 14, com.itextpdf.text.Font.BOLD);
+        Paragraph sectionTitle = new Paragraph("Resumen de Actividad Financiera", sectionFont);
+        sectionTitle.setAlignment(Element.ALIGN_LEFT);
+        document.add(sectionTitle);
+        document.add(new Paragraph("\n"));
+        
+        try {
+            // Usamos reflexión para extraer información de forma segura
+            for (Object userProfile : userProfiles) {
+                Class<?> clazz = userProfile.getClass();
+                
+                // Información del usuario
+                com.itextpdf.text.Font userFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 12, com.itextpdf.text.Font.BOLD);
+                
+                String username = getFieldValue(userProfile, "username", String.class, "Usuario no especificado");
+                String email = getFieldValue(userProfile, "email", String.class, "Email no especificado");
+                
+                Paragraph userInfo = new Paragraph("Usuario: " + username + " (" + email + ")", userFont);
+                document.add(userInfo);
+                document.add(new Paragraph("\n"));
+                
+                // Obtener lista de perfiles
+                List<?> profiles = getFieldValue(userProfile, "profiles", List.class, java.util.Collections.emptyList());
+                
+                for (Object profile : profiles) {
+                    generateProfileSectionPDF(document, profile);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error procesando datos de usuario: {}", e.getMessage());
+            // Fallback a mostrar información básica
+            document.add(new Paragraph("Se encontraron " + userProfiles.size() + " perfiles de usuario con información financiera."));
+        }
+    }
+    
+    private void generateProfileSectionPDF(Document document, Object profile) throws DocumentException {
+        try {
+            String profileName = getFieldValue(profile, "username", String.class, "Perfil sin nombre");
+            String profileEmail = getFieldValue(profile, "email", String.class, "N/A");
+            Integer transactionCount = getFieldValue(profile, "transactionCount", Integer.class, 0);
+            Double totalAmount = getFieldValue(profile, "totalAmount", Double.class, 0.0);
+            
+            // Información del perfil
+            com.itextpdf.text.Font profileFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 11, com.itextpdf.text.Font.BOLD);
+            Paragraph profileInfo = new Paragraph("Perfil: " + profileName, profileFont);
+            document.add(profileInfo);
+            
+            // Crear tabla de resumen
+            PdfPTable summaryTable = new PdfPTable(2);
+            summaryTable.setWidthPercentage(70);
+            summaryTable.setWidths(new float[]{1.5f, 1f});
+            
+            com.itextpdf.text.Font labelFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 10, com.itextpdf.text.Font.BOLD);
+            com.itextpdf.text.Font valueFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 10);
+            
+            // Email del perfil
+            PdfPCell emailLabelCell = new PdfPCell(new Phrase("Email:", labelFont));
+            emailLabelCell.setBorder(Rectangle.NO_BORDER);
+            emailLabelCell.setPadding(3);
+            summaryTable.addCell(emailLabelCell);
+            
+            PdfPCell emailValueCell = new PdfPCell(new Phrase(profileEmail, valueFont));
+            emailValueCell.setBorder(Rectangle.NO_BORDER);
+            emailValueCell.setPadding(3);
+            summaryTable.addCell(emailValueCell);
+            
+            // Número de transacciones
+            PdfPCell transLabelCell = new PdfPCell(new Phrase("Total de Transacciones:", labelFont));
+            transLabelCell.setBorder(Rectangle.NO_BORDER);
+            transLabelCell.setPadding(3);
+            summaryTable.addCell(transLabelCell);
+            
+            PdfPCell transValueCell = new PdfPCell(new Phrase(transactionCount.toString(), valueFont));
+            transValueCell.setBorder(Rectangle.NO_BORDER);
+            transValueCell.setPadding(3);
+            summaryTable.addCell(transValueCell);
+            
+            // Monto total
+            PdfPCell amountLabelCell = new PdfPCell(new Phrase("Monto Total Analizado:", labelFont));
+            amountLabelCell.setBorder(Rectangle.NO_BORDER);
+            amountLabelCell.setPadding(3);
+            summaryTable.addCell(amountLabelCell);
+            
+            PdfPCell amountValueCell = new PdfPCell(new Phrase("$" + String.format("%.2f", totalAmount), valueFont));
+            amountValueCell.setBorder(Rectangle.NO_BORDER);
+            amountValueCell.setPadding(3);
+            summaryTable.addCell(amountValueCell);
+            
+            document.add(summaryTable);
+            
+            // Información de transacciones resumida
+            List<?> transactions = getFieldValue(profile, "transactions", List.class, java.util.Collections.emptyList());
+            if (!transactions.isEmpty()) {
+                generateTransactionSummaryForProfilePDF(document, transactions);
+            }
+            
+            document.add(new Paragraph("\n"));
+            
+        } catch (Exception e) {
+            LOGGER.error("Error procesando perfil: {}", e.getMessage());
+            document.add(new Paragraph("Error procesando información del perfil"));
+        }
+    }
+    
+    private void generateTransactionSummaryForProfilePDF(Document document, List<?> transactions) throws DocumentException {
+        // Agrupar transacciones por tipo
+        Map<String, Double> incomesByCategory = new java.util.HashMap<>();
+        Map<String, Double> expensesByCategory = new java.util.HashMap<>();
+        double totalIncome = 0.0;
+        double totalExpenses = 0.0;
+        
+        LOGGER.info("Procesando {} transacciones para el reporte", transactions.size());
+        
+        for (Object transaction : transactions) {
+            try {
+                // Intentar diferentes formas de extraer el monto
+                Double amount = null;
+                if (amount == null) amount = getFieldValue(transaction, "amount", Double.class, null);
+                if (amount == null) {
+                    BigDecimal amountBD = getFieldValue(transaction, "amount", BigDecimal.class, null);
+                    if (amountBD != null) amount = amountBD.doubleValue();
+                }
+                if (amount == null) {
+                    Integer amountInt = getFieldValue(transaction, "amount", Integer.class, null);
+                    if (amountInt != null) amount = amountInt.doubleValue();
+                }
+                
+                if (amount == null || amount == 0.0) {
+                    LOGGER.debug("Transacción sin monto válido: {}", transaction.getClass().getSimpleName());
+                    continue;
+                }
+                
+                Object description = getFieldValue(transaction, "description", Object.class, null);
+                String type = "UNKNOWN";
+                String descText = "Sin descripción";
+                
+                if (description != null) {
+                    descText = getFieldValue(description, "description", String.class, "Sin descripción");
+                    type = getFieldValue(description, "type", String.class, "UNKNOWN");
+                } else {
+                    // Intentar obtener el tipo directamente de la transacción
+                    type = getFieldValue(transaction, "type", String.class, "UNKNOWN");
+                    descText = getFieldValue(transaction, "description", String.class, "Sin descripción");
+                }
+                
+                LOGGER.debug("Procesando transacción: tipo={}, monto={}, descripción={}", type, amount, descText);
+                
+                if ("INCOME".equals(type)) {
+                    totalIncome += amount;
+                    incomesByCategory.merge(descText, amount, Double::sum);
+                } else if ("EXPENSE".equals(type)) {
+                    totalExpenses += amount;
+                    expensesByCategory.merge(descText, amount, Double::sum);
+                } else {
+                    // Si no tiene tipo específico, asumimos que es gasto si el campo no está definido
+                    LOGGER.debug("Tipo de transacción desconocido '{}', agregando como gasto", type);
+                    totalExpenses += amount;
+                    expensesByCategory.merge(descText, amount, Double::sum);
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Error procesando transacción individual: {}", e.getMessage(), e);
+            }
+        }
+        
+        LOGGER.info("Resumen procesado - Ingresos: {}, Gastos: {}", totalIncome, totalExpenses);
+        
+        // Crear tabla de resumen financiero
+        PdfPTable financialTable = new PdfPTable(3);
+        financialTable.setWidthPercentage(90);
+        financialTable.setWidths(new float[]{2f, 1f, 1f});
+        
+        // Headers
+        com.itextpdf.text.Font headerFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 10, com.itextpdf.text.Font.BOLD);
+        
+        PdfPCell header1 = new PdfPCell(new Phrase("Resumen Financiero", headerFont));
+        header1.setBackgroundColor(SECONDARY_COLOR);
+        header1.setHorizontalAlignment(Element.ALIGN_CENTER);
+        header1.setPadding(5);
+        financialTable.addCell(header1);
+        
+        PdfPCell header2 = new PdfPCell(new Phrase("Total Ingresos", headerFont));
+        header2.setBackgroundColor(SECONDARY_COLOR);
+        header2.setHorizontalAlignment(Element.ALIGN_CENTER);
+        header2.setPadding(5);
+        financialTable.addCell(header2);
+        
+        PdfPCell header3 = new PdfPCell(new Phrase("Total Gastos", headerFont));
+        header3.setBackgroundColor(SECONDARY_COLOR);
+        header3.setHorizontalAlignment(Element.ALIGN_CENTER);
+        header3.setPadding(5);
+        financialTable.addCell(header3);
+        
+        // Datos
+        com.itextpdf.text.Font dataFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 10);
+        
+        PdfPCell balanceCell = new PdfPCell(new Phrase("Balance: $" + String.format("%.2f", totalIncome - totalExpenses), dataFont));
+        balanceCell.setPadding(5);
+        financialTable.addCell(balanceCell);
+        
+        PdfPCell incomeCell = new PdfPCell(new Phrase("$" + String.format("%.2f", totalIncome), dataFont));
+        incomeCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        incomeCell.setPadding(5);
+        financialTable.addCell(incomeCell);
+        
+        PdfPCell expenseCell = new PdfPCell(new Phrase("$" + String.format("%.2f", totalExpenses), dataFont));
+        expenseCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        expenseCell.setPadding(5);
+        financialTable.addCell(expenseCell);
+        
+        document.add(financialTable);
+        document.add(new Paragraph("\n"));
+        
+        // Generar gráfico de distribución de transacciones
+        try {
+            if (!incomesByCategory.isEmpty() || !expensesByCategory.isEmpty()) {
+                Map<String, Double> combinedData = new java.util.HashMap<>();
+                combinedData.putAll(expensesByCategory);
+                
+                byte[] chartBytes = chartGenerationService.generateCategoryExpenseChart(combinedData);
+                if (chartBytes.length > 0) {
+                    Image chart = Image.getInstance(chartBytes);
+                    chart.scalePercent(60);
+                    chart.setAlignment(Element.ALIGN_CENTER);
+                    document.add(chart);
+                    document.add(new Paragraph("\n"));
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Error generando gráfico de transacciones: {}", e.getMessage());
+        }
+        
+        // Agregar análisis de salud financiera
+        generateHealthScoreSection(document, totalIncome, totalExpenses, transactions.size());
+        document.add(new Paragraph("\n"));
+    }
+    
+    private void generateFormattedUserProfilesExcel(Sheet sheet, List<?> userProfiles, CellStyle headerStyle) {
+        int rowNum = 3;
+        
+        // Headers
+        Row headerRow = sheet.createRow(rowNum++);
+        headerRow.createCell(0).setCellValue("Usuario");
+        headerRow.createCell(1).setCellValue("Email");
+        headerRow.createCell(2).setCellValue("Perfil");
+        headerRow.createCell(3).setCellValue("Total Transacciones");
+        headerRow.createCell(4).setCellValue("Monto Total");
+        
+        for (Cell cell : headerRow) {
+            cell.setCellStyle(headerStyle);
+        }
+        
+        // Datos
+        for (Object userProfile : userProfiles) {
+            try {
+                String username = getFieldValue(userProfile, "username", String.class, "N/A");
+                String email = getFieldValue(userProfile, "email", String.class, "N/A");
+                List<?> profiles = getFieldValue(userProfile, "profiles", List.class, java.util.Collections.emptyList());
+                
+                for (Object profile : profiles) {
+                    Row dataRow = sheet.createRow(rowNum++);
+                    
+                    String profileName = getFieldValue(profile, "username", String.class, "N/A");
+                    Integer transactionCount = getFieldValue(profile, "transactionCount", Integer.class, 0);
+                    Double totalAmount = getFieldValue(profile, "totalAmount", Double.class, 0.0);
+                    
+                    dataRow.createCell(0).setCellValue(username);
+                    dataRow.createCell(1).setCellValue(email);
+                    dataRow.createCell(2).setCellValue(profileName);
+                    dataRow.createCell(3).setCellValue(transactionCount);
+                    dataRow.createCell(4).setCellValue(totalAmount);
+                }
+            } catch (Exception e) {
+                LOGGER.error("Error procesando datos para Excel: {}", e.getMessage());
+                Row errorRow = sheet.createRow(rowNum++);
+                errorRow.createCell(0).setCellValue("Error procesando datos");
+            }
+        }
+    }
+    
+    private void generateGenericDataPDF(Document document, Object data) throws DocumentException {
+        com.itextpdf.text.Font infoFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 12);
+        
+        Paragraph info = new Paragraph("Información del Análisis", infoFont);
+        info.setAlignment(Element.ALIGN_LEFT);
+        document.add(info);
+        document.add(new Paragraph("\n"));
+        
+        if (data instanceof List<?>) {
+            List<?> dataList = (List<?>) data;
+            Paragraph listInfo = new Paragraph("Se analizaron " + dataList.size() + " elementos de datos financieros.", infoFont);
+            document.add(listInfo);
+            
+            if (!dataList.isEmpty()) {
+                Paragraph typeInfo = new Paragraph("Tipo de datos: " + dataList.get(0).getClass().getSimpleName(), infoFont);
+                document.add(typeInfo);
+            }
+        } else {
+            Paragraph genericInfo = new Paragraph("Datos financieros procesados exitosamente.", infoFont);
+            document.add(genericInfo);
+        }
+    }
+    
+    private void generateGenericDataExcel(Sheet sheet, Object data) {
+        Row headerRow = sheet.createRow(3);
+        headerRow.createCell(0).setCellValue("Información del Análisis");
+        
+        Row dataRow = sheet.createRow(4);
+        if (data instanceof List<?>) {
+            List<?> dataList = (List<?>) data;
+            dataRow.createCell(0).setCellValue("Elementos analizados: " + dataList.size());
+            
+            if (!dataList.isEmpty()) {
+                Row typeRow = sheet.createRow(5);
+                typeRow.createCell(0).setCellValue("Tipo de datos: " + dataList.get(0).getClass().getSimpleName());
+            }
+        } else {
+            dataRow.createCell(0).setCellValue("Datos financieros procesados exitosamente");
+        }
+    }
+    
+    // Método auxiliar para extraer valores de campos usando reflexión de forma segura
+    @SuppressWarnings("unchecked")
+    private <T> T getFieldValue(Object object, String fieldName, Class<T> expectedType, T defaultValue) {
+        try {
+            Class<?> clazz = object.getClass();
+            
+            // Intentar primero con el campo directo
+            try {
+                java.lang.reflect.Field field = clazz.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                Object value = field.get(object);
+                
+                if (value != null && expectedType.isAssignableFrom(value.getClass())) {
+                    return (T) value;
+                } else if (value != null && expectedType == Double.class && value instanceof Number) {
+                    return (T) Double.valueOf(((Number) value).doubleValue());
+                } else if (value != null && expectedType == Integer.class && value instanceof Number) {
+                    return (T) Integer.valueOf(((Number) value).intValue());
+                } else if (value != null && expectedType == BigDecimal.class && value instanceof Number) {
+                    return (T) new BigDecimal(value.toString());
+                }
+            } catch (NoSuchFieldException e) {
+                // Intentar con getter method
+                String getterName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+                try {
+                    java.lang.reflect.Method getter = clazz.getMethod(getterName);
+                    Object value = getter.invoke(object);
+                    
+                    if (value != null && expectedType.isAssignableFrom(value.getClass())) {
+                        return (T) value;
+                    } else if (value != null && expectedType == Double.class && value instanceof Number) {
+                        return (T) Double.valueOf(((Number) value).doubleValue());
+                    } else if (value != null && expectedType == Integer.class && value instanceof Number) {
+                        return (T) Integer.valueOf(((Number) value).intValue());
+                    } else if (value != null && expectedType == BigDecimal.class && value instanceof Number) {
+                        return (T) new BigDecimal(value.toString());
+                    }
+                } catch (Exception me) {
+                    LOGGER.debug("No se pudo acceder al getter '{}': {}", getterName, me.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.debug("No se pudo extraer el campo '{}': {}", fieldName, e.getMessage());
+        }
+        return defaultValue;
+    }
+    
+    // Método para generar sección de puntuación de salud financiera
+    private void generateHealthScoreSection(Document document, double totalIncome, double totalExpenses, int transactionCount) throws DocumentException {
+        double balance = totalIncome - totalExpenses;
+        int healthScore = calculateFinancialHealthScore(totalIncome, totalExpenses, transactionCount);
+        String healthGrade = getHealthGrade(healthScore);
+        
+        // Título de la sección
+        com.itextpdf.text.Font sectionFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 12, com.itextpdf.text.Font.BOLD);
+        Paragraph healthTitle = new Paragraph("Evaluación de Salud Financiera", sectionFont);
+        healthTitle.setAlignment(Element.ALIGN_LEFT);
+        document.add(healthTitle);
+        document.add(new Paragraph("\n"));
+        
+        // Crear tabla de puntuación
+        PdfPTable scoreTable = new PdfPTable(2);
+        scoreTable.setWidthPercentage(60);
+        scoreTable.setWidths(new float[]{1.2f, 0.8f});
+        
+        com.itextpdf.text.Font labelFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 10, com.itextpdf.text.Font.BOLD);
+        com.itextpdf.text.Font valueFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 10);
+        
+        // Score
+        PdfPCell scoreLabelCell = new PdfPCell(new Phrase("Puntuación de Salud Financiera:", labelFont));
+        scoreLabelCell.setBorder(Rectangle.BOX);
+        scoreLabelCell.setPadding(5);
+        scoreLabelCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        scoreTable.addCell(scoreLabelCell);
+        
+        PdfPCell scoreValueCell = new PdfPCell(new Phrase(healthScore + "/10 (" + healthGrade + ")", valueFont));
+        scoreValueCell.setBorder(Rectangle.BOX);
+        scoreValueCell.setPadding(5);
+        scoreValueCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        scoreTable.addCell(scoreValueCell);
+        
+        // Ratio Gastos/Ingresos
+        double expenseRatio = totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0;
+        PdfPCell ratioLabelCell = new PdfPCell(new Phrase("Porcentaje de Gastos vs Ingresos:", labelFont));
+        ratioLabelCell.setBorder(Rectangle.BOX);
+        ratioLabelCell.setPadding(5);
+        ratioLabelCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        scoreTable.addCell(ratioLabelCell);
+        
+        PdfPCell ratioValueCell = new PdfPCell(new Phrase(String.format("%.1f%%", expenseRatio), valueFont));
+        ratioValueCell.setBorder(Rectangle.BOX);
+        ratioValueCell.setPadding(5);
+        ratioValueCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        scoreTable.addCell(ratioValueCell);
+        
+        // Ahorro estimado
+        PdfPCell savingsLabelCell = new PdfPCell(new Phrase("Capacidad de Ahorro:", labelFont));
+        savingsLabelCell.setBorder(Rectangle.BOX);
+        savingsLabelCell.setPadding(5);
+        savingsLabelCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        scoreTable.addCell(savingsLabelCell);
+        
+        PdfPCell savingsValueCell = new PdfPCell(new Phrase(balance >= 0 ? "$" + String.format("%.2f", balance) : "Déficit", valueFont));
+        savingsValueCell.setBorder(Rectangle.BOX);
+        savingsValueCell.setPadding(5);
+        savingsValueCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        scoreTable.addCell(savingsValueCell);
+        
+        document.add(scoreTable);
+        document.add(new Paragraph("\n"));
+        
+        // Recomendaciones
+        generateRecommendations(document, healthScore, expenseRatio, balance);
+    }
+    
+    private void generateRecommendations(Document document, int healthScore, double expenseRatio, double balance) throws DocumentException {
+        com.itextpdf.text.Font recFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 11, com.itextpdf.text.Font.BOLD);
+        Paragraph recTitle = new Paragraph("Recomendaciones:", recFont);
+        recTitle.setAlignment(Element.ALIGN_LEFT);
+        document.add(recTitle);
+        
+        com.itextpdf.text.Font listFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 10);
+        com.itextpdf.text.List recommendations = new com.itextpdf.text.List(false, 10);
+        recommendations.setListSymbol("• ");
+        
+        if (healthScore >= 8) {
+            recommendations.add(new ListItem("¡Excelente! Mantén tus hábitos financieros actuales.", listFont));
+            recommendations.add(new ListItem("Considera aumentar tus inversiones para hacer crecer tu patrimonio.", listFont));
+            recommendations.add(new ListItem("Evalúa crear un fondo de emergencia equivalente a 6 meses de gastos.", listFont));
+        } else if (healthScore >= 6) {
+            recommendations.add(new ListItem("Tu salud financiera es buena, pero hay espacio para mejorar.", listFont));
+            if (expenseRatio > 70) {
+                recommendations.add(new ListItem("Intenta reducir tus gastos al 70% o menos de tus ingresos.", listFont));
+            }
+            recommendations.add(new ListItem("Establece metas de ahorro específicas y automáticas.", listFont));
+            recommendations.add(new ListItem("Revisa tus gastos mensuales para identificar áreas de mejora.", listFont));
+        } else if (healthScore >= 4) {
+            recommendations.add(new ListItem("Tu situación financiera requiere atención.", listFont));
+            recommendations.add(new ListItem("Crea un presupuesto detallado y síguelo estrictamente.", listFont));
+            if (balance < 0) {
+                recommendations.add(new ListItem("Prioriza reducir gastos innecesarios para evitar el déficit.", listFont));
+            }
+            recommendations.add(new ListItem("Considera buscar fuentes adicionales de ingresos.", listFont));
+        } else {
+            recommendations.add(new ListItem("Tu situación financiera requiere acción inmediata.", listFont));
+            recommendations.add(new ListItem("Busca asesoría financiera profesional.", listFont));
+            recommendations.add(new ListItem("Implementa un plan de reducción de gastos urgente.", listFont));
+            recommendations.add(new ListItem("Considera restructurar deudas si las tienes.", listFont));
+        }
+        
+        document.add(recommendations);
+    }
+    
+    private int calculateFinancialHealthScore(double totalIncome, double totalExpenses, int transactionCount) {
+        if (totalIncome <= 0) return 1;
+        
+        double balance = totalIncome - totalExpenses;
+        double expenseRatio = totalExpenses / totalIncome;
+        
+        int score = 10; // Comenzar con puntuación perfecta
+        
+        // Penalizar por ratio de gastos alto
+        if (expenseRatio > 0.9) {
+            score -= 4; // Gastos > 90% de ingresos
+        } else if (expenseRatio > 0.8) {
+            score -= 3; // Gastos > 80% de ingresos
+        } else if (expenseRatio > 0.7) {
+            score -= 2; // Gastos > 70% de ingresos
+        } else if (expenseRatio > 0.6) {
+            score -= 1; // Gastos > 60% de ingresos
+        }
+        
+        // Penalizar por balance negativo
+        if (balance < 0) {
+            score -= 3;
+        } else if (balance < totalIncome * 0.1) {
+            score -= 1; // Ahorro < 10% de ingresos
+        }
+        
+        // Bonificar por consistencia (más transacciones indica actividad regular)
+        if (transactionCount >= 20) {
+            score += 1;
+        }
+        
+        // Bonificar por balance positivo alto
+        if (balance > totalIncome * 0.3) {
+            score += 1;
+        }
+        
+        return Math.max(1, Math.min(10, score));
+    }
+    
+    private String getHealthGrade(int score) {
+        if (score >= 9) return "Excelente";
+        if (score >= 7) return "Muy Bueno";
+        if (score >= 5) return "Bueno";
+        if (score >= 3) return "Regular";
+        return "Crítico";
     }
 }
