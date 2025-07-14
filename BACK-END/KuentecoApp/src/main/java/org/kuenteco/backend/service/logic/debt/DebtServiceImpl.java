@@ -221,7 +221,7 @@ public class DebtServiceImpl implements DebtService {
                 slaveUserRepository
                         .findByEmail(email)
                         .orElseThrow(() -> new DebtException("Usuario no encontrado " + email));
-        Debt debt = slaveDebtRepository.findDebtByUser(user);
+        Debt debt = slaveDebtRepository.getDebtByUserAndId(user, dto.getId());
         updateDebtMapper.toEntity(dto);
         log.info("Actualizando deuda para {}", email);
         masterDebtRepository.save(debt);

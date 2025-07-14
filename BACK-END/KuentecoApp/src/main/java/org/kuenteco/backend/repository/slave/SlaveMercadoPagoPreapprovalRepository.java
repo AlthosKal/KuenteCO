@@ -15,4 +15,6 @@ public interface SlaveMercadoPagoPreapprovalRepository
     boolean existsByUserAndSubscriptionState(User user, State state);
 
     Optional<MercadoPagoPreapproval> findByPreapprovalId(String preapprovalId);
+
+    Optional<MercadoPagoPreapproval> findByUser(User user);
 }

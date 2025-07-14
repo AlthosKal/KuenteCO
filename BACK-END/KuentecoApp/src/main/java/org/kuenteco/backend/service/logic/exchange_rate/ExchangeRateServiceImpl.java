@@ -24,7 +24,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         List<ExchangeRate> rates = slaveExchangeRateRepository.findAll();
 
         if (rates.isEmpty()) {
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 6; i++) {
                 masterExchangeRateRepository.getExchangeRates();
             }
 

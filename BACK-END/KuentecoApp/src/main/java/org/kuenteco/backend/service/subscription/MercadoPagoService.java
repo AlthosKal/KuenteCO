@@ -12,4 +12,6 @@ public interface MercadoPagoService {
 
     /** Obtiene el estado de una suscripción específica por su preapprovalId. */
     SubscriptionResponseDTO getSubscription(String preapprovalId, String userEmail);
+
+    SubscriptionResponseDTO getUserSubscriptions();
 }

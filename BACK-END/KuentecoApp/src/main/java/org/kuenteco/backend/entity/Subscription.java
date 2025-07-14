@@ -19,7 +19,7 @@ public class Subscription {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_user")
+    @JoinColumn(name = "id_user", unique = true)
     private User user;
 
     @Enumerated(EnumType.STRING)

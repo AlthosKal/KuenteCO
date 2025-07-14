@@ -10,6 +10,7 @@ import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.preapproval.Preapproval;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +35,10 @@ import org.kuenteco.backend.mapper.subscription.MercadoPagoPreapprovalMapper;
 import org.kuenteco.backend.repository.master.MasterMercadoPagoPreapprovalRepository;
 import org.kuenteco.backend.repository.master.MasterSubscriptionRepository;
 import org.kuenteco.backend.repository.slave.SlaveMercadoPagoPreapprovalRepository;
+import org.kuenteco.backend.repository.slave.SlaveSubscriptionRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -43,37 +46,39 @@ import org.springframework.stereotype.Service;
 public class MercadoPagoServiceImpl implements MercadoPagoService {
     private final MasterMercadoPagoPreapprovalRepository masterMercadoPagoPreapprovalRepository;
     private final SlaveMercadoPagoPreapprovalRepository slaveMercadoPagoPreapprovalRepository;
+    private final MasterSubscriptionRepository masterSubscriptionRepository;
+    private final SlaveSubscriptionRepository slaveSubscriptionRepository;
     private final MercadoPagoPreapprovalMapper preapprovalMapper;
     private final SlaveUserRepository slaveUserRepository;
-    private final MasterSubscriptionRepository masterSubscriptionRepository;
     private final String defaultBackUrl = "https://github.com/AlthosKal/KuenteCO";
 
     // Configuración de precios por tipo de suscripción
     private final Map<SubscriptionType, SubscriptionPriceConfigDTO> priceConfigs =
             Map.of(
                     SubscriptionType.BASIC,
-                            SubscriptionPriceConfigDTO.builder()
-                                    .type(SubscriptionType.BASIC)
-                                    .monthlyPrice(new BigDecimal("19900"))
-                                    .description("Plan Básico - KuenteCo")
-                                    .currencyId("COP")
-                                    .build(),
+                    SubscriptionPriceConfigDTO.builder()
+                            .type(SubscriptionType.BASIC)
+                            .monthlyPrice(new BigDecimal("19900"))
+                            .description("Plan Básico - KuenteCo")
+                            .currencyId("COP")
+                            .build(),
                     SubscriptionType.STANDARD,
-                            SubscriptionPriceConfigDTO.builder()
-                                    .type(SubscriptionType.STANDARD)
-                                    .monthlyPrice(new BigDecimal("39900"))
-                                    .description("Plan Estándar - KuenteCo")
-                                    .currencyId("COP")
-                                    .build(),
+                    SubscriptionPriceConfigDTO.builder()
+                            .type(SubscriptionType.STANDARD)
+                            .monthlyPrice(new BigDecimal("39900"))
+                            .description("Plan Estándar - KuenteCo")
+                            .currencyId("COP")
+                            .build(),
                     SubscriptionType.PREMIUM,
-                            SubscriptionPriceConfigDTO.builder()
-                                    .type(SubscriptionType.PREMIUM)
-                                    .monthlyPrice(new BigDecimal("59900"))
-                                    .description("Plan Premium - KuenteCo")
-                                    .currencyId("COP")
-                                    .build());
+                    SubscriptionPriceConfigDTO.builder()
+                            .type(SubscriptionType.PREMIUM)
+                            .monthlyPrice(new BigDecimal("59900"))
+                            .description("Plan Premium - KuenteCo")
+                            .currencyId("COP")
+                            .build());
 
     @Override
+    @Transactional
     public CreateSubscriptionResponseDTO createSubscription(
             CreateSubscriptionRequestDTO request, String userEmail) {
         AuthCredentials credentials = getCredentials();
@@ -82,6 +87,7 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
         if (role == RoleList.ROLE_PROFILE) {
             throw new TransactionException("Endpoint solo disponible para usuarios");
         }
+
         try {
             log.info("Iniciando creación de suscripción para usuario: {}", userEmail);
 
@@ -94,12 +100,8 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
                                             new SubscriptionMercadoPagoException(
                                                     "Usuario no encontrado"));
 
-            // Validar que no tenga una suscripción activa hasActiveSubscription
-            if (slaveMercadoPagoPreapprovalRepository.existsByUserAndSubscriptionState(
-                    user, State.ACTIVE)) {
-                throw new SubscriptionMercadoPagoException(
-                        "El usuario ya tiene una suscripción activa");
-            }
+            // Validar suscripciones activas del usuario
+            validateActiveSubscriptions(user, request.getSubscriptionType());
 
             // Obtener configuración de precios
             SubscriptionPriceConfigDTO priceConfig = getPriceConfig(request.getSubscriptionType());
@@ -110,14 +112,15 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
 
             // Crear preapproval en MercadoPago
             Preapproval preapproval =
-                    createMercadoPagoPreapproval(priceConfig, externalReference, userEmail);
+                    createMercadoPagoPreapproval(
+                            priceConfig, externalReference, userEmail, request.getBackUrl());
 
             // Guardar en base de datos
             MercadoPagoPreapproval savedPreapproval =
                     saveMercadoPagoPreapproval(preapproval, user, priceConfig);
 
-            // Crear suscripción asociada
-            createSubscription(user, savedPreapproval, request.getSubscriptionType());
+            // Actualizar o crear suscripción
+            updateOrCreateSubscription(user, savedPreapproval, request.getSubscriptionType());
 
             log.info(
                     "Suscripción creada exitosamente para usuario: {}, preapproval ID: {}",
@@ -140,6 +143,9 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
             log.error("Error al crear preapproval en MercadoPago: {}", e.getMessage(), e);
             throw new MercadoPagoException(
                     "Error al crear suscripción en MercadoPago: " + e.getMessage());
+        } catch (SubscriptionMercadoPagoException | TransactionException e) {
+            // Re-lanzar excepciones de negocio sin modificar
+            throw e;
         } catch (Exception e) {
             log.error("Error inesperado al crear suscripción: {}", e.getMessage(), e);
             throw new SubscriptionMercadoPagoException(
@@ -155,6 +161,7 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
         if (role == RoleList.ROLE_PROFILE) {
             throw new TransactionException("Endpoint solo disponible para usuarios");
         }
+
         log.info(
                 "Obteniendo suscripción para usuario: {}, preapproval ID: {}",
                 userEmail,
@@ -184,6 +191,101 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
         return preapprovalMapper.toSubscriptionResponse(preapproval);
     }
 
+    @Override
+    public SubscriptionResponseDTO getUserSubscriptions() {
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+
+        User user =
+                slaveUserRepository
+                        .findByEmail(email)
+                        .orElseThrow(
+                                () ->
+                                        new SubscriptionMercadoPagoException(
+                                                "Usuario no encontrado"));
+
+        Subscription subscription =
+                slaveSubscriptionRepository
+                        .getSubscriptionByUser(user)
+                        .orElseThrow(
+                                () ->
+                                        new SubscriptionMercadoPagoException(
+                                                "Subscripción no encontrada"));
+        MercadoPagoPreapproval mercadoPagoPreapproval =
+                slaveMercadoPagoPreapprovalRepository
+                        .findByUser(user)
+                        .orElseThrow(
+                                () ->
+                                        new SubscriptionMercadoPagoException(
+                                                "Subscripción no encontrada"));
+        return preapprovalMapper.toDTO(subscription, mercadoPagoPreapproval);
+    }
+
+    /** Valida si el usuario puede crear una nueva suscripción */
+    private void validateActiveSubscriptions(User user, SubscriptionType newSubscriptionType) {
+        // Buscar suscripciones activas del usuario
+        List<Subscription> activeSubscriptions =
+                slaveSubscriptionRepository.findByUserAndState(user, State.ACTIVE);
+
+        if (!activeSubscriptions.isEmpty()) {
+            Subscription activeSubscription = activeSubscriptions.get(0);
+
+            // Si la suscripción activa es del mismo tipo, no permitir duplicados
+            if (activeSubscription.getType() == newSubscriptionType) {
+                throw new SubscriptionMercadoPagoException(
+                        String.format(
+                                "El usuario ya tiene una suscripción activa del tipo %s",
+                                newSubscriptionType.name()));
+            }
+
+            // Si quiere cambiar de plan, marcar la suscripción actual como cancelada
+            log.info(
+                    "Usuario {} tiene suscripción activa tipo {}, cambiando a tipo {}",
+                    user.getEmail(),
+                    activeSubscription.getType(),
+                    newSubscriptionType);
+
+            activeSubscription.setState(State.CANCELLED);
+            activeSubscription.setUpdatedAt(LocalDateTime.now());
+            masterSubscriptionRepository.save(activeSubscription);
+
+            // También cancelar el preapproval asociado si existe
+            if (activeSubscription.getMercadoPagoPreapproval() != null) {
+                MercadoPagoPreapproval activePreapproval =
+                        activeSubscription.getMercadoPagoPreapproval();
+                activePreapproval.setStatus(PreapprovalStatus.CANCELLED);
+                activePreapproval.setLastModified(LocalDateTime.now());
+                masterMercadoPagoPreapprovalRepository.save(activePreapproval);
+            }
+        }
+
+        // Buscar suscripciones pendientes
+        List<Subscription> pendingSubscriptions =
+                slaveSubscriptionRepository.findByUserAndState(user, State.PENDING);
+
+        if (!pendingSubscriptions.isEmpty()) {
+            log.info(
+                    "Usuario {} tiene {} suscripciones pendientes, cancelándolas",
+                    user.getEmail(),
+                    pendingSubscriptions.size());
+
+            for (Subscription pendingSubscription : pendingSubscriptions) {
+                pendingSubscription.setState(State.CANCELLED);
+                pendingSubscription.setUpdatedAt(LocalDateTime.now());
+                masterSubscriptionRepository.save(pendingSubscription);
+
+                // Cancelar preapproval asociado
+                if (pendingSubscription.getMercadoPagoPreapproval() != null) {
+                    MercadoPagoPreapproval pendingPreapproval =
+                            pendingSubscription.getMercadoPagoPreapproval();
+                    pendingPreapproval.setStatus(PreapprovalStatus.CANCELLED);
+                    pendingPreapproval.setLastModified(LocalDateTime.now());
+                    masterMercadoPagoPreapprovalRepository.save(pendingPreapproval);
+                }
+            }
+        }
+    }
+
     private SubscriptionPriceConfigDTO getPriceConfig(SubscriptionType subscriptionType) {
         SubscriptionPriceConfigDTO config = priceConfigs.get(subscriptionType);
         if (config == null) {
@@ -195,24 +297,32 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
 
     private String generateExternalReference(String userId, SubscriptionType subscriptionType) {
         return String.format(
-                "SUB_%s_%s_%s",
-                userId.substring(0, 8),
+                "SUB_%s_%s_%s_%d",
+                userId.substring(0, Math.min(8, userId.length())),
                 subscriptionType.name(),
-                UUID.randomUUID().toString().substring(0, 8));
+                UUID.randomUUID().toString().substring(0, 8),
+                System.currentTimeMillis());
     }
 
     private Preapproval createMercadoPagoPreapproval(
-            SubscriptionPriceConfigDTO priceConfig, String externalReference, String userEmail)
+            SubscriptionPriceConfigDTO priceConfig,
+            String externalReference,
+            String userEmail,
+            String backUrl)
             throws MPException, MPApiException {
 
         PreapprovalClient client = new PreapprovalClient();
+
+        // Usar backUrl proporcionado o el por defecto
+        String finalBackUrl =
+                (backUrl != null && !backUrl.trim().isEmpty()) ? backUrl : defaultBackUrl;
 
         PreapprovalCreateRequest createRequest =
                 PreapprovalCreateRequest.builder()
                         .reason(priceConfig.getDescription())
                         .externalReference(externalReference)
                         .payerEmail(userEmail)
-                        .backUrl(defaultBackUrl) // AQUÍ va el back_url, obligatorio
+                        .backUrl(finalBackUrl)
                         .autoRecurring(
                                 PreApprovalAutoRecurringCreateRequest.builder()
                                         .frequency(30)
@@ -227,6 +337,7 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
 
     private MercadoPagoPreapproval saveMercadoPagoPreapproval(
             Preapproval preapproval, User user, SubscriptionPriceConfigDTO priceConfig) {
+
         MercadoPagoPreapproval entity =
                 MercadoPagoPreapproval.builder()
                         .user(user)
@@ -249,8 +360,11 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
         return masterMercadoPagoPreapprovalRepository.save(entity);
     }
 
-    private void createSubscription(
+    private void updateOrCreateSubscription(
             User user, MercadoPagoPreapproval preapproval, SubscriptionType subscriptionType) {
+
+        // Crear nueva suscripción (las anteriores ya fueron canceladas en
+        // validateActiveSubscriptions)
         Subscription subscription =
                 Subscription.builder()
                         .user(user)
@@ -265,6 +379,12 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
                         .build();
 
         subscription = masterSubscriptionRepository.save(subscription);
+
+        log.info(
+                "Nueva suscripción creada para usuario: {}, ID: {}, tipo: {}",
+                user.getEmail(),
+                subscription.getId(),
+                subscriptionType);
 
         // Actualizar la referencia bidireccional
         preapproval.setSubscription(subscription);

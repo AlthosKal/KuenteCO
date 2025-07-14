@@ -19,4 +19,6 @@ public interface SlaveProfileRepository extends JpaRepository<Profile, Integer> 
     Optional<Profile> findByEmail(String email);
 
     Optional<Profile> findByUsername(String name);
+
+    boolean existsByEmail(String email);
 }

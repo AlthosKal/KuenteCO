@@ -110,7 +110,7 @@ public class DebtController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> createDebt(
+    public ResponseEntity<?> addDebt(
             @Valid @RequestBody NewDebtDTO dto, HttpServletRequest request) {
         debtService.addDebt(dto);
         return new ResponseEntity<>(

@@ -1,19 +1,22 @@
 package org.kuenteco.backend.service.user;
 
+import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
+
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.dto.auth.DeleteUserDTO;
 import org.kuenteco.backend.dto.auth.UserDetailDTO;
 import org.kuenteco.backend.entity.Subscription;
 import org.kuenteco.backend.entity.User;
+import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.mapper.auth.UserDetailMapper;
 import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveSubscriptionRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.kuenteco.backend.service.image.ImageService;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -58,20 +61,24 @@ public class UserServiceImpl implements UserService {
         if (user.getState() == State.PENDING) masterUserRepository.removeUserByEmail(email);
     }
 
-    private User getDetails() {
-        String nameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        return findByNameOrEmail(nameOrEmail);
-    }
-
     @Override
     public UserDetailDTO getUserDetails() {
-        User user = getDetails();
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        RoleList role = credentials.role();
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new UsernameNotFoundException("Endpoint solo disponible para usuarios");
+        }
+        User user =
+                slaveUserRepository
+                        .findByEmail(email)
+                        .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
         Subscription subscription =
                 slaveSubscriptionRepository
-                        .findByUser(user)
+                        .findFirstByUserOrderByIdDesc(user)
                         .orElseThrow(
                                 () -> new UsernameNotFoundException("Subscripción no encontrada"));
+
         return userDetailMapper.toDto(user, subscription.getType());
     }
 

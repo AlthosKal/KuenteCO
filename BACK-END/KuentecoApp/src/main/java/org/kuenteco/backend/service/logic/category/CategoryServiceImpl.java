@@ -159,12 +159,15 @@ public class CategoryServiceImpl implements CategoryService {
         if (role == RoleList.ROLE_PROFILE) {
             throw new CategoryException("Endpoint solo disponible para usuarios");
         }
-        Category category = prepareUpdateCategory(dto);
         User user =
                 slaveUserRepository
                         .findByEmail(email)
                         .orElseThrow(
                                 () -> new CategoryException("Usuario no encontrado: " + email));
+
+        Category category = slaveCategoryRepository.getCategoryByUserAndId(user,dto.getId()).orElseThrow(()-> new CategoryException("Categoría no encontrada: ") );
+        updateCategoryMapper.toEntity(dto);
+        resolveBudget(dto.getBudgetId(), category);
         log.info("Actualizando la categoria para: {}", email);
         category.setUser(user);
         masterCategoryRepository.save(category);
@@ -234,13 +237,6 @@ public class CategoryServiceImpl implements CategoryService {
         resolveBudget(dto.getBudgetId(), category);
         return category;
     }
-
-    private Category prepareUpdateCategory(CategoryDTO dto) {
-        Category category = updateCategoryMapper.toEntity(dto);
-        resolveBudget(dto.getBudgetId(), category);
-        return category;
-    }
-
     private void resolveBudget(Integer budgetId, Category category) {
         if (budgetId != null) {
             category.setBudget(

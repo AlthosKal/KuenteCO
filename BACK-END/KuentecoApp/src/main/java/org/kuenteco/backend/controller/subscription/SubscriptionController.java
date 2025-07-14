@@ -39,15 +39,32 @@ public class SubscriptionController implements SubscriptionResource {
             @Valid @RequestBody CreateSubscriptionRequestDTO dto,
             Principal principal,
             HttpServletRequest request) {
-        log.info("Creando suscripción en Mercado Pago para usuario: {}", principal.getName());
 
-        CreateSubscriptionResponseDTO response =
-                mercadoPagoService.createSubscription(dto, principal.getName());
+        String userEmail = principal.getName();
+        log.info(
+                "Creando suscripción tipo {} para usuario: {}",
+                dto.getSubscriptionType(),
+                userEmail);
 
-        return new ResponseEntity<>(
-                ApiResponse.ok(
-                        "Suscripción creada exitosamente", response, request.getRequestURI()),
-                HttpStatus.CREATED);
+        try {
+            CreateSubscriptionResponseDTO response =
+                    mercadoPagoService.createSubscription(dto, userEmail);
+
+            log.info(
+                    "Suscripción creada exitosamente para usuario: {}, preapproval ID: {}",
+                    userEmail,
+                    response.getPreapprovalId());
+
+            return new ResponseEntity<>(
+                    ApiResponse.ok(
+                            "Suscripción creada exitosamente", response, request.getRequestURI()),
+                    HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            log.error(
+                    "Error al crear suscripción para usuario {}: {}", userEmail, e.getMessage(), e);
+            throw e; // Re-lanzar para que sea manejado por el GlobalExceptionHandler
+        }
     }
 
     /**
@@ -58,18 +75,31 @@ public class SubscriptionController implements SubscriptionResource {
      * @param request Información de la petición HTTP
      * @return Respuesta con los detalles de la suscripción
      */
-    @GetMapping("/subscription/{preapprovalId}")
+    @GetMapping("/{preapprovalId}")
     public ResponseEntity<?> getSubscription(
             @PathVariable String preapprovalId, Principal principal, HttpServletRequest request) {
-        log.info("Obteniendo suscripción {} para usuario: {}", preapprovalId, principal.getName());
 
-        SubscriptionResponseDTO response =
-                mercadoPagoService.getSubscription(preapprovalId, principal.getName());
+        String userEmail = principal.getName();
+        log.info("Obteniendo suscripción {} para usuario: {}", preapprovalId, userEmail);
 
-        return new ResponseEntity<>(
-                ApiResponse.ok(
-                        "Suscripción obtenida exitosamente", response, request.getRequestURI()),
-                HttpStatus.OK);
+        try {
+            SubscriptionResponseDTO response =
+                    mercadoPagoService.getSubscription(preapprovalId, userEmail);
+
+            return new ResponseEntity<>(
+                    ApiResponse.ok(
+                            "Suscripción obtenida exitosamente", response, request.getRequestURI()),
+                    HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error(
+                    "Error al obtener suscripción {} para usuario {}: {}",
+                    preapprovalId,
+                    userEmail,
+                    e.getMessage(),
+                    e);
+            throw e; // Re-lanzar para que sea manejado por el GlobalExceptionHandler
+        }
     }
 
     /**
@@ -80,22 +110,53 @@ public class SubscriptionController implements SubscriptionResource {
      * @param request Información de la petición HTTP
      * @return Respuesta con el historial de pagos
      */
-    @GetMapping("/subscription/{preapprovalId}/payment-history")
+    @GetMapping("/{preapprovalId}/payment-history")
     public ResponseEntity<?> getPaymentHistory(
             @PathVariable String preapprovalId, Principal principal, HttpServletRequest request) {
+
+        String userEmail = principal.getName();
         log.info(
                 "Obteniendo historial de pagos para suscripción {} del usuario: {}",
                 preapprovalId,
-                principal.getName());
+                userEmail);
 
-        List<PaymentHistoryResponseDTO> response =
-                mercadoPagoPaymentService.getPaymentHistory(preapprovalId, principal.getName());
+        try {
+            List<PaymentHistoryResponseDTO> response =
+                    mercadoPagoPaymentService.getPaymentHistory(preapprovalId, userEmail);
 
+            return new ResponseEntity<>(
+                    ApiResponse.ok(
+                            "Historial de pagos obtenido exitosamente",
+                            response,
+                            request.getRequestURI()),
+                    HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error(
+                    "Error al obtener historial de pagos para suscripción {} del usuario {}: {}",
+                    preapprovalId,
+                    userEmail,
+                    e.getMessage(),
+                    e);
+            throw e; // Re-lanzar para que sea manejado por el GlobalExceptionHandler
+        }
+    }
+
+    /**
+     * Obtiene todas las suscripciones del usuario autenticado
+     *
+     * <p>Información del usuario autenticado
+     *
+     * @param request Información de la petición HTTP
+     * @return Respuesta con las suscripciones del usuario
+     */
+    @GetMapping("/my-subscriptions")
+    public ResponseEntity<?> getMySubscriptions(HttpServletRequest request) {
+        // método en el service para obtener la subscripción del usuarío
+        SubscriptionResponseDTO response = mercadoPagoService.getUserSubscriptions();
         return new ResponseEntity<>(
                 ApiResponse.ok(
-                        "Historial de pagos obtenido exitosamente",
-                        response,
-                        request.getRequestURI()),
+                        "Suscripciones obtenidas exitosamente", response, request.getRequestURI()),
                 HttpStatus.OK);
     }
 }

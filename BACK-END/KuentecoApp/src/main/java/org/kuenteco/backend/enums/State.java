@@ -4,5 +4,6 @@ public enum State {
     PENDING,
     ACTIVE,
     INACTIVE,
-    SUSPENDED
+    SUSPENDED,
+    CANCELLED
 }

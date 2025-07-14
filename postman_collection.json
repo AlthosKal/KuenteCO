@@ -227,7 +227,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url_chat}}/v1/reports/download/cfdd1b0e-add7-471d-b89f-bdd6e4eb87f7",
+									"raw": "{{base_url_chat}}/v1/reports/download/a3955251-3727-4fdf-ac90-55b46e646691",
 									"host": [
 										"{{base_url_chat}}"
 									],
@@ -235,7 +235,7 @@
 										"v1",
 										"reports",
 										"download",
-										"cfdd1b0e-add7-471d-b89f-bdd6e4eb87f7"
+										"a3955251-3727-4fdf-ac90-55b46e646691"
 									]
 								}
 							},
@@ -284,18 +284,23 @@
 							"response": []
 						},
 						{
-							"name": "Get Subscription",
+							"name": "Get Subscription by Id",
 							"request": {
 								"method": "GET",
-								"header": [],
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
 								"url": {
-									"raw": "{{base_url}}/v1/mercado-pago/subscription/3c6183ee17d4492db87e133d47afee0e",
+									"raw": "{{base_url}}/v1/subscription/3c6183ee17d4492db87e133d47afee0e",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"v1",
-										"mercado-pago",
 										"subscription",
 										"3c6183ee17d4492db87e133d47afee0e"
 									]
@@ -304,18 +309,48 @@
 							"response": []
 						},
 						{
-							"name": "Get Payment History",
+							"name": "Get Subscription",
 							"request": {
 								"method": "GET",
-								"header": [],
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
 								"url": {
-									"raw": "{{base_url}}/v1/mercado-pago/subscription/3c6183ee17d4492db87e133d47afee0e/payment-history",
+									"raw": "{{base_url}}/v1/subscription/my-subscriptions",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"v1",
-										"mercado-pago",
+										"subscription",
+										"my-subscriptions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Payment History by Id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/subscription/3c6183ee17d4492db87e133d47afee0e/payment-history",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
 										"subscription",
 										"3c6183ee17d4492db87e133d47afee0e",
 										"payment-history"
@@ -1000,7 +1035,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"debtId\": 1,\n  \"paymentAmount\": 500.00,\n  \"description\": \"Pago mensual de enero\",\n  \"paymentDate\": \"2024-01-30T14:30:00\"\n}"
+									"raw": "{\n  \"debtId\": 2,\n  \"paymentAmount\": 500.00,\n  \"description\": \"Pago mensual de enero\",\n  \"paymentDate\": \"2024-01-30T14:30:00\"\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/v1/debt/payment",
@@ -1319,7 +1354,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\": 1,\n  \"budget\": {\n    \"id\": 1,\n    \"name\": \"Presupuesto Mensual\",\n    \"totalBudget\": 5000.00,\n    \"remainingBudget\": 4200.00\n  },\n  \"description\": {\n    \"name\": \"Alimentación y Comestibles\",\n    \"assignedBudget\": 1800.00,\n    \"state\": \"ACTIVE\"\n  },\n  \"startDate\": \"2024-01-01T00:00:00\",\n  \"finishDate\": \"2024-01-31T23:59:59\"\n}"
+									"raw": "{\n  \"id\": 2,\n  \"budgetId\": 2,\n  \"description\": {\n    \"name\": \"Alimentación y Comestibles\",\n    \"assignedBudget\": 1800.00,\n    \"state\": \"ACTIVE\"\n  },\n  \"startDate\": \"2024-01-01T00:00:00\",\n  \"finishDate\": \"2024-01-31T23:59:59\"\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/v1/category/update",
@@ -1352,7 +1387,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "[\n  {\n    \"id\": 1,\n    \"budgetId\": null,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  }\n]"
+									"raw": "[\n  {\n    \"id\": 1,\n    \"budgetId\": 1,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 2,\n    \"budgetId\": 2,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 3,\n    \"budgetId\": 3,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 4,\n    \"budgetId\": 4,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 5,\n    \"budgetId\": 5,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 6,\n    \"budgetId\": 6,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 7,\n    \"budgetId\": 7,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 8,\n    \"budgetId\": 8,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 9,\n    \"budgetId\": 9,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 10,\n    \"budgetId\": 10,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 11,\n    \"budgetId\": 11,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 12,\n    \"budgetId\": 12,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 13,\n    \"budgetId\": 13,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 14,\n    \"budgetId\": 14,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 15,\n    \"budgetId\": 15,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 16,\n    \"budgetId\": 16,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 17,\n    \"budgetId\": 17,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 18,\n    \"budgetId\": 18,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 19,\n    \"budgetId\": 19,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 20,\n    \"budgetId\": 20,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 21,\n    \"budgetId\": 21,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 22,\n    \"budgetId\": 22,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 23,\n    \"budgetId\": 23,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 24,\n    \"budgetId\": 24,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 25,\n    \"budgetId\": 25,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 26,\n    \"budgetId\": 26,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 27,\n    \"budgetId\": 27,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 28,\n    \"budgetId\": 28,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 29,\n    \"budgetId\": 29,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 30,\n    \"budgetId\": 30,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  }\n]\n"
 								},
 								"url": {
 									"raw": "{{base_url}}/v1/category/batch/update",
@@ -2006,7 +2041,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"nameOrEmail\": \"Nuevo Perfil\",\n    \"password\": \"password123\"\n}"
+									"raw": "{\n    \"nameOrEmail\": \"Exzidi\",\n    \"password\": \"newPassword123\"\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/v1/profile/login",
@@ -2038,7 +2073,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"username\": \"Nuevo Perfil\",\n    \"email\": \"nuevoperfil@example.com\",\n    \"password\": \"password123\"\n}"
+									"raw": "{\n    \"username\": \"Exzidi\",\n    \"email\": \"alejandromolinaacosta11@gmail.com\",\n    \"password\": \"password123\"\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/v1/profile/add",
@@ -2240,7 +2275,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"usuario@example.com\",\n    \"code\": \"123456\",\n    \"newPassword\": \"newPassword123\"\n}"
+									"raw": "{\n    \"email\": \"alejandromolinaacosta11@gmail.com\",\n    \"code\": \"436074\",\n    \"newPassword\": \"newPassword123\"\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/v1/profile/change-password",
@@ -2320,7 +2355,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"nameOrEmail\": \"nuevoUsuario\",\n    \"password\": \"password123\"\n}"
+									"raw": "{\n    \"nameOrEmail\": \"nuevoUsuario\",\n    \"password\": \"MiClave2024#\"\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/v1/auth/login",
@@ -2348,7 +2383,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"username\": \"nuevoUsuario\",\n    \"email\": \"agudelocastanoyeferson270@gmail.com\",\n    \"password\": \"password123\",\n    \"type\": \"BUSINESS\"\n}"
+									"raw": "{\n    \"username\": \"nuevoUsuario\",\n    \"email\": \"agudelocastanoyeferson270@gmail.com\",\n    \"password\": \"MiClave2024#\",\n    \"type\": \"BUSINESS\"\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/v1/auth/register",
@@ -2376,10 +2411,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"usuario@example.com\"\n}"
+									"raw": "{\n    \"email\": \"alejandromolinaacosta11@gmail.com\"\n}"
 								},
 								"url": {
-									"raw": "{{base_url}}/v1/auth/send-verification-code?isRegistration=false",
+									"raw": "{{base_url}}/v1/auth/send-verification-code?isRegistration=true",
 									"host": [
 										"{{base_url}}"
 									],
@@ -2391,7 +2426,7 @@
 									"query": [
 										{
 											"key": "isRegistration",
-											"value": "false",
+											"value": "true",
 											"description": "Set to true for registration verification"
 										}
 									]
@@ -2572,7 +2607,7 @@
 										{
 											"key": "image",
 											"type": "file",
-											"src": "/path/to/image.jpg"
+											"src": "/home/yeferson/Imágenes/Fondo.webp"
 										}
 									]
 								},

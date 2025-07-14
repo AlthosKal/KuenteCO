@@ -20,7 +20,7 @@ public class Category {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_user")
+    @JoinColumn(name = "id_user", nullable = false)
     private User user;
 
     @OneToOne
