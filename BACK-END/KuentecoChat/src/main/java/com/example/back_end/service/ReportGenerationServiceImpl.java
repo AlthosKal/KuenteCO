@@ -16,6 +16,7 @@ import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -167,10 +168,14 @@ PdfWriter.getInstance(document, new FileOutputStream(filePath));
 document.open();
 
 // Header con logo
-Image logo = Image.getInstance("src/main/resources/static/images/logo.png");
-logo.scalePercent(50);
-logo.setAlignment(Element.ALIGN_CENTER);
-document.add(logo);
+InputStream logoStream = getClass().getClassLoader().getResourceAsStream("static/images/logo.png");
+if (logoStream != null) {
+    Image logo = Image.getInstance(logoStream.readAllBytes());
+    logo.scalePercent(50);
+    logo.setAlignment(Element.ALIGN_CENTER);
+    document.add(logo);
+    logoStream.close();
+}
 
 document.add(new Paragraph("\n"));
 

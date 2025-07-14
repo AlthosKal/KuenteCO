@@ -28,10 +28,6 @@ public class NewUserDTO {
 
     @NotBlank(message = "La contraseña es requerida")
     @Size(min = 8, max = 128, message = "La contraseña debe tener entre 8 y 128 caracteres")
-    @Pattern(
-            regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$",
-            message =
-                    "La contraseña debe contener al menos: 1 número, 1 minúscula, 1 mayúscula y 1 carácter especial")
     public String password;
 
     @NotNull(message = "El tipo de Usuario es requerido")

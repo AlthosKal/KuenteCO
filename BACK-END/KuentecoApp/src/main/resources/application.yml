@@ -34,7 +34,7 @@ bancolombia:
     base-url: ${BANCOLOMBIA_BASE_URL}
     auth:
       token-expiration-buffer-seconds: 300
-      token-url-base-path: /public-bancolombia/sb/security/oauth-provider/oauth2
+      token-url-base-path: /public-bancolombia/sb/security/oauth-provider/oauth2/token
       client-id: ${BANCOLOMBIA_CLIENT_ID}
       client-secret: ${BANCOLOMBIA_CLIENT_SECRET}
       scope: transactional-information

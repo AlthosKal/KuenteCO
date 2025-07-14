@@ -298,4 +298,12 @@ public class GlobalExceptionHandler {
                                 "Error en el servicio de Bancolombia: " + ex.getMessage(),
                                 request.getRequestURI()));
     }
+
+    @ExceptionHandler(TransactionException.class)
+    public ResponseEntity<ApiResponse<Void>> handleTransactionException(
+            TransactionException ex, HttpServletRequest request) {
+        log.error("Error general del servicio de Transacciones: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
+    }
 }

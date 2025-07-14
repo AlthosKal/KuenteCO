@@ -2,13 +2,13 @@ package org.kuenteco.backend.dto.logic.debt;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.kuenteco.backend.enums.StateDebt;
-import org.kuenteco.backend.validation.FutureDate;
 import org.kuenteco.backend.validation.ValidCurrency;
 
 @Data
@@ -16,6 +16,7 @@ import org.kuenteco.backend.validation.ValidCurrency;
 @AllArgsConstructor
 public class NewDebtDTO {
 
+    @Positive(message = "El ID de la transacción debe ser un número positivo")
     private Integer transactionId;
 
     @NotBlank(message = "El nombre de la deuda es obligatorio")
@@ -39,10 +40,6 @@ public class NewDebtDTO {
     private LocalDateTime startDate;
 
     @NotNull(message = "La fecha de vencimiento es obligatoria")
-    @FutureDate(
-            minDaysInFuture = 1,
-            maxDaysInFuture = 7300,
-            message = "La fecha de vencimiento debe ser futura (entre 1 día y 20 años)")
     private LocalDateTime expirationDate;
 
     private StateDebt state;

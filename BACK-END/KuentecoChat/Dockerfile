@@ -19,6 +19,17 @@ RUN java -Djarmode=layertools -jar target/*.jar extract
 FROM openjdk:21-slim
 WORKDIR /workspace
 
+# Install graphics libraries required for JFreeChart
+RUN apt-get update && apt-get install -y \
+    libfreetype6 \
+    libfontconfig1 \
+    libxrender1 \
+    libxtst6 \
+    libxi6 \
+    libxrandr2 \
+    libasound2 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy Spring Boot layers from the builder stage
 COPY --from=builder /workspace/dependencies/ ./
 COPY --from=builder /workspace/spring-boot-loader/ ./

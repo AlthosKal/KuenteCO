@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.kuenteco.backend.entity.extra.DescriptionCategory;
-import org.kuenteco.backend.validation.FutureDate;
 
 @Data
 @NoArgsConstructor
@@ -22,16 +21,8 @@ public class NewCategoryDTO {
     private DescriptionCategory description;
 
     @NotNull(message = "La fecha de inicio es requerida")
-    @FutureDate(
-            minDaysInFuture = 0,
-            maxDaysInFuture = 3650,
-            message = "La fecha de inicio debe ser válida (hasta 10 años)")
     private LocalDateTime startDate;
 
     @NotNull(message = "La fecha de finalización es requerida")
-    @FutureDate(
-            minDaysInFuture = 0,
-            maxDaysInFuture = 3650,
-            message = "La fecha de finalización debe ser válida (hasta 10 años)")
     private LocalDateTime finishDate;
 }

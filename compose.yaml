@@ -1,6 +1,6 @@
 services:
   kuenteco-app:
-    image: yefff/image-backend-kuenteco-app:1.0.0
+    image: yefff/image-backend-kuenteco-app:1.0.1
     container_name: KuentecoApp
     volumes:
       - ./.env.docker:/workspace/.env
@@ -74,7 +74,7 @@ services:
       start_period: 90s
     restart: unless-stopped
   kuenteco-chat:
-    image: yefff/image-backend-kuenteco-chat:1.0.0
+    image: yefff/image-backend-kuenteco-chat:1.0.1
     container_name: KuentecoChat
     volumes:
       - ./.env.docker:/workspace/.env
