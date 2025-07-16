@@ -469,6 +469,11 @@ public class ChatServiceImpl implements ChatService {
                 .toList();
     }
 
+    @Override
+    public void removeChatHistoryByConversationId(String conversationId) {
+        repository.removeChatHistoriesByConversationId(conversationId);
+    }
+
     private String askToAI(ChatDTO dto, String fileContent, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
         String email = jwtUtil.extractEmail(token);

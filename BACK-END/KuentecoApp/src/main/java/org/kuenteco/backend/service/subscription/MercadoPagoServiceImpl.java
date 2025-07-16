@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,13 +56,6 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
     // Configuración de precios por tipo de suscripción
     private final Map<SubscriptionType, SubscriptionPriceConfigDTO> priceConfigs =
             Map.of(
-                    SubscriptionType.BASIC,
-                    SubscriptionPriceConfigDTO.builder()
-                            .type(SubscriptionType.BASIC)
-                            .monthlyPrice(new BigDecimal("19900"))
-                            .description("Plan Básico - KuenteCo")
-                            .currencyId("COP")
-                            .build(),
                     SubscriptionType.STANDARD,
                     SubscriptionPriceConfigDTO.builder()
                             .type(SubscriptionType.STANDARD)
@@ -251,9 +245,19 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
 
             // También cancelar el preapproval asociado si existe
             if (activeSubscription.getMercadoPagoPreapproval() != null) {
+
                 MercadoPagoPreapproval activePreapproval =
-                        activeSubscription.getMercadoPagoPreapproval();
+                        masterMercadoPagoPreapprovalRepository
+                                .findById(activeSubscription.getMercadoPagoPreapproval().getId())
+                                .orElseThrow(
+                                        () ->
+                                                new SubscriptionMercadoPagoException(
+                                                        "Preapproval no encontrado"));
+
                 activePreapproval.setStatus(PreapprovalStatus.CANCELLED);
+                activePreapproval.setLastModified(LocalDateTime.now());
+                masterMercadoPagoPreapprovalRepository.save(activePreapproval);
+
                 activePreapproval.setLastModified(LocalDateTime.now());
                 masterMercadoPagoPreapprovalRepository.save(activePreapproval);
             }
@@ -362,32 +366,36 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
 
     private void updateOrCreateSubscription(
             User user, MercadoPagoPreapproval preapproval, SubscriptionType subscriptionType) {
+        // Buscar suscripción actual del usuario (no importa el estado)
+        Optional<Subscription> existingSubscriptionOpt =
+                slaveSubscriptionRepository.findByUser(user);
 
-        // Crear nueva suscripción (las anteriores ya fueron canceladas en
-        // validateActiveSubscriptions)
-        Subscription subscription =
-                Subscription.builder()
-                        .user(user)
-                        .type(subscriptionType)
-                        .startDate(LocalDateTime.now())
-                        .expirationDate(LocalDateTime.now().plusDays(30))
-                        .state(State.PENDING)
-                        .mercadoPagoPreapproval(preapproval)
-                        .isAutoRenewable(true)
-                        .createdAt(LocalDateTime.now())
-                        .updatedAt(LocalDateTime.now())
-                        .build();
+        Subscription subscription = existingSubscriptionOpt.orElseGet(Subscription::new);
 
-        subscription = masterSubscriptionRepository.save(subscription);
+        subscription.setUser(user);
+        subscription.setType(subscriptionType);
+        subscription.setStartDate(LocalDateTime.now());
+        subscription.setExpirationDate(LocalDateTime.now().plusDays(30));
+        subscription.setState(State.PENDING);
+        subscription.setMercadoPagoPreapproval(preapproval);
+        subscription.setIsAutoRenewable(true);
+        subscription.setUpdatedAt(LocalDateTime.now());
 
-        log.info(
-                "Nueva suscripción creada para usuario: {}, ID: {}, tipo: {}",
-                user.getEmail(),
-                subscription.getId(),
-                subscriptionType);
+        // Si es una nueva fila, asignar createdAt
+        if (subscription.getCreatedAt() == null) {
+            subscription.setCreatedAt(LocalDateTime.now());
+        }
 
-        // Actualizar la referencia bidireccional
+        masterSubscriptionRepository.save(subscription);
+
+        // Relación bidireccional
         preapproval.setSubscription(subscription);
         masterMercadoPagoPreapprovalRepository.save(preapproval);
+
+        log.info(
+                "Suscripción actualizada o creada para usuario: {}, tipo: {}, ID: {}",
+                user.getEmail(),
+                subscriptionType,
+                subscription.getId());
     }
 }

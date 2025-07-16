@@ -36,4 +36,10 @@ public class ChatHistoryController implements ChatHistoryResource {
         List<ChatHistoryDTO> history = chatService.getHistoryByConversationId(conversationId);
         return new ResponseEntity<>(ApiResponse.ok("Historial obtenido correctamente", history, request.getRequestURI()), HttpStatus.OK);
     }
+
+    @DeleteMapping("/delete/{conversationId}")
+    public ResponseEntity<?> deleteHistory(@PathVariable String conversationId) {
+        chatService.removeChatHistoryByConversationId(conversationId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

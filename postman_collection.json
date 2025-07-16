@@ -30,7 +30,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"model\": \"OPENAI\",\n  \"conversationId\": \"\",\n  \"prompt\": \"Elabora un informe detallado en un archivo PDF de mis transacciones y presupuestos, en el cual evalues del 1 al 10 mi salud financiera\"\n}"
+									"raw": "{\n  \"model\": \"OPENAI\",\n  \"conversationId\": \"conv_42fd74ff21bc\",\n  \"prompt\": \"Elabora un informe detallado en un archivo PDF de mis transacciones y presupuestos, en el cual evalues del 1 al 10 mi salud financiera\"\n}\n"
 								},
 								"url": {
 									"raw": "{{base_url_chat}}/v1/chat",
@@ -165,7 +165,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url_chat}}/v1/chat/history/{{conversation_id}}",
+									"raw": "{{base_url_chat}}/v1/chat/history/conv_42fd74ff21bc",
 									"host": [
 										"{{base_url_chat}}"
 									],
@@ -173,7 +173,34 @@
 										"v1",
 										"chat",
 										"history",
-										"{{conversation_id}}"
+										"conv_42fd74ff21bc"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Chat History",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_chat}}/v1/chat/history/delete/conv_42fd74ff21bc",
+									"host": [
+										"{{base_url_chat}}"
+									],
+									"path": [
+										"v1",
+										"chat",
+										"history",
+										"delete",
+										"conv_42fd74ff21bc"
 									]
 								}
 							},
@@ -227,7 +254,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url_chat}}/v1/reports/download/a3955251-3727-4fdf-ac90-55b46e646691",
+									"raw": "{{base_url_chat}}/v1/reports/download/d63452b4-66ea-43cc-ab67-def7dcc2795e",
 									"host": [
 										"{{base_url_chat}}"
 									],
@@ -235,7 +262,7 @@
 										"v1",
 										"reports",
 										"download",
-										"a3955251-3727-4fdf-ac90-55b46e646691"
+										"d63452b4-66ea-43cc-ab67-def7dcc2795e"
 									]
 								}
 							},
@@ -354,6 +381,79 @@
 										"subscription",
 										"3c6183ee17d4492db87e133d47afee0e",
 										"payment-history"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "📌 Excel",
+					"item": [
+						{
+							"name": "Export Excel",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/excel/export",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"excel",
+										"export"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Import Excel",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"description": "File",
+											"type": "file",
+											"src": "/home/yeferson/Descargas/finanzas.xlsx"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/excel/import",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"excel",
+										"import"
 									]
 								}
 							},
@@ -559,7 +659,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "[\n  { \"name\": \"Gasolina\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Gasolina\", \"description\": \"Tanqueada semanal\", \"type\": \"EXPENSE\" }, \"amount\": 80.00 },\n  { \"name\": \"Salario\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Salario\", \"description\": \"Pago mensual salario\", \"type\": \"INCOME\" }, \"amount\": 3000.00 },\n  { \"name\": \"Comida\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Comida\", \"description\": \"Compras supermercado\", \"type\": \"EXPENSE\" }, \"amount\": 120.50 },\n  { \"name\": \"Freelance\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Freelance\", \"description\": \"Proyecto freelance\", \"type\": \"INCOME\" }, \"amount\": 750.00 },\n  { \"name\": \"Entretenimiento\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Entretenimiento\", \"description\": \"Suscripciones\", \"type\": \"EXPENSE\" }, \"amount\": 35.99 },\n  { \"name\": \"Bonificación\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Bonificación\", \"description\": \"Bono trimestral\", \"type\": \"INCOME\" }, \"amount\": 500.00 },\n  { \"name\": \"Transporte\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Transporte\", \"description\": \"Uber y buses\", \"type\": \"EXPENSE\" }, \"amount\": 60.00 },\n  { \"name\": \"Renta\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Renta\", \"description\": \"Pago mensual de arriendo\", \"type\": \"EXPENSE\" }, \"amount\": 900.00 },\n  { \"name\": \"Intereses\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Intereses\", \"description\": \"Rendimientos de inversión\", \"type\": \"INCOME\" }, \"amount\": 200.00 },\n  { \"name\": \"Gimnasio\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Gimnasio\", \"description\": \"Membresía mensual\", \"type\": \"EXPENSE\" }, \"amount\": 45.00 },\n  { \"name\": \"Salario\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Salario\", \"description\": \"Pago mensual salario\", \"type\": \"INCOME\" }, \"amount\": 3100.00 },\n  { \"name\": \"Café\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Café\", \"description\": \"Café diario\", \"type\": \"EXPENSE\" }, \"amount\": 60.00 },\n  { \"name\": \"Regalías\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Regalías\", \"description\": \"Ingresos pasivos\", \"type\": \"INCOME\" }, \"amount\": 120.00 },\n  { \"name\": \"Servicios\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Servicios\", \"description\": \"Agua, luz, internet\", \"type\": \"EXPENSE\" }, \"amount\": 200.00 },\n  { \"name\": \"Ventas\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Ventas\", \"description\": \"Ingreso por ventas\", \"type\": \"INCOME\" }, \"amount\": 650.00 },\n  { \"name\": \"Restaurante\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Restaurante\", \"description\": \"Salidas a comer\", \"type\": \"EXPENSE\" }, \"amount\": 90.00 },\n  { \"name\": \"Intereses\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Intereses\", \"description\": \"Ganancia de inversión\", \"type\": \"INCOME\" }, \"amount\": 210.00 },\n  { \"name\": \"Ropa\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Ropa\", \"description\": \"Compras personales\", \"type\": \"EXPENSE\" }, \"amount\": 130.00 },\n  { \"name\": \"Salario\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Salario\", \"description\": \"Pago mensual salario\", \"type\": \"INCOME\" }, \"amount\": 3050.00 },\n  { \"name\": \"Farmacia\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Farmacia\", \"description\": \"Medicamentos\", \"type\": \"EXPENSE\" }, \"amount\": 40.00 },\n  { \"name\": \"Freelance\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Freelance\", \"description\": \"Proyecto independiente\", \"type\": \"INCOME\" }, \"amount\": 680.00 },\n  { \"name\": \"Entretenimiento\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Entretenimiento\", \"description\": \"Netflix y Spotify\", \"type\": \"EXPENSE\" }, \"amount\": 30.00 },\n  { \"name\": \"Bonificación\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Bonificación\", \"description\": \"Bono anual\", \"type\": \"INCOME\" }, \"amount\": 800.00 },\n  { \"name\": \"Gasolina\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Gasolina\", \"description\": \"Llenado de tanque\", \"type\": \"EXPENSE\" }, \"amount\": 70.00 },\n  { \"name\": \"Regalías\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Regalías\", \"description\": \"Ingreso pasivo mensual\", \"type\": \"INCOME\" }, \"amount\": 180.00 },\n  { \"name\": \"Compras\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Compras\", \"description\": \"Amazon y tiendas\", \"type\": \"EXPENSE\" }, \"amount\": 220.00 },\n  { \"name\": \"Renta\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Renta\", \"description\": \"Pago mensual vivienda\", \"type\": \"EXPENSE\" }, \"amount\": 920.00 },\n  { \"name\": \"Ventas\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Ventas\", \"description\": \"Ventas online\", \"type\": \"INCOME\" }, \"amount\": 450.00 },\n  { \"name\": \"Café\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Café\", \"description\": \"Capuccino diario\", \"type\": \"EXPENSE\" }, \"amount\": 45.00 },\n  { \"name\": \"Intereses\", \"categoryId\": null, \"budgetId\": null, \"debtId\": null, \"description\": { \"name\": \"Intereses\", \"description\": \"Retorno de inversión\", \"type\": \"INCOME\" }, \"amount\": 190.00 }\n]\n"
+									"raw": "[\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Gasolina\",\n    \"description\": {\n      \"description\": \"Tanqueada semanal\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 80.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Salario\",\n    \"description\": {\n      \"description\": \"Pago mensual salario\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 3000.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Comida\",\n    \"description\": {\n      \"description\": \"Compras supermercado\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 120.5\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Freelance\",\n    \"description\": {\n      \"description\": \"Proyecto freelance\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 750.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Entretenimiento\",\n    \"description\": {\n      \"description\": \"Suscripciones\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 35.99\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Bonificación\",\n    \"description\": {\n      \"description\": \"Bono trimestral\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 500.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Transporte\",\n    \"description\": {\n      \"description\": \"Uber y buses\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 60.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Renta\",\n    \"description\": {\n      \"description\": \"Pago mensual de arriendo\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 900.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Intereses\",\n    \"description\": {\n      \"description\": \"Rendimientos de inversión\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 200.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Gimnasio\",\n    \"description\": {\n      \"description\": \"Membresía mensual\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 45.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Salario\",\n    \"description\": {\n      \"description\": \"Pago mensual salario\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 3100.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Café\",\n    \"description\": {\n      \"description\": \"Café diario\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 60.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Regalías\",\n    \"description\": {\n      \"description\": \"Ingresos pasivos\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 120.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Servicios\",\n    \"description\": {\n      \"description\": \"Agua, luz, internet\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 200.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Ventas\",\n    \"description\": {\n      \"description\": \"Ingreso por ventas\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 650.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Restaurante\",\n    \"description\": {\n      \"description\": \"Salidas a comer\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 90.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Intereses\",\n    \"description\": {\n      \"description\": \"Ganancia de inversión\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 210.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Ropa\",\n    \"description\": {\n      \"description\": \"Compras personales\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 130.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Salario\",\n    \"description\": {\n      \"description\": \"Pago mensual salario\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 3050.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Farmacia\",\n    \"description\": {\n      \"description\": \"Medicamentos\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 40.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Freelance\",\n    \"description\": {\n      \"description\": \"Proyecto independiente\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 680.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Entretenimiento\",\n    \"description\": {\n      \"description\": \"Netflix y Spotify\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 30.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Bonificación\",\n    \"description\": {\n      \"description\": \"Bono anual\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 800.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Gasolina\",\n    \"description\": {\n      \"description\": \"Llenado de tanque\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 70.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Regalías\",\n    \"description\": {\n      \"description\": \"Ingreso pasivo mensual\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 180.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Compras\",\n    \"description\": {\n      \"description\": \"Amazon y tiendas\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 220.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Renta\",\n    \"description\": {\n      \"description\": \"Pago mensual vivienda\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 920.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Ventas\",\n    \"description\": {\n      \"description\": \"Ventas online\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 450.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Café\",\n    \"description\": {\n      \"description\": \"Capuccino diario\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 45.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Intereses\",\n    \"description\": {\n      \"description\": \"Retorno de inversión\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 190.0\n  }\n]\n"
 								},
 								"url": {
 									"raw": "{{base_url}}/v1/transaction/batch/add",
@@ -2041,7 +2141,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"nameOrEmail\": \"Exzidi\",\n    \"password\": \"newPassword123\"\n}"
+									"raw": "{\n    \"nameOrEmail\": \"Exzidi\",\n    \"password\": \"password123\"\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/v1/profile/login",
@@ -2688,6 +2788,14 @@
 							"response": []
 						}
 					]
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
 				}
 			]
 		}

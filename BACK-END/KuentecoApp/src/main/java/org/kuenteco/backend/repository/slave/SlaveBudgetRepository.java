@@ -2,7 +2,6 @@ package org.kuenteco.backend.repository.slave;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.kuenteco.backend.dto.logic.budget.BudgetSummaryDTO;
 import org.kuenteco.backend.dto.logic.budget.BudgetVsActualDTO;
 import org.kuenteco.backend.entity.Budget;

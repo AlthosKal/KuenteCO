@@ -6,6 +6,7 @@ import static org.kuenteco.backend.service.user.SendgridServiceImpl.verification
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -129,28 +130,30 @@ public class ProfileServiceImpl implements ProfileService {
 
         if (roleList == RoleList.ROLE_PROFILE) {
             throw new ProfileException("Endpoint solo disponible para usuarios");
+        } else if (Objects.equals(email, dto.getEmail())) {
+            throw new ProfileException("No puedes registrar un perfil con tú correo");
         }
         User user =
                 slaveUserRepository
                         .findByEmail(email)
                         .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
+        if (user.getType().equals(UserType.PERSONAL)) {
+            throw new ProfileException(
+                    "Los usuarios con cuenta personal no pueden registrar perfiles");
+        } else if (existsByProfileName(dto.getUsername(), user))
+            throw new ProfileException("Cuenta con este nombre ya existente");
+
         Subscription subscription =
                 slaveSubscriptionRepository
                         .findByUser(user)
                         .orElseThrow(
                                 () -> new IllegalArgumentException("Subscription no encontrada"));
-        if (slaveProfileRepository.count() > 3 && subscription.getType() == SubscriptionType.FREE) {
+        if (slaveProfileRepository.count() > 3
+                && subscription.getType() == SubscriptionType.BASIC) {
             throw new ProfileException(
                     "No puedes registrar mas de 3 perfiles, tienes que actualizar tu plan de subscripción");
         }
-
-        if (user.getType().equals(UserType.PERSONAL)) {
-            throw new ProfileException(
-                    "Los usuarios con cuenta personal no pueden registrar perfiles");
-        } else if (existsByProfileName(dto.getUsername()))
-            throw new ProfileException("Cuenta con este nombre ya existente");
-
         log.info("Registrando nuevo perfil {}", dto.getEmail());
 
         Role role =
@@ -183,7 +186,7 @@ public class ProfileServiceImpl implements ProfileService {
                 slaveUserRepository
                         .findByEmail(email)
                         .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-        if (existsByProfileName(dto.getUsername()))
+        if (existsByProfileName(dto.getUsername(),user))
             throw new ProfileException("Cuenta con este nombre ya existente");
         log.info("Actualizando nuevo perfil {}", dto.getEmail());
 
@@ -261,7 +264,7 @@ public class ProfileServiceImpl implements ProfileService {
         return findByNameOrEmail(nameOrEmail);
     }
 
-    public boolean existsByProfileName(String username) {
-        return slaveProfileRepository.existsByUsername(username);
+    public boolean existsByProfileName(String username, User user) {
+        return slaveProfileRepository.existsByUsernameAndUser(username, user);
     }
 }

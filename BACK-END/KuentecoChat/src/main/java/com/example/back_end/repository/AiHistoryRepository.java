@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AiHistoryRepository extends MongoRepository<ChatHistory, String> {
     List<ChatHistory> findByConversationId(String conversationId);
-
     List<ChatHistory> findByEmail(String email);
+    void removeChatHistoriesByConversationId(String conversationId);
 }

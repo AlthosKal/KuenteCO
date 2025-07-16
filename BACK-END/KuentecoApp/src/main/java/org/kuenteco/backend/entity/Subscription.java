@@ -18,8 +18,8 @@ public class Subscription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "id_user", unique = true)
+    @OneToOne
+    @JoinColumn(name = "id_user")
     private User user;
 
     @Enumerated(EnumType.STRING)

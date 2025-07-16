@@ -159,7 +159,7 @@ public class AuthServiceImpl implements AuthService {
                             Subscription.builder()
                                     .user(savedUser) // ← Ahora el user tiene ID
                                     .state(State.INACTIVE)
-                                    .type(SubscriptionType.FREE)
+                                    .type(SubscriptionType.BASIC)
                                     .build();
 
                     // TERCERO: Guardar la subscription

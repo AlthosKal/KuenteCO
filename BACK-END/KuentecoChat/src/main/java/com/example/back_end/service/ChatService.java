@@ -18,4 +18,6 @@ public interface ChatService {
     List<ChatHistoryDTO> getHistoryByConversationId(String conversationId);
 
     List<ChatHistoryDTO> getAllConversationsOfAuthenticatedUser(HttpServletRequest request);
+
+    void removeChatHistoryByConversationId(String conversationId);
 }

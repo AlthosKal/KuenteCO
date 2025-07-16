@@ -28,5 +28,6 @@ public interface SlaveCategoryRepository extends JpaRepository<Category, Integer
             nativeQuery = true)
     List<TransactionsByCategoryDTO> getTransactionsByCategoryAndUserEmail(
             @Param("email") String email);
+
     Optional<Category> getCategoryByUserAndId(User user, Integer id);
 }

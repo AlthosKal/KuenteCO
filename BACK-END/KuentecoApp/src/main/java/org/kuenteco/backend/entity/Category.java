@@ -23,7 +23,7 @@ public class Category {
     @JoinColumn(name = "id_user", nullable = false)
     private User user;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id_budget")
     private Budget budget;
 

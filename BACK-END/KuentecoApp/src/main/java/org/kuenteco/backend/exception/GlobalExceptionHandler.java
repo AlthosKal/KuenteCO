@@ -306,4 +306,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }
+
+    @ExceptionHandler(ExcelException.class)
+    public ResponseEntity<ApiResponse<Void>> handleExcelException(
+            ExcelException ex, HttpServletRequest request) {
+        log.error("Error general del servicio de Excel: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
+    }
 }
