@@ -217,7 +217,7 @@ public class ExcelServiceImpl implements ExcelService {
         categories.forEach(
                 category -> {
                     Row row = sheet.createRow(rowIdx.getAndIncrement());
-                    row.createCell(0).setCellValue(category.getDescription().getName());
+                    row.createCell(0).setCellValue(category.getName());
                     row.createCell(1)
                             .setCellValue(
                                     category.getDescription().getAssignedBudget().doubleValue());
@@ -447,12 +447,12 @@ public class ExcelServiceImpl implements ExcelService {
                                         validateDateCellAsString(row, 4, "Fecha de Finalización");
 
                                 DescriptionCategory description =
-                                        new DescriptionCategory(
-                                                name, assignedBudget, State.valueOf(stateStr));
+                                        new DescriptionCategory(assignedBudget, State.valueOf(stateStr));
 
                                 Category category =
                                         Category.builder()
                                                 .user(user)
+                                                .name(name)
                                                 .description(description)
                                                 .startDate(
                                                         LocalDate.parse(startStr, formatter)

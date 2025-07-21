@@ -13,6 +13,7 @@ import org.kuenteco.backend.entity.extra.DescriptionCategory;
 public class CategoryDTO {
     @Positive private Integer id;
     @Positive private Integer budgetId;
+    private String name;
     private DescriptionCategory description;
     private LocalDateTime startDate;
     private LocalDateTime finishDate;

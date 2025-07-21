@@ -65,7 +65,7 @@ public class CategoryEnrollmentServiceImpl implements CategoryEnrollmentService 
         String email = credentials.email();
         RoleList role = credentials.role();
 
-        if (role == RoleList.ROLE_PROFILE) {
+        if (role == RoleList.ROLE_USER) {
             throw new CategoryException("Endpoint solo disponible para usuarios");
         }
         List<CategoryEnrollmentSummaryDTO> dto =

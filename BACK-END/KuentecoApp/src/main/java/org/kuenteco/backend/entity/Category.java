@@ -27,6 +27,8 @@ public class Category {
     @JoinColumn(name = "id_budget")
     private Budget budget;
 
+    private String name;
+
     @Type(JsonBinaryType.class)
     @Column(columnDefinition = "jsonb")
     private DescriptionCategory description;

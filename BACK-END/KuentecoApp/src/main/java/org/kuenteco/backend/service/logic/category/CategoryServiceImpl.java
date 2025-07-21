@@ -170,7 +170,7 @@ public class CategoryServiceImpl implements CategoryService {
                         .getCategoryByUserAndId(user, dto.getId())
                         .orElseThrow(() -> new CategoryException("Categoría no encontrada: "));
         updateCategoryMapper.toEntity(dto);
-        resolveBudget(dto.getBudgetId(), category);
+        resolveCategory(dto.getBudgetId(), category);
         log.info("Actualizando la categoria para: {}", email);
         masterCategoryRepository.save(category);
     }
@@ -236,20 +236,21 @@ public class CategoryServiceImpl implements CategoryService {
 
     private Category prepareNewCategory(NewCategoryDTO dto) {
         Category category = newCategoryMapper.toEntity(dto);
-        resolveBudget(dto.getBudgetId(), category);
+        resolveCategory(dto.getBudgetId(), category);
         return category;
     }
 
-    private void resolveBudget(Integer budgetId, Category category) {
-        if (budgetId != null) {
+    private void resolveCategory(Integer categoryId, Category category) {
+        if (categoryId != null) {
             category.setBudget(
                     slaveBudgetRepository
-                            .findById(budgetId)
+                            .findById(categoryId)
                             .orElseThrow(
                                     () ->
                                             new CategoryException(
                                                     "Budget no encontrado por el Id: "
-                                                            + budgetId)));
+                                                            + categoryId)));
         }
+        category.setBudget(null);
     }
 }
