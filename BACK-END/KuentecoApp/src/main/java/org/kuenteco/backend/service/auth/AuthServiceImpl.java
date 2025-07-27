@@ -116,7 +116,7 @@ public class AuthServiceImpl implements AuthService {
         String jwt = jwtUtil.generateToken(authResult);
         cookieService.addHttpOnlyCookie("jwt", jwt, 7 * 24 * 60 * 60, response);
 
-        return new TokenResponseDTO(jwt, user.getRole().getName().toString());
+        return new TokenResponseDTO(jwt, user.getType());
     }
 
     @Override
