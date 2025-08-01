@@ -16,8 +16,8 @@ public class NewCategoryDTO {
     @Positive(message = "El ID del presupuesto debe ser un número positivo")
     private Integer budgetId;
 
-    @NotNull
-    private String name;
+    @NotNull private String name;
+
     @Valid
     @NotNull(message = "La descripción de la categoría es requerida")
     private DescriptionCategory description;

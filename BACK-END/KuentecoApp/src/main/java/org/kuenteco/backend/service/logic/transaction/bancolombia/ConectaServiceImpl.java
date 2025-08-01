@@ -12,7 +12,10 @@ import org.kuenteco.backend.config.properties.BancolombiaProperties;
 import org.kuenteco.backend.dto.logic.transaction.bancolombia.BancolombiaTransactionRequestDTO;
 import org.kuenteco.backend.dto.logic.transaction.bancolombia.response.TransactionalInfoResponse;
 import org.kuenteco.backend.enums.RoleList;
-import org.kuenteco.backend.exception.exceptions.*;
+import org.kuenteco.backend.exception.exceptions.BancolombiaApiException;
+import org.kuenteco.backend.exception.exceptions.BancolombiaAuthenticationException;
+import org.kuenteco.backend.exception.exceptions.BancolombiaTimeoutException;
+import org.kuenteco.backend.exception.exceptions.TransactionException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -148,6 +151,62 @@ public class ConectaServiceImpl implements ConectaService {
             }
             throw new BancolombiaApiException(
                     "Error inesperado al consultar transacciones", 500, e);
+        }
+    }
+
+    @Override
+    public boolean checkHealthStatus() {
+        log.info("Verificando estado de salud del servicio de información transaccional");
+
+        try {
+            // El endpoint de health usa HEAD method y no requiere autenticación OAuth2
+            // Solo requiere el header X-IBM-Client-Id según la documentación
+            apiWebClient
+                    .head()
+                    .uri(
+                            uriBuilder ->
+                                    uriBuilder
+                                            .path(
+                                                    props.getSandbox()
+                                                            .getApi()
+                                                            .getEndpoints()
+                                                            .getHealth())
+                                            .build())
+                    // Según la documentación, el health check usa API key authentication
+                    .header("client-id", props.getSandbox().getAuth().getClientId())
+                    .retrieve()
+                    .toBodilessEntity()
+                    .timeout(Duration.ofSeconds(10)) // Timeout más corto para health check
+                    .onErrorMap(
+                            TimeoutException.class,
+                            ex ->
+                                    new BancolombiaTimeoutException(
+                                            "Timeout al verificar health status", ex))
+                    .onErrorMap(
+                            WebClientResponseException.class,
+                            ex -> {
+                                // Para health check, logeamos pero no lanzamos excepción
+                                log.warn("Health check falló con status: {}", ex.getStatusCode());
+                                return ex;
+                            })
+                    .block();
+
+            log.info("Health check exitoso - Servicio disponible");
+            return true;
+
+        } catch (BancolombiaTimeoutException e) {
+            log.error("Timeout en health check: {}", e.getMessage());
+            return false;
+        } catch (WebClientResponseException e) {
+            // Cualquier respuesta HTTP diferente a 2xx indica servicio no disponible
+            log.warn(
+                    "Health check falló - Status: {}, Mensaje: {}",
+                    e.getStatusCode(),
+                    e.getMessage());
+            return false;
+        } catch (Exception e) {
+            log.error("Error inesperado en health check: {}", e.getMessage(), e);
+            return false;
         }
     }
 }

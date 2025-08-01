@@ -203,7 +203,7 @@ FROM
         LEFT JOIN category_enrollment ce ON c.id = ce.id_category
 GROUP BY
     c.id,
-    c.description->>'name',
+    c.name,
     c.id_user,
     c.start_date,
     c.finish_date

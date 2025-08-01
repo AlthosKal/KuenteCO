@@ -3,8 +3,9 @@ package org.kuenteco.backend.controller.logic.transaction;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.kuenteco.backend.dto.logic.transaction.bancolombia.BancolombiaTransactionRequestDTO;
 import org.kuenteco.backend.dto.logic.transaction.kuenteco.NewTransactionDTO;
@@ -59,6 +60,23 @@ public class TransactionController {
                         result,
                         request.getRequestURI()),
                 HttpStatus.OK);
+    }
+
+    @GetMapping("/bancolombia/health")
+    public ResponseEntity<?> checkHealth() {
+        boolean isHealthy = conectaService.checkHealthStatus();
+
+        Map<String, Object> response =
+                Map.of(
+                        "status",
+                        isHealthy ? "UP" : "DOWN",
+                        "service",
+                        "bancolombia-transactional-info",
+                        "timestamp",
+                        LocalDateTime.now());
+
+        return ResponseEntity.status(isHealthy ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE)
+                .body(response);
     }
 
     @Operation(

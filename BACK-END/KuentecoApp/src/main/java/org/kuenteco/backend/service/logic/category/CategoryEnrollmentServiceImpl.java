@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.dto.logic.category.CategoryEnrollmentDTO;
-import org.kuenteco.backend.dto.logic.category.CategoryEnrollmentSummaryDTO;
+import org.kuenteco.backend.dto.logic.category.CategoryEnrollmentProjection;
 import org.kuenteco.backend.entity.Category;
 import org.kuenteco.backend.entity.CategoryEnrollment;
 import org.kuenteco.backend.entity.Profile;
@@ -65,10 +65,10 @@ public class CategoryEnrollmentServiceImpl implements CategoryEnrollmentService 
         String email = credentials.email();
         RoleList role = credentials.role();
 
-        if (role == RoleList.ROLE_USER) {
+        if (role == RoleList.ROLE_PROFILE) {
             throw new CategoryException("Endpoint solo disponible para usuarios");
         }
-        List<CategoryEnrollmentSummaryDTO> dto =
+        List<CategoryEnrollmentProjection> dto =
                 slaveCategoryEnrollmentRepository.findCategoryEnrollmentsByUserEmail(email);
         if (dto.isEmpty()) {
             return "No tienes Perfiles con Categorías asociadas";

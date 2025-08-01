@@ -1,7 +1,7 @@
 package org.kuenteco.backend.repository.slave;
 
 import java.util.List;
-import org.kuenteco.backend.dto.logic.category.CategoryEnrollmentSummaryDTO;
+import org.kuenteco.backend.dto.logic.category.CategoryEnrollmentProjection;
 import org.kuenteco.backend.entity.CategoryEnrollment;
 import org.kuenteco.backend.entity.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,6 +25,6 @@ public interface SlaveCategoryEnrollmentRepository
         WHERE v.owner_user_id = (SELECT id FROM kuentecouser WHERE email = :email)
         """,
             nativeQuery = true)
-    List<CategoryEnrollmentSummaryDTO> findCategoryEnrollmentsByUserEmail(
+    List<CategoryEnrollmentProjection> findCategoryEnrollmentsByUserEmail(
             @Param("email") String email);
 }

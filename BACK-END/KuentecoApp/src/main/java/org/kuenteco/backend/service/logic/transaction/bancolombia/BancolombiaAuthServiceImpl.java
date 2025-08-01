@@ -9,12 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.config.properties.BancolombiaProperties;
 import org.kuenteco.backend.dto.logic.transaction.bancolombia.response.TokenResponseDTO;
 import org.kuenteco.backend.entity.BancolombiaToken;
-import org.kuenteco.backend.exception.exceptions.BancolombiaApiException;
-import org.kuenteco.backend.exception.exceptions.BancolombiaAuthenticationException;
-import org.kuenteco.backend.exception.exceptions.BancolombiaAuthorizationException;
-import org.kuenteco.backend.exception.exceptions.BancolombiaException;
-import org.kuenteco.backend.exception.exceptions.BancolombiaRateLimitException;
-import org.kuenteco.backend.exception.exceptions.BancolombiaTimeoutException;
+import org.kuenteco.backend.exception.exceptions.*;
 import org.kuenteco.backend.repository.master.MasterBancolombiaTokenRepository;
 import org.kuenteco.backend.repository.slave.SlaveBancolombiaTokenRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -97,7 +92,6 @@ public class BancolombiaAuthServiceImpl implements BancolombiaAuthService {
                                                             props.getSandbox()
                                                                     .getAuth()
                                                                     .getTokenUrlBasePath())
-                                                    .path("/token")
                                                     .build())
                             .header("Authorization", basicAuth)
                             // 🔧 CORRECCIÓN: Agregar X-IBM-Client-Secret

@@ -85,7 +85,7 @@ public class ProfileServiceImpl implements ProfileService {
         String jwt = jwtUtil.generateToken(authResult);
         cookieService.addHttpOnlyCookie("jwt", jwt, 7 * 24 * 60 * 60, response);
 
-        return new TokenResponseDTO(jwt,"PROFILE");
+        return new TokenResponseDTO(jwt, "PROFILE");
     }
 
     @Override
@@ -186,7 +186,7 @@ public class ProfileServiceImpl implements ProfileService {
                 slaveUserRepository
                         .findByEmail(email)
                         .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-        if (existsByProfileName(dto.getUsername(),user))
+        if (existsByProfileName(dto.getUsername(), user))
             throw new ProfileException("Cuenta con este nombre ya existente");
         log.info("Actualizando nuevo perfil {}", dto.getEmail());
 

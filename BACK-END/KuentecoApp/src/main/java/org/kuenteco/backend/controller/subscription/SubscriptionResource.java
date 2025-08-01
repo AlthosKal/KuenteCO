@@ -16,7 +16,10 @@ import org.kuenteco.backend.dto.subscription.response.PaymentHistoryResponseDTO;
 import org.kuenteco.backend.dto.subscription.response.SubscriptionResponseDTO;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "Subscription", description = "API para la gestión de suscripciones con Mercado Pago")
 public interface SubscriptionResource {

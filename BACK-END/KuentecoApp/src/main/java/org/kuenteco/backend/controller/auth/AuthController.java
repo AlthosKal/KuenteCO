@@ -132,9 +132,9 @@ public class AuthController implements AuthResource {
                 HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) throws IOException {
-        userService.deleteUser(new DeleteUserDTO(id));
+    @DeleteMapping()
+    public ResponseEntity<?> delete() throws IOException {
+        userService.deleteUser();
         return ResponseEntity.noContent().build();
     }
 

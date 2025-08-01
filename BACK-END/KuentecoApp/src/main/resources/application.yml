@@ -37,11 +37,15 @@ bancolombia:
       token-url-base-path: /public-bancolombia/sb/security/oauth-provider/oauth2/token
       client-id: ${BANCOLOMBIA_CLIENT_ID}
       client-secret: ${BANCOLOMBIA_CLIENT_SECRET}
-      scope: transactional-information
+      scope: "Device:write:app"  # Scope corregido según documentación
     api:
-      base-path: /public-bancolombia/sb/v1/operations/cross-product/account-management/transaction-engine/transactional-information/information
+      # Base path corregido - removido el path específico del endpoint
+      base-path: /public-bancolombia/sb/v1/operations/cross-product/account-management/transaction-engine/transactional-information
       endpoints:
-        transactions: /retrieve/transactional/info
+        # Endpoint corregido para obtener información transaccional
+        transactions: /information/retrieve/transactional/info
+        # Endpoint para health check
+        health: /information/retrieve/transactional/info/health
       timeout-seconds: 45
       max-retries: 5
     ssl:

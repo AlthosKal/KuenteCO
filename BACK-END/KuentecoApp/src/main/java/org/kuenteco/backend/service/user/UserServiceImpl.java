@@ -10,6 +10,7 @@ import org.kuenteco.backend.dto.auth.DeleteUserDTO;
 import org.kuenteco.backend.dto.auth.UserDetailDTO;
 import org.kuenteco.backend.entity.Subscription;
 import org.kuenteco.backend.entity.User;
+import org.kuenteco.backend.entity.extra.Image;
 import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.mapper.auth.UserDetailMapper;
@@ -83,16 +84,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(DeleteUserDTO deleteUserDTOid) throws IOException {
+    public void deleteUser() throws IOException {
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
         User user =
                 slaveUserRepository
-                        .findById(deleteUserDTOid.getId())
+                        .findByEmail(email)
                         .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-        if (user.getImage() != null) {
+        Image image = user.getImage();
+
+        masterUserRepository.delete(user);
+
+        if (image != null) {
             imageService.removeImage(user.getImage());
         }
 
-        masterUserRepository.delete(user);
     }
 }

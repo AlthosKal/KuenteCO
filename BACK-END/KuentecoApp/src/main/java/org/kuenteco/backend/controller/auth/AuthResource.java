@@ -467,7 +467,7 @@ public interface AuthResource {
                                         type = "string",
                                         example = "123e4567-e89b-12d3-a456-426614174000"))
             })
-    ResponseEntity<?> delete(@PathVariable String id) throws IOException;
+    ResponseEntity<?> delete() throws IOException;
 
     @Operation(
             description = "Carga una nueva imagen de perfil para el usuario autenticado",

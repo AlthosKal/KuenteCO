@@ -50,6 +50,8 @@ public class BancolombiaProperties {
         public static class Endpoints {
             /** Sólo la parte final, p. ej. "/retrieve/transactional/info" */
             private String transactions;
+
+            private String health;
         }
     }
 
