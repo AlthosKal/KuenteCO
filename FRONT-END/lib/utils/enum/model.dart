@@ -1,1 +1,0 @@
-enum Model { OPENAI, DEEPSEEK }
