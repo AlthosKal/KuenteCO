@@ -1,0 +1,320 @@
+.
+├── Dockerfile
+├── DOM.txt
+├── HELP.md
+├── mvnw
+├── mvnw.cmd
+├── pom.xml
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── com
+│   │   │       └── example
+│   │   │           └── back_end
+│   │   │               ├── configuration
+│   │   │               │   ├── ia
+│   │   │               │   │   ├── AiConfiguration.java
+│   │   │               │   │   └── CachingConfiguration.java
+│   │   │               │   └── security
+│   │   │               │       ├── JwtRequestFilter.java
+│   │   │               │       ├── JwtUtil.java
+│   │   │               │       └── SecurityConfiguration.java
+│   │   │               ├── connector
+│   │   │               │   ├── config
+│   │   │               │   │   ├── EndpointConfiguration.java
+│   │   │               │   │   ├── HostConfiguration.java
+│   │   │               │   │   ├── HttpConnectorConfiguration.java
+│   │   │               │   │   └── KuentecoEndpoint.java
+│   │   │               │   ├── KuentecoAppConnector.java
+│   │   │               │   └── rest
+│   │   │               │       ├── budget
+│   │   │               │       │   ├── BudgetDTO.java
+│   │   │               │       │   ├── BudgetSummaryDTO.java
+│   │   │               │       │   └── BudgetVsActualDTO.java
+│   │   │               │       ├── category
+│   │   │               │       │   ├── CategoryDTO.java
+│   │   │               │       │   ├── CategoryEnrollmentDTO.java
+│   │   │               │       │   ├── CategoryEnrollmentSummaryDTO.java
+│   │   │               │       │   ├── CategoryReportDTO.java
+│   │   │               │       │   ├── DescriptionCategory.java
+│   │   │               │       │   └── TransactionsByCategoryDTO.java
+│   │   │               │       ├── debt
+│   │   │               │       │   ├── DebtDTO.java
+│   │   │               │       │   └── DebtSummaryDTO.java
+│   │   │               │       └── transaction
+│   │   │               │           ├── DescriptionTransaction.java
+│   │   │               │           ├── GetTransactionDTO.java
+│   │   │               │           ├── ProfileWithTransactionsDTO.java
+│   │   │               │           ├── TransactionDetailDTO.java
+│   │   │               │           ├── TransactionResponseWrapper.java
+│   │   │               │           ├── TransactionSummaryDTO.java
+│   │   │               │           └── UserProfilesWithTransactionsDTO.java
+│   │   │               ├── controller
+│   │   │               │   ├── ChatController.java
+│   │   │               │   ├── ChatHistoryController.java
+│   │   │               │   ├── DocumentationController.java
+│   │   │               │   ├── ModelController.java
+│   │   │               │   └── resource
+│   │   │               │       ├── ChatHistoryResource.java
+│   │   │               │       ├── ChatResource.java
+│   │   │               │       └── ModelResource.java
+│   │   │               ├── dto
+│   │   │               │   ├── request
+│   │   │               │   │   ├── ChatDTO.java
+│   │   │               │   │   ├── ChatFilesDTO.java
+│   │   │               │   │   ├── ChatHistoryDTO.java
+│   │   │               │   │   ├── ChatMultipartDTO.java
+│   │   │               │   │   ├── CustomUserDetailsDTO.java
+│   │   │               │   │   └── ErrorDTO.java
+│   │   │               │   └── response
+│   │   │               │       ├── ai
+│   │   │               │       │   ├── BaseDynamicResponseDTO.java
+│   │   │               │       │   ├── ChartDataResponseDTO.java
+│   │   │               │       │   ├── DebtAnalysisResponseDTO.java
+│   │   │               │       │   ├── DebtRiskAnalysisDTO.java
+│   │   │               │       │   ├── ExpenseReductionResponseDTO.java
+│   │   │               │       │   ├── ExpenseReductionSuggestionDTO.java
+│   │   │               │       │   ├── FinancialHealthResponseDTO.java
+│   │   │               │       │   ├── FinancialHealthScoreDTO.java
+│   │   │               │       │   ├── FinancialProjectionDTO.java
+│   │   │               │       │   ├── FinancialProjectionResponseDTO.java
+│   │   │               │       │   ├── SimpleTextResponseDTO.java
+│   │   │               │       │   └── SpendingPatternResponseDTO.java
+│   │   │               │       ├── CharDataDTO.java
+│   │   │               │       ├── ChatResponseDTO.java
+│   │   │               │       ├── DynamicAnalysisResponseDTO.java
+│   │   │               │       └── StringChatResponseDTO.java
+│   │   │               ├── entity
+│   │   │               │   └── ChatHistory.java
+│   │   │               ├── enums
+│   │   │               │   ├── ApiError.java
+│   │   │               │   ├── Model.java
+│   │   │               │   ├── ResponseType.java
+│   │   │               │   ├── StateDebt.java
+│   │   │               │   ├── State.java
+│   │   │               │   └── TransactionType.java
+│   │   │               ├── exception
+│   │   │               │   ├── AiProfileException.java
+│   │   │               │   ├── ApiResponse.java
+│   │   │               │   └── GlobalExceptionHandler.java
+│   │   │               ├── KuentecoChatApplication.java
+│   │   │               ├── mapper
+│   │   │               │   ├── ChatHistoryMapper.java
+│   │   │               │   └── TransactionMapper.java
+│   │   │               ├── repository
+│   │   │               │   └── AiHistoryRepository.java
+│   │   │               ├── service
+│   │   │               │   ├── ChatServiceImpl.java
+│   │   │               │   ├── ChatService.java
+│   │   │               │   ├── factory
+│   │   │               │   │   └── DynamicResponseFactory.java
+│   │   │               │   ├── functions
+│   │   │               │   │   ├── AnalyzeDebtRiskFunction.java
+│   │   │               │   │   ├── AnalyzeUserSpendingPatternsFunction.java
+│   │   │               │   │   ├── BalanceOverTimeFunction.java
+│   │   │               │   │   ├── CalculateFinancialHealthScoreWithBudgetsFunction.java
+│   │   │               │   │   ├── CalculateFinancialHealthScoreWithTransactionsFunction.java
+│   │   │               │   │   ├── CompareFinancialPeriodsFunction.java
+│   │   │               │   │   ├── ConversationIdService.java
+│   │   │               │   │   ├── FinancialStatementFunction.java
+│   │   │               │   │   ├── IncomesAndExpensesByPeriodFunction.java
+│   │   │               │   │   ├── ProjectFinancialBalanceFunction.java
+│   │   │               │   │   └── SuggestExpenseReductionsFunction.java
+│   │   │               │   ├── report
+│   │   │               │   ├── ResponseTypeDetectorServiceImpl.java
+│   │   │               │   └── ResponseTypeDetectorService.java
+│   │   │               └── util
+│   │   │                   └── KuentecoChatUtil.java
+│   │   └── resources
+│   │       ├── application.yml
+│   │       ├── banner.txt
+│   │       └── prompts
+│   │           └── ai_prompt_template.txt
+│   └── test
+│       └── java
+│           └── com
+│               └── example
+│                   └── back_end
+│                       └── AiProfileChat
+│                           └── AiProfileChatApplicationTests.java
+└── target
+    ├── classes
+    │   ├── application.yml
+    │   ├── banner.txt
+    │   ├── com
+    │   │   └── example
+    │   │       └── back_end
+    │   │           ├── configuration
+    │   │           │   ├── ia
+    │   │           │   │   ├── AiConfiguration.class
+    │   │           │   │   └── CachingConfiguration.class
+    │   │           │   └── security
+    │   │           │       ├── JwtRequestFilter.class
+    │   │           │       ├── JwtUtil.class
+    │   │           │       └── SecurityConfiguration.class
+    │   │           ├── connector
+    │   │           │   ├── config
+    │   │           │   │   ├── EndpointConfiguration.class
+    │   │           │   │   ├── HostConfiguration.class
+    │   │           │   │   ├── HttpConnectorConfiguration.class
+    │   │           │   │   └── KuentecoEndpoint.class
+    │   │           │   ├── KuentecoAppConnector$1.class
+    │   │           │   ├── KuentecoAppConnector.class
+    │   │           │   └── rest
+    │   │           │       ├── budget
+    │   │           │       │   ├── BudgetDTO.class
+    │   │           │       │   ├── BudgetSummaryDTO$BudgetSummaryDTOBuilder.class
+    │   │           │       │   ├── BudgetSummaryDTO.class
+    │   │           │       │   ├── BudgetVsActualDTO$BudgetVsActualDTOBuilder.class
+    │   │           │       │   └── BudgetVsActualDTO.class
+    │   │           │       ├── category
+    │   │           │       │   ├── CategoryDTO.class
+    │   │           │       │   ├── CategoryEnrollmentDTO.class
+    │   │           │       │   ├── CategoryEnrollmentSummaryDTO$CategoryEnrollmentSummaryDTOBuilder.class
+    │   │           │       │   ├── CategoryEnrollmentSummaryDTO.class
+    │   │           │       │   ├── CategoryReportDTO$CategoryReportDTOBuilder.class
+    │   │           │       │   ├── CategoryReportDTO.class
+    │   │           │       │   ├── DescriptionCategory.class
+    │   │           │       │   ├── TransactionsByCategoryDTO$TransactionsByCategoryDTOBuilder.class
+    │   │           │       │   └── TransactionsByCategoryDTO.class
+    │   │           │       ├── debt
+    │   │           │       │   ├── DebtDTO.class
+    │   │           │       │   ├── DebtSummaryDTO$DebtSummaryDTOBuilder.class
+    │   │           │       │   └── DebtSummaryDTO.class
+    │   │           │       └── transaction
+    │   │           │           ├── DescriptionTransaction.class
+    │   │           │           ├── GetTransactionDTO.class
+    │   │           │           ├── ProfileWithTransactionsDTO$ProfileWithTransactionsDTOBuilder.class
+    │   │           │           ├── ProfileWithTransactionsDTO.class
+    │   │           │           ├── TransactionDetailDTO.class
+    │   │           │           ├── TransactionResponseWrapper$ResponseType.class
+    │   │           │           ├── TransactionResponseWrapper.class
+    │   │           │           ├── TransactionSummaryDTO$TransactionSummaryDTOBuilder.class
+    │   │           │           ├── TransactionSummaryDTO.class
+    │   │           │           ├── UserProfilesWithTransactionsDTO$UserProfilesWithTransactionsDTOBuilder.class
+    │   │           │           └── UserProfilesWithTransactionsDTO.class
+    │   │           ├── controller
+    │   │           │   ├── ChatController.class
+    │   │           │   ├── ChatHistoryController.class
+    │   │           │   ├── DocumentationController.class
+    │   │           │   ├── ModelController.class
+    │   │           │   └── resource
+    │   │           │       ├── ChatHistoryResource.class
+    │   │           │       ├── ChatResource.class
+    │   │           │       └── ModelResource.class
+    │   │           ├── dto
+    │   │           │   ├── request
+    │   │           │   │   ├── ChatDTO.class
+    │   │           │   │   ├── ChatFilesDTO.class
+    │   │           │   │   ├── ChatHistoryDTO$ChatHistoryDTOBuilder.class
+    │   │           │   │   ├── ChatHistoryDTO.class
+    │   │           │   │   ├── ChatMultipartDTO.class
+    │   │           │   │   ├── CustomUserDetailsDTO.class
+    │   │           │   │   └── ErrorDTO.class
+    │   │           │   └── response
+    │   │           │       ├── ai
+    │   │           │       │   ├── BaseDynamicResponseDTO.class
+    │   │           │       │   ├── ChartDataResponseDTO.class
+    │   │           │       │   ├── DebtAnalysisResponseDTO.class
+    │   │           │       │   ├── DebtRiskAnalysisDTO.class
+    │   │           │       │   ├── ExpenseReductionResponseDTO.class
+    │   │           │       │   ├── ExpenseReductionSuggestionDTO.class
+    │   │           │       │   ├── FinancialHealthResponseDTO.class
+    │   │           │       │   ├── FinancialHealthScoreDTO.class
+    │   │           │       │   ├── FinancialProjectionDTO.class
+    │   │           │       │   ├── FinancialProjectionResponseDTO.class
+    │   │           │       │   ├── SimpleTextResponseDTO.class
+    │   │           │       │   └── SpendingPatternResponseDTO.class
+    │   │           │       ├── CharDataDTO.class
+    │   │           │       ├── ChatResponseDTO.class
+    │   │           │       ├── DynamicAnalysisResponseDTO.class
+    │   │           │       └── StringChatResponseDTO.class
+    │   │           ├── entity
+    │   │           │   ├── ChatHistory$ChatHistoryBuilder.class
+    │   │           │   └── ChatHistory.class
+    │   │           ├── enums
+    │   │           │   ├── ApiError.class
+    │   │           │   ├── Model.class
+    │   │           │   ├── ResponseType.class
+    │   │           │   ├── State.class
+    │   │           │   ├── StateDebt.class
+    │   │           │   └── TransactionType.class
+    │   │           ├── exception
+    │   │           │   ├── AiProfileException.class
+    │   │           │   ├── ApiResponse$ApiResponseBuilder.class
+    │   │           │   ├── ApiResponse.class
+    │   │           │   └── GlobalExceptionHandler.class
+    │   │           ├── KuentecoChatApplication.class
+    │   │           ├── mapper
+    │   │           │   ├── ChatHistoryMapper.class
+    │   │           │   ├── ChatHistoryMapperImpl.class
+    │   │           │   ├── TransactionMapper.class
+    │   │           │   └── TransactionMapperImpl.class
+    │   │           ├── repository
+    │   │           │   └── AiHistoryRepository.class
+    │   │           ├── service
+    │   │           │   ├── ChatService.class
+    │   │           │   ├── ChatServiceImpl$1.class
+    │   │           │   ├── ChatServiceImpl.class
+    │   │           │   ├── factory
+    │   │           │   │   └── DynamicResponseFactory.class
+    │   │           │   ├── functions
+    │   │           │   │   ├── AnalyzeDebtRiskFunction$1.class
+    │   │           │   │   ├── AnalyzeDebtRiskFunction$Request.class
+    │   │           │   │   ├── AnalyzeDebtRiskFunction.class
+    │   │           │   │   ├── AnalyzeUserSpendingPatternsFunction$Request.class
+    │   │           │   │   ├── AnalyzeUserSpendingPatternsFunction.class
+    │   │           │   │   ├── BalanceOverTimeFunction$1.class
+    │   │           │   │   ├── BalanceOverTimeFunction$Request.class
+    │   │           │   │   ├── BalanceOverTimeFunction.class
+    │   │           │   │   ├── CalculateFinancialHealthScoreWithBudgetsFunction$1.class
+    │   │           │   │   ├── CalculateFinancialHealthScoreWithBudgetsFunction$Request.class
+    │   │           │   │   ├── CalculateFinancialHealthScoreWithBudgetsFunction.class
+    │   │           │   │   ├── CalculateFinancialHealthScoreWithTransactionsFunction$Request.class
+    │   │           │   │   ├── CalculateFinancialHealthScoreWithTransactionsFunction.class
+    │   │           │   │   ├── CompareFinancialPeriodsFunction$1.class
+    │   │           │   │   ├── CompareFinancialPeriodsFunction$Request.class
+    │   │           │   │   ├── CompareFinancialPeriodsFunction.class
+    │   │           │   │   ├── ConversationIdService.class
+    │   │           │   │   ├── FinancialStatementFunction$1.class
+    │   │           │   │   ├── FinancialStatementFunction$Request.class
+    │   │           │   │   ├── FinancialStatementFunction.class
+    │   │           │   │   ├── IncomesAndExpensesByPeriodFunction$1.class
+    │   │           │   │   ├── IncomesAndExpensesByPeriodFunction$Request.class
+    │   │           │   │   ├── IncomesAndExpensesByPeriodFunction.class
+    │   │           │   │   ├── ProjectFinancialBalanceFunction$1.class
+    │   │           │   │   ├── ProjectFinancialBalanceFunction$Request.class
+    │   │           │   │   ├── ProjectFinancialBalanceFunction.class
+    │   │           │   │   ├── SuggestExpenseReductionsFunction$1.class
+    │   │           │   │   ├── SuggestExpenseReductionsFunction$Request.class
+    │   │           │   │   └── SuggestExpenseReductionsFunction.class
+    │   │           │   ├── ResponseTypeDetectorService.class
+    │   │           │   └── ResponseTypeDetectorServiceImpl.class
+    │   │           └── util
+    │   │               └── KuentecoChatUtil.class
+    │   └── prompts
+    │       └── ai_prompt_template.txt
+    ├── generated-sources
+    │   └── annotations
+    │       └── com
+    │           └── example
+    │               └── back_end
+    │                   └── mapper
+    │                       ├── ChatHistoryMapperImpl.java
+    │                       └── TransactionMapperImpl.java
+    ├── generated-test-sources
+    │   └── test-annotations
+    ├── maven-status
+    │   └── maven-compiler-plugin
+    │       └── compile
+    │           └── default-compile
+    │               ├── createdFiles.lst
+    │               └── inputFiles.lst
+    └── test-classes
+        └── com
+            └── example
+                └── back_end
+                    └── AiProfileChat
+                        └── AiProfileChatApplicationTests.class
+
+89 directories, 229 files

@@ -1,7 +1,7 @@
 package org.kuenteco.backend.mapper.logic.transaction;
 
 import java.util.List;
-import org.kuenteco.backend.dto.logic.transaction.TransactionDetailDTO;
+import org.kuenteco.backend.dto.logic.transaction.kuenteco.TransactionDetailDTO;
 import org.kuenteco.backend.entity.Transaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

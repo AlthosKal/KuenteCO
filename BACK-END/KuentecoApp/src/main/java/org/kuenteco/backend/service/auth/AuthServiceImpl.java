@@ -11,12 +11,15 @@ import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.config.jwt.JwtUtil;
 import org.kuenteco.backend.dto.auth.*;
 import org.kuenteco.backend.entity.Role;
+import org.kuenteco.backend.entity.Subscription;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.State;
+import org.kuenteco.backend.enums.SubscriptionType;
 import org.kuenteco.backend.exception.exceptions.AuthException;
 import org.kuenteco.backend.mapper.auth.NewUserMapper;
 import org.kuenteco.backend.repository.master.MasterRoleRepository;
+import org.kuenteco.backend.repository.master.MasterSubscriptionRepository;
 import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveRoleRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
@@ -51,6 +54,7 @@ public class AuthServiceImpl implements AuthService {
     private final TransactionTemplate transactionTemplate;
     private final NewUserMapper newUserMapper;
     private final SendgridService sendgridService;
+    private final MasterSubscriptionRepository masterSubscriptionRepository;
 
     @Autowired
     public AuthServiceImpl(
@@ -67,7 +71,8 @@ public class AuthServiceImpl implements AuthService {
             @Qualifier("masterTransactionManager")
                     PlatformTransactionManager masterTransactionManager,
             NewUserMapper newUserMapper,
-            SendgridService sendgridService) {
+            SendgridService sendgridService,
+            MasterSubscriptionRepository masterSubscriptionRepository) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
@@ -86,6 +91,7 @@ public class AuthServiceImpl implements AuthService {
         this.transactionTemplate.setTimeout(30); // 30 segundos
         this.transactionTemplate.setPropagationBehavior(
                 TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        this.masterSubscriptionRepository = masterSubscriptionRepository;
     }
 
     @Override
@@ -110,7 +116,7 @@ public class AuthServiceImpl implements AuthService {
         String jwt = jwtUtil.generateToken(authResult);
         cookieService.addHttpOnlyCookie("jwt", jwt, 7 * 24 * 60 * 60, response);
 
-        return new TokenResponseDTO(jwt, user.getRole().getName().toString());
+        return new TokenResponseDTO(jwt, user.getType());
     }
 
     @Override
@@ -138,16 +144,28 @@ public class AuthServiceImpl implements AuthService {
         // Utilizar transacción explícita para guardar el usuario
         transactionTemplate.execute(
                 status -> {
-
-                    // Nuevo usuario se crea con estado PENDING
+                    // Crear y configurar el usuario
                     User user = newUserMapper.toEntity(dto);
                     user.setPassword(passwordEncoder.encode(dto.getPassword()));
                     user.setRole(masterRole);
                     user.setState(State.PENDING);
-                    user.setVersion(0); // Inicializar versión para bloqueo optimista
+                    user.setVersion(0);
 
-                    masterUserRepository.save(user);
-                    return "Usuarío registrado correctamente";
+                    // PRIMERO: Guardar el usuario para que obtenga su ID
+                    User savedUser = masterUserRepository.save(user);
+
+                    // SEGUNDO: Crear la subscription con el usuario ya persistido
+                    Subscription subscription =
+                            Subscription.builder()
+                                    .user(savedUser) // ← Ahora el user tiene ID
+                                    .state(State.INACTIVE)
+                                    .type(SubscriptionType.BASIC)
+                                    .build();
+
+                    // TERCERO: Guardar la subscription
+                    masterSubscriptionRepository.save(subscription);
+
+                    return "Usuario registrado correctamente";
                 });
 
         // Enviar código de verificación automáticamente

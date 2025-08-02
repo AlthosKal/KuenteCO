@@ -18,6 +18,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Controlador REST para la gestión de autenticación y operaciones de usuario.
+ *
+ * <p>Este controlador maneja todas las operaciones relacionadas con: - Autenticación de usuarios
+ * (login/logout) - Registro de nuevos usuarios - Verificación de códigos por email - Cambio de
+ * contraseñas - Gestión de imágenes de perfil - Eliminación de usuarios
+ *
+ * @author KuenteCO Team
+ * @version 1.0
+ * @since 2024
+ */
 @Slf4j
 @RestController
 @RequestMapping("/v1/auth")
@@ -121,9 +132,9 @@ public class AuthController implements AuthResource {
                 HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) throws IOException {
-        userService.deleteUser(new DeleteUserDTO(id));
+    @DeleteMapping()
+    public ResponseEntity<?> delete() throws IOException {
+        userService.deleteUser();
         return ResponseEntity.noContent().build();
     }
 

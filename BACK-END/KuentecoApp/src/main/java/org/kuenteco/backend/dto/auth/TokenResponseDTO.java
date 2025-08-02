@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TokenResponseDTO {
+public class TokenResponseDTO<T> {
     private String token;
-    private String role;
+    private T type;
 }

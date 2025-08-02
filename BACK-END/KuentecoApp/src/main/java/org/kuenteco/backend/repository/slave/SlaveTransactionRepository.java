@@ -1,7 +1,6 @@
 package org.kuenteco.backend.repository.slave;
 
 import java.util.List;
-import org.kuenteco.backend.dto.logic.transaction.TransactionSummaryDTO;
 import org.kuenteco.backend.entity.Category;
 import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.Transaction;
@@ -24,10 +23,26 @@ public interface SlaveTransactionRepository extends JpaRepository<Transaction, I
     @Query(
             value =
                     """
-    SELECT v.* FROM vw_transactions_summary v
+    SELECT
+        v.owner_user_id,
+        v.transaction_owner_type,
+        v.id_profile,
+        v.transaction_name,
+        v.category_name,
+        v.budget_name,
+        v.debt_name,
+        v.transaction_count,
+        v.income_count,
+        v.expense_count,
+        v.total_income,
+        v.total_expenses,
+        v.net_amount,
+        v.first_transaction_date,
+        v.last_transaction_date
+    FROM vw_transactions_summary v
     JOIN kuentecouser u ON v.owner_user_id = u.id
     WHERE u.email = :email
     """,
             nativeQuery = true)
-    List<TransactionSummaryDTO> findAllTransactionsSummaries(@Param("email") String email);
+    List<Object[]> findAllTransactionsSummariesRaw(@Param("email") String email);
 }

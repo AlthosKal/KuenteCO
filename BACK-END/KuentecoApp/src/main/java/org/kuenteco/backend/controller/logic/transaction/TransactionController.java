@@ -1,25 +1,45 @@
 package org.kuenteco.backend.controller.logic.transaction;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
-import org.kuenteco.backend.dto.logic.transaction.NewTransactionDTO;
-import org.kuenteco.backend.dto.logic.transaction.UpdateTransactionDTO;
+import org.kuenteco.backend.dto.logic.transaction.bancolombia.BancolombiaTransactionRequestDTO;
+import org.kuenteco.backend.dto.logic.transaction.kuenteco.NewTransactionDTO;
+import org.kuenteco.backend.dto.logic.transaction.kuenteco.UpdateTransactionDTO;
 import org.kuenteco.backend.exception.ApiResponse;
-import org.kuenteco.backend.service.logic.transaction.TransactionService;
+import org.kuenteco.backend.service.logic.transaction.bancolombia.ConectaService;
+import org.kuenteco.backend.service.logic.transaction.kuenteco.TransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controlador para gestionar las transacciones de la aplicación.
+ *
+ * <p>Provee endpoints para: - Obtener transacciones - Resúmenes de transacciones - Operaciones de
+ * transacciones desde Bancolombia - Adición, actualización y eliminación de transacciones
+ */
 @RestController
 @RequestMapping("/v1/transaction")
 @AllArgsConstructor
 public class TransactionController {
     private TransactionService transactionService;
+    private ConectaService conectaService;
 
+    @Operation(
+            summary = "Obtener transacciones",
+            description =
+                    "Recupera una lista de transacciones basadas en los parámetros proporcionados")
     @GetMapping
-    public ResponseEntity<?> getTransactions(HttpServletRequest request) {
+    public ResponseEntity<?> getTransactions(
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
         Object result = transactionService.getTransactions();
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -28,7 +48,11 @@ public class TransactionController {
     }
 
     @GetMapping("/report/summary")
-    public ResponseEntity<?> getTransactionSummary(HttpServletRequest request) {
+    public ResponseEntity<?> getTransactionSummary(
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
         Object result = transactionService.getTransactionSummary();
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -38,6 +62,44 @@ public class TransactionController {
                 HttpStatus.OK);
     }
 
+    @GetMapping("/bancolombia/health")
+    public ResponseEntity<?> checkHealth() {
+        boolean isHealthy = conectaService.checkHealthStatus();
+
+        Map<String, Object> response =
+                Map.of(
+                        "status",
+                        isHealthy ? "UP" : "DOWN",
+                        "service",
+                        "bancolombia-transactional-info",
+                        "timestamp",
+                        LocalDateTime.now());
+
+        return ResponseEntity.status(isHealthy ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE)
+                .body(response);
+    }
+
+    @Operation(
+            summary = "Obtener transacciones de Bancolombia",
+            description =
+                    "Genera una URL de archivo con transacciones filtradas por los criterios de Bancolombia")
+    @PostMapping("/bancolombia")
+    public ResponseEntity<?> getBancolombiaTransactions(
+            @Valid @RequestBody BancolombiaTransactionRequestDTO request,
+            HttpServletRequest servletRequest) {
+
+        String fileUrl = conectaService.getTransactionsFromRequest(request);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "URL de archivo de transacciones obtenida",
+                        fileUrl,
+                        servletRequest.getRequestURI()));
+    }
+
+    @Operation(
+            summary = "Agregar nueva transacción",
+            description = "Registra una nueva transacción en el sistema")
     @PostMapping("/add")
     public ResponseEntity<?> addTransaction(
             @Valid @RequestBody NewTransactionDTO dto, HttpServletRequest request) {
@@ -60,6 +122,9 @@ public class TransactionController {
                 HttpStatus.CREATED);
     }
 
+    @Operation(
+            summary = "Actualizar transacción",
+            description = "Actualiza una transacción existente en el sistema")
     @PatchMapping("/update")
     public ResponseEntity<?> updateTransaction(
             @Valid @RequestBody UpdateTransactionDTO dto, HttpServletRequest request) {
@@ -80,6 +145,7 @@ public class TransactionController {
                 HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Eliminar transacción", description = "Elimina una transacción por su ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTransaction(
             @PathVariable Integer id, HttpServletRequest request) {

@@ -16,5 +16,5 @@ public interface UserService {
 
     UserDetailDTO getUserDetails();
 
-    void deleteUser(DeleteUserDTO deleteUserDTO) throws IOException;
+    void deleteUser() throws IOException;
 }

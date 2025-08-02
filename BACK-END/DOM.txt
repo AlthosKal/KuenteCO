@@ -1,0 +1,1159 @@
+.
+├── DOM.txt
+├── KuentecoApp
+│   ├── Dockerfile
+│   ├── HELP.md
+│   ├── KuentecoApp.iml
+│   ├── logs
+│   │   ├── api_reservations-error.log
+│   │   ├── api_reservations.log
+│   │   ├── KuenteCO-error.log
+│   │   └── KuenteCO.log
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   ├── README.md
+│   ├── src
+│   │   └── main
+│   │       ├── java
+│   │       │   └── org
+│   │       │       └── kuenteco
+│   │       │           └── backend
+│   │       │               ├── BackEndApplication.java
+│   │       │               ├── config
+│   │       │               │   ├── api
+│   │       │               │   │   ├── CloudinaryConfig.java
+│   │       │               │   │   ├── MercadoPagoConfiguration.java
+│   │       │               │   │   └── WebClientConfig.java
+│   │       │               │   ├── database
+│   │       │               │   │   ├── FlywayMigrationInitializer.java
+│   │       │               │   │   ├── MasterDataSourceConfig.java
+│   │       │               │   │   └── SlaveDataSourceConfig.java
+│   │       │               │   ├── jwt
+│   │       │               │   │   ├── AuthCredentials.java
+│   │       │               │   │   ├── AuthenticatedUser.java
+│   │       │               │   │   ├── JwtAuthenticationFilter.java
+│   │       │               │   │   ├── JwtEntryPoint.java
+│   │       │               │   │   └── JwtUtil.java
+│   │       │               │   ├── properties
+│   │       │               │   │   └── BancolombiaProperties.java
+│   │       │               │   └── security
+│   │       │               │       └── SecurityConfig.java
+│   │       │               ├── controller
+│   │       │               │   ├── auth
+│   │       │               │   │   ├── AuthController.java
+│   │       │               │   │   └── AuthResource.java
+│   │       │               │   ├── DocumentationOpenApi.java
+│   │       │               │   ├── logic
+│   │       │               │   │   ├── budget
+│   │       │               │   │   │   ├── BudgetController.java
+│   │       │               │   │   │   └── BudgetResource.java
+│   │       │               │   │   ├── category
+│   │       │               │   │   │   ├── CategoryController.java
+│   │       │               │   │   │   └── CategoryResource.java
+│   │       │               │   │   ├── debt
+│   │       │               │   │   │   ├── DebtController.java
+│   │       │               │   │   │   └── DebtResource.java
+│   │       │               │   │   ├── excel
+│   │       │               │   │   │   └── ExcelController.java
+│   │       │               │   │   ├── exchange_rate
+│   │       │               │   │   │   ├── ExchangeRateController.java
+│   │       │               │   │   │   └── ExchangeRateResource.java
+│   │       │               │   │   └── transaction
+│   │       │               │   │       ├── TransactionController.java
+│   │       │               │   │       └── TransactionResource.java
+│   │       │               │   ├── notification
+│   │       │               │   │   ├── NotificationController.java
+│   │       │               │   │   └── NotificationResource.java
+│   │       │               │   ├── profile
+│   │       │               │   │   ├── ProfileController.java
+│   │       │               │   │   └── ProfileResource.java
+│   │       │               │   └── subscription
+│   │       │               │       ├── SubscriptionController.java
+│   │       │               │       └── SubscriptionResource.java
+│   │       │               ├── dto
+│   │       │               │   ├── auth
+│   │       │               │   │   ├── ChangePasswordDTO.java
+│   │       │               │   │   ├── DeleteUserDTO.java
+│   │       │               │   │   ├── LoginDTO.java
+│   │       │               │   │   ├── NewUserDTO.java
+│   │       │               │   │   ├── RoleDetailDTO.java
+│   │       │               │   │   ├── SendVerificationCodeDTO.java
+│   │       │               │   │   ├── TokenResponseDTO.java
+│   │       │               │   │   ├── UserDetailDTO.java
+│   │       │               │   │   └── ValidateVerificationCodeDTO.java
+│   │       │               │   ├── image
+│   │       │               │   │   └── ImageDTO.java
+│   │       │               │   ├── logic
+│   │       │               │   │   ├── budget
+│   │       │               │   │   │   ├── BudgetDTO.java
+│   │       │               │   │   │   ├── BudgetEnrollmentDTO.java
+│   │       │               │   │   │   ├── BudgetSummaryDTO.java
+│   │       │               │   │   │   ├── BudgetVsActualDTO.java
+│   │       │               │   │   │   └── NewBudgetDTO.java
+│   │       │               │   │   ├── category
+│   │       │               │   │   │   ├── CategoryDTO.java
+│   │       │               │   │   │   ├── CategoryEnrollmentDTO.java
+│   │       │               │   │   │   ├── CategoryEnrollmentSummaryDTO.java
+│   │       │               │   │   │   ├── CategoryReportDTO.java
+│   │       │               │   │   │   ├── NewCategoryDTO.java
+│   │       │               │   │   │   └── TransactionsByCategoryDTO.java
+│   │       │               │   │   ├── debt
+│   │       │               │   │   │   ├── DebtDTO.java
+│   │       │               │   │   │   ├── DebtPaymentDTO.java
+│   │       │               │   │   │   ├── DebtSummaryDTO.java
+│   │       │               │   │   │   └── NewDebtDTO.java
+│   │       │               │   │   ├── exchange_rate
+│   │       │               │   │   │   ├── ConvertCurrencyRequestDTO.java
+│   │       │               │   │   │   ├── ConvertCurrencyResponseDTO.java
+│   │       │               │   │   │   └── ExchangeRateDTO.java
+│   │       │               │   │   └── transaction
+│   │       │               │   │       ├── bancolombia
+│   │       │               │   │       │   ├── BancolombiaTransactionRequestDTO.java
+│   │       │               │   │       │   └── response
+│   │       │               │   │       │       ├── extra
+│   │       │               │   │       │       │   ├── Data.java
+│   │       │               │   │       │       │   ├── Identification.java
+│   │       │               │   │       │       │   ├── Meta.java
+│   │       │               │   │       │       │   └── ThirdParty.java
+│   │       │               │   │       │       ├── TokenResponseDTO.java
+│   │       │               │   │       │       └── TransactionalInfoResponse.java
+│   │       │               │   │       └── kuenteco
+│   │       │               │   │           ├── NewTransactionDTO.java
+│   │       │               │   │           ├── ProfileWithTransactionsDTO.java
+│   │       │               │   │           ├── TransactionDetailDTO.java
+│   │       │               │   │           ├── TransactionSummaryDTO.java
+│   │       │               │   │           ├── UpdateTransactionDTO.java
+│   │       │               │   │           └── UserProfilesWithTransactionsDTO.java
+│   │       │               │   ├── notification
+│   │       │               │   │   ├── NotificationDTO.java
+│   │       │               │   │   └── NotificationPreferencesDTO.java
+│   │       │               │   ├── profile
+│   │       │               │   │   ├── NewProfileDTO.java
+│   │       │               │   │   ├── ProfileDetailDTO.java
+│   │       │               │   │   └── UpdateProfileDTO.java
+│   │       │               │   └── subscription
+│   │       │               │       ├── request
+│   │       │               │       │   └── CreateSubscriptionRequestDTO.java
+│   │       │               │       ├── response
+│   │       │               │       │   ├── CreateSubscriptionResponseDTO.java
+│   │       │               │       │   ├── PaymentHistoryResponseDTO.java
+│   │       │               │       │   └── SubscriptionResponseDTO.java
+│   │       │               │       └── SubscriptionPriceConfigDTO.java
+│   │       │               ├── entity
+│   │       │               │   ├── BancolombiaToken.java
+│   │       │               │   ├── BudgetEnrollment.java
+│   │       │               │   ├── Budget.java
+│   │       │               │   ├── CategoryEnrollment.java
+│   │       │               │   ├── Category.java
+│   │       │               │   ├── Debt.java
+│   │       │               │   ├── extra
+│   │       │               │   │   ├── ContentNotification.java
+│   │       │               │   │   ├── DescriptionCategory.java
+│   │       │               │   │   ├── DescriptionTransaction.java
+│   │       │               │   │   ├── ExchangeRate.java
+│   │       │               │   │   └── Image.java
+│   │       │               │   ├── MercadoPagoPayment.java
+│   │       │               │   ├── MercadoPagoPreapproval.java
+│   │       │               │   ├── Notification.java
+│   │       │               │   ├── Profile.java
+│   │       │               │   ├── Role.java
+│   │       │               │   ├── Subscription.java
+│   │       │               │   ├── Transaction.java
+│   │       │               │   └── User.java
+│   │       │               ├── enums
+│   │       │               │   ├── PaymentStatus.java
+│   │       │               │   ├── PreapprovalStatus.java
+│   │       │               │   ├── RoleList.java
+│   │       │               │   ├── StateDebt.java
+│   │       │               │   ├── State.java
+│   │       │               │   ├── SubscriptionType.java
+│   │       │               │   ├── TransactionType.java
+│   │       │               │   └── UserType.java
+│   │       │               ├── exception
+│   │       │               │   ├── ApiResponse.java
+│   │       │               │   ├── exceptions
+│   │       │               │   │   ├── AuthException.java
+│   │       │               │   │   ├── BancolombiaApiException.java
+│   │       │               │   │   ├── BancolombiaAuthenticationException.java
+│   │       │               │   │   ├── BancolombiaAuthorizationException.java
+│   │       │               │   │   ├── BancolombiaConfigurationException.java
+│   │       │               │   │   ├── BancolombiaException.java
+│   │       │               │   │   ├── BancolombiaRateLimitException.java
+│   │       │               │   │   ├── BancolombiaTimeoutException.java
+│   │       │               │   │   ├── BudgetException.java
+│   │       │               │   │   ├── CategoryException.java
+│   │       │               │   │   ├── DebtException.java
+│   │       │               │   │   ├── ExcelException.java
+│   │       │               │   │   ├── ExchangeRateException.java
+│   │       │               │   │   ├── MercadoPagoException.java
+│   │       │               │   │   ├── NotificationException.java
+│   │       │               │   │   ├── ProfileException.java
+│   │       │               │   │   ├── SendgridException.java
+│   │       │               │   │   ├── SubscriptionMercadoPagoException.java
+│   │       │               │   │   ├── SubscriptionPriceException.java
+│   │       │               │   │   └── TransactionException.java
+│   │       │               │   └── GlobalExceptionHandler.java
+│   │       │               ├── job
+│   │       │               │   └── TokenMaintenanceJob.java
+│   │       │               ├── mapper
+│   │       │               │   ├── auth
+│   │       │               │   │   ├── NewUserMapper.java
+│   │       │               │   │   ├── RoleDetailMapper.java
+│   │       │               │   │   └── UserDetailMapper.java
+│   │       │               │   ├── image
+│   │       │               │   │   └── ImageMapper.java
+│   │       │               │   ├── logic
+│   │       │               │   │   ├── budget
+│   │       │               │   │   │   ├── BudgetDetailMapper.java
+│   │       │               │   │   │   ├── BudgetEnrollmentMapper.java
+│   │       │               │   │   │   ├── NewBudgetMapper.java
+│   │       │               │   │   │   └── UpdateBudgetMapper.java
+│   │       │               │   │   ├── category
+│   │       │               │   │   │   ├── CategoryDetailMapper.java
+│   │       │               │   │   │   ├── CategoryEnrollmentMapper.java
+│   │       │               │   │   │   ├── CategoryReportMapper.java
+│   │       │               │   │   │   ├── NewCategoryMapper.java
+│   │       │               │   │   │   └── UpdateCategoryMapper.java
+│   │       │               │   │   ├── debt
+│   │       │               │   │   │   ├── DebtDetailMapper.java
+│   │       │               │   │   │   ├── debtsByStateMapper.java
+│   │       │               │   │   │   ├── NewDebtMapper.java
+│   │       │               │   │   │   └── UpdateDebtMapper.java
+│   │       │               │   │   ├── exchange_rate
+│   │       │               │   │   │   └── ExchangeRateMapper.java
+│   │       │               │   │   └── transaction
+│   │       │               │   │       ├── NewTransactionMapper.java
+│   │       │               │   │       ├── ProfileWithTransactionsMapper.java
+│   │       │               │   │       ├── TransactionDetailMapper.java
+│   │       │               │   │       ├── TransactionSummaryMapper.java
+│   │       │               │   │       └── UpdateTransactionMapper.java
+│   │       │               │   ├── NotificationMapper.java
+│   │       │               │   ├── profile
+│   │       │               │   │   ├── NewProfileMapper.java
+│   │       │               │   │   ├── ProfileDetailMapper.java
+│   │       │               │   │   └── UpdateProfileMapper.java
+│   │       │               │   └── subscription
+│   │       │               │       ├── MercadoPagoPaymentMapper.java
+│   │       │               │       └── MercadoPagoPreapprovalMapper.java
+│   │       │               ├── repository
+│   │       │               │   ├── master
+│   │       │               │   │   ├── MasterBancolombiaTokenRepository.java
+│   │       │               │   │   ├── MasterBudgetEnrollmentRepository.java
+│   │       │               │   │   ├── MasterBudgetRepository.java
+│   │       │               │   │   ├── MasterCategoryEnrollmentRepository.java
+│   │       │               │   │   ├── MasterCategoryRepository.java
+│   │       │               │   │   ├── MasterDebtRepository.java
+│   │       │               │   │   ├── MasterExchangeRateRepository.java
+│   │       │               │   │   ├── MasterImageRepository.java
+│   │       │               │   │   ├── MasterMercadoPagoPreapprovalRepository.java
+│   │       │               │   │   ├── MasterProfileRepository.java
+│   │       │               │   │   ├── MasterRoleRepository.java
+│   │       │               │   │   ├── MasterSubscriptionRepository.java
+│   │       │               │   │   ├── MasterTransactionRepository.java
+│   │       │               │   │   └── MasterUserRepository.java
+│   │       │               │   └── slave
+│   │       │               │       ├── SlaveBancolombiaTokenRepository.java
+│   │       │               │       ├── SlaveBudgetEnrollmentRepository.java
+│   │       │               │       ├── SlaveBudgetRepository.java
+│   │       │               │       ├── SlaveCategoryEnrollmentRepository.java
+│   │       │               │       ├── SlaveCategoryRepository.java
+│   │       │               │       ├── SlaveDebtRepository.java
+│   │       │               │       ├── SlaveExchangeRateRepository.java
+│   │       │               │       ├── SlaveMercadoPagoPaymentRepository.java
+│   │       │               │       ├── SlaveMercadoPagoPreapprovalRepository.java
+│   │       │               │       ├── SlaveNotificationRepository.java
+│   │       │               │       ├── SlaveProfileRepository.java
+│   │       │               │       ├── SlaveRoleRepository.java
+│   │       │               │       ├── SlaveSubscriptionRepository.java
+│   │       │               │       ├── SlaveTransactionRepository.java
+│   │       │               │       └── SlaveUserRepository.java
+│   │       │               ├── service
+│   │       │               │   ├── auth
+│   │       │               │   │   ├── AuthServiceImpl.java
+│   │       │               │   │   ├── AuthService.java
+│   │       │               │   │   ├── CookieServiceImpl.java
+│   │       │               │   │   ├── CookieService.java
+│   │       │               │   │   ├── TokenBlacklistServiceImpl.java
+│   │       │               │   │   └── TokenBlacklistService.java
+│   │       │               │   ├── image
+│   │       │               │   │   ├── CloudinaryServiceImpl.java
+│   │       │               │   │   ├── CloudinaryService.java
+│   │       │               │   │   ├── ImageServiceImpl.java
+│   │       │               │   │   └── ImageService.java
+│   │       │               │   ├── logic
+│   │       │               │   │   ├── budget
+│   │       │               │   │   │   ├── BudgetEnrollmentServiceImpl.java
+│   │       │               │   │   │   ├── BudgetEnrollmentService.java
+│   │       │               │   │   │   ├── BudgetServiceImpl.java
+│   │       │               │   │   │   └── BudgetService.java
+│   │       │               │   │   ├── category
+│   │       │               │   │   │   ├── CategoryEnrollmentServiceImpl.java
+│   │       │               │   │   │   ├── CategoryEnrollmentService.java
+│   │       │               │   │   │   ├── CategoryServiceImpl.java
+│   │       │               │   │   │   └── CategoryService.java
+│   │       │               │   │   ├── debt
+│   │       │               │   │   │   ├── DebtServiceImpl.java
+│   │       │               │   │   │   └── DebtService.java
+│   │       │               │   │   ├── excel
+│   │       │               │   │   │   ├── ExcelServiceImpl.java
+│   │       │               │   │   │   ├── ExcelService.java
+│   │       │               │   │   │   └── tool
+│   │       │               │   │   │       └── ExcelValidator.java
+│   │       │               │   │   ├── exchange_rate
+│   │       │               │   │   │   ├── ExchangeRateServiceImpl.java
+│   │       │               │   │   │   └── ExchangeRateService.java
+│   │       │               │   │   └── transaction
+│   │       │               │   │       ├── bancolombia
+│   │       │               │   │       │   ├── BancolombiaAuthServiceImpl.java
+│   │       │               │   │       │   ├── BancolombiaAuthService.java
+│   │       │               │   │       │   ├── ConectaServiceImpl.java
+│   │       │               │   │       │   └── ConectaService.java
+│   │       │               │   │       └── kuenteco
+│   │       │               │   │           ├── TransactionServiceImpl.java
+│   │       │               │   │           └── TransactionService.java
+│   │       │               │   ├── notification
+│   │       │               │   │   ├── NotificationServiceImpl.java
+│   │       │               │   │   └── NotificationService.java
+│   │       │               │   ├── profile
+│   │       │               │   │   ├── ProfileServiceImpl.java
+│   │       │               │   │   └── ProfileService.java
+│   │       │               │   ├── subscription
+│   │       │               │   │   ├── MercadoPagoPaymentServiceImpl.java
+│   │       │               │   │   ├── MercadoPagoPaymentService.java
+│   │       │               │   │   ├── MercadoPagoServiceImpl.java
+│   │       │               │   │   └── MercadoPagoService.java
+│   │       │               │   └── user
+│   │       │               │       ├── SendgridServiceImpl.java
+│   │       │               │       ├── SendgridService.java
+│   │       │               │       ├── UserServiceImpl.java
+│   │       │               │       └── UserService.java
+│   │       │               └── validation
+│   │       │                   ├── CurrencyValidator.java
+│   │       │                   └── ValidCurrency.java
+│   │       └── resources
+│   │           ├── application-master.yml
+│   │           ├── application-slave.yml
+│   │           ├── application.yml
+│   │           ├── banner.txt
+│   │           └── db
+│   │               ├── V1.1__create_logstables.sql
+│   │               ├── V1.2__insert_rows.sql
+│   │               ├── V1.3__create_views.sql
+│   │               ├── V1.4__create_triggers.sql
+│   │               └── V1.5__create_functions.sql
+│   ├── target
+│   │   ├── classes
+│   │   │   ├── application-master.yml
+│   │   │   ├── application-slave.yml
+│   │   │   ├── application.yml
+│   │   │   ├── banner.txt
+│   │   │   ├── db
+│   │   │   │   ├── V1.1__create_logstables.sql
+│   │   │   │   ├── V1.2__insert_rows.sql
+│   │   │   │   ├── V1.3__create_views.sql
+│   │   │   │   ├── V1.4__create_triggers.sql
+│   │   │   │   └── V1.5__create_functions.sql
+│   │   │   └── org
+│   │   │       └── kuenteco
+│   │   │           └── backend
+│   │   │               ├── BackEndApplication.class
+│   │   │               ├── config
+│   │   │               │   ├── api
+│   │   │               │   │   ├── CloudinaryConfig.class
+│   │   │               │   │   ├── MercadoPagoConfiguration.class
+│   │   │               │   │   └── WebClientConfig.class
+│   │   │               │   ├── database
+│   │   │               │   │   ├── FlywayMigrationInitializer.class
+│   │   │               │   │   ├── MasterDataSourceConfig.class
+│   │   │               │   │   └── SlaveDataSourceConfig.class
+│   │   │               │   ├── jwt
+│   │   │               │   │   ├── AuthCredentials.class
+│   │   │               │   │   ├── AuthenticatedUser.class
+│   │   │               │   │   ├── JwtAuthenticationFilter.class
+│   │   │               │   │   ├── JwtEntryPoint.class
+│   │   │               │   │   └── JwtUtil.class
+│   │   │               │   ├── properties
+│   │   │               │   │   ├── BancolombiaProperties$Api$Endpoints.class
+│   │   │               │   │   ├── BancolombiaProperties$Api.class
+│   │   │               │   │   ├── BancolombiaProperties$Auth.class
+│   │   │               │   │   ├── BancolombiaProperties$Sandbox.class
+│   │   │               │   │   ├── BancolombiaProperties$Ssl.class
+│   │   │               │   │   └── BancolombiaProperties.class
+│   │   │               │   └── security
+│   │   │               │       └── SecurityConfig.class
+│   │   │               ├── controller
+│   │   │               │   ├── auth
+│   │   │               │   │   ├── AuthController.class
+│   │   │               │   │   └── AuthResource.class
+│   │   │               │   ├── DocumentationOpenApi.class
+│   │   │               │   ├── logic
+│   │   │               │   │   ├── budget
+│   │   │               │   │   │   ├── BudgetController.class
+│   │   │               │   │   │   └── BudgetResource.class
+│   │   │               │   │   ├── category
+│   │   │               │   │   │   ├── CategoryController.class
+│   │   │               │   │   │   └── CategoryResource.class
+│   │   │               │   │   ├── debt
+│   │   │               │   │   │   ├── DebtController.class
+│   │   │               │   │   │   └── DebtResource.class
+│   │   │               │   │   ├── excel
+│   │   │               │   │   │   └── ExcelController.class
+│   │   │               │   │   ├── exchange_rate
+│   │   │               │   │   │   ├── ExchangeRateController.class
+│   │   │               │   │   │   └── ExchangeRateResource.class
+│   │   │               │   │   └── transaction
+│   │   │               │   │       ├── TransactionController.class
+│   │   │               │   │       └── TransactionResource.class
+│   │   │               │   ├── notification
+│   │   │               │   │   ├── NotificationController.class
+│   │   │               │   │   └── NotificationResource.class
+│   │   │               │   ├── profile
+│   │   │               │   │   ├── ProfileController.class
+│   │   │               │   │   └── ProfileResource.class
+│   │   │               │   └── subscription
+│   │   │               │       ├── SubscriptionController.class
+│   │   │               │       └── SubscriptionResource.class
+│   │   │               ├── dto
+│   │   │               │   ├── auth
+│   │   │               │   │   ├── ChangePasswordDTO.class
+│   │   │               │   │   ├── DeleteUserDTO.class
+│   │   │               │   │   ├── LoginDTO.class
+│   │   │               │   │   ├── NewUserDTO.class
+│   │   │               │   │   ├── RoleDetailDTO.class
+│   │   │               │   │   ├── SendVerificationCodeDTO.class
+│   │   │               │   │   ├── TokenResponseDTO.class
+│   │   │               │   │   ├── UserDetailDTO.class
+│   │   │               │   │   └── ValidateVerificationCodeDTO.class
+│   │   │               │   ├── image
+│   │   │               │   │   └── ImageDTO.class
+│   │   │               │   ├── logic
+│   │   │               │   │   ├── budget
+│   │   │               │   │   │   ├── BudgetDTO.class
+│   │   │               │   │   │   ├── BudgetEnrollmentDTO.class
+│   │   │               │   │   │   ├── BudgetSummaryDTO$BudgetSummaryDTOBuilder.class
+│   │   │               │   │   │   ├── BudgetSummaryDTO.class
+│   │   │               │   │   │   ├── BudgetVsActualDTO$BudgetVsActualDTOBuilder.class
+│   │   │               │   │   │   ├── BudgetVsActualDTO.class
+│   │   │               │   │   │   └── NewBudgetDTO.class
+│   │   │               │   │   ├── category
+│   │   │               │   │   │   ├── CategoryDTO.class
+│   │   │               │   │   │   ├── CategoryEnrollmentDTO.class
+│   │   │               │   │   │   ├── CategoryEnrollmentSummaryDTO$CategoryEnrollmentSummaryDTOBuilder.class
+│   │   │               │   │   │   ├── CategoryEnrollmentSummaryDTO.class
+│   │   │               │   │   │   ├── CategoryReportDTO$CategoryReportDTOBuilder.class
+│   │   │               │   │   │   ├── CategoryReportDTO.class
+│   │   │               │   │   │   ├── NewCategoryDTO.class
+│   │   │               │   │   │   ├── TransactionsByCategoryDTO$TransactionsByCategoryDTOBuilder.class
+│   │   │               │   │   │   └── TransactionsByCategoryDTO.class
+│   │   │               │   │   ├── debt
+│   │   │               │   │   │   ├── DebtDTO.class
+│   │   │               │   │   │   ├── DebtPaymentDTO.class
+│   │   │               │   │   │   ├── DebtSummaryDTO$DebtSummaryDTOBuilder.class
+│   │   │               │   │   │   ├── DebtSummaryDTO.class
+│   │   │               │   │   │   └── NewDebtDTO.class
+│   │   │               │   │   ├── exchange_rate
+│   │   │               │   │   │   ├── ConvertCurrencyRequestDTO$ConvertCurrencyRequestDTOBuilder.class
+│   │   │               │   │   │   ├── ConvertCurrencyRequestDTO.class
+│   │   │               │   │   │   ├── ConvertCurrencyResponseDTO$ConvertCurrencyResponseDTOBuilder.class
+│   │   │               │   │   │   ├── ConvertCurrencyResponseDTO.class
+│   │   │               │   │   │   ├── ExchangeRateDTO$ExchangeRateDTOBuilder.class
+│   │   │               │   │   │   └── ExchangeRateDTO.class
+│   │   │               │   │   └── transaction
+│   │   │               │   │       ├── bancolombia
+│   │   │               │   │       │   ├── BancolombiaTransactionRequestDTO$BancolombiaTransactionRequestDTOBuilder.class
+│   │   │               │   │       │   ├── BancolombiaTransactionRequestDTO.class
+│   │   │               │   │       │   └── response
+│   │   │               │   │       │       ├── extra
+│   │   │               │   │       │       │   ├── Data.class
+│   │   │               │   │       │       │   ├── Identification.class
+│   │   │               │   │       │       │   ├── Meta.class
+│   │   │               │   │       │       │   └── ThirdParty.class
+│   │   │               │   │       │       ├── TokenResponseDTO$TokenResponseDTOBuilder.class
+│   │   │               │   │       │       ├── TokenResponseDTO.class
+│   │   │               │   │       │       └── TransactionalInfoResponse.class
+│   │   │               │   │       └── kuenteco
+│   │   │               │   │           ├── NewTransactionDTO.class
+│   │   │               │   │           ├── ProfileWithTransactionsDTO$ProfileWithTransactionsDTOBuilder.class
+│   │   │               │   │           ├── ProfileWithTransactionsDTO.class
+│   │   │               │   │           ├── TransactionDetailDTO.class
+│   │   │               │   │           ├── TransactionSummaryDTO$TransactionSummaryDTOBuilder.class
+│   │   │               │   │           ├── TransactionSummaryDTO.class
+│   │   │               │   │           ├── UpdateTransactionDTO.class
+│   │   │               │   │           ├── UserProfilesWithTransactionsDTO$UserProfilesWithTransactionsDTOBuilder.class
+│   │   │               │   │           └── UserProfilesWithTransactionsDTO.class
+│   │   │               │   ├── notification
+│   │   │               │   │   ├── NotificationDTO.class
+│   │   │               │   │   └── NotificationPreferencesDTO.class
+│   │   │               │   ├── profile
+│   │   │               │   │   ├── NewProfileDTO.class
+│   │   │               │   │   ├── ProfileDetailDTO.class
+│   │   │               │   │   └── UpdateProfileDTO.class
+│   │   │               │   └── subscription
+│   │   │               │       ├── request
+│   │   │               │       │   ├── CreateSubscriptionRequestDTO$CreateSubscriptionRequestDTOBuilder.class
+│   │   │               │       │   └── CreateSubscriptionRequestDTO.class
+│   │   │               │       ├── response
+│   │   │               │       │   ├── CreateSubscriptionResponseDTO$CreateSubscriptionResponseDTOBuilder.class
+│   │   │               │       │   ├── CreateSubscriptionResponseDTO.class
+│   │   │               │       │   ├── PaymentHistoryResponseDTO$PaymentHistoryResponseDTOBuilder.class
+│   │   │               │       │   ├── PaymentHistoryResponseDTO.class
+│   │   │               │       │   ├── SubscriptionResponseDTO$SubscriptionResponseDTOBuilder.class
+│   │   │               │       │   └── SubscriptionResponseDTO.class
+│   │   │               │       ├── SubscriptionPriceConfigDTO$SubscriptionPriceConfigDTOBuilder.class
+│   │   │               │       └── SubscriptionPriceConfigDTO.class
+│   │   │               ├── entity
+│   │   │               │   ├── BancolombiaToken$BancolombiaTokenBuilder.class
+│   │   │               │   ├── BancolombiaToken.class
+│   │   │               │   ├── Budget$BudgetBuilder.class
+│   │   │               │   ├── Budget.class
+│   │   │               │   ├── BudgetEnrollment$BudgetEnrollmentBuilder.class
+│   │   │               │   ├── BudgetEnrollment.class
+│   │   │               │   ├── Category$CategoryBuilder.class
+│   │   │               │   ├── Category.class
+│   │   │               │   ├── CategoryEnrollment$CategoryEnrollmentBuilder.class
+│   │   │               │   ├── CategoryEnrollment.class
+│   │   │               │   ├── Debt$DebtBuilder.class
+│   │   │               │   ├── Debt.class
+│   │   │               │   ├── extra
+│   │   │               │   │   ├── ContentNotification.class
+│   │   │               │   │   ├── DescriptionCategory.class
+│   │   │               │   │   ├── DescriptionTransaction.class
+│   │   │               │   │   ├── ExchangeRate$ExchangeRateBuilder.class
+│   │   │               │   │   ├── ExchangeRate.class
+│   │   │               │   │   ├── Image$ImageBuilder.class
+│   │   │               │   │   └── Image.class
+│   │   │               │   ├── MercadoPagoPayment$MercadoPagoPaymentBuilder.class
+│   │   │               │   ├── MercadoPagoPayment.class
+│   │   │               │   ├── MercadoPagoPreapproval$MercadoPagoPreapprovalBuilder.class
+│   │   │               │   ├── MercadoPagoPreapproval.class
+│   │   │               │   ├── Notification$NotificationBuilder.class
+│   │   │               │   ├── Notification.class
+│   │   │               │   ├── Profile$ProfileBuilder.class
+│   │   │               │   ├── Profile.class
+│   │   │               │   ├── Role$RoleBuilder.class
+│   │   │               │   ├── Role.class
+│   │   │               │   ├── Subscription$SubscriptionBuilder.class
+│   │   │               │   ├── Subscription.class
+│   │   │               │   ├── Transaction$TransactionBuilder.class
+│   │   │               │   ├── Transaction.class
+│   │   │               │   ├── User$UserBuilder.class
+│   │   │               │   └── User.class
+│   │   │               ├── enums
+│   │   │               │   ├── PaymentStatus.class
+│   │   │               │   ├── PreapprovalStatus.class
+│   │   │               │   ├── RoleList.class
+│   │   │               │   ├── State.class
+│   │   │               │   ├── StateDebt.class
+│   │   │               │   ├── SubscriptionType.class
+│   │   │               │   ├── TransactionType.class
+│   │   │               │   └── UserType.class
+│   │   │               ├── exception
+│   │   │               │   ├── ApiResponse$ApiResponseBuilder.class
+│   │   │               │   ├── ApiResponse.class
+│   │   │               │   ├── exceptions
+│   │   │               │   │   ├── AuthException.class
+│   │   │               │   │   ├── BancolombiaApiException.class
+│   │   │               │   │   ├── BancolombiaAuthenticationException.class
+│   │   │               │   │   ├── BancolombiaAuthorizationException.class
+│   │   │               │   │   ├── BancolombiaConfigurationException.class
+│   │   │               │   │   ├── BancolombiaException.class
+│   │   │               │   │   ├── BancolombiaRateLimitException.class
+│   │   │               │   │   ├── BancolombiaTimeoutException.class
+│   │   │               │   │   ├── BudgetException.class
+│   │   │               │   │   ├── CategoryException.class
+│   │   │               │   │   ├── DebtException.class
+│   │   │               │   │   ├── ExcelException.class
+│   │   │               │   │   ├── ExchangeRateException.class
+│   │   │               │   │   ├── MercadoPagoException.class
+│   │   │               │   │   ├── NotificationException.class
+│   │   │               │   │   ├── ProfileException.class
+│   │   │               │   │   ├── SendgridException.class
+│   │   │               │   │   ├── SubscriptionMercadoPagoException.class
+│   │   │               │   │   ├── SubscriptionPriceException.class
+│   │   │               │   │   └── TransactionException.class
+│   │   │               │   └── GlobalExceptionHandler.class
+│   │   │               ├── job
+│   │   │               │   └── TokenMaintenanceJob.class
+│   │   │               ├── mapper
+│   │   │               │   ├── auth
+│   │   │               │   │   ├── NewUserMapper.class
+│   │   │               │   │   ├── NewUserMapperImpl.class
+│   │   │               │   │   ├── RoleDetailMapper.class
+│   │   │               │   │   ├── RoleDetailMapperImpl.class
+│   │   │               │   │   ├── UserDetailMapper.class
+│   │   │               │   │   └── UserDetailMapperImpl.class
+│   │   │               │   ├── image
+│   │   │               │   │   ├── ImageMapper.class
+│   │   │               │   │   └── ImageMapperImpl.class
+│   │   │               │   ├── logic
+│   │   │               │   │   ├── budget
+│   │   │               │   │   │   ├── BudgetDetailMapper.class
+│   │   │               │   │   │   ├── BudgetDetailMapperImpl.class
+│   │   │               │   │   │   ├── BudgetEnrollmentMapper.class
+│   │   │               │   │   │   ├── BudgetEnrollmentMapperImpl.class
+│   │   │               │   │   │   ├── NewBudgetMapper.class
+│   │   │               │   │   │   ├── NewBudgetMapperImpl.class
+│   │   │               │   │   │   ├── UpdateBudgetMapper.class
+│   │   │               │   │   │   └── UpdateBudgetMapperImpl.class
+│   │   │               │   │   ├── category
+│   │   │               │   │   │   ├── CategoryDetailMapper.class
+│   │   │               │   │   │   ├── CategoryDetailMapperImpl.class
+│   │   │               │   │   │   ├── CategoryEnrollmentMapper.class
+│   │   │               │   │   │   ├── CategoryEnrollmentMapperImpl.class
+│   │   │               │   │   │   ├── CategoryReportMapper.class
+│   │   │               │   │   │   ├── CategoryReportMapperImpl.class
+│   │   │               │   │   │   ├── NewCategoryMapper.class
+│   │   │               │   │   │   ├── NewCategoryMapperImpl.class
+│   │   │               │   │   │   ├── UpdateCategoryMapper.class
+│   │   │               │   │   │   └── UpdateCategoryMapperImpl.class
+│   │   │               │   │   ├── debt
+│   │   │               │   │   │   ├── DebtDetailMapper.class
+│   │   │               │   │   │   ├── DebtDetailMapperImpl.class
+│   │   │               │   │   │   ├── debtsByStateMapper.class
+│   │   │               │   │   │   ├── debtsByStateMapperImpl.class
+│   │   │               │   │   │   ├── NewDebtMapper.class
+│   │   │               │   │   │   ├── NewDebtMapperImpl.class
+│   │   │               │   │   │   ├── UpdateDebtMapper.class
+│   │   │               │   │   │   └── UpdateDebtMapperImpl.class
+│   │   │               │   │   ├── exchange_rate
+│   │   │               │   │   │   ├── ExchangeRateMapper.class
+│   │   │               │   │   │   └── ExchangeRateMapperImpl.class
+│   │   │               │   │   └── transaction
+│   │   │               │   │       ├── NewTransactionMapper.class
+│   │   │               │   │       ├── NewTransactionMapperImpl.class
+│   │   │               │   │       ├── ProfileWithTransactionsMapper.class
+│   │   │               │   │       ├── ProfileWithTransactionsMapperImpl.class
+│   │   │               │   │       ├── TransactionDetailMapper.class
+│   │   │               │   │       ├── TransactionDetailMapperImpl.class
+│   │   │               │   │       ├── TransactionSummaryMapper.class
+│   │   │               │   │       ├── UpdateTransactionMapper.class
+│   │   │               │   │       └── UpdateTransactionMapperImpl.class
+│   │   │               │   ├── NotificationMapper.class
+│   │   │               │   ├── NotificationMapperImpl.class
+│   │   │               │   ├── profile
+│   │   │               │   │   ├── NewProfileMapper.class
+│   │   │               │   │   ├── NewProfileMapperImpl.class
+│   │   │               │   │   ├── ProfileDetailMapper.class
+│   │   │               │   │   ├── ProfileDetailMapperImpl.class
+│   │   │               │   │   ├── UpdateProfileMapper.class
+│   │   │               │   │   └── UpdateProfileMapperImpl.class
+│   │   │               │   └── subscription
+│   │   │               │       ├── MercadoPagoPaymentMapper.class
+│   │   │               │       ├── MercadoPagoPaymentMapperImpl.class
+│   │   │               │       ├── MercadoPagoPreapprovalMapper.class
+│   │   │               │       └── MercadoPagoPreapprovalMapperImpl.class
+│   │   │               ├── repository
+│   │   │               │   ├── master
+│   │   │               │   │   ├── MasterBancolombiaTokenRepository.class
+│   │   │               │   │   ├── MasterBudgetEnrollmentRepository.class
+│   │   │               │   │   ├── MasterBudgetRepository.class
+│   │   │               │   │   ├── MasterCategoryEnrollmentRepository.class
+│   │   │               │   │   ├── MasterCategoryRepository.class
+│   │   │               │   │   ├── MasterDebtRepository.class
+│   │   │               │   │   ├── MasterExchangeRateRepository.class
+│   │   │               │   │   ├── MasterImageRepository.class
+│   │   │               │   │   ├── MasterMercadoPagoPreapprovalRepository.class
+│   │   │               │   │   ├── MasterProfileRepository.class
+│   │   │               │   │   ├── MasterRoleRepository.class
+│   │   │               │   │   ├── MasterSubscriptionRepository.class
+│   │   │               │   │   ├── MasterTransactionRepository.class
+│   │   │               │   │   └── MasterUserRepository.class
+│   │   │               │   └── slave
+│   │   │               │       ├── SlaveBancolombiaTokenRepository.class
+│   │   │               │       ├── SlaveBudgetEnrollmentRepository.class
+│   │   │               │       ├── SlaveBudgetRepository.class
+│   │   │               │       ├── SlaveCategoryEnrollmentRepository.class
+│   │   │               │       ├── SlaveCategoryRepository.class
+│   │   │               │       ├── SlaveDebtRepository.class
+│   │   │               │       ├── SlaveExchangeRateRepository.class
+│   │   │               │       ├── SlaveMercadoPagoPaymentRepository.class
+│   │   │               │       ├── SlaveMercadoPagoPreapprovalRepository.class
+│   │   │               │       ├── SlaveNotificationRepository.class
+│   │   │               │       ├── SlaveProfileRepository.class
+│   │   │               │       ├── SlaveRoleRepository.class
+│   │   │               │       ├── SlaveSubscriptionRepository.class
+│   │   │               │       ├── SlaveTransactionRepository.class
+│   │   │               │       └── SlaveUserRepository.class
+│   │   │               ├── service
+│   │   │               │   ├── auth
+│   │   │               │   │   ├── AuthService.class
+│   │   │               │   │   ├── AuthServiceImpl.class
+│   │   │               │   │   ├── CookieService.class
+│   │   │               │   │   ├── CookieServiceImpl.class
+│   │   │               │   │   ├── TokenBlacklistService.class
+│   │   │               │   │   └── TokenBlacklistServiceImpl.class
+│   │   │               │   ├── image
+│   │   │               │   │   ├── CloudinaryService.class
+│   │   │               │   │   ├── CloudinaryServiceImpl.class
+│   │   │               │   │   ├── ImageService.class
+│   │   │               │   │   ├── ImageServiceImpl$1.class
+│   │   │               │   │   └── ImageServiceImpl.class
+│   │   │               │   ├── logic
+│   │   │               │   │   ├── budget
+│   │   │               │   │   │   ├── BudgetEnrollmentService.class
+│   │   │               │   │   │   ├── BudgetEnrollmentServiceImpl.class
+│   │   │               │   │   │   ├── BudgetService.class
+│   │   │               │   │   │   └── BudgetServiceImpl.class
+│   │   │               │   │   ├── category
+│   │   │               │   │   │   ├── CategoryEnrollmentService.class
+│   │   │               │   │   │   ├── CategoryEnrollmentServiceImpl.class
+│   │   │               │   │   │   ├── CategoryService.class
+│   │   │               │   │   │   └── CategoryServiceImpl.class
+│   │   │               │   │   ├── debt
+│   │   │               │   │   │   ├── DebtService.class
+│   │   │               │   │   │   └── DebtServiceImpl.class
+│   │   │               │   │   ├── excel
+│   │   │               │   │   │   ├── ExcelService.class
+│   │   │               │   │   │   ├── ExcelServiceImpl.class
+│   │   │               │   │   │   └── tool
+│   │   │               │   │   │       └── ExcelValidator.class
+│   │   │               │   │   ├── exchange_rate
+│   │   │               │   │   │   ├── ExchangeRateService.class
+│   │   │               │   │   │   └── ExchangeRateServiceImpl.class
+│   │   │               │   │   └── transaction
+│   │   │               │   │       ├── bancolombia
+│   │   │               │   │       │   ├── BancolombiaAuthService.class
+│   │   │               │   │       │   ├── BancolombiaAuthServiceImpl.class
+│   │   │               │   │       │   ├── ConectaService.class
+│   │   │               │   │       │   └── ConectaServiceImpl.class
+│   │   │               │   │       └── kuenteco
+│   │   │               │   │           ├── TransactionService.class
+│   │   │               │   │           ├── TransactionServiceImpl$1.class
+│   │   │               │   │           └── TransactionServiceImpl.class
+│   │   │               │   ├── notification
+│   │   │               │   │   ├── NotificationService.class
+│   │   │               │   │   ├── NotificationServiceImpl$1.class
+│   │   │               │   │   └── NotificationServiceImpl.class
+│   │   │               │   ├── profile
+│   │   │               │   │   ├── ProfileService.class
+│   │   │               │   │   └── ProfileServiceImpl.class
+│   │   │               │   ├── subscription
+│   │   │               │   │   ├── MercadoPagoPaymentService.class
+│   │   │               │   │   ├── MercadoPagoPaymentServiceImpl.class
+│   │   │               │   │   ├── MercadoPagoService.class
+│   │   │               │   │   └── MercadoPagoServiceImpl.class
+│   │   │               │   └── user
+│   │   │               │       ├── SendgridService.class
+│   │   │               │       ├── SendgridServiceImpl.class
+│   │   │               │       ├── UserService.class
+│   │   │               │       └── UserServiceImpl.class
+│   │   │               └── validation
+│   │   │                   ├── CurrencyValidator.class
+│   │   │                   └── ValidCurrency.class
+│   │   ├── generated-sources
+│   │   │   └── annotations
+│   │   │       └── org
+│   │   │           └── kuenteco
+│   │   │               └── backend
+│   │   │                   └── mapper
+│   │   │                       ├── auth
+│   │   │                       │   ├── NewUserMapperImpl.java
+│   │   │                       │   ├── RoleDetailMapperImpl.java
+│   │   │                       │   └── UserDetailMapperImpl.java
+│   │   │                       ├── image
+│   │   │                       │   └── ImageMapperImpl.java
+│   │   │                       ├── logic
+│   │   │                       │   ├── budget
+│   │   │                       │   │   ├── BudgetDetailMapperImpl.java
+│   │   │                       │   │   ├── BudgetEnrollmentMapperImpl.java
+│   │   │                       │   │   ├── NewBudgetMapperImpl.java
+│   │   │                       │   │   └── UpdateBudgetMapperImpl.java
+│   │   │                       │   ├── category
+│   │   │                       │   │   ├── CategoryDetailMapperImpl.java
+│   │   │                       │   │   ├── CategoryEnrollmentMapperImpl.java
+│   │   │                       │   │   ├── CategoryReportMapperImpl.java
+│   │   │                       │   │   ├── NewCategoryMapperImpl.java
+│   │   │                       │   │   └── UpdateCategoryMapperImpl.java
+│   │   │                       │   ├── debt
+│   │   │                       │   │   ├── DebtDetailMapperImpl.java
+│   │   │                       │   │   ├── debtsByStateMapperImpl.java
+│   │   │                       │   │   ├── NewDebtMapperImpl.java
+│   │   │                       │   │   └── UpdateDebtMapperImpl.java
+│   │   │                       │   ├── exchange_rate
+│   │   │                       │   │   └── ExchangeRateMapperImpl.java
+│   │   │                       │   └── transaction
+│   │   │                       │       ├── NewTransactionMapperImpl.java
+│   │   │                       │       ├── ProfileWithTransactionsMapperImpl.java
+│   │   │                       │       ├── TransactionDetailMapperImpl.java
+│   │   │                       │       └── UpdateTransactionMapperImpl.java
+│   │   │                       ├── NotificationMapperImpl.java
+│   │   │                       ├── profile
+│   │   │                       │   ├── NewProfileMapperImpl.java
+│   │   │                       │   ├── ProfileDetailMapperImpl.java
+│   │   │                       │   └── UpdateProfileMapperImpl.java
+│   │   │                       └── subscription
+│   │   │                           ├── MercadoPagoPaymentMapperImpl.java
+│   │   │                           └── MercadoPagoPreapprovalMapperImpl.java
+│   │   ├── KuentecoApp-0.0.1-SNAPSHOT.jar
+│   │   ├── KuentecoApp-0.0.1-SNAPSHOT.jar.original
+│   │   ├── maven-archiver
+│   │   │   └── pom.properties
+│   │   └── maven-status
+│   │       └── maven-compiler-plugin
+│   │           └── compile
+│   │               └── default-compile
+│   │                   ├── createdFiles.lst
+│   │                   └── inputFiles.lst
+│   └── Testing.png
+└── KuentecoChat
+    ├── Dockerfile
+    ├── DOM.txt
+    ├── HELP.md
+    ├── mvnw
+    ├── mvnw.cmd
+    ├── pom.xml
+    ├── reports
+    │   ├── README.md
+    │   ├── reporte_analyzeDebtRisk_20250712_213709.pdf
+    │   ├── reporte_analyzeDebtRisk_20250713_120255.pdf
+    │   ├── reporte_analyzeUserSpendingPatterns_20250715_235708.pdf
+    │   ├── reporte_calculateFinancialHealthScore_20250713_112451.pdf
+    │   ├── reporte_calculateFinancialHealthScore_20250713_113944.pdf
+    │   ├── reporte_calculateFinancialHealthScore_20250713_114548.pdf
+    │   ├── reporte_calculateFinancialHealthScore_20250713_114711.xlsx
+    │   ├── reporte_calculateFinancialHealthScore_20250713_115258.pdf
+    │   ├── reporte_calculateFinancialHealthScore_20250713_120415.pdf
+    │   ├── reporte_calculateFinancialHealthScore_20250713_184314.pdf
+    │   ├── reporte_calculateFinancialHealthScore_20250713_184637.pdf
+    │   ├── reporte_calculateFinancialHealthScore_20250713_184920.xlsx
+    │   ├── reporte_calculateFinancialHealthScore_20250715_235534.pdf
+    │   ├── reporte_calculateFinancialHealthScore_20250716_000706.pdf
+    │   ├── reporte_financialStatement_20250712_211407.pdf
+    │   ├── reporte_financialStatement_20250712_214046.xlsx
+    │   └── reporte_financialStatement_20250715_235405.pdf
+    ├── src
+    │   ├── main
+    │   │   ├── java
+    │   │   │   └── com
+    │   │   │       └── example
+    │   │   │           └── back_end
+    │   │   │               ├── configuration
+    │   │   │               │   ├── ia
+    │   │   │               │   │   ├── AiConfiguration.java
+    │   │   │               │   │   └── CachingConfiguration.java
+    │   │   │               │   └── security
+    │   │   │               │       ├── JwtRequestFilter.java
+    │   │   │               │       ├── JwtUtil.java
+    │   │   │               │       └── SecurityConfiguration.java
+    │   │   │               ├── connector
+    │   │   │               │   ├── config
+    │   │   │               │   │   ├── EndpointConfiguration.java
+    │   │   │               │   │   ├── HostConfiguration.java
+    │   │   │               │   │   ├── HttpConnectorConfiguration.java
+    │   │   │               │   │   └── KuentecoEndpoint.java
+    │   │   │               │   ├── KuentecoAppConnector.java
+    │   │   │               │   └── rest
+    │   │   │               │       ├── budget
+    │   │   │               │       │   ├── BudgetDTO.java
+    │   │   │               │       │   ├── BudgetSummaryDTO.java
+    │   │   │               │       │   └── BudgetVsActualDTO.java
+    │   │   │               │       ├── category
+    │   │   │               │       │   ├── CategoryDTO.java
+    │   │   │               │       │   ├── CategoryEnrollmentDTO.java
+    │   │   │               │       │   ├── CategoryEnrollmentSummaryDTO.java
+    │   │   │               │       │   ├── CategoryReportDTO.java
+    │   │   │               │       │   ├── DescriptionCategory.java
+    │   │   │               │       │   └── TransactionsByCategoryDTO.java
+    │   │   │               │       ├── debt
+    │   │   │               │       │   ├── DebtDTO.java
+    │   │   │               │       │   └── DebtSummaryDTO.java
+    │   │   │               │       └── transaction
+    │   │   │               │           ├── DescriptionTransaction.java
+    │   │   │               │           ├── GetTransactionDTO.java
+    │   │   │               │           ├── ProfileWithTransactionsDTO.java
+    │   │   │               │           ├── TransactionDetailDTO.java
+    │   │   │               │           ├── TransactionResponseWrapper.java
+    │   │   │               │           ├── TransactionSummaryDTO.java
+    │   │   │               │           └── UserProfilesWithTransactionsDTO.java
+    │   │   │               ├── controller
+    │   │   │               │   ├── ChatController.java
+    │   │   │               │   ├── ChatHistoryController.java
+    │   │   │               │   ├── DocumentationController.java
+    │   │   │               │   ├── ModelController.java
+    │   │   │               │   └── resource
+    │   │   │               │       ├── ChatHistoryResource.java
+    │   │   │               │       ├── ChatResource.java
+    │   │   │               │       └── ModelResource.java
+    │   │   │               ├── dto
+    │   │   │               │   ├── request
+    │   │   │               │   │   ├── ChatDTO.java
+    │   │   │               │   │   ├── ChatFilesDTO.java
+    │   │   │               │   │   ├── ChatHistoryDTO.java
+    │   │   │               │   │   ├── ChatMultipartDTO.java
+    │   │   │               │   │   ├── CustomUserDetailsDTO.java
+    │   │   │               │   │   └── ErrorDTO.java
+    │   │   │               │   └── response
+    │   │   │               │       ├── ai
+    │   │   │               │       │   ├── BaseDynamicResponseDTO.java
+    │   │   │               │       │   ├── ChartDataResponseDTO.java
+    │   │   │               │       │   ├── DebtAnalysisResponseDTO.java
+    │   │   │               │       │   ├── DebtRiskAnalysisDTO.java
+    │   │   │               │       │   ├── ExpenseReductionResponseDTO.java
+    │   │   │               │       │   ├── ExpenseReductionSuggestionDTO.java
+    │   │   │               │       │   ├── FinancialHealthResponseDTO.java
+    │   │   │               │       │   ├── FinancialHealthScoreDTO.java
+    │   │   │               │       │   ├── FinancialProjectionDTO.java
+    │   │   │               │       │   ├── FinancialProjectionResponseDTO.java
+    │   │   │               │       │   ├── ReportDownloadResponseDTO.java
+    │   │   │               │       │   ├── SimpleTextResponseDTO.java
+    │   │   │               │       │   └── SpendingPatternResponseDTO.java
+    │   │   │               │       ├── CharDataDTO.java
+    │   │   │               │       ├── DynamicAnalysisResponseDTO.java
+    │   │   │               │       └── StringChatResponseDTO.java
+    │   │   │               ├── entity
+    │   │   │               │   └── ChatHistory.java
+    │   │   │               ├── enums
+    │   │   │               │   ├── ApiError.java
+    │   │   │               │   ├── Model.java
+    │   │   │               │   ├── ReportType.java
+    │   │   │               │   ├── ResponseType.java
+    │   │   │               │   ├── StateDebt.java
+    │   │   │               │   ├── State.java
+    │   │   │               │   └── TransactionType.java
+    │   │   │               ├── exception
+    │   │   │               │   ├── AiProfileException.java
+    │   │   │               │   ├── ApiResponse.java
+    │   │   │               │   └── GlobalExceptionHandler.java
+    │   │   │               ├── KuentecoChatApplication.java
+    │   │   │               ├── mapper
+    │   │   │               │   ├── ChatHistoryMapper.java
+    │   │   │               │   └── TransactionMapper.java
+    │   │   │               ├── repository
+    │   │   │               │   └── AiHistoryRepository.java
+    │   │   │               ├── service
+    │   │   │               │   ├── ChartGenerationService.java
+    │   │   │               │   ├── ChatServiceImpl.java
+    │   │   │               │   ├── ChatService.java
+    │   │   │               │   ├── factory
+    │   │   │               │   │   └── DynamicResponseFactory.java
+    │   │   │               │   ├── functions
+    │   │   │               │   │   ├── AnalyzeDebtRiskFunction.java
+    │   │   │               │   │   ├── AnalyzeUserSpendingPatternsFunction.java
+    │   │   │               │   │   ├── BalanceOverTimeFunction.java
+    │   │   │               │   │   ├── CalculateFinancialHealthScoreWithBudgetsFunction.java
+    │   │   │               │   │   ├── CalculateFinancialHealthScoreWithTransactionsFunction.java
+    │   │   │               │   │   ├── CompareFinancialPeriodsFunction.java
+    │   │   │               │   │   ├── ConversationIdService.java
+    │   │   │               │   │   ├── FinancialStatementFunction.java
+    │   │   │               │   │   ├── IncomesAndExpensesByPeriodFunction.java
+    │   │   │               │   │   ├── ProjectFinancialBalanceFunction.java
+    │   │   │               │   │   └── SuggestExpenseReductionsFunction.java
+    │   │   │               │   ├── ReportGenerationServiceImpl.java
+    │   │   │               │   ├── ReportGenerationService.java
+    │   │   │               │   ├── ResponseTypeDetectorServiceImpl.java
+    │   │   │               │   └── ResponseTypeDetectorService.java
+    │   │   │               └── util
+    │   │   │                   └── KuentecoChatUtil.java
+    │   │   └── resources
+    │   │       ├── application.yml
+    │   │       ├── banner.txt
+    │   │       ├── prompts
+    │   │       │   └── ai_prompt_template.txt
+    │   │       └── static
+    │   │           └── images
+    │   │               └── logo.png
+    │   └── test
+    │       └── java
+    │           └── com
+    │               └── example
+    │                   └── back_end
+    │                       └── AiProfileChat
+    │                           └── AiProfileChatApplicationTests.java
+    └── target
+        ├── classes
+        │   ├── application.yml
+        │   ├── banner.txt
+        │   ├── com
+        │   │   └── example
+        │   │       └── back_end
+        │   │           ├── configuration
+        │   │           │   ├── ia
+        │   │           │   │   ├── AiConfiguration.class
+        │   │           │   │   └── CachingConfiguration.class
+        │   │           │   └── security
+        │   │           │       ├── JwtRequestFilter.class
+        │   │           │       ├── JwtUtil.class
+        │   │           │       └── SecurityConfiguration.class
+        │   │           ├── connector
+        │   │           │   ├── config
+        │   │           │   │   ├── EndpointConfiguration.class
+        │   │           │   │   ├── HostConfiguration.class
+        │   │           │   │   ├── HttpConnectorConfiguration.class
+        │   │           │   │   └── KuentecoEndpoint.class
+        │   │           │   ├── KuentecoAppConnector$1.class
+        │   │           │   ├── KuentecoAppConnector.class
+        │   │           │   └── rest
+        │   │           │       ├── budget
+        │   │           │       │   ├── BudgetDTO.class
+        │   │           │       │   ├── BudgetSummaryDTO$BudgetSummaryDTOBuilder.class
+        │   │           │       │   ├── BudgetSummaryDTO.class
+        │   │           │       │   ├── BudgetVsActualDTO$BudgetVsActualDTOBuilder.class
+        │   │           │       │   └── BudgetVsActualDTO.class
+        │   │           │       ├── category
+        │   │           │       │   ├── CategoryDTO.class
+        │   │           │       │   ├── CategoryEnrollmentDTO.class
+        │   │           │       │   ├── CategoryEnrollmentSummaryDTO$CategoryEnrollmentSummaryDTOBuilder.class
+        │   │           │       │   ├── CategoryEnrollmentSummaryDTO.class
+        │   │           │       │   ├── CategoryReportDTO$CategoryReportDTOBuilder.class
+        │   │           │       │   ├── CategoryReportDTO.class
+        │   │           │       │   ├── DescriptionCategory.class
+        │   │           │       │   ├── TransactionsByCategoryDTO$TransactionsByCategoryDTOBuilder.class
+        │   │           │       │   └── TransactionsByCategoryDTO.class
+        │   │           │       ├── debt
+        │   │           │       │   ├── DebtDTO.class
+        │   │           │       │   ├── DebtSummaryDTO$DebtSummaryDTOBuilder.class
+        │   │           │       │   └── DebtSummaryDTO.class
+        │   │           │       └── transaction
+        │   │           │           ├── DescriptionTransaction.class
+        │   │           │           ├── GetTransactionDTO.class
+        │   │           │           ├── ProfileWithTransactionsDTO$ProfileWithTransactionsDTOBuilder.class
+        │   │           │           ├── ProfileWithTransactionsDTO.class
+        │   │           │           ├── TransactionDetailDTO.class
+        │   │           │           ├── TransactionResponseWrapper$ResponseType.class
+        │   │           │           ├── TransactionResponseWrapper.class
+        │   │           │           ├── TransactionSummaryDTO$TransactionSummaryDTOBuilder.class
+        │   │           │           ├── TransactionSummaryDTO.class
+        │   │           │           ├── UserProfilesWithTransactionsDTO$UserProfilesWithTransactionsDTOBuilder.class
+        │   │           │           └── UserProfilesWithTransactionsDTO.class
+        │   │           ├── controller
+        │   │           │   ├── ChatController.class
+        │   │           │   ├── ChatHistoryController.class
+        │   │           │   ├── DocumentationController.class
+        │   │           │   ├── ModelController.class
+        │   │           │   └── resource
+        │   │           │       ├── ChatHistoryResource.class
+        │   │           │       ├── ChatResource.class
+        │   │           │       └── ModelResource.class
+        │   │           ├── dto
+        │   │           │   ├── request
+        │   │           │   │   ├── ChatDTO.class
+        │   │           │   │   ├── ChatFilesDTO.class
+        │   │           │   │   ├── ChatHistoryDTO$ChatHistoryDTOBuilder.class
+        │   │           │   │   ├── ChatHistoryDTO.class
+        │   │           │   │   ├── ChatMultipartDTO.class
+        │   │           │   │   ├── CustomUserDetailsDTO.class
+        │   │           │   │   └── ErrorDTO.class
+        │   │           │   └── response
+        │   │           │       ├── ai
+        │   │           │       │   ├── BaseDynamicResponseDTO.class
+        │   │           │       │   ├── ChartDataResponseDTO.class
+        │   │           │       │   ├── DebtAnalysisResponseDTO.class
+        │   │           │       │   ├── DebtRiskAnalysisDTO.class
+        │   │           │       │   ├── ExpenseReductionResponseDTO.class
+        │   │           │       │   ├── ExpenseReductionSuggestionDTO.class
+        │   │           │       │   ├── FinancialHealthResponseDTO.class
+        │   │           │       │   ├── FinancialHealthScoreDTO.class
+        │   │           │       │   ├── FinancialProjectionDTO.class
+        │   │           │       │   ├── FinancialProjectionResponseDTO.class
+        │   │           │       │   ├── ReportDownloadResponseDTO.class
+        │   │           │       │   ├── SimpleTextResponseDTO.class
+        │   │           │       │   └── SpendingPatternResponseDTO.class
+        │   │           │       ├── CharDataDTO.class
+        │   │           │       ├── DynamicAnalysisResponseDTO.class
+        │   │           │       └── StringChatResponseDTO.class
+        │   │           ├── entity
+        │   │           │   ├── ChatHistory$ChatHistoryBuilder.class
+        │   │           │   └── ChatHistory.class
+        │   │           ├── enums
+        │   │           │   ├── ApiError.class
+        │   │           │   ├── Model.class
+        │   │           │   ├── ReportType.class
+        │   │           │   ├── ResponseType.class
+        │   │           │   ├── State.class
+        │   │           │   ├── StateDebt.class
+        │   │           │   └── TransactionType.class
+        │   │           ├── exception
+        │   │           │   ├── AiProfileException.class
+        │   │           │   ├── ApiResponse$ApiResponseBuilder.class
+        │   │           │   ├── ApiResponse.class
+        │   │           │   └── GlobalExceptionHandler.class
+        │   │           ├── KuentecoChatApplication.class
+        │   │           ├── mapper
+        │   │           │   ├── ChatHistoryMapper.class
+        │   │           │   ├── ChatHistoryMapperImpl.class
+        │   │           │   ├── TransactionMapper.class
+        │   │           │   └── TransactionMapperImpl.class
+        │   │           ├── repository
+        │   │           │   └── AiHistoryRepository.class
+        │   │           ├── service
+        │   │           │   ├── ChartGenerationService.class
+        │   │           │   ├── ChatService.class
+        │   │           │   ├── ChatServiceImpl$1.class
+        │   │           │   ├── ChatServiceImpl.class
+        │   │           │   ├── factory
+        │   │           │   │   └── DynamicResponseFactory.class
+        │   │           │   ├── functions
+        │   │           │   │   ├── AnalyzeDebtRiskFunction$1.class
+        │   │           │   │   ├── AnalyzeDebtRiskFunction$Request.class
+        │   │           │   │   ├── AnalyzeDebtRiskFunction.class
+        │   │           │   │   ├── AnalyzeUserSpendingPatternsFunction$Request.class
+        │   │           │   │   ├── AnalyzeUserSpendingPatternsFunction.class
+        │   │           │   │   ├── BalanceOverTimeFunction$1.class
+        │   │           │   │   ├── BalanceOverTimeFunction$Request.class
+        │   │           │   │   ├── BalanceOverTimeFunction.class
+        │   │           │   │   ├── CalculateFinancialHealthScoreWithBudgetsFunction$1.class
+        │   │           │   │   ├── CalculateFinancialHealthScoreWithBudgetsFunction$Request.class
+        │   │           │   │   ├── CalculateFinancialHealthScoreWithBudgetsFunction.class
+        │   │           │   │   ├── CalculateFinancialHealthScoreWithTransactionsFunction$Request.class
+        │   │           │   │   ├── CalculateFinancialHealthScoreWithTransactionsFunction.class
+        │   │           │   │   ├── CompareFinancialPeriodsFunction$1.class
+        │   │           │   │   ├── CompareFinancialPeriodsFunction$Request.class
+        │   │           │   │   ├── CompareFinancialPeriodsFunction.class
+        │   │           │   │   ├── ConversationIdService.class
+        │   │           │   │   ├── FinancialStatementFunction$1.class
+        │   │           │   │   ├── FinancialStatementFunction$Request.class
+        │   │           │   │   ├── FinancialStatementFunction.class
+        │   │           │   │   ├── IncomesAndExpensesByPeriodFunction$1.class
+        │   │           │   │   ├── IncomesAndExpensesByPeriodFunction$Request.class
+        │   │           │   │   ├── IncomesAndExpensesByPeriodFunction.class
+        │   │           │   │   ├── ProjectFinancialBalanceFunction$1.class
+        │   │           │   │   ├── ProjectFinancialBalanceFunction$Request.class
+        │   │           │   │   ├── ProjectFinancialBalanceFunction.class
+        │   │           │   │   ├── SuggestExpenseReductionsFunction$1.class
+        │   │           │   │   ├── SuggestExpenseReductionsFunction$Request.class
+        │   │           │   │   └── SuggestExpenseReductionsFunction.class
+        │   │           │   ├── ReportGenerationService.class
+        │   │           │   ├── ReportGenerationServiceImpl$ReportMetadata.class
+        │   │           │   ├── ReportGenerationServiceImpl.class
+        │   │           │   ├── ResponseTypeDetectorService.class
+        │   │           │   └── ResponseTypeDetectorServiceImpl.class
+        │   │           └── util
+        │   │               └── KuentecoChatUtil.class
+        │   ├── prompts
+        │   │   └── ai_prompt_template.txt
+        │   └── static
+        │       └── images
+        │           └── logo.png
+        ├── generated-sources
+        │   └── annotations
+        │       └── com
+        │           └── example
+        │               └── back_end
+        │                   └── mapper
+        │                       ├── ChatHistoryMapperImpl.java
+        │                       └── TransactionMapperImpl.java
+        ├── generated-test-sources
+        │   └── test-annotations
+        ├── KuentecoChat-0.0.1-SNAPSHOT.jar
+        ├── KuentecoChat-0.0.1-SNAPSHOT.jar.original
+        ├── maven-archiver
+        │   └── pom.properties
+        ├── maven-status
+        │   └── maven-compiler-plugin
+        │       ├── compile
+        │       │   └── default-compile
+        │       │       ├── createdFiles.lst
+        │       │       └── inputFiles.lst
+        │       └── testCompile
+        │           └── default-testCompile
+        │               ├── createdFiles.lst
+        │               └── inputFiles.lst
+        └── test-classes
+            └── com
+                └── example
+                    └── back_end
+                        └── AiProfileChat
+                            └── AiProfileChatApplicationTests.class
+
+282 directories, 875 files

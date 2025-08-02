@@ -16,6 +16,7 @@ import org.kuenteco.backend.dto.logic.debt.DebtSummaryDTO;
 import org.kuenteco.backend.dto.logic.debt.NewDebtDTO;
 import org.kuenteco.backend.entity.Debt;
 import org.kuenteco.backend.entity.User;
+import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.StateDebt;
 import org.kuenteco.backend.exception.exceptions.DebtException;
 import org.kuenteco.backend.mapper.logic.debt.DebtDetailMapper;
@@ -44,7 +45,11 @@ public class DebtServiceImpl implements DebtService {
     public Object getDebts() {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
 
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new DebtException("Endpoint solo disponible para usuarios");
+        }
         log.info("Buscando deudas para: {}", email);
 
         User user =
@@ -60,6 +65,11 @@ public class DebtServiceImpl implements DebtService {
     public Object getDebtsByState(StateDebt state) {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new DebtException("Endpoint solo disponible para usuarios");
+        }
         log.info("Buscando deudas por estado para: {}", email);
 
         User user =
@@ -78,6 +88,11 @@ public class DebtServiceImpl implements DebtService {
     public Object getOverdueDebts() {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new DebtException("Endpoint solo disponible para usuarios");
+        }
         log.info("Buscando deudas atrasadas para: {}", email);
 
         User user =
@@ -98,7 +113,11 @@ public class DebtServiceImpl implements DebtService {
     public Object getDebtsExpiringInDays(Integer days) {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
 
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new DebtException("Endpoint solo disponible para usuarios");
+        }
         User user =
                 slaveUserRepository
                         .findByEmail(email)
@@ -124,6 +143,11 @@ public class DebtServiceImpl implements DebtService {
     public BigDecimal getTotalPendingAmount() {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new DebtException("Endpoint solo disponible para usuarios");
+        }
         User user =
                 slaveUserRepository
                         .findByEmail(email)
@@ -140,6 +164,11 @@ public class DebtServiceImpl implements DebtService {
     public Object getDebtSummaryReport() {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new DebtException("Endpoint solo disponible para usuarios");
+        }
         List<DebtSummaryDTO> dto = slaveDebtRepository.findByUserEmailDebtSummaries(email);
         if (dto.isEmpty()) {
             return "No tienes deudas registradas";
@@ -151,6 +180,11 @@ public class DebtServiceImpl implements DebtService {
     public void addDebt(NewDebtDTO dto) {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new DebtException("Endpoint solo disponible para usuarios");
+        }
 
         User user =
                 slaveUserRepository
@@ -178,11 +212,16 @@ public class DebtServiceImpl implements DebtService {
     public void updateDebt(DebtDTO dto) {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new DebtException("Endpoint solo disponible para usuarios");
+        }
         User user =
                 slaveUserRepository
                         .findByEmail(email)
                         .orElseThrow(() -> new DebtException("Usuario no encontrado " + email));
-        Debt debt = slaveDebtRepository.findDebtByUser(user);
+        Debt debt = slaveDebtRepository.getDebtByUserAndId(user, dto.getId());
         updateDebtMapper.toEntity(dto);
         log.info("Actualizando deuda para {}", email);
         masterDebtRepository.save(debt);
@@ -220,6 +259,12 @@ public class DebtServiceImpl implements DebtService {
 
     @Override
     public void deleteDebt(Integer id) {
+        AuthCredentials credentials = getCredentials();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new DebtException("Endpoint solo disponible para usuarios");
+        }
         if (!slaveDebtRepository.existsById(id)) {
             throw new DebtException("Deuda no encontrada con ID: " + id);
         }
@@ -228,6 +273,12 @@ public class DebtServiceImpl implements DebtService {
 
     @Override
     public void updateDebtState(Integer id, StateDebt newState) {
+        AuthCredentials credentials = getCredentials();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new DebtException("Endpoint solo disponible para usuarios");
+        }
         Debt debt =
                 slaveDebtRepository
                         .findById(id)

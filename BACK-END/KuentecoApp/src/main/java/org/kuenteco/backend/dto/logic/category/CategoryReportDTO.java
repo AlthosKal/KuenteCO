@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.kuenteco.backend.dto.logic.budget.BudgetDTO;
-import org.kuenteco.backend.dto.logic.transaction.TransactionDetailDTO;
+import org.kuenteco.backend.dto.logic.transaction.kuenteco.TransactionDetailDTO;
 
 @Data
 @Builder

@@ -11,7 +11,6 @@ import org.kuenteco.backend.enums.TransactionType;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DescriptionTransaction {
-    private String name;
     private String description;
 
     @Enumerated(EnumType.STRING)

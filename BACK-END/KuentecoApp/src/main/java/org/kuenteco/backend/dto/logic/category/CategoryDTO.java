@@ -1,6 +1,6 @@
 package org.kuenteco.backend.dto.logic.category;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,9 +11,10 @@ import org.kuenteco.backend.entity.extra.DescriptionCategory;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryDTO {
-    @NotBlank private Integer id;
-    @NotBlank private Integer budgetId;
-    @NotBlank private DescriptionCategory description;
+    @Positive private Integer id;
+    @Positive private Integer budgetId;
+    private String name;
+    private DescriptionCategory description;
     private LocalDateTime startDate;
     private LocalDateTime finishDate;
 }

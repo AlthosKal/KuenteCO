@@ -25,24 +25,36 @@ public class Transaction {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_profile")
+    @JoinColumn(name = "id_profile",
+            foreignKey = @ForeignKey(name = "fk_profile",
+                    foreignKeyDefinition = "FOREIGN KEY (id_profile) REFERENCES profile(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
     private Profile profile;
 
     @ManyToOne
-    @JoinColumn(name = "id_user")
+    @JoinColumn(name = "id_user",
+            foreignKey = @ForeignKey(name = "fk_user",
+                    foreignKeyDefinition = "FOREIGN KEY (id_user) REFERENCES kuentecouser(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "id_category")
+    @JoinColumn(name = "id_category",
+            foreignKey = @ForeignKey(name = "fk_category",
+                    foreignKeyDefinition = "FOREIGN KEY (id_category) REFERENCES category(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "id_budget")
+    @JoinColumn(name = "id_budget",
+            foreignKey = @ForeignKey(name = "fk_budget",
+                    foreignKeyDefinition = "FOREIGN KEY (id_budget) REFERENCES budget(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
     private Budget budget;
 
     @ManyToOne
-    @JoinColumn(name = "id_debt")
+    @JoinColumn(name = "id_debt",
+            foreignKey = @ForeignKey(name = "fk_debt",
+                    foreignKeyDefinition = "FOREIGN KEY (id_debt) REFERENCES debt(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
     private Debt debt;
+
+    private String name;
 
     private BigDecimal amount;
 

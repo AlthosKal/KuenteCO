@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.dto.auth.SendVerificationCodeDTO;
 import org.kuenteco.backend.dto.auth.ValidateVerificationCodeDTO;
 import org.kuenteco.backend.exception.exceptions.SendgridException;
+import org.kuenteco.backend.repository.slave.SlaveProfileRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ public class SendgridServiceImpl implements SendgridService {
     private final SlaveUserRepository slaveUserRepository;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final UserService userService;
+    private final SlaveProfileRepository slaveProfileRepository;
 
     // SendGrid
     @Value("${spring.sendgrid.api-key}")
@@ -51,7 +53,11 @@ public class SendgridServiceImpl implements SendgridService {
             SendVerificationCodeDTO sendVerificationCodeDTO, boolean isRegistration) {
         String email =
                 Optional.ofNullable(sendVerificationCodeDTO.getEmail())
-                        .filter(e -> isRegistration && slaveUserRepository.existsByEmail(e))
+                        .filter(
+                                e ->
+                                        isRegistration && slaveUserRepository.existsByEmail(e)
+                                                || isRegistration
+                                                        && slaveProfileRepository.existsByEmail(e))
                         .orElseThrow(
                                 () ->
                                         new SendgridException(

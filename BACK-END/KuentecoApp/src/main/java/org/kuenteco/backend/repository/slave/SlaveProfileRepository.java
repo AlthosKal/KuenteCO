@@ -12,11 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(transactionManager = "slaveTransactionManager", readOnly = true)
 public interface SlaveProfileRepository extends JpaRepository<Profile, Integer> {
 
-    Boolean existsByUsername(String name);
+    Boolean existsByUsernameAndUser(String name, User user);
 
     List<Profile> findByUser(User user);
 
     Optional<Profile> findByEmail(String email);
 
     Optional<Profile> findByUsername(String name);
+
+    boolean existsByEmail(String email);
 }

@@ -1,0 +1,120 @@
+# Configuración JWT
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400
+
+# Configuración Spring
+spring:
+  application:
+    name: KuentecoChat
+  data:
+    mongodb:
+      uri: ${MONGO_URI}
+      auto-index-creation: true
+  ai:
+    deepseek:
+      base-url: ${DEEPSEEK_BASE_URL}
+      api-key: ${DEEPSEEK_KEY}
+      chat:
+        options:
+          model: ${DEEPSEEK_MODEL}
+          temperature: 0.7
+    openai:
+      api-key: ${OPENAI_KEY}
+      chat:
+        options:
+          model: ${OPENAI_MODEL}
+          temperature: 0.7
+  cache:
+    type: caffeine
+
+# Configuración del servidor
+server:
+  port: 7070
+  error:
+    include-stacktrace: never
+  servlet:
+    context-path: /api/chat
+
+# Configuración de actuator
+management:
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: never
+
+# Configuración para reportes
+app:
+  reports:
+    storage:
+      path: ./reports  # Carpeta dentro del proyecto
+    expiration:
+      hours: 24
+
+# Configuración de conectores HTTP
+http-connector:
+  hosts:
+    # Configuración para transacciones
+    transaction:
+      host: ${KUENTECO_APP_URL}
+      base-path: "/api/app/v1/transaction"
+      endpoints:
+        get-transactions-summary:
+          url: "/report/summary"
+          readTimeout: 10000
+          writeTimeout: 5000
+          connectionTimeout: 5000
+        get-user-transactions:
+          url: ""
+          readTimeout: 10000
+          writeTimeout: 5000
+          connectionTimeout: 5000
+
+    # Configuración para presupuestos
+    budget:
+      host: ${KUENTECO_APP_URL}
+      base-path: "/api/app/v1/budget"
+      endpoints:
+        get-budget-summary:
+          url: "/report/summary"
+          readTimeout: 10000
+          writeTimeout: 5000
+          connectionTimeout: 5000
+        get-budget-comparison:
+          url: "/report/comparison"
+          readTimeout: 10000
+          writeTimeout: 5000
+          connectionTimeout: 5000
+
+    # Configuración para deudas
+    debt:
+      host: ${KUENTECO_APP_URL}
+      base-path: "/api/app/v1/debt"
+      endpoints:
+        get-user-debts:
+          url: ""
+          readTimeout: 10000
+          writeTimeout: 5000
+          connectionTimeout: 5000
+
+    # Configuración para categorías
+    category:
+      host: ${KUENTECO_APP_URL}
+      base-path: "/api/app/v1/category"
+      endpoints:
+        get-categories:
+          url: ""
+          readTimeout: 10000
+          writeTimeout: 5000
+          connectionTimeout: 5000
+
+# Configuración de logging
+logging:
+  level:
+    com.example.back_end.connector: DEBUG
+    org.springframework.web.reactive.function.client: DEBUG
+    org.springframework: INFO

@@ -3,7 +3,9 @@ package org.kuenteco.backend;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableScheduling
 @SpringBootApplication
 public class BackEndApplication {
 
@@ -25,12 +27,10 @@ public class BackEndApplication {
         // API de MercadoPago
         System.setProperty("MERCADOPAGO_ACCESS_TOKEN", dotenv.get("MERCADOPAGO_ACCESS_TOKEN"));
 
-        // API de Wompi
-        System.setProperty("WOMPI_BASE_URL", dotenv.get("WOMPI_BASE_URL"));
-        System.setProperty("WOMPI_PUBLIC_KEY", dotenv.get("WOMPI_PUBLIC_KEY"));
-        System.setProperty("WOMPI_PRIVATE_KEY", dotenv.get("WOMPI_PRIVATE_KEY"));
-        System.setProperty("WOMPI_EVENTS_SECRET", dotenv.get("WOMPI_EVENTS_SECRET"));
-        System.setProperty("WOMPI_INTEGRITY_SECRET", dotenv.get("WOMPI_INTEGRITY_SECRET"));
+        // API de Bancolombia
+        System.setProperty("BANCOLOMBIA_BASE_URL", dotenv.get("BANCOLOMBIA_BASE_URL"));
+        System.setProperty("BANCOLOMBIA_CLIENT_ID", dotenv.get("BANCOLOMBIA_CLIENT_ID"));
+        System.setProperty("BANCOLOMBIA_CLIENT_SECRET", dotenv.get("BANCOLOMBIA_CLIENT_SECRET"));
 
         // Secret de Jwt
         System.setProperty("JWT_SECRET", dotenv.get("JWT_SECRET"));

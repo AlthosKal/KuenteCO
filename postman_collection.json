@@ -1,2305 +1,21 @@
 {
 	"info": {
-		"_postman_id": "676caaa8-5ce3-4e6d-9269-121184db6302",
+		"_postman_id": "98ffc8bd-73ad-4f77-bcb7-46914048d84b",
 		"name": "Kuenteco Backend API",
 		"description": "Collección de Postman para testear los controladores del backend Kuenteco",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "40305044",
-		"_collection_link": "https://kuenteco.postman.co/workspace/KuenteCO-Workspace~970c5daf-2edb-4c5d-8e8d-7fd78229512b/collection/40305044-676caaa8-5ce3-4e6d-9269-121184db6302?action=share&source=collection_link&creator=40305044"
+		"_collection_link": "https://kuenteco.postman.co/workspace/KuenteCO-Workspace~970c5daf-2edb-4c5d-8e8d-7fd78229512b/collection/40305044-98ffc8bd-73ad-4f77-bcb7-46914048d84b?action=share&source=collection_link&creator=40305044"
 	},
 	"item": [
 		{
-			"name": "📌 Authentication",
+			"name": "KuentecoChat",
 			"item": [
 				{
-					"name": "Login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    const response = pm.response.json();",
-									"    if (response.success && response.data && response.data.token) {",
-									"        pm.collectionVariables.set('jwt_token', response.data.token);",
-									"        console.log('JWT Token saved: ' + response.data.token);",
-									"    }",
-									"}"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"nameOrEmail\": \"nuevoUsuario\",\n    \"password\": \"password123\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/auth/login",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"auth",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Register",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"nuevoUsuario\",\n    \"email\": \"agudelocastanoyeferson270@gmail.com\",\n    \"password\": \"password123\",\n    \"type\": \"BUSINESS\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/auth/register",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"auth",
-								"register"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Send Verification Code",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"usuario@example.com\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/auth/send-verification-code?isRegistration=false",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"auth",
-								"send-verification-code"
-							],
-							"query": [
-								{
-									"key": "isRegistration",
-									"value": "false",
-									"description": "Set to true for registration verification"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Validate Verification Code",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"usuario@example.com\",\n    \"code\": \"123456\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/auth/validate-verification-code",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"auth",
-								"validate-verification-code"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Activate User",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"agudelocastanoyeferson270@gmail.com\",\n    \"code\": \"152886\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/auth/activate-user",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"auth",
-								"activate-user"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Change Password",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"usuario@example.com\",\n    \"code\": \"123456\",\n    \"newPassword\": \"newPassword123\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/auth/change-password",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"auth",
-								"change-password"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Logout",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/auth/logout",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"auth",
-								"logout"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete User",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/auth/{{user_id}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"auth",
-								"{{user_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Authenticated User Details",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/auth/user/details",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"auth",
-								"user",
-								"details"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Upload User Image",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "image",
-									"type": "file",
-									"src": "/path/to/image.jpg"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/auth/user/image/add",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"auth",
-								"user",
-								"image",
-								"add"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update User Image",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "image",
-									"type": "file",
-									"src": "/path/to/new-image.jpg"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/auth/user/image/update",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"auth",
-								"user",
-								"image",
-								"update"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete User Image",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/auth/delete",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"auth",
-								"delete"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "📌 Profile",
-			"item": [
-				{
-					"name": "Get All Profiles",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/profile",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"profile"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Profile Login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    const response = pm.response.json();",
-									"    if (response.success && response.data && response.data.token) {",
-									"        pm.collectionVariables.set('jwt_token', response.data.token);",
-									"        console.log('JWT Token saved: ' + response.data.token);",
-									"    }",
-									"}"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"nameOrEmail\": \"Nuevo Perfil\",\n    \"password\": \"password123\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/profile/login",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"profile",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add Profile",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"Nuevo Perfil\",\n    \"email\": \"nuevoperfil@example.com\",\n    \"password\": \"password123\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/profile/add",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"profile",
-								"add"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Profile",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"name\": \"Perfil Actualizado\",\n    \"email\": \"perfilactualizado@example.com\",\n    \"password\": \"newPassword123\",\n    \"image\": {\n        \"name\": \"profile-image.jpg\",\n        \"imageUrl\": \"https://example.com/image.jpg\",\n        \"imageId\": \"img_123\"\n    }\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/profile/update",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"profile",
-								"update"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Profile",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/profile/{{profile_id}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"profile",
-								"{{profile_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Upload Profile Image",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "image",
-									"type": "file",
-									"src": "/path/to/profile-image.jpg"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/profile/image/add",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"profile",
-								"image",
-								"add"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Profile Image",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "image",
-									"type": "file",
-									"src": "/path/to/new-profile-image.jpg"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/profile/image/update",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"profile",
-								"image",
-								"update"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Profile Image",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/profile/delete",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"profile",
-								"delete"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Authenticated Profile",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/profile/details",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"profile",
-								"details"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Change Password",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"usuario@example.com\",\n    \"code\": \"123456\",\n    \"newPassword\": \"newPassword123\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/profile/change-password",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"profile",
-								"change-password"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Logout",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/profile/logout",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"profile",
-								"logout"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "📌 Notifications",
-			"item": [
-				{
-					"name": "Get All Notifications",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Beare {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/notification",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"notification"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Notifications by Date Range",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/notification/range?fromDate=2024-01-01T00:00:00&toDate=2024-12-31T23:59:59",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"notification",
-								"range"
-							],
-							"query": [
-								{
-									"key": "fromDate",
-									"value": "2024-01-01T00:00:00"
-								},
-								{
-									"key": "toDate",
-									"value": "2024-12-31T23:59:59"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Search Notifications",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/notification/search?keyword=deuda",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"notification",
-								"search"
-							],
-							"query": [
-								{
-									"key": "keyword",
-									"value": "deuda"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "📌 Budgets",
-			"item": [
-				{
-					"name": "Get All Budgets",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/budget",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"budget"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Budget Comparison",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/budget/report/comparison",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"budget",
-								"report",
-								"comparison"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Budget Summary",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/budget/report/summary",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"budget",
-								"report",
-								"summary"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Budget Enrollments",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/budget/enroll",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"budget",
-								"enroll"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Budget",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Presupuesto Mensual Enero\",\n  \"totalBudget\": 5000.00,\n  \"remainingBudget\": 5000.00\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/budget/add",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"budget",
-								"add"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Multiple Budgets",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "[\n  {\n    \"name\": \"Presupuesto Febrero\",\n    \"totalBudget\": 4500.00,\n    \"remainingBudget\": 4500.00\n  },\n  {\n    \"name\": \"Presupuesto Marzo\",\n    \"totalBudget\": 5200.00,\n    \"remainingBudget\": 5200.00\n  }\n]"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/budget/batch/add",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"budget",
-								"batch",
-								"add"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Budget",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"id\": 1,\n  \"name\": \"Presupuesto Mensual Enero Actualizado\",\n  \"totalBudget\": 5500.00,\n  \"remainingBudget\": 4800.00\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/budget/update",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"budget",
-								"update"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Multiple Budgets",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "[\n  {\n    \"id\": 1,\n    \"name\": \"Presupuesto Enero Actualizado\",\n    \"totalBudget\": 5500.00,\n    \"remainingBudget\": 4800.00\n  },\n  {\n    \"id\": 2,\n    \"name\": \"Presupuesto Febrero Actualizado\",\n    \"totalBudget\": 4800.00,\n    \"remainingBudget\": 4200.00\n  }\n]"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/budget/batch/update",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"budget",
-								"batch",
-								"update"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Enroll Profile to Budget",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/budget/enroll/add?profileId=1&budgetId=1",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"budget",
-								"enroll",
-								"add"
-							],
-							"query": [
-								{
-									"key": "profileId",
-									"value": "1"
-								},
-								{
-									"key": "budgetId",
-									"value": "1"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Budget",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/budget/1",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"budget",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Multiple Budgets",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/budget/batch?id=1&id=2",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"budget",
-								"batch"
-							],
-							"query": [
-								{
-									"key": "id",
-									"value": "1"
-								},
-								{
-									"key": "id",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Remove Budget Enrollment",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/budget/enroll/1",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"budget",
-								"enroll",
-								"1"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "📌 Categories",
-			"item": [
-				{
-					"name": "Get All Categories",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/category",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"category"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Transaction by Category",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/category/report/summary",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"category",
-								"report",
-								"summary"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Category Report",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/category/report/1",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"category",
-								"report",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Category Enrollments",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/category/enroll",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"category",
-								"enroll"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Business UserCategory Enrollments",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/category/report/enroll",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"category",
-								"report",
-								"enroll"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Category",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"budgetId\": null,\n  \"description\": {\n    \"name\": \"Alimentación\",\n    \"assignedBudget\": 1500.00,\n    \"state\": \"ACTIVE\"\n  },\n  \"startDate\": \"2024-01-01T00:00:00\",\n  \"finishDate\": \"2024-01-31T23:59:59\"\n}\n"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/category/add",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"category",
-								"add"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Multiple Categories",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "[\n  {\n    \"budgetId\": null,\n    \"description\": {\n      \"name\": \"Transporte\",\n      \"assignedBudget\": 800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": null,\n    \"description\": {\n      \"name\": \"Entretenimiento\",\n      \"assignedBudget\": 500.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  }\n]"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/category/batch/add",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"category",
-								"batch",
-								"add"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Category",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"id\": 1,\n  \"budget\": {\n    \"id\": 1,\n    \"name\": \"Presupuesto Mensual\",\n    \"totalBudget\": 5000.00,\n    \"remainingBudget\": 4200.00\n  },\n  \"description\": {\n    \"name\": \"Alimentación y Comestibles\",\n    \"assignedBudget\": 1800.00,\n    \"state\": \"ACTIVE\"\n  },\n  \"startDate\": \"2024-01-01T00:00:00\",\n  \"finishDate\": \"2024-01-31T23:59:59\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/category/update",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"category",
-								"update"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Multiple Categories",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "[\n  {\n    \"id\": 1,\n    \"budgetId\": null,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  }\n]"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/category/batch/update",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"category",
-								"batch",
-								"update"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Enroll Profile to Category",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/category/enroll/add?profileId=1&categoryId=1",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"category",
-								"enroll",
-								"add"
-							],
-							"query": [
-								{
-									"key": "profileId",
-									"value": "1"
-								},
-								{
-									"key": "categoryId",
-									"value": "1"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Category",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/category/1",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"category",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Multiple Categories",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/category/batch?id=1&id=2",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"category",
-								"batch"
-							],
-							"query": [
-								{
-									"key": "id",
-									"value": "1"
-								},
-								{
-									"key": "id",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Remove Category Enrollment",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/category/enroll/1",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"category",
-								"enroll",
-								"1"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "📌 Debts",
-			"item": [
-				{
-					"name": "Get All Debts",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/debt",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"debt"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Debts by State",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/debt/state/ACTIVE",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"debt",
-								"state",
-								"ACTIVE"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Overdue Debts",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/debt/overdue",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"debt",
-								"overdue"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Debts Expiring Soon",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/debt/expiring-soon?days=7",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"debt",
-								"expiring-soon"
-							],
-							"query": [
-								{
-									"key": "days",
-									"value": "7"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Total Pending Amount",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/debt/total-pending",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"debt",
-								"total-pending"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Debt Summary Report",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/debt/report/summary",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"debt",
-								"report",
-								"summary"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Debt",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"transactionId\": 1,\n  \"name\": \"Préstamo Personal\",\n  \"totalAmount\": 10000.00,\n  \"pendingAmount\": 8500.00,\n  \"startDate\": \"2024-01-15T10:00:00\",\n  \"expirationDate\": \"2024-12-15T23:59:59\",\n  \"state\": \"ACTIVE\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/debt/add",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"debt",
-								"add"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Multiple Debts",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "[\n  {\n    \"transactionId\": 2,\n    \"name\": \"Tarjeta de Crédito\",\n    \"totalAmount\": 3500.00,\n    \"pendingAmount\": 2800.00,\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"expirationDate\": \"2024-03-01T23:59:59\",\n    \"state\": \"ACTIVE\"\n  },\n  {\n    \"transactionId\": 3,\n    \"name\": \"Préstamo Vehicular\",\n    \"totalAmount\": 25000.00,\n    \"pendingAmount\": 22000.00,\n    \"startDate\": \"2024-01-10T09:00:00\",\n    \"expirationDate\": \"2026-01-10T23:59:59\",\n    \"state\": \"ACTIVE\"\n  }\n]"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/debt/batch/add",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"debt",
-								"batch",
-								"add"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Debt",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"id\": 1,\n  \"name\": \"Préstamo Personal Actualizado\",\n  \"totalAmount\": 10000.00,\n  \"pendingAmount\": 8000.00,\n  \"startDate\": \"2024-01-15T10:00:00\",\n  \"expirationDate\": \"2024-12-15T23:59:59\",\n  \"state\": \"ACTIVE\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/debt/update",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"debt",
-								"update"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Multiple Debts",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "[\n  {\n    \"id\": 1,\n    \"name\": \"Préstamo Personal - Cuota Enero\",\n    \"totalAmount\": 10000.00,\n    \"pendingAmount\": 7500.00,\n    \"startDate\": \"2024-01-15T10:00:00\",\n    \"expirationDate\": \"2024-12-15T23:59:59\",\n    \"state\": \"ACTIVE\"\n  }\n]"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/debt/batch/update",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"debt",
-								"batch",
-								"update"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Make Payment",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"debtId\": 1,\n  \"paymentAmount\": 500.00,\n  \"description\": \"Pago mensual de enero\",\n  \"paymentDate\": \"2024-01-30T14:30:00\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/debt/payment",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"debt",
-								"payment"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Debt State",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/debt/1/state/PAID",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"debt",
-								"1",
-								"state",
-								"PAID"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Debt",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/debt/1",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"debt",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Multiple Debts",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/debt/batch?id=1&id=2",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"debt",
-								"batch"
-							],
-							"query": [
-								{
-									"key": "id",
-									"value": "1"
-								},
-								{
-									"key": "id",
-									"value": "2"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "📌 Transactions",
-			"item": [
-				{
-					"name": "Get All Transactions",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/transaction",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"transaction"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Transactions Summary",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/transaction/report/summary",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"transaction",
-								"report",
-								"summary"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Transaction",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"categoryId\": null,\n  \"budgetId\": null,\n  \"debtId\": null,\n  \"description\": {\n    \"name\": \"Compra Supermercado\",\n    \"description\": \"Compra semanal de alimentos\",\n    \"type\": \"EXPENSE\"\n  },\n  \"amount\": 25000\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/transaction/add",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"transaction",
-								"add"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Multiple Transactions",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "[\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"description\": {\n      \"name\": \"Gasolina\",\n      \"description\": \"Tanqueada semanal\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 80.00\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"description\": {\n      \"name\": \"Salario\",\n      \"description\": \"Pago mensual salario\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 3000.00\n  }\n]"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/transaction/batch/add",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"transaction",
-								"batch",
-								"add"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Transaction",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"id\": 1,\n  \"categoryId\": 1,\n  \"budgetId\": 1,\n  \"debtId\": 1,\n  \"description\": {\n    \"name\": \"Compra Supermercado Actualizada\",\n    \"description\": \"Compra quincenal de alimentos y productos de limpieza\",\n    \"type\": \"EXPENSE\"\n  },\n  \"amount\": 280.00\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/transaction/update",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"transaction",
-								"update"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Multiple Transactions",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "[\n  {\n    \"id\": 1,\n    \"categoryId\": 1,\n    \"budgetId\": 1,\n    \"debtId\": 1,\n    \"description\": {\n      \"name\": \"Compra de supermercado actualizada\",\n      \"description\": \"Compra semanal actualizada\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 175.25\n  },\n  {\n    \"id\": 2,\n    \"categoryId\": 2,\n    \"budgetId\": 1,\n    \"debtId\": 2,\n    \"description\": {\n      \"name\": \"Pago de servicios actualizado\",\n      \"description\": \"Pago de electricidad actualizado\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 95.75\n  }\n]"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/transaction/batch/update",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"transaction",
-								"batch",
-								"update"
-							]
-						},
-						"description": "Actualiza múltiples transacciones en una sola operación"
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Transaction",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/transaction/1",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"transaction",
-								"1"
-							]
-						},
-						"description": "Elimina una transacción específica por su ID"
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Multiple Transactions",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/transaction/batch?id=1&id=2&id=3",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"transaction",
-								"batch"
-							],
-							"query": [
-								{
-									"key": "id",
-									"value": "1"
-								},
-								{
-									"key": "id",
-									"value": "2"
-								},
-								{
-									"key": "id",
-									"value": "3"
-								}
-							]
-						},
-						"description": "Elimina múltiples transacciones especificando sus IDs como parámetros de consulta"
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "📌 Echange Rate",
-			"item": [
-				{
-					"name": "Get All Rates",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/exchange-rates",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"exchange-rates"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Convert",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"amount\": 100.00,\n  \"baseCurrency\": \"USD\",\n  \"targetCurrency\": \"EUR\"\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/exchange-rates/convert",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"v1",
-								"exchange-rates",
-								"convert"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "📌 Payment Subscription",
-			"item": [
-				{
-					"name": "Wompi",
+					"name": "🤖 AI Chat",
 					"item": [
 						{
-							"name": "Tokenize Card",
+							"name": "Basic Chat",
 							"request": {
 								"method": "POST",
 								"header": [
@@ -2314,186 +30,95 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"cardNumber\": \"4111111111111111\",\n  \"cvc\": \"123\",\n  \"expiryMonth\": \"12\",\n  \"expiryYear\": \"2025\",\n  \"cardHolder\": \"Juan Pérez\"\n}"
+									"raw": "{\n  \"model\": \"OPENAI\",\n  \"conversationId\": \"conv_42fd74ff21bc\",\n  \"prompt\": \"Elabora un informe detallado en un archivo PDF de mis transacciones y presupuestos, en el cual evalues del 1 al 10 mi salud financiera\"\n}\n"
 								},
 								"url": {
-									"raw": "{{base_url}}/v1/wompi/payments/tokenize-card",
+									"raw": "{{base_url_chat}}/v1/chat",
 									"host": [
-										"{{base_url}}"
+										"{{base_url_chat}}"
 									],
 									"path": [
 										"v1",
-										"wompi",
-										"payments",
-										"tokenize-card"
+										"chat"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "Get User Tokens",
+							"name": "Chat with URL",
 							"request": {
-								"method": "GET",
+								"method": "POST",
 								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
 									{
 										"key": "Authorization",
 										"value": "Bearer {{jwt_token}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"model\": \"GPT_4\",\n  \"conversationId\": \"conv-456\",\n  \"prompt\": \"Analiza los datos de este enlace y dame un resumen\",\n  \"files\": [\n    \"https://ejemplo.com/archivo1.pdf\",\n    \"https://ejemplo.com/archivo2.csv\"\n  ]\n}"
+								},
 								"url": {
-									"raw": "{{base_url}}/v1/wompi/payments/tokens",
+									"raw": "{{base_url_chat}}/v1/chat-with-url",
 									"host": [
-										"{{base_url}}"
+										"{{base_url_chat}}"
 									],
 									"path": [
 										"v1",
-										"wompi",
-										"payments",
-										"tokens"
+										"chat-with-url"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "Create Subscription Payment using a existing token",
+							"name": "Chat with File",
 							"request": {
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
 										"value": "Bearer {{jwt_token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"type": "text"
 									}
 								],
 								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"subscriptionType\": \"PREMIUM\",\n  \"paymentTokenId\": 1,\n  \"shippingAddress\": {\n    \"address_line_1\": \"Calle 123 #45-67\",\n    \"country\": \"CO\",\n    \"region\": \"Cundinamarca\",\n    \"city\": \"Bogotá\",\n    \"name\": \"Juan Pérez\",\n    \"phone_number\": \"+573001234567\"\n  },\n  \"customerData\": {\n    \"phone_number\": \"+573001234567\",\n    \"full_name\": \"Juan Pérez\"\n  },\n  \"paymentOptions\": {\n    \"installments\": 1\n  }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "model",
+											"value": "GPT_4",
+											"type": "text"
+										},
+										{
+											"key": "conversationId",
+											"value": "conv-789",
+											"type": "text"
+										},
+										{
+											"key": "prompt",
+											"value": "Analiza este archivo y extrae información importante",
+											"type": "text"
+										},
+										{
+											"key": "file",
+											"type": "file",
+											"src": []
 										}
-									}
+									]
 								},
 								"url": {
-									"raw": "{{base_url}}/v1/wompi/payments/subscription",
+									"raw": "{{base_url_chat}}/v1/chat-with-file",
 									"host": [
-										"{{base_url}}"
+										"{{base_url_chat}}"
 									],
 									"path": [
 										"v1",
-										"wompi",
-										"payments",
-										"subscription"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Create Subscription Payment tokenized a new target card",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{jwt_token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"subscriptionType\": \"STANDARD\",\n  \"cardInfo\": {\n    \"cardNumber\": \"4111111111111111\",\n    \"cvc\": \"123\",\n    \"expiryMonth\": \"12\",\n    \"expiryYear\": \"2025\",\n    \"cardHolder\": \"Juan Pérez\"\n  },\n  \"shippingAddress\": {\n    \"address_line_1\": \"Carrera 15 #93-07\",\n    \"country\": \"CO\",\n    \"region\": \"Cundinamarca\", \n    \"city\": \"Bogotá\",\n    \"name\": \"María González\",\n    \"phone_number\": \"+573009876543\"\n  },\n  \"customerData\": {\n    \"phone_number\": \"+573009876543\",\n    \"full_name\": \"María González\"\n  },\n  \"paymentOptions\": {\n    \"installments\": 3\n  }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{base_url}}/v1/wompi/payments/subscription",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"v1",
-										"wompi",
-										"payments",
-										"subscription"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get Subscription Status",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{jwt_token}}"
-									}
-								],
-								"url": {
-									"raw": "{{base_url}}/v1/wompi/payments/subscription/1",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"v1",
-										"wompi",
-										"payments",
-										"subscription",
-										"1"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Handle Wompi Webhook",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{jwt_token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"event\": \"transaction.updated\",\n  \"data\": {\n    \"id\": \"12345-abc-67890\",\n    \"status\": \"APPROVED\",\n    \"amount_in_cents\": 2990000,\n    \"currency\": \"COP\"\n  }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{base_url}}/v1/wompi/payments/webhook",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"v1",
-										"wompi",
-										"payments",
-										"webhook"
+										"chat-with-file"
 									]
 								}
 							},
@@ -2502,7 +127,156 @@
 					]
 				},
 				{
-					"name": "Mercado Pago",
+					"name": "📚 Chat History",
+					"item": [
+						{
+							"name": "Get Conversation History",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_chat}}/v1/chat/history/user",
+									"host": [
+										"{{base_url_chat}}"
+									],
+									"path": [
+										"v1",
+										"chat",
+										"history",
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Conversation History by Id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_chat}}/v1/chat/history/conv_42fd74ff21bc",
+									"host": [
+										"{{base_url_chat}}"
+									],
+									"path": [
+										"v1",
+										"chat",
+										"history",
+										"conv_42fd74ff21bc"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Chat History",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_chat}}/v1/chat/history/delete/conv_42fd74ff21bc",
+									"host": [
+										"{{base_url_chat}}"
+									],
+									"path": [
+										"v1",
+										"chat",
+										"history",
+										"delete",
+										"conv_42fd74ff21bc"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "🔧 Models",
+					"item": [
+						{
+							"name": "Get Available Models",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_chat}}/v1/model",
+									"host": [
+										"{{base_url_chat}}"
+									],
+									"path": [
+										"v1",
+										"model"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Reports",
+					"item": [
+						{
+							"name": "Get Report",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_chat}}/v1/reports/download/d63452b4-66ea-43cc-ab67-def7dcc2795e",
+									"host": [
+										"{{base_url_chat}}"
+									],
+									"path": [
+										"v1",
+										"reports",
+										"download",
+										"d63452b4-66ea-43cc-ab67-def7dcc2795e"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "KuentecoApp",
+			"item": [
+				{
+					"name": "📌 Payment Subscription",
 					"item": [
 						{
 							"name": "Create Subscription",
@@ -2521,17 +295,41 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"subscriptionType\": \"BASIC\",\n  \"backUrl\": \"https://github.com/AlthosKal/KuenteCO\"\n}\n"
+									"raw": "{\n  \"subscriptionType\": \"PREMIUM\",\n  \"backUrl\": \"https://github.com/AlthosKal/KuenteCO\"\n}\n"
 								},
 								"url": {
-									"raw": "{{base_url}}/v1/mercado-pago/subscription",
+									"raw": "{{base_url}}/v1/subscription",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"v1",
-										"mercado-pago",
 										"subscription"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Subscription by Id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/subscription/3c6183ee17d4492db87e133d47afee0e",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"subscription",
+										"3c6183ee17d4492db87e133d47afee0e"
 									]
 								}
 							},
@@ -2541,38 +339,2449 @@
 							"name": "Get Subscription",
 							"request": {
 								"method": "GET",
-								"header": [],
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
 								"url": {
-									"raw": "{{base_url}}/v1/mercado-pago/subscription/3c6183ee17d4492db87e133d47afee0e",
+									"raw": "{{base_url}}/v1/subscription/my-subscriptions",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"v1",
-										"mercado-pago",
 										"subscription",
-										"3c6183ee17d4492db87e133d47afee0e"
+										"my-subscriptions"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "Get Payment History",
+							"name": "Get Payment History by Id",
 							"request": {
 								"method": "GET",
-								"header": [],
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
 								"url": {
-									"raw": "{{base_url}}/v1/mercado-pago/subscription/3c6183ee17d4492db87e133d47afee0e/payment-history",
+									"raw": "{{base_url}}/v1/subscription/3c6183ee17d4492db87e133d47afee0e/payment-history",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"v1",
-										"mercado-pago",
 										"subscription",
 										"3c6183ee17d4492db87e133d47afee0e",
 										"payment-history"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "📌 Excel",
+					"item": [
+						{
+							"name": "Export Excel",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/excel/export",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"excel",
+										"export"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Import Excel",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"description": "File",
+											"type": "file",
+											"src": "/home/yeferson/Descargas/finanzas.xlsx"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/excel/import",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"excel",
+										"import"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "📌 Echange Rate",
+					"item": [
+						{
+							"name": "Get All Rates",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/v1/exchange-rates",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"exchange-rates"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Convert",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"amount\": 100.00,\n  \"baseCurrency\": \"USD\",\n  \"targetCurrency\": \"EUR\"\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/exchange-rates/convert",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"exchange-rates",
+										"convert"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "📌 Transactions",
+					"item": [
+						{
+							"name": "Get All Transactions",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/transaction",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"transaction"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Transactions Summary",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/transaction/report/summary",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"transaction",
+										"report",
+										"summary"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get  Bancolombia Transactions",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"product\": \"bnpl\",\n  \"identificationType\": \"nit\",\n  \"identificationNumber\": \"1999012334-6\",\n  \"initialDate\": \"01/03/2023\",\n  \"finalDate\": \"31/03/2023\",\n  \"timeSpan\": \"D\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/transaction/bancolombia",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"transaction",
+										"bancolombia"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Transaction",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"categoryId\": null,\n  \"budgetId\": null,\n  \"debtId\": null,\n  \"name\": \"Compra Supermercado\",\n  \"description\": {\n    \"description\": \"Compra semanal de alimentos\",\n    \"type\": \"EXPENSE\"\n  },\n  \"amount\": 25000\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/transaction/add",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"transaction",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Multiple Transactions",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Gasolina\",\n    \"description\": {\n      \"description\": \"Tanqueada semanal\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 80.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Salario\",\n    \"description\": {\n      \"description\": \"Pago mensual salario\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 3000.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Comida\",\n    \"description\": {\n      \"description\": \"Compras supermercado\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 120.5\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Freelance\",\n    \"description\": {\n      \"description\": \"Proyecto freelance\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 750.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Entretenimiento\",\n    \"description\": {\n      \"description\": \"Suscripciones\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 35.99\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Bonificación\",\n    \"description\": {\n      \"description\": \"Bono trimestral\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 500.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Transporte\",\n    \"description\": {\n      \"description\": \"Uber y buses\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 60.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Renta\",\n    \"description\": {\n      \"description\": \"Pago mensual de arriendo\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 900.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Intereses\",\n    \"description\": {\n      \"description\": \"Rendimientos de inversión\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 200.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Gimnasio\",\n    \"description\": {\n      \"description\": \"Membresía mensual\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 45.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Salario\",\n    \"description\": {\n      \"description\": \"Pago mensual salario\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 3100.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Café\",\n    \"description\": {\n      \"description\": \"Café diario\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 60.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Regalías\",\n    \"description\": {\n      \"description\": \"Ingresos pasivos\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 120.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Servicios\",\n    \"description\": {\n      \"description\": \"Agua, luz, internet\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 200.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Ventas\",\n    \"description\": {\n      \"description\": \"Ingreso por ventas\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 650.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Restaurante\",\n    \"description\": {\n      \"description\": \"Salidas a comer\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 90.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Intereses\",\n    \"description\": {\n      \"description\": \"Ganancia de inversión\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 210.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Ropa\",\n    \"description\": {\n      \"description\": \"Compras personales\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 130.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Salario\",\n    \"description\": {\n      \"description\": \"Pago mensual salario\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 3050.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Farmacia\",\n    \"description\": {\n      \"description\": \"Medicamentos\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 40.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Freelance\",\n    \"description\": {\n      \"description\": \"Proyecto independiente\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 680.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Entretenimiento\",\n    \"description\": {\n      \"description\": \"Netflix y Spotify\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 30.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Bonificación\",\n    \"description\": {\n      \"description\": \"Bono anual\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 800.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Gasolina\",\n    \"description\": {\n      \"description\": \"Llenado de tanque\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 70.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Regalías\",\n    \"description\": {\n      \"description\": \"Ingreso pasivo mensual\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 180.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Compras\",\n    \"description\": {\n      \"description\": \"Amazon y tiendas\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 220.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Renta\",\n    \"description\": {\n      \"description\": \"Pago mensual vivienda\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 920.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Ventas\",\n    \"description\": {\n      \"description\": \"Ventas online\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 450.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Café\",\n    \"description\": {\n      \"description\": \"Capuccino diario\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 45.0\n  },\n  {\n    \"categoryId\": null,\n    \"budgetId\": null,\n    \"debtId\": null,\n    \"name\": \"Intereses\",\n    \"description\": {\n      \"description\": \"Retorno de inversión\",\n      \"type\": \"INCOME\"\n    },\n    \"amount\": 190.0\n  }\n]\n"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/transaction/batch/add",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"transaction",
+										"batch",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Transaction",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": 1,\n  \"categoryId\": 1,\n  \"budgetId\": 1,\n  \"debtId\": 1,\n  \"description\": {\n    \"name\": \"Compra Supermercado Actualizada\",\n    \"description\": \"Compra quincenal de alimentos y productos de limpieza\",\n    \"type\": \"EXPENSE\"\n  },\n  \"amount\": 280.00\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/transaction/update",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"transaction",
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Multiple Transactions",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\n  {\n    \"id\": 1,\n    \"categoryId\": 1,\n    \"budgetId\": 1,\n    \"debtId\": 1,\n    \"description\": {\n      \"name\": \"Compra de supermercado actualizada\",\n      \"description\": \"Compra semanal actualizada\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 175.25\n  },\n  {\n    \"id\": 2,\n    \"categoryId\": 2,\n    \"budgetId\": 1,\n    \"debtId\": 2,\n    \"description\": {\n      \"name\": \"Pago de servicios actualizado\",\n      \"description\": \"Pago de electricidad actualizado\",\n      \"type\": \"EXPENSE\"\n    },\n    \"amount\": 95.75\n  }\n]"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/transaction/batch/update",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"transaction",
+										"batch",
+										"update"
+									]
+								},
+								"description": "Actualiza múltiples transacciones en una sola operación"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Transaction",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/transaction/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"transaction",
+										"1"
+									]
+								},
+								"description": "Elimina una transacción específica por su ID"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Multiple Transactions",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/transaction/batch?id=1&id=2&id=3",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"transaction",
+										"batch"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										},
+										{
+											"key": "id",
+											"value": "2"
+										},
+										{
+											"key": "id",
+											"value": "3"
+										}
+									]
+								},
+								"description": "Elimina múltiples transacciones especificando sus IDs como parámetros de consulta"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "📌 Debts",
+					"item": [
+						{
+							"name": "Get All Debts",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/debt",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"debt"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Debts by State",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/debt/state/ACTIVE",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"debt",
+										"state",
+										"ACTIVE"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Overdue Debts",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/debt/overdue",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"debt",
+										"overdue"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Debts Expiring Soon",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/debt/expiring-soon?days=7",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"debt",
+										"expiring-soon"
+									],
+									"query": [
+										{
+											"key": "days",
+											"value": "7"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Total Pending Amount",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/debt/total-pending",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"debt",
+										"total-pending"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Debt Summary Report",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/debt/report/summary",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"debt",
+										"report",
+										"summary"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Debt",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"transactionId\": 1,\n  \"name\": \"Préstamo Personal\",\n  \"totalAmount\": 10000.00,\n  \"pendingAmount\": 8500.00,\n  \"startDate\": \"2024-01-15T10:00:00\",\n  \"expirationDate\": \"2024-12-15T23:59:59\",\n  \"state\": \"ACTIVE\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/debt/add",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"debt",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Multiple Debts",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\n  { \"transactionId\": 1, \"name\": \"Tarjeta de Crédito\", \"totalAmount\": 3500.00, \"pendingAmount\": 2800.00, \"startDate\": \"2024-01-01T00:00:00\", \"expirationDate\": \"2024-03-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 2, \"name\": \"Préstamo Vehicular\", \"totalAmount\": 25000.00, \"pendingAmount\": 22000.00, \"startDate\": \"2024-01-10T09:00:00\", \"expirationDate\": \"2026-01-10T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 3, \"name\": \"Préstamo Personal\", \"totalAmount\": 15000.00, \"pendingAmount\": 12000.00, \"startDate\": \"2023-11-01T00:00:00\", \"expirationDate\": \"2025-11-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 4, \"name\": \"Hipoteca\", \"totalAmount\": 180000.00, \"pendingAmount\": 174000.00, \"startDate\": \"2020-06-15T00:00:00\", \"expirationDate\": \"2040-06-15T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 5, \"name\": \"Crédito Educativo\", \"totalAmount\": 20000.00, \"pendingAmount\": 15000.00, \"startDate\": \"2022-09-01T00:00:00\", \"expirationDate\": \"2026-09-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 6, \"name\": \"Línea de Crédito\", \"totalAmount\": 8000.00, \"pendingAmount\": 3000.00, \"startDate\": \"2024-02-01T00:00:00\", \"expirationDate\": \"2024-07-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 7, \"name\": \"Crédito Celular\", \"totalAmount\": 1200.00, \"pendingAmount\": 800.00, \"startDate\": \"2024-03-15T00:00:00\", \"expirationDate\": \"2024-09-15T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 8, \"name\": \"Tarjeta de Tienda\", \"totalAmount\": 4000.00, \"pendingAmount\": 3500.00, \"startDate\": \"2024-01-20T00:00:00\", \"expirationDate\": \"2024-12-20T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 9, \"name\": \"Crédito Médico\", \"totalAmount\": 5000.00, \"pendingAmount\": 2500.00, \"startDate\": \"2023-10-10T00:00:00\", \"expirationDate\": \"2025-10-10T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 10, \"name\": \"Financiamiento PC\", \"totalAmount\": 3500.00, \"pendingAmount\": 2100.00, \"startDate\": \"2023-12-01T00:00:00\", \"expirationDate\": \"2024-12-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 11, \"name\": \"Préstamo Viaje\", \"totalAmount\": 6000.00, \"pendingAmount\": 5000.00, \"startDate\": \"2024-05-01T00:00:00\", \"expirationDate\": \"2025-05-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 12, \"name\": \"Crédito Gimnasio\", \"totalAmount\": 1200.00, \"pendingAmount\": 1000.00, \"startDate\": \"2024-04-01T00:00:00\", \"expirationDate\": \"2025-04-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 13, \"name\": \"Crédito Curso\", \"totalAmount\": 2000.00, \"pendingAmount\": 1500.00, \"startDate\": \"2023-06-01T00:00:00\", \"expirationDate\": \"2024-06-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 14, \"name\": \"Tarjeta Premium\", \"totalAmount\": 10000.00, \"pendingAmount\": 9000.00, \"startDate\": \"2024-02-01T00:00:00\", \"expirationDate\": \"2025-02-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 15, \"name\": \"Crédito Dental\", \"totalAmount\": 4500.00, \"pendingAmount\": 3000.00, \"startDate\": \"2023-09-01T00:00:00\", \"expirationDate\": \"2024-09-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 16, \"name\": \"Préstamo Urgente\", \"totalAmount\": 5000.00, \"pendingAmount\": 4500.00, \"startDate\": \"2024-06-01T00:00:00\", \"expirationDate\": \"2025-06-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 17, \"name\": \"Crédito Electrodomésticos\", \"totalAmount\": 3000.00, \"pendingAmount\": 2000.00, \"startDate\": \"2024-01-15T00:00:00\", \"expirationDate\": \"2025-01-15T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 18, \"name\": \"Financiamiento Bici\", \"totalAmount\": 1500.00, \"pendingAmount\": 800.00, \"startDate\": \"2024-02-20T00:00:00\", \"expirationDate\": \"2024-10-20T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 19, \"name\": \"Pago Servicios Médicos\", \"totalAmount\": 4000.00, \"pendingAmount\": 1000.00, \"startDate\": \"2023-05-01T00:00:00\", \"expirationDate\": \"2024-05-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 20, \"name\": \"Préstamo Negocio\", \"totalAmount\": 10000.00, \"pendingAmount\": 8500.00, \"startDate\": \"2024-03-01T00:00:00\", \"expirationDate\": \"2026-03-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 21, \"name\": \"Préstamo Mueble\", \"totalAmount\": 2500.00, \"pendingAmount\": 2300.00, \"startDate\": \"2024-02-01T00:00:00\", \"expirationDate\": \"2024-12-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 22, \"name\": \"Crédito Electrónica\", \"totalAmount\": 5500.00, \"pendingAmount\": 3200.00, \"startDate\": \"2023-07-01T00:00:00\", \"expirationDate\": \"2024-07-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 23, \"name\": \"Tarjeta Recompensas\", \"totalAmount\": 6000.00, \"pendingAmount\": 5900.00, \"startDate\": \"2023-03-01T00:00:00\", \"expirationDate\": \"2024-03-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 24, \"name\": \"Crédito Salud\", \"totalAmount\": 7000.00, \"pendingAmount\": 3500.00, \"startDate\": \"2022-12-01T00:00:00\", \"expirationDate\": \"2024-12-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 25, \"name\": \"Préstamo Equipos\", \"totalAmount\": 9000.00, \"pendingAmount\": 7200.00, \"startDate\": \"2024-01-05T00:00:00\", \"expirationDate\": \"2026-01-05T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 26, \"name\": \"Crédito Vacacional\", \"totalAmount\": 3000.00, \"pendingAmount\": 2900.00, \"startDate\": \"2024-06-01T00:00:00\", \"expirationDate\": \"2025-06-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 27, \"name\": \"Crédito Consumo\", \"totalAmount\": 15000.00, \"pendingAmount\": 11000.00, \"startDate\": \"2023-08-01T00:00:00\", \"expirationDate\": \"2025-08-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 28, \"name\": \"Crédito Educativo Extra\", \"totalAmount\": 18000.00, \"pendingAmount\": 12000.00, \"startDate\": \"2023-10-01T00:00:00\", \"expirationDate\": \"2026-10-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 29, \"name\": \"Pago Dental\", \"totalAmount\": 3200.00, \"pendingAmount\": 1500.00, \"startDate\": \"2023-06-01T00:00:00\", \"expirationDate\": \"2024-06-01T23:59:59\", \"state\": \"ACTIVE\" },\n  { \"transactionId\": 30, \"name\": \"Tarjeta Black\", \"totalAmount\": 15000.00, \"pendingAmount\": 14500.00, \"startDate\": \"2024-04-01T00:00:00\", \"expirationDate\": \"2025-04-01T23:59:59\", \"state\": \"ACTIVE\" }\n]\n"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/debt/batch/add",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"debt",
+										"batch",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Debt",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": 1,\n  \"name\": \"Préstamo Personal Actualizado\",\n  \"totalAmount\": 10000.00,\n  \"pendingAmount\": 8000.00,\n  \"startDate\": \"2024-01-15T10:00:00\",\n  \"expirationDate\": \"2024-12-15T23:59:59\",\n  \"state\": \"ACTIVE\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/debt/update",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"debt",
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Multiple Debts",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\n  {\n    \"id\": 1,\n    \"name\": \"Préstamo Personal - Cuota Enero\",\n    \"totalAmount\": 10000.00,\n    \"pendingAmount\": 7500.00,\n    \"startDate\": \"2024-01-15T10:00:00\",\n    \"expirationDate\": \"2024-12-15T23:59:59\",\n    \"state\": \"ACTIVE\"\n  }\n]"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/debt/batch/update",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"debt",
+										"batch",
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Make Payment",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"debtId\": 2,\n  \"paymentAmount\": 500.00,\n  \"description\": \"Pago mensual de enero\",\n  \"paymentDate\": \"2024-01-30T14:30:00\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/debt/payment",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"debt",
+										"payment"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Debt State",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/debt/1/state/PAID",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"debt",
+										"1",
+										"state",
+										"PAID"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Debt",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/debt/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"debt",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Multiple Debts",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/debt/batch?id=1&id=2",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"debt",
+										"batch"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										},
+										{
+											"key": "id",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "📌 Categories",
+					"item": [
+						{
+							"name": "Get All Categories",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/category",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"category"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Transaction by Category",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/category/report/summary",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"category",
+										"report",
+										"summary"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Category Report",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/category/report/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"category",
+										"report",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Category Enrollments",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/category/enroll",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"category",
+										"enroll"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Business UserCategory Enrollments",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/category/enroll/user",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"category",
+										"enroll",
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Category",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"budgetId\": null,\n  \"name\": \"Alimentación\",\n  \"description\": {\n    \"assignedBudget\": 1500.00,\n    \"state\": \"ACTIVE\"\n  },\n  \"startDate\": \"2024-01-01T00:00:00\",\n  \"finishDate\": \"2024-01-31T23:59:59\"\n}\n"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/category/add",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"category",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Multiple Categories",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\n  {\n    \"budgetId\": 1,\n    \"name\": \"Transporte\",\n    \"description\": { \"assignedBudget\": 800.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 2,\n    \"name\": \"Entretenimiento\",\n    \"description\": { \"assignedBudget\": 500.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 3,\n    \"name\": \"Alimentación\",\n    \"description\": { \"assignedBudget\": 1200.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 4,\n    \"name\": \"Salud\",\n    \"description\": { \"assignedBudget\": 300.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 5,\n    \"name\": \"Educación\",\n    \"description\": { \"assignedBudget\": 1000.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 6,\n    \"name\": \"Hogar\",\n    \"description\": { \"assignedBudget\": 1500.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 7,\n    \"name\": \"Ropa\",\n    \"description\": { \"assignedBudget\": 400.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 8,\n    \"name\": \"Mascotas\",\n    \"description\": { \"assignedBudget\": 250.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 9,\n    \"name\": \"Regalos\",\n    \"description\": { \"assignedBudget\": 350.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 10,\n    \"name\": \"Viajes\",\n    \"description\": { \"assignedBudget\": 2000.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 11,\n    \"name\": \"Cuidado Personal\",\n    \"description\": { \"assignedBudget\": 600.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 12,\n    \"name\": \"Suscripciones\",\n    \"description\": { \"assignedBudget\": 100.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 13,\n    \"name\": \"Impuestos\",\n    \"description\": { \"assignedBudget\": 700.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 14,\n    \"name\": \"Servicios\",\n    \"description\": { \"assignedBudget\": 900.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 15,\n    \"name\": \"Tecnología\",\n    \"description\": { \"assignedBudget\": 1100.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 16,\n    \"name\": \"Ahorro\",\n    \"description\": { \"assignedBudget\": 2500.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 17,\n    \"name\": \"Donaciones\",\n    \"description\": { \"assignedBudget\": 200.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 18,\n    \"name\": \"Mantenimiento Auto\",\n    \"description\": { \"assignedBudget\": 450.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 19,\n    \"name\": \"Cuidado Infantil\",\n    \"description\": { \"assignedBudget\": 950.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 20,\n    \"name\": \"Electrodomésticos\",\n    \"description\": { \"assignedBudget\": 1300.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 21,\n    \"name\": \"Seguros\",\n    \"description\": { \"assignedBudget\": 780.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 22,\n    \"name\": \"Jardinería\",\n    \"description\": { \"assignedBudget\": 180.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 23,\n    \"name\": \"Hobbies\",\n    \"description\": { \"assignedBudget\": 700.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 24,\n    \"name\": \"Eventos Especiales\",\n    \"description\": { \"assignedBudget\": 600.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 25,\n    \"name\": \"Consultoría\",\n    \"description\": { \"assignedBudget\": 1250.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 26,\n    \"name\": \"Accesorios\",\n    \"description\": { \"assignedBudget\": 420.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 27,\n    \"name\": \"Reparaciones\",\n    \"description\": { \"assignedBudget\": 980.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 28,\n    \"name\": \"Papelería\",\n    \"description\": { \"assignedBudget\": 150.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 29,\n    \"name\": \"Servicios Profesionales\",\n    \"description\": { \"assignedBudget\": 890.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"budgetId\": 30,\n    \"name\": \"Herramientas\",\n    \"description\": { \"assignedBudget\": 620.00, \"state\": \"ACTIVE\" },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  }\n]\n"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/category/batch/add",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"category",
+										"batch",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Category",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": 2,\n  \"budgetId\": 2,\n  \"description\": {\n    \"name\": \"Alimentación y Comestibles\",\n    \"assignedBudget\": 1800.00,\n    \"state\": \"ACTIVE\"\n  },\n  \"startDate\": \"2024-01-01T00:00:00\",\n  \"finishDate\": \"2024-01-31T23:59:59\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/category/update",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"category",
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Multiple Categories",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\n  {\n    \"id\": 1,\n    \"budgetId\": 1,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 2,\n    \"budgetId\": 2,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 3,\n    \"budgetId\": 3,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 4,\n    \"budgetId\": 4,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 5,\n    \"budgetId\": 5,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 6,\n    \"budgetId\": 6,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 7,\n    \"budgetId\": 7,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 8,\n    \"budgetId\": 8,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 9,\n    \"budgetId\": 9,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 10,\n    \"budgetId\": 10,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 11,\n    \"budgetId\": 11,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 12,\n    \"budgetId\": 12,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 13,\n    \"budgetId\": 13,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 14,\n    \"budgetId\": 14,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 15,\n    \"budgetId\": 15,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 16,\n    \"budgetId\": 16,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 17,\n    \"budgetId\": 17,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 18,\n    \"budgetId\": 18,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 19,\n    \"budgetId\": 19,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 20,\n    \"budgetId\": 20,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 21,\n    \"budgetId\": 21,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 22,\n    \"budgetId\": 22,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 23,\n    \"budgetId\": 23,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 24,\n    \"budgetId\": 24,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 25,\n    \"budgetId\": 25,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 26,\n    \"budgetId\": 26,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 27,\n    \"budgetId\": 27,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 28,\n    \"budgetId\": 28,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 29,\n    \"budgetId\": 29,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  },\n  {\n    \"id\": 30,\n    \"budgetId\": 30,\n    \"description\": {\n      \"name\": \"Alimentación Actualizada\",\n      \"assignedBudget\": 1800.00,\n      \"state\": \"ACTIVE\"\n    },\n    \"startDate\": \"2024-01-01T00:00:00\",\n    \"finishDate\": \"2024-01-31T23:59:59\"\n  }\n]\n"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/category/batch/update",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"category",
+										"batch",
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Enroll Profile to Category",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/category/enroll/add?profileId=1&categoryId=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"category",
+										"enroll",
+										"add"
+									],
+									"query": [
+										{
+											"key": "profileId",
+											"value": "1"
+										},
+										{
+											"key": "categoryId",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Category",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/category/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"category",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Multiple Categories",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/category/batch?id=1&id=2",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"category",
+										"batch"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										},
+										{
+											"key": "id",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Category Enrollment",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/category/enroll/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"category",
+										"enroll",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "📌 Budgets",
+					"item": [
+						{
+							"name": "Get All Budgets",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/budget",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"budget"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Budget Comparison",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/budget/report/comparison",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"budget",
+										"report",
+										"comparison"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Budget Summary",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/budget/report/summary",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"budget",
+										"report",
+										"summary"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Budget Enrollments",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/budget/enroll",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"budget",
+										"enroll"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Budget",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Presupuesto Mensual Enero\",\n  \"totalBudget\": 5000.00,\n  \"remainingBudget\": 5000.00\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/budget/add",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"budget",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Multiple Budgets",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\n  { \"name\": \"Presupuesto Enero\", \"totalBudget\": 4000.00, \"remainingBudget\": 4000.00 },\n  { \"name\": \"Presupuesto Febrero\", \"totalBudget\": 4500.00, \"remainingBudget\": 4500.00 },\n  { \"name\": \"Presupuesto Marzo\", \"totalBudget\": 5200.00, \"remainingBudget\": 5200.00 },\n  { \"name\": \"Presupuesto Abril\", \"totalBudget\": 4800.00, \"remainingBudget\": 4800.00 },\n  { \"name\": \"Presupuesto Mayo\", \"totalBudget\": 5000.00, \"remainingBudget\": 5000.00 },\n  { \"name\": \"Presupuesto Junio\", \"totalBudget\": 4700.00, \"remainingBudget\": 4700.00 },\n  { \"name\": \"Presupuesto Julio\", \"totalBudget\": 5100.00, \"remainingBudget\": 5100.00 },\n  { \"name\": \"Presupuesto Agosto\", \"totalBudget\": 5300.00, \"remainingBudget\": 5300.00 },\n  { \"name\": \"Presupuesto Septiembre\", \"totalBudget\": 4400.00, \"remainingBudget\": 4400.00 },\n  { \"name\": \"Presupuesto Octubre\", \"totalBudget\": 4600.00, \"remainingBudget\": 4600.00 },\n  { \"name\": \"Presupuesto Noviembre\", \"totalBudget\": 4900.00, \"remainingBudget\": 4900.00 },\n  { \"name\": \"Presupuesto Diciembre\", \"totalBudget\": 5500.00, \"remainingBudget\": 5500.00 },\n  { \"name\": \"Presupuesto Viajes\", \"totalBudget\": 3000.00, \"remainingBudget\": 3000.00 },\n  { \"name\": \"Presupuesto Educación\", \"totalBudget\": 3800.00, \"remainingBudget\": 3800.00 },\n  { \"name\": \"Presupuesto Salud\", \"totalBudget\": 3200.00, \"remainingBudget\": 3200.00 },\n  { \"name\": \"Presupuesto Hogar\", \"totalBudget\": 6000.00, \"remainingBudget\": 6000.00 },\n  { \"name\": \"Presupuesto Entretenimiento\", \"totalBudget\": 1500.00, \"remainingBudget\": 1500.00 },\n  { \"name\": \"Presupuesto Ahorro\", \"totalBudget\": 7000.00, \"remainingBudget\": 7000.00 },\n  { \"name\": \"Presupuesto Ropa\", \"totalBudget\": 1200.00, \"remainingBudget\": 1200.00 },\n  { \"name\": \"Presupuesto Servicios\", \"totalBudget\": 2500.00, \"remainingBudget\": 2500.00 },\n  { \"name\": \"Presupuesto Transporte\", \"totalBudget\": 2800.00, \"remainingBudget\": 2800.00 },\n  { \"name\": \"Presupuesto Mascotas\", \"totalBudget\": 900.00, \"remainingBudget\": 900.00 },\n  { \"name\": \"Presupuesto Tecnología\", \"totalBudget\": 3300.00, \"remainingBudget\": 3300.00 },\n  { \"name\": \"Presupuesto Consultoría\", \"totalBudget\": 4200.00, \"remainingBudget\": 4200.00 },\n  { \"name\": \"Presupuesto Eventos\", \"totalBudget\": 2100.00, \"remainingBudget\": 2100.00 },\n  { \"name\": \"Presupuesto Hobbies\", \"totalBudget\": 1750.00, \"remainingBudget\": 1750.00 },\n  { \"name\": \"Presupuesto Reparaciones\", \"totalBudget\": 3900.00, \"remainingBudget\": 3900.00 },\n  { \"name\": \"Presupuesto Jardinería\", \"totalBudget\": 1400.00, \"remainingBudget\": 1400.00 },\n  { \"name\": \"Presupuesto Donaciones\", \"totalBudget\": 1100.00, \"remainingBudget\": 1100.00 },\n  { \"name\": \"Presupuesto Otros\", \"totalBudget\": 1600.00, \"remainingBudget\": 1600.00 }\n]\n"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/budget/batch/add",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"budget",
+										"batch",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Budget",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": 1,\n  \"name\": \"Presupuesto Mensual Enero Actualizado\",\n  \"totalBudget\": 5500.00,\n  \"remainingBudget\": 4800.00\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/budget/update",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"budget",
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Multiple Budgets",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\n  {\n    \"id\": 1,\n    \"name\": \"Presupuesto Enero Actualizado\",\n    \"totalBudget\": 5500.00,\n    \"remainingBudget\": 4800.00\n  },\n  {\n    \"id\": 2,\n    \"name\": \"Presupuesto Febrero Actualizado\",\n    \"totalBudget\": 4800.00,\n    \"remainingBudget\": 4200.00\n  }\n]"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/budget/batch/update",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"budget",
+										"batch",
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Enroll Profile to Budget",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/budget/enroll/add?profileId=1&budgetId=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"budget",
+										"enroll",
+										"add"
+									],
+									"query": [
+										{
+											"key": "profileId",
+											"value": "1"
+										},
+										{
+											"key": "budgetId",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Budget",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/budget/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"budget",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Multiple Budgets",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/budget/batch?id=1&id=2",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"budget",
+										"batch"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										},
+										{
+											"key": "id",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Budget Enrollment",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/budget/enroll/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"budget",
+										"enroll",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "📌 Notifications",
+					"item": [
+						{
+							"name": "Get All Notifications",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Beare {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/notification",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"notification"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Notifications by Date Range",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/notification/range?fromDate=2024-01-01T00:00:00&toDate=2024-12-31T23:59:59",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"notification",
+										"range"
+									],
+									"query": [
+										{
+											"key": "fromDate",
+											"value": "2024-01-01T00:00:00"
+										},
+										{
+											"key": "toDate",
+											"value": "2024-12-31T23:59:59"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search Notifications",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/notification/search?keyword=deuda",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"notification",
+										"search"
+									],
+									"query": [
+										{
+											"key": "keyword",
+											"value": "deuda"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "📌 Profile",
+					"item": [
+						{
+							"name": "Get All Profiles",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/profile",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"profile"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Profile Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const response = pm.response.json();",
+											"    if (response.success && response.data && response.data.token) {",
+											"        pm.collectionVariables.set('jwt_token', response.data.token);",
+											"        console.log('JWT Token saved: ' + response.data.token);",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"nameOrEmail\": \"Exzidi\",\n    \"password\": \"password123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/profile/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"profile",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Profile",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"Exzidi\",\n    \"email\": \"alejandromolinaacosta11@gmail.com\",\n    \"password\": \"password123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/profile/add",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"profile",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Profile",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": 1,\n    \"name\": \"Perfil Actualizado\",\n    \"email\": \"perfilactualizado@example.com\",\n    \"password\": \"newPassword123\",\n    \"image\": {\n        \"name\": \"profile-image.jpg\",\n        \"imageUrl\": \"https://example.com/image.jpg\",\n        \"imageId\": \"img_123\"\n    }\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/profile/update",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"profile",
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Profile",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/profile/{{profile_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"profile",
+										"{{profile_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Upload Profile Image",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "image",
+											"type": "file",
+											"src": "/path/to/profile-image.jpg"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/profile/image/add",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"profile",
+										"image",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Profile Image",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "image",
+											"type": "file",
+											"src": "/path/to/new-profile-image.jpg"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/profile/image/update",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"profile",
+										"image",
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Profile Image",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/profile/delete",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"profile",
+										"delete"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Authenticated Profile",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/profile/details",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"profile",
+										"details"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change Password",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"alejandromolinaacosta11@gmail.com\",\n    \"code\": \"436074\",\n    \"newPassword\": \"newPassword123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/profile/change-password",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"profile",
+										"change-password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Logout",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/profile/logout",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"profile",
+										"logout"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "📌 Authentication",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const response = pm.response.json();",
+											"    if (response.success && response.data && response.data.token) {",
+											"        pm.collectionVariables.set('jwt_token', response.data.token);",
+											"        console.log('JWT Token saved: ' + response.data.token);",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"nameOrEmail\": \"nuevoUsuario\",\n    \"password\": \"MiClave2024#\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/auth/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Register",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"nuevoUsuario\",\n    \"email\": \"agudelocastanoyeferson270@gmail.com\",\n    \"password\": \"MiClave2024#\",\n    \"type\": \"BUSINESS\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/auth/register",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Send Verification Code",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"alejandromolinaacosta11@gmail.com\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/auth/send-verification-code?isRegistration=true",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"auth",
+										"send-verification-code"
+									],
+									"query": [
+										{
+											"key": "isRegistration",
+											"value": "true",
+											"description": "Set to true for registration verification"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Validate Verification Code",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"usuario@example.com\",\n    \"code\": \"123456\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/auth/validate-verification-code",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"auth",
+										"validate-verification-code"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Activate User",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"agudelocastanoyeferson270@gmail.com\",\n    \"code\": \"152886\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/auth/activate-user",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"auth",
+										"activate-user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change Password",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"usuario@example.com\",\n    \"code\": \"123456\",\n    \"newPassword\": \"newPassword123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/auth/change-password",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"auth",
+										"change-password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Logout",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/auth/logout",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"auth",
+										"logout"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete User",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/auth/{{user_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"auth",
+										"{{user_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Authenticated User Details",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/auth/user/details",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"auth",
+										"user",
+										"details"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Upload User Image",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "image",
+											"type": "file",
+											"src": "/home/yeferson/Imágenes/Fondo.webp"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/auth/user/image/add",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"auth",
+										"user",
+										"image",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update User Image",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "image",
+											"type": "file",
+											"src": "/path/to/new-image.jpg"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/auth/user/image/update",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"auth",
+										"user",
+										"image",
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete User Image",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/v1/auth/delete",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"auth",
+										"delete"
 									]
 								}
 							},
@@ -2606,11 +2815,21 @@
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://localhost:8080/api",
+			"value": "http://localhost:8080/api/app",
 			"type": "string"
 		},
 		{
 			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "base_url_chat",
+			"value": "http://localhost:8080/api/chat",
+			"type": "string"
+		},
+		{
+			"key": "conversation_id",
 			"value": "",
 			"type": "string"
 		}

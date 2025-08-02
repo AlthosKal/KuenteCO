@@ -40,5 +40,5 @@ public interface SlaveDebtRepository extends JpaRepository<Debt, Integer> {
     List<Debt> findByUserAndExpirationDateBetween(
             User user, LocalDateTime start, LocalDateTime end);
 
-    Debt findDebtByUser(User user);
+    Debt getDebtByUserAndId(User user, Integer id);
 }

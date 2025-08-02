@@ -8,11 +8,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.dto.logic.category.CategoryEnrollmentDTO;
-import org.kuenteco.backend.dto.logic.category.CategoryEnrollmentSummaryDTO;
+import org.kuenteco.backend.dto.logic.category.CategoryEnrollmentProjection;
 import org.kuenteco.backend.entity.Category;
 import org.kuenteco.backend.entity.CategoryEnrollment;
 import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.User;
+import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.exception.exceptions.CategoryException;
 import org.kuenteco.backend.mapper.logic.category.CategoryEnrollmentMapper;
 import org.kuenteco.backend.repository.master.MasterCategoryEnrollmentRepository;
@@ -37,6 +38,11 @@ public class CategoryEnrollmentServiceImpl implements CategoryEnrollmentService 
     public Object getAllCategoryEnrollments() {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_USER) {
+            throw new CategoryException("Endpoint solo disponible para perfiles");
+        }
 
         log.info("Obteniendo las categorías asociadas de: {}", email);
         Profile profile =
@@ -57,8 +63,12 @@ public class CategoryEnrollmentServiceImpl implements CategoryEnrollmentService 
     public Object getBusinessUserCategoryEnrollments() {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
+        RoleList role = credentials.role();
 
-        List<CategoryEnrollmentSummaryDTO> dto =
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new CategoryException("Endpoint solo disponible para usuarios");
+        }
+        List<CategoryEnrollmentProjection> dto =
                 slaveCategoryEnrollmentRepository.findCategoryEnrollmentsByUserEmail(email);
         if (dto.isEmpty()) {
             return "No tienes Perfiles con Categorías asociadas";
@@ -71,6 +81,11 @@ public class CategoryEnrollmentServiceImpl implements CategoryEnrollmentService 
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
 
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new CategoryException("Endpoint solo disponible para usuarios");
+        }
         User user =
                 slaveUserRepository
                         .findByEmail(email)

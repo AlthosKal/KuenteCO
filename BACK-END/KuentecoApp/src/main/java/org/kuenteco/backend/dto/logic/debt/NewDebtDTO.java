@@ -9,26 +9,35 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.kuenteco.backend.enums.StateDebt;
+import org.kuenteco.backend.validation.ValidCurrency;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class NewDebtDTO {
 
+    @Positive(message = "El ID de la transacción debe ser un número positivo")
     private Integer transactionId;
 
     @NotBlank(message = "El nombre de la deuda es obligatorio")
     private String name;
 
     @NotNull(message = "El monto total es obligatorio")
-    @Positive(message = "El monto total debe ser positivo")
+    @ValidCurrency(
+            min = 0.01,
+            max = 999999999.99,
+            message = "El monto total debe ser un valor monetario válido")
     private BigDecimal totalAmount;
 
     @NotNull(message = "El monto pendiente es obligatorio")
-    @Positive(message = "El monto pendiente debe ser positivo")
+    @ValidCurrency(
+            min = 0.01,
+            max = 999999999.99,
+            message = "El monto pendiente debe ser un valor monetario válido")
     private BigDecimal pendingAmount;
 
-    @NotNull private LocalDateTime startDate;
+    @NotNull(message = "La fecha de inicio es obligatoria")
+    private LocalDateTime startDate;
 
     @NotNull(message = "La fecha de vencimiento es obligatoria")
     private LocalDateTime expirationDate;

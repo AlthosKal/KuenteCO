@@ -3,7 +3,7 @@ package org.kuenteco.backend.mapper.logic.transaction;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
-import org.kuenteco.backend.dto.logic.transaction.ProfileWithTransactionsDTO;
+import org.kuenteco.backend.dto.logic.transaction.kuenteco.ProfileWithTransactionsDTO;
 import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.Transaction;
 import org.mapstruct.Mapper;

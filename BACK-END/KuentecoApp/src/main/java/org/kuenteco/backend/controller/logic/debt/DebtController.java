@@ -23,7 +23,11 @@ public class DebtController {
     private DebtService debtService;
 
     @GetMapping
-    public ResponseEntity<?> getAllDebts(HttpServletRequest request) {
+    public ResponseEntity<?> getAllDebts(
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
         Object debts = debtService.getDebts();
         return new ResponseEntity<>(
                 ApiResponse.ok("Deudas obtenidas correctamente", debts, request.getRequestURI()),
@@ -32,7 +36,11 @@ public class DebtController {
 
     @GetMapping("/state/{state}")
     public ResponseEntity<?> getDebtsByState(
-            @PathVariable StateDebt state, HttpServletRequest request) {
+            @PathVariable StateDebt state,
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
         Object debts = debtService.getDebtsByState(state);
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -43,7 +51,11 @@ public class DebtController {
     }
 
     @GetMapping("/overdue")
-    public ResponseEntity<?> getOverdueDebts(HttpServletRequest request) {
+    public ResponseEntity<?> getOverdueDebts(
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
         Object debts = debtService.getOverdueDebts();
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -53,7 +65,11 @@ public class DebtController {
 
     @GetMapping("/expiring-soon")
     public ResponseEntity<?> getDebtsExpiringInDays(
-            @RequestParam("days") Integer days, HttpServletRequest request) {
+            @RequestParam("days") Integer days,
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
         Object debts = debtService.getDebtsExpiringInDays(days);
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -64,7 +80,11 @@ public class DebtController {
     }
 
     @GetMapping("/total-pending")
-    public ResponseEntity<?> getTotalPendingAmount(HttpServletRequest request) {
+    public ResponseEntity<?> getTotalPendingAmount(
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
         BigDecimal totalPending = debtService.getTotalPendingAmount();
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -75,7 +95,11 @@ public class DebtController {
     }
 
     @GetMapping("/report/summary")
-    public ResponseEntity<?> getDebtSummaryReport(HttpServletRequest request) {
+    public ResponseEntity<?> getDebtSummaryReport(
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
         Object result = debtService.getDebtSummaryReport();
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -86,7 +110,7 @@ public class DebtController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> createDebt(
+    public ResponseEntity<?> addDebt(
             @Valid @RequestBody NewDebtDTO dto, HttpServletRequest request) {
         debtService.addDebt(dto);
         return new ResponseEntity<>(

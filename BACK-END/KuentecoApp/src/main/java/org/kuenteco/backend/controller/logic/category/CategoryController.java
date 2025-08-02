@@ -15,15 +15,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controlador para la gestión de categorías.
+ *
+ * <p>Proporciona endpoints para: - Obtener categorías y sus asignaciones - Crear, actualizar y
+ * eliminar categorías - Generar reportes por categoría
+ */
 @RestController
 @RequestMapping("v1/category")
 @AllArgsConstructor
-public class CategoryController {
+public class CategoryController implements CategoryResource {
     private CategoryService categoryService;
     private CategoryEnrollmentService categoryEnrollmentService;
 
     @GetMapping
-    public ResponseEntity<?> getCategories(HttpServletRequest request) {
+    public ResponseEntity<?> getCategories(
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
         Object result = categoryService.getCategories();
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -32,7 +42,11 @@ public class CategoryController {
     }
 
     @GetMapping("/enroll")
-    public ResponseEntity<?> getAllCategoryEnrollments(HttpServletRequest request) {
+    public ResponseEntity<?> getAllCategoryEnrollments(
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
         Object result = categoryEnrollmentService.getAllCategoryEnrollments();
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -42,7 +56,11 @@ public class CategoryController {
 
     @GetMapping("/report/{categoryId}")
     public ResponseEntity<?> getCategoryReport(
-            @PathVariable Integer categoryId, HttpServletRequest request) {
+            @PathVariable Integer categoryId,
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
         CategoryReportDTO dto = categoryService.getCategoryReport(categoryId);
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -51,7 +69,11 @@ public class CategoryController {
     }
 
     @GetMapping("/report/summary")
-    public ResponseEntity<?> getTransactionsByCategory(HttpServletRequest request) {
+    public ResponseEntity<?> getTransactionsByCategory(
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
         Object result = categoryService.getTransactionsByCategory();
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -61,9 +83,13 @@ public class CategoryController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/report/enroll")
-    public ResponseEntity<?> getBusinessUserCategoryEnrollments(HttpServletRequest request) {
-        Object result = categoryService.getTransactionsByCategory();
+    @GetMapping("/enroll/user")
+    public ResponseEntity<?> getBusinessUserCategoryEnrollments(
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
+        Object result = categoryEnrollmentService.getBusinessUserCategoryEnrollments();
         return new ResponseEntity<>(
                 ApiResponse.ok(
                         "Resumen de transacciones por categoría obtenido correctamente",

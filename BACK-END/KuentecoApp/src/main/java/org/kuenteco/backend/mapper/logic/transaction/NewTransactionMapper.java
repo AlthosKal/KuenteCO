@@ -1,6 +1,6 @@
 package org.kuenteco.backend.mapper.logic.transaction;
 
-import org.kuenteco.backend.dto.logic.transaction.NewTransactionDTO;
+import org.kuenteco.backend.dto.logic.transaction.kuenteco.NewTransactionDTO;
 import org.kuenteco.backend.entity.Transaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

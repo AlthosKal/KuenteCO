@@ -1,6 +1,7 @@
 package org.kuenteco.backend.repository.slave;
 
 import java.util.List;
+import java.util.Optional;
 import org.kuenteco.backend.dto.logic.budget.BudgetSummaryDTO;
 import org.kuenteco.backend.dto.logic.budget.BudgetVsActualDTO;
 import org.kuenteco.backend.entity.Budget;
@@ -15,8 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(transactionManager = "slaveTransactionManager", readOnly = true)
 public interface SlaveBudgetRepository extends JpaRepository<Budget, Integer> {
     List<Budget> findByUser(User user);
-
-    Budget findBudgetByUser(User user);
 
     @Query(
             value =
@@ -36,4 +35,6 @@ WHERE v.owner_user_id = (SELECT id FROM kuentecouser WHERE email = :email)
 """,
             nativeQuery = true)
     List<BudgetSummaryDTO> getBudgetSummaries(@Param("email") String email);
+
+    Optional<Budget> getBudgetByUserAndId(User user, Integer id);
 }
