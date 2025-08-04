@@ -1,0 +1,7 @@
+enum PreapprovalStatus {
+PENDING,
+AUTHORIZED,
+PAUSED,
+CANCELLED,
+FINISHED
+}
