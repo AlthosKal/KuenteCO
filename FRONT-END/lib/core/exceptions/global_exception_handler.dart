@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-
 import '../../utils/parser/api_error_parse.dart';
 
 typedef AsyncTask<T> = Future<T> Function();
@@ -13,7 +12,7 @@ class GlobalExceptionHandler {
       print('🛑 Error global: $e');
       print('📍 Stack trace: $stack');
 
-      // Si es un Dio error, tratamos de extraer el mensaje del backend
+      // Resuelve mensaje amigable
       String userMessage = _resolveMessage(e);
 
       if (onError != null) {
@@ -29,7 +28,17 @@ class GlobalExceptionHandler {
       return ApiErrorParser.extractMessage(error.response?.data);
     }
 
-    // Otros tipos de errores ya conocidos
+    // Si es una excepción personalizada con mensaje, respétalo
+    if (error is Exception) {
+      final message = error.toString();
+      if (message.isNotEmpty &&
+          message != 'Exception' &&
+          !message.contains('Ocurrió un error inesperado')) {
+        return message.replaceFirst('Exception: ', '');
+      }
+    }
+
+    // Otros errores comunes
     final errorString = error.toString().toLowerCase();
     if (errorString.contains('unauthorized') || errorString.contains('401')) {
       return 'Sesión expirada. Inicia sesión nuevamente.';

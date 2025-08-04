@@ -5,15 +5,14 @@ import '../core/services/app/auth_service.dart';
 import '../dto/auth/request/validate_verification_code_dto.dart';
 import '../provider/toast_helper.dart';
 import '../routes/app_routes.dart';
+import '../screens/auth/password_recovery_view.dart';
 
 class ValidateVerificationCodeController {
   final AuthService _authService;
   final ValueNotifier<bool> isLoading = ValueNotifier(false);
 
-  /// 📌 Variable estática para almacenar temporalmente el código validado (para recuperación de contraseña)
   static String? _validatedCode;
 
-  /// 📌 Controladores de los 6 campos de código
   final List<TextEditingController> codeControllers = List.generate(
     6,
         (_) => TextEditingController(),
@@ -26,7 +25,6 @@ class ValidateVerificationCodeController {
   ValidateVerificationCodeController({AuthService? authService})
       : _authService = authService ?? AuthService();
 
-  /// ✅ Valida y activa la cuenta del usuario
   Future<void> validateVerificationCode({
     required BuildContext context,
     required String email,
@@ -36,7 +34,6 @@ class ValidateVerificationCodeController {
     final dto = ValidateVerificationCodeDTO(email: email, code: code);
 
     await GlobalExceptionHandler.run(() async {
-      // 🔥 Llama a activateUser (que valida y activa la cuenta)
       await _authService.activateUser(dto);
 
       if (context.mounted) {
@@ -44,8 +41,6 @@ class ValidateVerificationCodeController {
           context,
           title: 'Cuenta activada correctamente. Ahora puedes iniciar sesión',
         );
-
-        // Redirige al login
         Navigator.pushReplacementNamed(context, AppRoutes.login);
       }
     }, onError: (error) {
@@ -60,7 +55,6 @@ class ValidateVerificationCodeController {
     isLoading.value = false;
   }
 
-  /// ✅ Valida el código para recuperación de contraseña
   Future<void> validatePasswordRecoveryCode({
     required BuildContext context,
     required String email,
@@ -70,18 +64,18 @@ class ValidateVerificationCodeController {
     final dto = ValidateVerificationCodeDTO(email: email, code: code);
 
     await GlobalExceptionHandler.run(() async {
-      // 📩 Solo valida el código, no activa usuario
       await _authService.validateVerificationCode(dto);
 
       if (context.mounted) {
-        _validatedCode = code; // ✅ Guardamos código temporalmente
+        _validatedCode = code;
         ToastHelper.showSuccess(context, title: 'Código validado correctamente');
 
-        // Redirige a la vista de cambio de contraseña
-        Navigator.pushReplacementNamed(
+        /// ✅ Redirige pasando email y código directamente al constructor
+        Navigator.pushReplacement(
           context,
-          AppRoutes.recoverPassword,
-          arguments: email,
+          MaterialPageRoute(
+            builder: (_) => RecoverPasswordScreen(email: email, code: code),
+          ),
         );
       }
     }, onError: (error) {
@@ -96,7 +90,6 @@ class ValidateVerificationCodeController {
     isLoading.value = false;
   }
 
-  /// ⏱️ Inicia el temporizador del código
   void startTimer(VoidCallback onTick, VoidCallback onFinished) {
     timerCount = 120;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -109,29 +102,22 @@ class ValidateVerificationCodeController {
     });
   }
 
-  /// 🔢 Formatea el tiempo (MM:SS)
   String formatTime() {
     final minutes = timerCount ~/ 60;
     final seconds = timerCount % 60;
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
-  /// 🔐 Obtiene el código ingresado en los 6 campos
   String getCodeInput() {
     return codeControllers.map((c) => c.text).join();
   }
 
-  /// 📌 Devuelve el código validado (para recuperación de contraseña)
-  static String? getValidatedCode() {
-    return _validatedCode;
-  }
+  static String? getValidatedCode() => _validatedCode;
 
-  /// 📌 Limpia el código validado (por ejemplo, después de cambiar la contraseña)
   static void clearValidatedCode() {
     _validatedCode = null;
   }
 
-  /// 🧹 Limpia recursos
   void dispose() {
     isLoading.dispose();
     for (var c in codeControllers) {

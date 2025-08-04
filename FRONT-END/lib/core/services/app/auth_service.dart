@@ -11,6 +11,7 @@ import '../../../dto/auth/response/token_response_dto.dart';
 import '../../../dto/auth/response/user_detail_dto.dart';
 import '../../exceptions/api_response.dart';
 import '../api_client.dart';
+import 'dart:convert';
 
 class AuthService {
   final _api = ApiClient();
@@ -26,15 +27,35 @@ class AuthService {
 
     final apiResponse = ApiResponse<TokenResponseDTO>.fromJson(
       json,
-          (data) => TokenResponseDTO.fromJson(data),
+          (data) {
+        if (data is String) {
+          try {
+            final decoded = jsonDecode(data);
+            if (decoded is Map<String, dynamic>) {
+              return TokenResponseDTO.fromJson(decoded);
+            } else {
+              throw Exception('Cadena no contenía un Map<String, dynamic>: $data');
+            }
+          } catch (_) {
+            throw Exception('No se pudo decodificar JSON del string: $data');
+          }
+        }
+
+        if (data is! Map<String, dynamic>) {
+          throw Exception('Tipo inesperado de data: ${data.runtimeType}');
+        }
+
+        return TokenResponseDTO.fromJson(data);
+      },
     );
 
     // ✅ Guardamos token y rol
     await _storage.write(key: 'Authorization', value: apiResponse.data.token);
-    await _storage.write(key: 'role', value: apiResponse.data.role);
+    await _storage.write(key: 'role', value: apiResponse.data.type);
 
     return apiResponse.data;
   }
+
 
   /// 🆕 REGISTRO
   Future<void> register(NewUserDTO dto) async {
