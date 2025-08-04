@@ -4,7 +4,6 @@ import '../../widgets/common/background_widget.dart';
 import '../../widgets/common/blurred_card.dart';
 import '../../widgets/common/footer_logged_widget.dart';
 import '../../widgets/common/navbar_logged_widget.dart';
-import '../../widgets/common/primary_buttom.dart';
 
 class LoggedHomeBusinessView extends StatelessWidget {
   final String userName;
@@ -133,22 +132,12 @@ class LoggedHomeBusinessView extends StatelessWidget {
                           ],
                         ),
                       ),
-
-                      /// 🔵 BOTÓN PRINCIPAL
-                      PrimaryButton(
-                        label: "Nuevo envío",
-                        isLoading: false,
-                        onPressed: () {
-                          // Acción rápida (crear un envío)
-                        },
-                      ),
+                      /// ✅ FOOTER
+                      const FooterLoggedWidget(),
                     ],
                   ),
                 ),
               ),
-
-              /// 👣 FOOTER
-              const FooterLoggedWidget(),
             ],
           ),
         ),
