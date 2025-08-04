@@ -1,7 +1,7 @@
+import 'package:KuenteCO/routes/app_routes.dart';
+import 'package:KuenteCO/routes/route_generator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:joder/routes/app_routes.dart';
-import 'package:joder/routes/route_generator.dart';
 import 'core/config/is_autenticated.dart';
 
 void main() async {
@@ -28,6 +28,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: initialRoute,
+      title: "KuenteCO",
       onGenerateRoute: RouteGenerator.generateRoute,
       builder: (context, child) {
         return child ?? const SizedBox.shrink();
