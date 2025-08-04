@@ -1,4 +1,4 @@
-import 'package:joder/dto/transaction/bancolombia/response/extra/thirdParty_extra.dart';
+import 'package:KuenteCO/dto/transaction/bancolombia/response/extra/thirdParty_extra.dart';
 
 class Data {
   final ThirdParty thirdParty;

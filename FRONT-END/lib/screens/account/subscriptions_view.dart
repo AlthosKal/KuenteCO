@@ -1,8 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:joder/widgets/common/footer_logged_widget.dart';
 import '../../widgets/common/background_widget.dart';
-import '../../widgets/common/footer_guest_widget.dart';
+import '../../widgets/common/footer_logged_widget.dart';
 import '../../widgets/common/navbar_logged_widget.dart';
 
 class SubscriptionPlansView extends StatelessWidget {
