@@ -1,0 +1,8 @@
+enum StateDebt {
+  ACTIVE,
+  PAID,
+  DEFEATED,
+  REFINANCED,
+  IN_MORATIUM,
+  CANCELLED
+}
