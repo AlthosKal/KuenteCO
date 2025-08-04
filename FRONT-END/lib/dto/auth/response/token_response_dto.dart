@@ -1,10 +1,10 @@
 class TokenResponseDTO {
   final String token;
-  final String role;
+  final String type;
 
-  TokenResponseDTO({required this.token, required this.role});
+  TokenResponseDTO({required this.token, required this.type});
 
   factory TokenResponseDTO.fromJson(Map<String, dynamic> json) {
-    return TokenResponseDTO(token: json['token'], role: json['role']);
+    return TokenResponseDTO(token: json['token'], type: json['type']);
   }
 }

@@ -43,13 +43,13 @@ class LoginController {
           ToastHelper.showSuccess(
             context,
             title: 'Inicio de Sesión Exitoso',
-            description: tokenResponse.role == 'personal'
-                ? 'Has iniciado como usuario personal'
-                : 'Has iniciado como cuenta business',
+            description: tokenResponse.type == 'PERSONAL'
+                ? 'Has iniciado como usuario Personal'
+                : 'Has iniciado como cuenta Business',
           );
 
           /// ✅ 4️⃣ Redirigir a la vista correcta según el tipo de cuenta
-          if (tokenResponse.role == 'personal') {
+          if (tokenResponse.type == 'PERSONAL') {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(

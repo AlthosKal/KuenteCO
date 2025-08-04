@@ -30,7 +30,6 @@ class ApiClient {
     _isInitialized = true;
   }
 
-
   void _initializeUrls() {
     if (kIsWeb) {
       baseUrlApp = dotenv.get('APP_URL_WEB');
@@ -61,10 +60,8 @@ class ApiClient {
           return handler.next(options);
         },
         onError: (DioException e, handler) {
-          // Manejo centralizado de errores
           if (e.response?.statusCode == 401) {
-            // Redirigir al login
-            AppRoutes.login;
+            AppRoutes.login; // puedes redirigir desde un navigator global si lo tienes
           }
           return handler.next(e);
         },
@@ -74,41 +71,104 @@ class ApiClient {
     return dio;
   }
 
-  //Verificar si está inicializado
   bool get isInitialized => _isInitialized;
 
-  // Métodos públicos para usar las APIs
+  // Métodos API con manejo de errores
   Future<Response> getApp(
       String path, {
         Map<String, dynamic>? queryParameters,
-      }) => _dioApp.get(path, queryParameters: queryParameters);
-
-  Future<Response> postApp(String path, dynamic data) =>
-      _dioApp.post(path, data: data);
-
-  Future<Response> putApp(String path, dynamic data) =>
-      _dioApp.put(path, data: data);
-
-  Future<Response> deleteApp(String path) => _dioApp.delete(path);
-
-  Future<Response> patchApp(String path, [dynamic data]) =>
-      _dioApp.patch(path, data: data);
-
-  Future<Response> downloadFile(String path, String savePath) {
-    return _dioApp.download(
-      path,
-      savePath,
-      options: Options(responseType: ResponseType.bytes),
-    );
+      }) async {
+    try {
+      return await _dioApp.get(path, queryParameters: queryParameters);
+    } on DioException catch (e) {
+      final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al obtener datos.';
+      throw Exception(mensaje);
+    }
   }
 
-  Future<Response> getChat(String path) => _dioChat.get(path);
+  Future<Response> postApp(String path, dynamic data) async {
+    try {
+      return await _dioApp.post(path, data: data);
+    } on DioException catch (e) {
+      final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al enviar datos.';
+      throw Exception(mensaje);
+    }
+  }
 
-  Future<Response> postChat(String path, dynamic data) =>
-      _dioChat.post(path, data: data);
+  Future<Response> putApp(String path, dynamic data) async {
+    try {
+      return await _dioApp.put(path, data: data);
+    } on DioException catch (e) {
+      final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al actualizar datos.';
+      throw Exception(mensaje);
+    }
+  }
 
-  Future<Response> putChat(String path, dynamic data) =>
-      _dioChat.put(path, data: data);
+  Future<Response> patchApp(String path, [dynamic data]) async {
+    try {
+      return await _dioApp.patch(path, data: data);
+    } on DioException catch (e) {
+      final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al modificar datos.';
+      throw Exception(mensaje);
+    }
+  }
 
-  Future<Response> deleteChat(String path) => _dioChat.delete(path);
+  Future<Response> deleteApp(String path) async {
+    try {
+      return await _dioApp.delete(path);
+    } on DioException catch (e) {
+      final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al eliminar datos.';
+      throw Exception(mensaje);
+    }
+  }
+
+  Future<Response> downloadFile(String path, String savePath) async {
+    try {
+      return await _dioApp.download(
+        path,
+        savePath,
+        options: Options(responseType: ResponseType.bytes),
+      );
+    } on DioException catch (e) {
+      final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al descargar archivo.';
+      throw Exception(mensaje);
+    }
+  }
+
+  // Métodos para la API del chat
+  Future<Response> getChat(String path) async {
+    try {
+      return await _dioChat.get(path);
+    } on DioException catch (e) {
+      final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al obtener datos del chat.';
+      throw Exception(mensaje);
+    }
+  }
+
+  Future<Response> postChat(String path, dynamic data) async {
+    try {
+      return await _dioChat.post(path, data: data);
+    } on DioException catch (e) {
+      final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al enviar datos al chat.';
+      throw Exception(mensaje);
+    }
+  }
+
+  Future<Response> putChat(String path, dynamic data) async {
+    try {
+      return await _dioChat.put(path, data: data);
+    } on DioException catch (e) {
+      final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al actualizar chat.';
+      throw Exception(mensaje);
+    }
+  }
+
+  Future<Response> deleteChat(String path) async {
+    try {
+      return await _dioChat.delete(path);
+    } on DioException catch (e) {
+      final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al eliminar del chat.';
+      throw Exception(mensaje);
+    }
+  }
 }
