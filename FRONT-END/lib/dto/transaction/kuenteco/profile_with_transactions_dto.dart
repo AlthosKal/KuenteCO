@@ -1,4 +1,4 @@
-import 'package:joder/dto/transaction/kuenteco/transaction_detail_dto.dart';
+import 'package:KuenteCO/dto/transaction/kuenteco/transaction_detail_dto.dart';
 
 class ProfileWithTransactionsDTO {
   final String username;

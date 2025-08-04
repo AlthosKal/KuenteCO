@@ -1,6 +1,6 @@
+import 'package:KuenteCO/widgets/common/profile_buttom_business.dart';
+import 'package:KuenteCO/widgets/common/profile_buttom_personal_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:joder/widgets/common/profile_buttom_business.dart';
-import 'package:joder/widgets/common/profile_buttom_personal_widget.dart';
 import '../../core/services/app/auth_service.dart';
 import '../../dto/auth/response/user_detail_dto.dart';
 import '../../routes/app_routes.dart';
