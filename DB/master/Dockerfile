@@ -1,11 +1,14 @@
-FROM postgres:17
+FROM postgres:17-alpine
 
 # Instalar dependencias
-RUN apt-get update && apt-get install -y \
-    postgresql-server-dev-17 \
-    libcurl4-openssl-dev \
+RUN apk add --no-cache \
+    postgresql-dev \
+    curl-dev \
     make \
     gcc \
+    clang19 \
+    llvm19 \
+    llvm19-dev \
     git \
     && rm -rf /var/lib/apt/lists/*
 

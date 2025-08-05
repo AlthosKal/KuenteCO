@@ -1,5 +1,4 @@
 services:
-
   kuenteco-ui:
     image: yefff/image-frontend-kuenteco-ui:1.0.0
     container_name: KuentecoUi
@@ -30,10 +29,7 @@ services:
       - kuenteco-network
     restart: unless-stopped
   postgres-master-database:
-    build:
-      context: ./Database/master
-      dockerfile: Dockerfile
-    image: yefff/image-master-kuenteco:1.0.0
+    image: yefff/image-master-kuenteco:1.1.0
     container_name: DatabaseMasterKuenteCO
     environment:
       POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME_MASTER}
@@ -56,10 +52,7 @@ services:
       start_period: 250s
     restart: unless-stopped
   postgres-replica-database:
-    build:
-      context: ./Database/slave
-      dockerfile: Dockerfile
-    image: yefff/image-slave-kuenteco:1.0.0
+    image: yefff/image-slave-kuenteco:1.1.0
     container_name: DatabaseSlaveKuenteCO
     environment:
       POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME_SLAVE}
