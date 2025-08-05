@@ -1,4 +1,17 @@
 services:
+
+  kuenteco-ui:
+    image: yefff/image-frontend-kuenteco-ui:1.0.0
+    container_name: KuentecoUi
+    ports:
+      - "5000:80"
+    depends_on:
+      - kuenteco-app
+      - kuenteco-chat
+    networks:
+      - kuenteco-network
+    restart: unless-stopped
+
   kuenteco-app:
     image: yefff/image-backend-kuenteco-app:1.0.1
     container_name: KuentecoApp
