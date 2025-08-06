@@ -1,6 +1,6 @@
 services:
   kuenteco-ui:
-    image: yefff/image-frontend-kuenteco-ui:1.0.1
+    image: yefff/image-frontend-kuenteco-ui:1.0.2
     container_name: KuentecoUi
     ports:
       - "80:80"
