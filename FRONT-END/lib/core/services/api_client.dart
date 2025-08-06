@@ -46,7 +46,9 @@ class ApiClient {
         baseUrl: baseUrl,
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json',
+          'Accept':'application/json'
+        }
       ),
     );
 
@@ -56,6 +58,9 @@ class ApiClient {
           final token = await _storage.read(key: 'Authorization');
           if (token != null) {
             options.headers['Authorization'] = 'Bearer $token';
+          }
+          if (kIsWeb) {
+            options.headers['X-Requested-With'] = 'XMLHttpRequest';
           }
           return handler.next(options);
         },
