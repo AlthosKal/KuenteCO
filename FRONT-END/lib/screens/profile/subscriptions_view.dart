@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../../widgets/common/background_widget.dart';
-import '../../widgets/common/footer_logged_widget.dart';
-import '../../widgets/common/navbar_logged_widget.dart';
+import '../../widgets/common/background/background_widget.dart';
+import '../../widgets/common/footer/footer_logged_widget.dart';
+import '../../widgets/common/navbar/navbar_logged_widget.dart';
 
 class SubscriptionPlansView extends StatelessWidget {
   const SubscriptionPlansView({super.key});

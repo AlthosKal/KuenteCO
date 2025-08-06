@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../widgets/common/background_widget.dart';
-import '../../routes/app_routes.dart';
-import '../../widgets/common/footer_guest_widget.dart';
-import '../../widgets/common/footer_logged_widget.dart';
-import '../../widgets/common/navbar_logged_widget.dart';
+import '../../widgets/common/background/background_widget.dart';
+import '../../widgets/common/footer/footer_logged_widget.dart';
+import '../../widgets/common/navbar/navbar_logged_widget.dart';
 
 // 🎨 Colores principales
 const kPrimaryPurple = Color(0xFF890cac);
@@ -142,37 +140,6 @@ class PrivacyLoggedView extends StatelessWidget {
                                         'Cambios en esta Política',
                                         'Podemos actualizar nuestra Política de Privacidad de vez en cuando. Le notificaremos cualquier cambio publicando la nueva Política de Privacidad en esta página.',
                                         theme,
-                                      ),
-
-                                      /// ✅ Botón de "Entendido"
-                                      Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context); // ✅ Opción simple: regresa a la vista anterior
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: kPrimaryPurple,
-                                              foregroundColor: Colors.white,
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 32,
-                                                vertical: 12,
-                                              ),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(8),
-                                              ),
-                                              elevation: 5,
-                                            ),
-                                            child: const Text(
-                                              'Entendido',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
                                       ),
                                     ],
                                   ),
