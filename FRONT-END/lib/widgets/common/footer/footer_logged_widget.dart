@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../routes/app_routes.dart';
+import '../../../routes/app_routes.dart';
 
-class Footer extends StatelessWidget {
-  const Footer({super.key});
+class FooterLoggedWidget extends StatelessWidget {
+  const FooterLoggedWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,10 @@ class Footer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
-                  onPressed: () => Navigator.pushNamed(context, AppRoutes.terms),
+                  onPressed: () => Navigator.pushReplacementNamed(
+                    context,
+                    AppRoutes.termsLogged,
+                  ),
                   child: const Text(
                     'Términos y Condiciones',
                     style: TextStyle(color: Colors.white),
@@ -25,7 +28,10 @@ class Footer extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 TextButton(
-                  onPressed: () => Navigator.pushNamed(context, AppRoutes.privacy),
+                  onPressed: () => Navigator.pushReplacementNamed(
+                    context,
+                    AppRoutes.privacyLogged,
+                  ),
                   child: const Text(
                     'Política de Privacidad',
                     style: TextStyle(color: Colors.white),
@@ -33,7 +39,10 @@ class Footer extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 TextButton(
-                  onPressed: () => Navigator.pushNamed(context, AppRoutes.contact),
+                  onPressed: () => Navigator.pushReplacementNamed(
+                    context,
+                    AppRoutes.contactLogged,
+                  ),
                   child: const Text(
                     'Contáctanos',
                     style: TextStyle(color: Colors.white),

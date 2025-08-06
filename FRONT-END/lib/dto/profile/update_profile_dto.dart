@@ -1,4 +1,6 @@
-import '../auth/response/image_dto.dart';
+
+
+import '../image/image_dto.dart';
 
 class UpdateProfileDTO {
   final int id;

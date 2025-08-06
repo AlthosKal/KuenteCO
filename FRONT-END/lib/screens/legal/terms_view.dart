@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../widgets/common/background_widget.dart';
-import '../../widgets/common/footer_guest_widget.dart';
-import '../../widgets/common/navbar_guest_widget.dart';
+import '../../widgets/common/background/background_widget.dart';
+import '../../widgets/common/footer/footer_guest_widget.dart';
+import '../../widgets/common/navbar/navbar_guest_widget.dart';
 
 // Colores principales
 const kPrimaryPurple = Color(0xFF890cac);
@@ -126,35 +126,6 @@ class TermsView extends StatelessWidget {
                                         'Ley Aplicable',
                                         'Estos términos y condiciones se regirán e interpretarán de acuerdo con las leyes vigentes, sin tener en cuenta sus disposiciones sobre conflicto de leyes.',
                                         theme,
-                                      ),
-                                      Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: kPrimaryPurple,
-                                              foregroundColor: Colors.white,
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 32,
-                                                vertical: 12,
-                                              ),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(8),
-                                              ),
-                                              elevation: 5,
-                                            ),
-                                            child: const Text(
-                                              'Aceptar Términos',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
                                       ),
                                     ],
                                   ),

@@ -1,11 +1,11 @@
-import 'package:KuenteCO/widgets/common/profile_buttom_business.dart';
+import 'package:KuenteCO/widgets/common/profile_buttom_business_widget.dart';
 import 'package:KuenteCO/widgets/common/profile_buttom_personal_widget.dart';
 import 'package:flutter/material.dart';
-import '../../core/services/app/auth_service.dart';
-import '../../dto/auth/response/user_detail_dto.dart';
-import '../../routes/app_routes.dart';
-import '../../screens/home/logged_home_business_view.dart';
-import '../../screens/home/logged_home_personal_view.dart';
+import '../../../core/services/app/auth_service.dart';
+import '../../../dto/auth/response/user_detail_dto.dart';
+import '../../../routes/app_routes.dart';
+import '../../../screens/home/logged_home_business_view.dart';
+import '../../../screens/home/logged_home_personal_view.dart';
 
 /// ✅ Navbar principal para usuarios logueados
 class KuentecoLoggedNavbar extends StatefulWidget {
@@ -175,12 +175,10 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     if (_selectedProfile?.userType.toLowerCase() == 'personal') {
       return ProfileButtonPersonal(
         profileImageUrl: _selectedProfile?.image?.imageUrl ?? '',
-        onMenuSelection: _handleMenuSelection,
       );
     } else {
       return ProfileButtonBusiness(
         profileImageUrl: _selectedProfile?.image?.imageUrl ?? '',
-        onMenuSelection: _handleMenuSelection,
       );
     }
   }

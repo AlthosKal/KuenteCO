@@ -1,6 +1,5 @@
+import 'package:KuenteCO/screens/account_view.dart';
 import 'package:flutter/material.dart';
-import '../screens/account/profiles_view.dart';
-import '../screens/account/subscriptions_view.dart';
 import '../screens/auth/code_recovery_view.dart';
 import '../screens/auth/login_view.dart';
 import '../screens/auth/password_recovery_view.dart';
@@ -16,6 +15,8 @@ import '../screens/legal/privacy_logged_view.dart';
 import '../screens/legal/privacy_view.dart';
 import '../screens/legal/terms_logged_view.dart';
 import '../screens/legal/terms_view.dart';
+import '../screens/profile/profiles_view.dart';
+import '../screens/profile/subscriptions_view.dart';
 import 'app_routes.dart';
 
 class RouteGenerator {
@@ -123,8 +124,10 @@ class RouteGenerator {
         );
 
     // ✅ PANTALLA DE PERFILES
-      case AppRoutes.profilesScreen:
-        return MaterialPageRoute(builder: (_) => const ProfilesScreen());
+      case AppRoutes.profileScreen:
+        return MaterialPageRoute(builder: (_) => ProfileScreen());
+      case AppRoutes.accountScreen:
+        return MaterialPageRoute(builder: (_) => AccountScreen());
 
     // ✅ DEFAULT -> RUTA NO ENCONTRADA
       default:
