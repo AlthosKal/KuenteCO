@@ -1,3 +1,5 @@
+import 'package:KuenteCO/screens/account_view.dart';
+
 class AppRoutes {
   static const homeGuest = '/';
   static const login = '/login';
@@ -17,8 +19,9 @@ class AppRoutes {
   static const terms = '/terms';
   static const privacy = '/privacy';
   static const verificationRegister = '/verificationRegister';
-  static const profilesScreen = '/profilesScreen';
+  static const profileScreen = '/profileScreen';
   static const termsLogged = '/termsLogged';
   static const privacyLogged = '/privacyLogged';
+  static const accountScreen = '/accountScreen';
 
 }

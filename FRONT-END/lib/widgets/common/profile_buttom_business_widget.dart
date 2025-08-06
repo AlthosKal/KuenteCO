@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../routes/app_routes.dart';
 
-class ProfileButtonPersonal extends StatelessWidget {
+class ProfileButtonBusiness extends StatelessWidget {
   final String? profileImageUrl;
 
-  const ProfileButtonPersonal({
+  const ProfileButtonBusiness({
     super.key,
     this.profileImageUrl,
   });
@@ -12,19 +12,23 @@ class ProfileButtonPersonal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
-      tooltip: 'Opciones de cuenta personal',
+      tooltip: 'Opciones de cuenta de Negocio',
       child: (profileImageUrl != null && profileImageUrl!.isNotEmpty)
           ? CircleAvatar(
         backgroundImage: NetworkImage(profileImageUrl!),
       )
           : const CircleAvatar(
         backgroundColor: Colors.white,
-        child: Icon(Icons.person),
+        child: Icon(Icons.business),
       ),
       itemBuilder: (BuildContext context) => const [
         PopupMenuItem<String>(
           value: 'account',
           child: Text('Mis datos'),
+        ),
+        PopupMenuItem<String>(
+          value: 'add_profile',
+          child: Text('Agregar perfil'),
         ),
         PopupMenuItem<String>(
           value: 'subscription',
@@ -40,10 +44,15 @@ class ProfileButtonPersonal extends StatelessWidget {
           case 'account':
             Navigator.pushNamed(context, AppRoutes.accountScreen);
             break;
+          case 'add_profile':
+            Navigator.pushNamed(context, AppRoutes.profileScreen);
+            break;
           case 'subscription':
             Navigator.pushNamed(context, AppRoutes.suscriptions);
             break;
           case 'logout':
+          // aquí tu lógica para cerrar sesión
+          // por ejemplo:
             _logout(context);
             break;
         }
@@ -52,12 +61,7 @@ class ProfileButtonPersonal extends StatelessWidget {
   }
 
   void _logout(BuildContext context) {
-    // Aquí puedes borrar token si lo deseas
     print("Cerrando sesión...");
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      AppRoutes.login,
-          (route) => false,
-    );
+    Navigator.pushReplacementNamed(context, AppRoutes.login);
   }
 }

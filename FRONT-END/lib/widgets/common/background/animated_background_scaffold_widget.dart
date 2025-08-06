@@ -1,4 +1,4 @@
-import 'package:KuenteCO/widgets/common/particle_animation_widget.dart';
+import 'package:KuenteCO/widgets/common/background/particle_animation_widget.dart';
 import 'package:flutter/material.dart';
 
 class AnimatedBackgroundScaffold extends StatelessWidget {
