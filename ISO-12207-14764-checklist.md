@@ -692,4 +692,3 @@
 
 - 🔲 **[/]** 9.1.13 Definir los registros e informes de mantenimiento.
   > *Parcialmente aplicable: Los registros existen en Jira y Git, pero no se generan informes de mantenimiento específicos.*
-

@@ -1,9 +1,9 @@
 services:
   kuenteco-ui:
-    image: yefff/image-frontend-kuenteco-ui:1.0.0
+    image: yefff/image-frontend-kuenteco-ui:1.0.1
     container_name: KuentecoUi
     ports:
-      - "5000:80"
+      - "80:80"
     depends_on:
       - kuenteco-app
       - kuenteco-chat
@@ -16,8 +16,8 @@ services:
     container_name: KuentecoApp
     volumes:
       - ./.env.docker:/workspace/.env
-    ports:
-      - "8080:8080"
+    #ports:
+    #  - "8080:8080"
     env_file:
     - .env.docker
     depends_on:
@@ -40,8 +40,8 @@ services:
     volumes:
       - postgres-master-data:/var/lib/postgresql/data
       - ./Database/db:/db
-    ports:
-      - "5432:5432"
+    #ports:
+    #  - "5432:5432"
     networks:
       - kuenteco-network
     healthcheck:
@@ -65,8 +65,8 @@ services:
       PGUSER: ${SPRING_DATASOURCE_USERNAME_SLAVE}
     volumes:
       - postgres-replica-data:/var/lib/postgresql/data
-    ports:
-      - "5433:5432"
+    #ports:
+    #  - "5433:5432"
     networks:
       - kuenteco-network
     depends_on:
@@ -84,8 +84,8 @@ services:
     container_name: KuentecoChat
     volumes:
       - ./.env.docker:/workspace/.env
-    ports:
-      - "7070:7070"
+    #ports:
+    #  - "7070:7070"
     env_file:
       - .env.docker
     depends_on:
@@ -103,8 +103,8 @@ services:
       MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
     volumes:
       - mongo-kuenteco-data:/data/db
-    ports:
-      - "27017:27017"
+    #ports:
+    #  - "27017:27017"
     networks:
       - kuenteco-network
     command: ["mongod", "--bind_ip_all"]

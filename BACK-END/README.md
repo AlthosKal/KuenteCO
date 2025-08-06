@@ -1261,7 +1261,7 @@ GET /v1/notification/search?keyword=presupuesto
 - 📊 Análisis dinámico de datos financieros
 - 🔄 Generación automática de IDs de conversación
 - 📈 Respuestas estructuradas con gráficos y datos
-- 💭 Contexto conversacional mantenido
+- 💭 Contexto conversacional mantenido por medio del conversationId
 
 **Response:** `DynamicAnalysisResponseDTO` - Respuesta estructurada de la IA  
 **Status:** `200 OK` / `400 BAD REQUEST` / `404 NOT FOUND`  
