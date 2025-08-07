@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
-
 import '../../controllers/user_controller.dart';
 import '../../dto/auth/response/user_detail_dto.dart';
 import '../../dto/image/image_dto.dart';
+import '../widgets/common/primary_buttom_widget.dart';
+import 'auth/verification_code_email_view.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -25,17 +26,10 @@ class _AccountScreenState extends State<AccountScreen> {
   void initState() {
     super.initState();
     userController = Provider.of<UserController>(context, listen: false);
-    userController.loadUser().then((_) {
-      if (mounted) {
-        setState(() {
-          _selectedImageBytes = null;
-          _selectedImageName = null;
-        });
-      }
-    });
+    userController.loadUser();
   }
 
-  Future<void> _pickImage() async {
+  Future<void> _pickImageAndUploadOrUpdate() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -44,6 +38,31 @@ class _AccountScreenState extends State<AccountScreen> {
         _selectedImageBytes = bytes;
         _selectedImageName = pickedFile.name;
       });
+
+      try {
+        final multipartFile = MultipartFile.fromBytes(
+          bytes,
+          filename: pickedFile.name,
+        );
+
+        final currentImage = userController.user.value?.image;
+
+        if (currentImage == null) {
+          await userController.uploadUserImage(multipartFile, pickedFile.name);
+          _showSnackBar('Imagen subida correctamente');
+        } else {
+          await userController.updateUserImage(multipartFile, pickedFile.name);
+          _showSnackBar('Imagen actualizada correctamente');
+        }
+
+        await userController.loadUser();
+        setState(() {
+          _selectedImageBytes = null;
+          _selectedImageName = null;
+        });
+      } catch (e) {
+        _showSnackBar('Error al procesar la imagen');
+      }
     }
   }
 
@@ -51,19 +70,40 @@ class _AccountScreenState extends State<AccountScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  void _clearSelectedImage() {
-    setState(() {
-      _selectedImageBytes = null;
-      _selectedImageName = null;
-    });
+  Future<void> _confirmDeleteImage() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Eliminar imagen?'),
+        content: const Text('¿Estás seguro de que deseas eliminar tu imagen de perfil?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Sí, eliminar', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await userController.deleteUserImage();
+        await userController.loadUser();
+        _showSnackBar('Imagen eliminada correctamente');
+      } catch (e) {
+        _showSnackBar('Error al eliminar la imagen');
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cuenta'),
-      ),
+      appBar: AppBar(title: const Text("Cuenta")),
       body: Center(
         child: ValueListenableBuilder<UserDetailDTO?>(
           valueListenable: userController.user,
@@ -71,41 +111,37 @@ class _AccountScreenState extends State<AccountScreen> {
             final ImageDTO? currentImage = user?.image;
             final String? imageUrl = currentImage?.imageUrl;
 
-            Widget avatar = ClipOval(
-              child: SizedBox(
-                width: 150,
-                height: 150,
-                child: _selectedImageBytes != null
-                    ? Image.memory(
-                  _selectedImageBytes!,
-                  fit: BoxFit.cover,
-                )
-                    : (imageUrl != null && imageUrl.isNotEmpty)
-                    ? Image.network(
-                  imageUrl,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                            : null,
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(Icons.person, size: 100);
-                  },
-                )
-                    : const Icon(Icons.person, size: 100),
+            Widget avatar = GestureDetector(
+              onTap: _pickImageAndUploadOrUpdate,
+              onLongPress: currentImage != null ? _confirmDeleteImage : null,
+              child: ClipOval(
+                child: SizedBox(
+                  width: 150,
+                  height: 150,
+                  child: _selectedImageBytes != null
+                      ? Image.memory(
+                    _selectedImageBytes!,
+                    fit: BoxFit.cover,
+                  )
+                      : (imageUrl != null && imageUrl.isNotEmpty)
+                      ? Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(Icons.person, size: 100);
+                    },
+                  )
+                      : const Icon(Icons.person, size: 100),
+                ),
               ),
             );
 
             return SingleChildScrollView(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 32),
                   avatar,
@@ -120,80 +156,26 @@ class _AccountScreenState extends State<AccountScreen> {
                     style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                   const SizedBox(height: 24),
-                  ValueListenableBuilder<bool>(
-                    valueListenable: userController.isLoading,
-                    builder: (context, isLoading, _) {
-                      if (isLoading) return const CircularProgressIndicator();
-                      return Column(
-                        children: [
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.upload),
-                            label: const Text('Subir nueva imagen'),
-                            onPressed: () async {
-                              await _pickImage();
-                              if (_selectedImageBytes != null && _selectedImageName != null) {
-                                try {
-                                  final multipartFile = MultipartFile.fromBytes(
-                                    _selectedImageBytes!,
-                                    filename: _selectedImageName!,
-                                  );
-                                  await userController.uploadUserImage(
-                                      multipartFile, _selectedImageName!);
-                                  await userController.loadUser(); // recargar datos
-                                  _showSnackBar('Imagen subida correctamente');
-                                  _clearSelectedImage();
-                                } catch (e) {
-                                  _showSnackBar('Error al subir la imagen');
-                                }
-                              }
-                            },
-                          ),
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.update),
-                            label: const Text('Actualizar imagen'),
-                            onPressed: () async {
-                              await _pickImage();
-                              if (_selectedImageBytes != null && _selectedImageName != null) {
-                                try {
-                                  final multipartFile = MultipartFile.fromBytes(
-                                    _selectedImageBytes!,
-                                    filename: _selectedImageName!,
-                                  );
-                                  await userController.updateUserImage(
-                                      multipartFile, _selectedImageName!);
-                                  await userController.loadUser(); // recargar datos
-                                  _showSnackBar('Imagen actualizada correctamente');
-                                  _clearSelectedImage();
-                                } catch (e) {
-                                  _showSnackBar('Error al actualizar la imagen');
-                                }
-                              }
-                            },
-                          ),
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.delete),
-                            label: const Text('Eliminar imagen'),
-                            onPressed: () async {
-                              try {
-                                await userController.deleteUserImage();
-                                await userController.loadUser(); // recargar datos
-                                _showSnackBar('Imagen eliminada');
-                              } catch (e) {
-                                _showSnackBar('Error al eliminar la imagen');
-                              }
-                            },
-                          ),
-                        ],
+
+                  // cambiar contraseña
+                  PrimaryButton(
+                    label: "Cambiar contraseña",
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => VerificationCodeScreen(email: '',),
+                        ),
                       );
                     },
                   ),
-                  const SizedBox(height: 40),
+
+                  const SizedBox(height: 24),
+
+                  // eliminar cuenta
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                      ),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                       icon: const Icon(Icons.delete_forever),
                       label: const Text('Eliminar cuenta'),
                       onPressed: () async {
@@ -201,8 +183,7 @@ class _AccountScreenState extends State<AccountScreen> {
                           context: context,
                           builder: (context) => AlertDialog(
                             title: const Text('Confirmar eliminación'),
-                            content: const Text(
-                                '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.'),
+                            content: const Text('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.'),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context, false),
@@ -210,20 +191,17 @@ class _AccountScreenState extends State<AccountScreen> {
                               ),
                               TextButton(
                                 onPressed: () => Navigator.pop(context, true),
-                                child: const Text(
-                                  'Eliminar',
-                                  style: TextStyle(color: Colors.red),
-                                ),
+                                child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
                               ),
                             ],
                           ),
                         );
-
                         if (confirm == true) {
                           try {
                             await userController.deleteUser();
                             _showSnackBar('Cuenta eliminada correctamente');
-                            // Podrías navegar al login aquí si quieres
+                            // Podrías redirigir al login:
+                            // Navigator.pushReplacementNamed(context, '/login');
                           } catch (e) {
                             _showSnackBar('Error al eliminar la cuenta');
                           }
@@ -231,6 +209,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       },
                     ),
                   ),
+
                   const SizedBox(height: 20),
                 ],
               ),
