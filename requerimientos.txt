@@ -1,0 +1,604 @@
+Especificación de Requerimientos de Software para el Sistema Kuenteco
+
+
+Yeferson Agudelo Castaño
+Alejandro Molina Acosta
+Sergio Daniel Lizcano Ruiz
+
+Ficha-2899588
+
+
+Instructor
+Christian Serna
+C.T.M.A
+Fecha: 12/08/2024
+
+Índice
+
+
+
+1.       Introducción
+1.1 Descripción General del Sistema
+1.2 Propósito del Documento
+1.3 Alcance del Sistema
+2.   Descripción General del Sistema
+2.1 Contexto del Sistema
+2.2 Usuarios y Roles
+2.3 Suposiciones y Dependencias
+3.   Requerimientos Funcionales e Historias de Usuario
+3.1 Gestión de Proyectos
+3.2 Gestión de Usuarios y Permisos
+3.3 Flujos de Trabajo (Workflows)
+3.4 Reglas de Negocio
+
+
+4.   Requerimientos No Funcionales
+4.1 Rendimiento
+4.2 Seguridad
+4.3 Usabilidad
+4.4 Compatibilidad
+5.   Requerimientos Técnicos
+5.1 Arquitectura del Sistema
+5.2 Plataforma y Herramientas
+5.3 Integraciones
+6.  Apéndices
+6.1 Apéndice A: Glosario  
+6.2 Apéndice B: Diagramas Adicionales
+6.2.1 Diagrama de Arquitectura del Sistema
+6.2.2 Diagrama casos de uso
+6.2.3 Modelo lógico
+
+
+
+
+
+
+Introducción
+Descripción General del Sistema
+KuenteCO es un sistema integral de gestión financiera diseñado para usuarios particulares y negocios informales. Permite la administración eficiente de finanzas, facilitando la planificación, seguimiento y análisis de datos financieros. Es un aplicativo web y móvil accesible desde cualquier dispositivo con conexión a Internet.
+
+Propósito del Documento
+Este documento de Especificación de Requerimientos de Software (ERS) describe las funcionalidades y características de KuenteCO. Sirve como guía para desarrolladores, diseñadores y stakeholders, asegurando que los requisitos técnicos y de usuario sean comprendidos y atendidos adecuadamente.
+
+Alcance del Sistema
+KuenteCO incluye:
+Gestión de Ingresos y Gastos: Registro y seguimiento de todas las transacciones financieras, tanto ingresos como gastos, con opciones para categorización y análisis.
+Planificación Financiera: Herramientas para la creación de presupuestos, registro de transacciones y planificación de pago de deudas a corto y largo plazo.
+Generación de Informes: Capacidades para generar informes detallados sobre la situación financiera del usuario, incluyendo gráficos y estadísticas personalizables.
+Integración Bancaria: Conexión con cuentas bancarias para la importación automática de transacciones y el seguimiento en tiempo real.(A Considerar)
+Alertas y Recordatorios: Alertas y recordatorios automatizados para eventos relevantes en la app.
+Acceso Multiperfil: Soporte para múltiples perfiles, permitiendo a pequeños y medianos negocios gestionar las finanzas de manera colaborativa.
+Seguridad y Privacidad: Implementación de protocolos de seguridad robustos para proteger los datos financieros de los usuarios.
+Descripción General del Sistema
+Contexto del Sistema
+KuenteCO se integra como una herramienta central en la gestión financiera tanto de usuarios particulares como de pequeños y medianos negocios, brindando una solución completa y accesible para el control de sus finanzas.
+Para un particular, KuenteCO actúa como un asistente personal de finanzas, facilitando el registro diario de ingresos y gastos, la creación de presupuestos, el seguimiento de deudas, registro de rubros y la generación de informes personalizados. Todo esto permite a los usuarios tener una visión clara de su situación financiera, tomar decisiones informadas y planificar para el futuro de manera efectiva.
+En el contexto de un negocio pequeño o mediano, KuenteCO se convierte en una herramienta esencial para la gestión financiera empresarial. Permite a los negocios llevar un control detallado de sus transacciones, gestionar múltiples perfiles, generar reportes financieros cruciales para la toma de decisiones, y mantener un control efectivo sobre los gastos operativos y los ingresos. La capacidad de KuenteCO para integrar cuentas bancarias y automatizar la importación de transacciones reduce la carga administrativa, permitiendo a los propietarios de negocios concentrarse en otras áreas clave de su operación.
+Usuarios y Roles
+Kuenteco está diseñado para los siguientes tipos de usuarios:
+1. Usuarios Finales:
+   - Particulares: Usuarios individuales que gestionan sus finanzas personales.
+   - Propietarios de Negocios: Personas o entidades que administran las finanzas de su negocio.
+-Trabajadores de Negocios: Personal del negocio administrado por el propietario.
+2. Equipo de Desarrollo y Soporte:
+   - Desarrolladores: Encargados de la creación, mantenimiento y actualización del sistema.
+   - Testers: Responsables de probar el sistema para garantizar su correcto funcionamiento.
+   - Soporte Técnico: Personal encargado de brindar asistencia a los usuarios finales.
+
+Suposiciones y Dependencias
+ 1. Suposiciones.  
+   - Los usuarios tendrán conocimientos básicos de gestión financiera.  
+
+   - El sistema será accesible desde dispositivos con conexión a Internet.  
+
+   - Las instituciones bancarias proporcionarán APIs seguras para la integración. 
+ 
+   - El sistema operará bajo una política de seguridad estricta.  
+2. Dependencias:
+   - Integración Bancaria: Kuenteco dependerá de las APIs proporcionadas en API Market Bancolombia para la importación automática de transacciones.
+   - Servicios de autenticación: El sistema utilizará como servicio de autenticación a externos OAuth y para la gestión segura de usuarios y accesos utilizara JWT.
+   - Infraestructura en la Nube: KuenteCO dependerá del servicio de ECS de AWS para el alojamiento, almacenamiento y escalabilidad del sistema.
+   - Dependencias Tecnológicas: El sistema dependerá de tecnologías como Flutter (FRONT-END), y otras tecnologías como SpringBoot (BACK-END) y usará como bases de Datos PostgreSQL y MongoDB.
+
+Requerimientos Funcionales e Historias de Usuario
+Gestión de usuarios
+- Requerimiento Funcional: KuenteCO permitirá crear, eliminar, modificar y seleccionar entre cuenta particular o de negocio.
+  - Historias de Usuario:
+    Como usuario, 
+    Quiero crear una cuenta, 
+    Para usar la app Kuenteco
+ 
+    Como usuario, 
+    Quiero eliminar mi cuenta, 
+    Para no figurar en Kuenteco
+ 
+    Como usuario, 
+    Quiero modificar mi cuenta, 
+    Para actualizarla
+ - Criterios de aceptación:
+Los usuarios deben poder registrar una cuenta personal o de negocio.
+Debe permitirse la edición de la información de la cuenta en cualquier momento.
+El usuario podrá eliminar su cuenta y todos sus datos asociados.
+Se debe permitir la gestión de múltiples cuentas dentro de una misma sesión.
+Beneficio: Ofrece flexibilidad y control sobre la información personal del usuario, promoviendo la confianza en la plataforma y mejorando la experiencia del usuario (Laudon & Laudon, 2020).
+
+Gestión Integral de Perfiles por el Usuario de Negocio
+- Requerimiento Funcional: KuenteCO permitirá a los usuarios de negocio administrar completamente sus perfiles con capacidades de creación, listado y eliminación.
+- Historias de Usuario:
+Como usuario de negocio,  
+Quiero crear nuevos perfiles,  
+Para administrar mi negocio.
+
+Como usuario de negocio,  
+Quiero ver todos los perfiles existentes,  
+Para tener una visión clara de los miembros.
+
+Como usuario de negocio,  
+Quiero eliminar perfiles que ya no son necesarios,  
+Para mantener la base de datos de perfiles limpia y actualizada.
+
+- Criterios de Aceptación:
+El sistema debe permitir la creación de nuevos perfiles asociados a un negocio a través de un formulario con validaciones robustas de datos.
+Cada perfil debe incluir un nombre de usuario, email único, contraseña segura, rol asignado automáticamente, imagen de perfil opcional, y fecha de inicio automática.
+Las contraseñas deben cumplir criterios de seguridad: mínimo 8 caracteres, al menos 1 número, 1 minúscula, 1 mayúscula y 1 carácter especial.
+Los usuarios de tipo PERSONAL no pueden crear perfiles adicionales.
+Los usuarios con suscripción BASIC están limitados a 3 perfiles máximo.
+El sistema debe mostrar una lista detallada de todos los perfiles asociados a un negocio, incluyendo información básica como nombre de usuario, email e imagen.
+La vista de listado debe ser accesible solo para usuarios autenticados con rol de usuario de negocio.
+Los cambios deben reflejarse inmediatamente en el sistema.
+No se pueden duplicar nombres de usuario dentro del mismo negocio..
+El usuario debe poder eliminar perfiles por ID.
+Al eliminar un perfil, todos los datos asociados deben eliminarse de manera segura de la base de datos.
+Los perfiles pueden iniciar sesión usando nombre de usuario o email con contraseña.
+El sistema genera tokens JWT seguros para mantener las sesiones.
+Cambio de contraseña mediante código de verificación enviado por email.
+Implementación de blacklist de tokens para mayor seguridad.
+Funcionalidad para actualizar imágenes existentes.
+Integración con servicio de almacenamiento de imágenes.
+Validación de formato de email.
+Restricciones de caracteres para nombres de usuario (solo letras y espacios).
+Verificación de límites de perfiles según tipo de suscripción.
+
+Beneficios:
+•  Gestión Organizacional Completa: Permite a los negocios gestionar eficientemente su estructura organizativa y roles.
+•  Seguridad Robusta: Implementa autenticación segura con JWT, verificación por email y gestión segura de contraseñas.
+•  Control de Acceso: Sistemas de roles y permisos que garantizan acceso apropiado según el tipo de usuario.
+•  Personalización: Capacidad de personalizar perfiles con imágenes e información específica.
+•  Escalabilidad: Restricciones basadas en suscripción que permiten crecimiento controlado.
+•  Integridad de Datos: Validaciones exhaustivas que mantienen la calidad y consistencia de los datos.
+
+Gestión de Categorías Para Perfiles por el Usuario de Negocio
+- Requerimiento Funcional: Permitir a los usuarios de negocio gestionar y asignar Rubros (Categorías), también presupuestos a sus perfiles asociados.
+
+Historias de Usuario:
+Como usuario de negocio, 
+Quiero asignar categorías a cada perfil de mi negocio, 
+Para organizar y controlar gastos según responsabilidades.
+
+Como usuario de negocio, 
+Quiero asignar presupuestos a cada categoría por perfil, 
+Para administrar límites financieros.
+
+Como usuario de negocio, 
+Quiero modificar las asignaciones de categorías y presupuestos por perfil, 
+Para ajustar necesidades financieras según la operación del negocio.
+
+Como usuario de negocio, 
+Quiero eliminar asignaciones de categorías a perfiles que ya no las requieran, 
+Para mantener la estructura financiera actualizada y ordenada.
+
+Criterios de Aceptación:
+El sistema debe permitir crear y modificar categorías asignadas a perfiles.
+Cada Categoría debe estar asociada a un Usuario.
+Las asignaciones deben incluir metadatos como fechas de inicio y fin.
+Se debe respetar la integridad referencial y permisos de usuario al modificar/eliminar.
+Validar que los presupuestos asignados no superen los límites financieros globales.
+Mantener logs de cambios para auditoría.
+
+Beneficios:
+Control Financiero Detallado: Gestión de gastos y presupuestos.
+Flexibilidad Operativa: Ajuste en tiempo real de asignaciones.
+Mejora en Toma de Decisiones: Análisis financiero detallado.
+Seguridad y Precisión: Control de asignaciones bajo permisos y trazabilidad.
+Optimización de Recursos: Uso eficiente de recursos económicos.
+
+Gestión de Perfiles
+- Requerimiento Funcional: KuenteCO permitirá a los perfiles administrar sus datos.
+
+- Historias de usuario:
+Como perfil de negocio,  
+Quiero listar mis datos,  
+Para visualizar mis datos personales registrados.
+
+Como perfil de negocio,  
+Quiero cambiar mi contraseña mediante verificación por email,  
+Para mantener la seguridad de mi cuenta.
+
+Como perfil de negocio,  
+Quiero gestionar mi imagen de perfil (subir, actualizar, eliminar),  
+Para personalizar mi cuenta y facilitar mi identificación.
+
+- Criterios de Aceptación:
+Los perfiles pueden obtener sus propios detalles mediante autenticación.
+Los perfiles pueden cerrar sesión, invalidando tokens y limpiando cookies.
+Los perfiles pueden subir imágenes en formato multipart/form-data.
+
+Beneficios:
+Autonomía Operativa: Permite a los perfiles de negocio gestionar su propia información sin depender del usuario propietario, mejorando la eficiencia operativa.
+Seguridad Granular: Cada perfil mantiene sus propias credenciales y sesiones independientes, reduciendo riesgos de seguridad compartida.
+Personalización Individual: Los perfiles pueden personalizar su experiencia con imágenes y configuraciones propias, mejorando la identificación y satisfacción del usuario.
+Trazabilidad Completa: El sistema de logs permite rastrear todas las actividades de cada perfil, facilitando auditorías y resolución de problemas.
+Escalabilidad Organizacional: Facilita el crecimiento de la estructura organizacional del negocio sin comprometer la seguridad o funcionalidad.
+Gestión de Accesos Distribuida: Permite delegar responsabilidades específicas a diferentes perfiles sin comprometer el control central.
+Continuidad Operativa: Los perfiles pueden operar independientemente, garantizando que las operaciones del negocio continúen sin interrupciones.
+Experiencia de Usuario Mejorada: Interfaces personalizadas y contextuales para cada perfil mejoran la usabilidad y adopción del sistema.
+
+Registro y gestión de transacciones desde los perfiles de negocio
+-Requerimiento funcional:
+KuenteCO permitirá a los perfiles la gestión de transacciones para un usuario de negocio por medio de creación, modificación y eliminación de estas,
+-Historias de usuario:
+Como perfil de negocio,  
+Quiero poder agregar transacciones,  
+Para llevar las cuentas del negocio.
+
+Como perfil de negocio,  
+Quiero poder eliminar transacciones,  
+Para tener los registros actualizados.
+
+Como perfil de negocio,
+Quiero poder modificar las transacciones,  
+Para tener los registros actualizados.
+
+- Criterios de Aceptación:
+El sistema debe permitir a los perfiles de negocio registrar transacciones con detalles específicos como nombre, monto, y fecha.
+Las transacciones deben asociarse a perfiles de negocio correctamente identificados.
+Debe permitir la categorización de transacciones por tipo y rubro.
+Los perfiles deben poder eliminar transacciones sin afectar registros previos incorrectamente.
+Las actualizaciones de transacciones deben reflejarse inmediatamente en el histórico.
+La gestión de transacciones debe respetar los permisos y roles asignados al perfil.
+Se debe garantizar que todos los movimientos sean auditables y se conserven los logs completos de operaciones.
+
+Beneficios:
+Transparencia y Control: Permite a los perfiles de negocio monitorear y ajustar el flujo financiero del negocio de manera granular.
+Flexibilidad y Autonomía: Los perfiles pueden gestionar sus propias transacciones, ajustándose a las necesidades del negocio en tiempo real.
+Seguridad Estricta: La gestión basada en roles asegura que solo los perfiles autorizados pueden hacer cambios críticos.
+Eficiencia Operativa: La habilidad de modificar y ajustar transacciones rápidamente mejora la adaptación a cambios económicos o empresariales.
+Mejor Auditoría: Los logs completos aseguran transparencia financiera y trazabilidad completa de las operaciones.
+
+Registro y Gestión de Transacciones
+KuenteCO facilitará a los usuarios el ingreso, gestión y visualización de sus transacciones financieras, permitiéndoles realizar un seguimiento preciso y actualizado de sus finanzas.
+Historias de Usuario:
+Como usuario,  
+Quiero ingresar manualmente las transacciones con detalles específicos,  
+Para llevar un seguimiento claro de mis movimientos financieros y categorizar mis gastos.
+
+Como usuario,  
+Quiero importar automáticamente las transacciones bancarias,  
+Para mantener mis finanzas actualizadas sin necesidad de ingreso manual.
+
+- Criterios de Aceptación:
+El sistema permitirá la entrada manual de transacciones con fecha, monto y descripción detallada.
+Las transacciones se podrán categorizar utilizando categorías predefinidas o personalizadas por el usuario.
+Las transacciones podrán ser importadas automáticamente mediante integración segura con cuentas bancarias, como Bancolombia, mediante APIs.
+Se proporcionará una URL de archivo con las transacciones obtenidas desde el banco.
+Los usuarios podrán visualizar una lista completa de sus transacciones, filtrarlas por parámetros como fecha y categoría.
+Los usuarios tendrán la capacidad de editar y eliminar transacciones si es necesario.
+El sistema generará un resumen de transacciones que incluirá totales y clasificación por categorías, disponible bajo demanda para el usuario autenticado.
+El acceso al resumen se restringe según el rol del usuario para mantener la integridad de los datos.
+
+Beneficio:
+Proporciona al usuario un control detallado de sus movimientos financieros, permitiéndole tomar decisiones económicas informadas con base en información precisa y organizada.
+
+Gestión de Rubros
+- Requerimiento Funcional: KuenteCO permitirá a los usuarios crear y gestionar presupuestos dentro de rubros(categorías). 
+  - Historia de Usuario:
+    Como usuario, 
+    Quiero crear un rubro, 
+    Para cumplir con un objetivo financiero
+ 
+    Como usuario, 
+    Quiero Gestionar rubros
+    Para realizar un seguimiento financiero
+  - Criterios de aceptación:
+  El usuario debe poder crear rubros con nombre, descripción y presupuesto asignado.
+Cada rubro debe permitir la asignación de ingresos y gastos.
+El sistema debe permitir editar y eliminar rubros sin afectar datos históricos.
+Debe ser posible organizar rubros para mayor claridad.
+Beneficio: Contribuye al logro de metas financieras específicas mediante la asignación clara de presupuestos por categorías, mejorando la planificación y el cumplimiento de objetivos personales o empresariales (Ross, Westerfield & Jordan, 2021).
+
+Gestión de Suscripciones
+- Requerimiento Funcional: KuenteCO tendrá diferentes tipos de suscripciones, dependiendo su tipo, esta les dará nuevas funcionalidades.
+  - Historias de Usuario:
+    Como usuario
+    Quiero ver suscripciones disponibles, 
+    Para adquirir una
+ 
+    Como usuario, 
+    Quiero eliminar mi suscripción, 
+    Para no figurar con subscripción en Kuenteco
+ 
+    Como usuario, 
+    Quiero modificar mi subscripción, 
+    Para actualizarla
+
+ - Criterios de aceptación:
+El sistema debe mostrar las diferentes opciones de suscripción disponibles.
+Los usuarios deben poder adquirir, renovar y cancelar su suscripción.
+La información de la suscripción debe incluir estado, fecha de inicio y expiración.
+Las funcionalidades adicionales de cada suscripción deben habilitarse según el nivel adquirido.
+Beneficio: Proporciona claridad y autonomía al usuario sobre los servicios contratados, facilitando la elección del plan más conveniente y la gestión de su relación con la aplicación (Kotler & Keller, 2016).
+ 
+Gestión de presupuestos
+- Requerimiento Funcional: KuenteCO permitirá crear, modificar y eliminar los presupuestos ingresados.
+  - Historias de Usuario:
+    Como usuario, 
+    Quiero modificar presupuestos, 
+    Para estar al dia financieramente
+ 
+    Como usuario, 
+    Quiero eliminar presupuestos, 
+    Para no tener información desactualizada
+ 
+    Como usuario, 
+    Quiero crear presupuestos, 
+    Para manejar información
+
+ - Criterios de aceptación:
+El usuario podrá crear presupuestos mensuales, anuales o personalizados.
+El sistema debe permitir la edición y eliminación de presupuestos sin afectar registros previos.
+Se generarán alertas cuando un presupuesto esté cerca de ser excedido.
+Los usuarios podrán comparar sus presupuestos con los gastos reales.
+Beneficio: Facilita el control del gasto, fomentando una mejor administración financiera y ayudando a evitar el sobreendeudamiento (Brigham & Ehrhardt, 2016).
+ 
+Asistente Virtual
+- Requerimiento Funcional: KuenteCO proporcionará un asistente virtual financiero avanzado que utiliza inteligencia artificial para resolver dudas, brindar asesoría personalizada y realizar análisis financieros en tiempo real.
+- Historias de Usuarío:
+Como usuario, 
+Quiero interactuar con un asistente virtual inteligente,  
+Para resolver mis dudas e inquietudes financieras de manera rápida y personalizada.
+
+- Criterios de Aceptación:
+El asistente responde a consultas financieras en lenguaje natural
+Las respuestas incluyen datos reales y actualizados del usuario
+El sistema mantiene el contexto de la conversación durante la sesión
+Se proporciona análisis inteligente combinando IA y datos financieros
+El historial de conversaciones se preserva y es accesible
+Las respuestas incluyen visualizaciones cuando es relevante
+El asistente puede generar y entregar reportes descargables
+La autenticación garantiza respuestas personalizadas y seguras
+El sistema soporta múltiples formatos de entrada (texto, archivos)
+ Las recomendaciones son específicas y accionables
+
+Beneficios:
+Accesibilidad Financiera: Democratiza el acceso a asesoría financiera inteligente
+Toma de Decisiones Informada: Proporciona insights basados en datos reales
+Educación Financiera: Explica conceptos y ayuda a desarrollar mejores hábitos
+Eficiencia: Respuestas instantáneas sin necesidad de navegación compleja
+Personalización: Asesoría adaptada al perfil financiero individual
+
+Informes financieros
+- Requerimiento Funcional: KuenteCO proporcionará un sistema avanzado de generación de informes financieros que aprovecha la integración con el asistente virtual para generar análisis financieros personalizados. 
+  - Historias de Usuario:
+    Como usuario, 
+    Quiero obtener un informe financiero, 
+    Para realizar un análisis de estado financiero 
+ - Criterios de aceptación:
+El usuario podrá obtener informes de balance general, flujo de caja y gastos en períodos específicos.
+Los datos deben visualizarse mediante tablas y gráficas interactivas.
+El sistema debe permitir comparar informes financieros de diferentes períodos.
+Beneficio: La generación de reportes visuales e interactivos permite una comprensión clara del estado financiero, promoviendo una toma de decisiones más informada (Horngren et al., 2012).
+
+Gestión Avanzada de Deudas con Análisis de Riesgo
+- Requerimiento Funcional:KuenteCO proporcionará un sistema integral de gestión de deudas que incluye análisis de riesgo automatizado, seguimiento de estados, y alertas proactivas para optimizar la salud financiera del usuario.
+  - Historias de Usuario:
+Como usuario,
+Quiero registrar deudas con información detallada,
+Para tener un control completo de mis obligaciones financieras.
+
+Como usuario,
+Quiero recibir análisis de riesgo de mis deudas,
+Para tomar decisiones informadas sobre mi situación financiera.
+
+Como usuario,
+Quiero ver el estado actualizado de todas mis deudas,
+Para planificar mis pagos de manera efectiva.
+
+ - Criterios de Aceptación:
+Los usuarios podrán registrar deudas con información completa: monto original, monto pendiente, tasa de interés, fechas de inicio y vencimiento, y descripción.
+El sistema calculará automáticamente análisis de riesgo basado en montos, plazos y capacidad de pago.
+Se generarán estados automáticos de deuda: PENDING (pendiente), PAID (pagada), OVERDUE (vencida), PARTIALLY_PAID (parcialmente pagada).
+El sistema enviará alertas automáticas 7, 3 y 1 día antes del vencimiento.
+Los usuarios podrán visualizar un dashboard con resumen de todas las deudas y su estado actual.
+El sistema proporcionará recomendaciones para optimizar el pago de deudas basado en tasas de interés y fechas.
+Se mantendrá un historial completo de pagos realizados y saldos restantes.
+Los análisis incluirán métricas de salud financiera relacionadas con el nivel de endeudamiento
+
+Beneficio: Ayuda a reducir riesgos de morosidad y mejora la salud financiera del usuario mediante una gestión organizada y recordatorios oportunos (Fabozzi & Peterson, 2013).
+ 
+Historial de movimientos
+- Requerimiento Funcional: KuenteCO facilitara un historial para una comprensión de los movimientos realizados por el usuario.
+  - Historias de Usuario:
+    Como usuario, 
+    Quiero ver mi historial, 
+    Para recordar mis movimientos.
+ - Criterios de aceptación:
+Los usuarios podrán visualizar un historial detallado de sus transacciones.
+El sistema debe permitir filtrar por fecha, categoría y tipo de movimiento.
+Beneficio: Brinda transparencia sobre las acciones realizadas, favoreciendo la auditoría personal y la trazabilidad financiera (Needles & Powers, 2013).
+
+Control de acceso
+- Requerimiento Funcional:  KuenteCO implementará un sistema de seguridad multicapa que incluye autenticación robusta, gestión avanzada de tokens JWT, blacklist de seguridad, y control granular de accesos basado en roles.
+  - Historias de Usuario:
+Como usuario,
+Quiero autenticarme de manera segura con múltiples factores,
+Para proteger mi información financiera sensible.
+
+Como usuario,
+Quiero que mis sesiones sean seguras y controladas,
+Para prevenir accesos no autorizados a mi cuenta.
+
+Como usuario,
+Quiero recibir alertas de actividad sospechosa,
+Para detectar y prevenir accesos maliciosos a mi cuenta.
+
+ - Criterios de aceptación:
+El sistema implementará autenticación JWT con tokens seguros que incluyan información de rol y expiración.
+Se mantendrá una blacklist automática de tokens para sesiones terminadas o comprometidas.
+Los usuarios podrán cerrar sesión de forma segura, invalidando inmediatamente todos los tokens activos.
+Se implementará control de acceso basado en roles (RBAC) diferenciando entre usuarios personales, de negocio y perfiles.
+El sistema detectará automáticamente patrones de acceso inusuales (IPs diferentes, horarios atípicos).
+Se enviarán notificaciones inmediatas por email sobre inicios de sesión desde dispositivos no reconocidos.
+Las contraseñas seguirán políticas estrictas: mínimo 8 caracteres, combinación de mayúsculas, minúsculas, números y símbolos.
+Se implementará un bloqueo automático de cuentas después de 5 intentos fallidos de autenticación.
+Los tokens JWT tendrán expiración automática configurable (por defecto 7 días).
+Se mantendrá el log completo de todos los intentos de autenticación exitosos y fallidos.
+
+
+Beneficio: Garantiza la protección de la información personal y financiera del usuario, fortaleciendo la seguridad de la plataforma (Pfleeger & Pfleeger, 2012).
+ 
+Notificaciones y alertas
+- Requerimiento Funcional: KuenteCO proporcionará un sistema de notificaciones que mantendrá informado al usuario sobre eventos financieros importantes, con capacidades avanzadas de búsqueda, filtrado y gestión personalizada.
+  - Historias de Usuario:
+Como usuario, 
+Quiero recibir notificaciones personalizadas, 
+Para estar informado sobre eventos financieros relevantes.
+
+Como usuario,
+Quiero buscar notificaciones por palabras clave,
+Para encontrar información específica rápidamente.
+
+Como usuario,
+Quiero filtrar notificaciones por fechas,
+Para revisar eventos de períodos específicos.
+
+ - Criterios de aceptación:
+El sistema enviará notificaciones automáticas sobre eventos críticos: vencimientos de deudas, límites de presupuesto excedidos, saldos bajos, y movimientos inusuales.
+Los usuarios podrán visualizar todas sus notificaciones en una lista organizada cronológicamente.
+El sistema permitirá búsqueda de notificaciones por palabras clave en tiempo real.
+Los usuarios podrán filtrar notificaciones por rangos de fechas específicas.
+Las notificaciones incluirán información contextual relevante (fechas, montos, categorías).
+El sistema mantendrá un historial completo de notificaciones para auditoría.
+Los usuarios podrán configurar preferencias de notificación por tipo y canal (web, email, móvil).
+Las notificaciones críticas tendrán prioridad visual en la interfaz.
+
+Beneficio: Aumenta la proactividad del usuario mediante avisos relevantes, lo cual mejora su capacidad de reacción ante eventos financieros importantes (Laudon & Laudon, 2020).
+
+ Gestión de Imágenes y Contenido Multimedia
+- Requerimiento Funcional: KuenteCO proporcionará un sistema completo de gestión de contenido multimedia que permite almacenamiento, procesamiento, y administración eficiente de imágenes de perfil y documentos financieros.
+
+- Historias de Usuario:
+Como usuario,
+Quiero subir y gestionar mi imagen de perfil,
+Para personalizar mi cuenta y facilitar mi identificación visual.
+
+Como usuario,
+Quiero adjuntar documentos a mis transacciones,
+Para mantener comprobantes digitales organizados y accesibles.
+
+Como administrador del sistema,
+Quiero optimizar automáticamente las imágenes,
+Para mantener el rendimiento del sistema y reducir el uso de almacenamiento.
+
+- Criterios de aceptación:
+El sistema soportará formatos de imagen estándar: JPEG, PNG, WebP con límite de 5MB por archivo.
+Se implementará compresión automática manteniendo calidad visual aceptable.
+Las imágenes se redimensionarán automáticamente a múltiples tamaños (thumbnail, medium, full).
+Se proporcionará almacenamiento seguro con URLs únicas y no predecibles.
+Los usuarios podrán subir, actualizar y eliminar sus imágenes de perfil.
+Se implementará validación automática de contenido para prevenir archivos maliciosos.
+El sistema mantendrá metadatos de imágenes (fecha, tamaño original, usuario).
+Se proporcionará CDN para entrega rápida de contenido multimedia.
+Las imágenes eliminadas se marcarán para borrado diferido (soft delete) por 30 días.
+Se implementarán cuotas de almacenamiento por tipo de usuario y suscripción.
+
+Beneficio: Enriquece la experiencia del usuario mediante personalización visual completa, proporciona capacidades de documentación digital para transacciones, y garantiza rendimiento óptimo a través de optimización automática y entrega eficiente de contenido multimedia.
+
+Multidivisa
+- Requerimiento Funcional: KuenteCO dará soporte para múltiples divisas con tasas de cambio actualizadas.
+  - Historias de Usuario:
+    Como usuario, 
+    Quiero saber de otras divisas, 
+    Para saber el cambio actual
+ - Criterios de aceptación:
+El sistema debe permitir el manejo de múltiples divisas con tasas de cambio actualizadas.
+Se debe mostrar la equivalencia en la moneda local según las tasas actuales.
+Beneficio: Favorece la gestión de finanzas en contextos internacionales, apoyando a usuarios con transacciones en distintas monedas (Madura, 2021).
+
+Importación y Exportación de Datos en Excel
+- Requerimiento Funcional: KuenteCO proporcionará un sistema completo de importación y exportación de datos financieros en formato Excel (.xlsx), permitiendo a los usuarios realizar respaldos, migración de datos y análisis offline de su información financiera.
+- Historias de Usuario:
+Como usuario,
+Quiero exportar todos mis datos financieros a Excel,
+Para realizar respaldos offline y análisis detallados en herramientas externas.
+
+Como usuario,
+Quiero importar datos financieros desde Excel,
+Para migrar información existente o restaurar respaldos previos.
+
+Como usuario de negocio,
+Quiero exportar datos consolidados de todos mis perfiles,
+Para generar reportes empresariales completos.
+
+- Criterios de Aceptación:
+El sistema debe generar archivos Excel (.xlsx) con múltiples hojas organizadas por tipo de dato (Transacciones, Presupuestos, Categorías, Deudas).
+La exportación debe incluir todos los datos del usuario autenticado, diferenciando entre usuarios PERSONAL y BUSINESS.
+Para usuarios BUSINESS, debe incluir datos de todos los perfiles asociados con identificación clara del perfil responsable.
+La importación debe validar el formato y estructura de los datos antes de procesarlos.
+El sistema debe proporcionar mensajes de error detallados para datos inválidos durante la importación.
+Los archivos exportados deben mantener el formato de fecha dd/MM/yyyy para consistencia.
+Debe soportar validación de tipos de datos (texto, numérico, fechas) durante la importación.
+La funcionalidad debe estar protegida por autenticación JWT.
+El sistema debe registrar los logs detallados de las operaciones de importación/exportación.
+La importación debe ser transaccional - si falla una fila, debe continuar con las siguientes.
+
+Requerimientos No Funcionales
+Rendimiento
+Tiempo de respuesta: La aplicación debe cargar las pantallas principales en menos de 2 segundos.
+Eficiencia de uso: El sistema debe procesar y guardar transacciones en menos de 3 segundos.
+2. Seguridad	
+Activación de cuenta de usuario: Implementación de activación para el registro de un usuario.
+Privacidad: Los datos de los usuarios deben manejarse conforme a normativas locales de privacidad de datos.
+Respaldo de datos: La aplicación debe tener respaldos automáticos diarios para prevenir la pérdida de información.
+3. Usabilidad
+Facilidad de uso: La interfaz debe ser intuitiva y comprensible para usuarios con conocimientos limitados en finanzas y tecnología.
+Tiempo de aprendizaje: Un usuario promedio debe poder aprender a usar las funciones clave en menos de 15 minutos.
+Feedback en tiempo real: La aplicación debe proporcionar mensajes de error o éxito directos y claros inmediatamente después de una acción.
+4. Compatibilidad
+Compatibilidad con múltiples plataformas: Debe ser funcional en sistemas Android y  ser accesible desde navegadores web (navegadores más usados: Chrome, Firefox, Edge).
+Adaptación a dispositivos: La aplicación debe ajustarse automáticamente a diferentes tamaños de pantalla (móviles, tablets) con un diseño responsivo.
+Requerimientos mínimos de sistema: La aplicación debe funcionar en dispositivos con al menos 6 GB de RAM y Android 10 en adelante.
+5. Requerimientos Técnicos
+5.1 Arquitectura del Sistema
+El sistema KuenteCO estará basado en una arquitectura cliente/servidor, dividiendo las responsabilidades de presentación, lógica de negocio y acceso a datos, lo que permite una mejor escalabilidad, mantenibilidad y seguridad. Las capas son:
+Capa de Presentación (Frontend): La interfaz web y móvil será desarrollada usando el framework Flutter para gestionar componentes dinámicos.
+Capa de Lógica de Negocio (Backend): La lógica del sistema será gestionada por SpringBoot, conectando las interfaces de usuario con la capa de datos. El backend será responsable del manejo de la lógica financiera, el procesamiento de transacciones y la gestión de usuarios.
+Capa de Datos (Base de Datos): Utiliza PostgreSQL como base de datos principal para almacenar la información relacionada con los usuarios, presupuestos, pagos, ingresos, y otros datos financieros y MongoDB  para almacenar el historial del servicio de chat.
+5.2 Plataforma y Herramientas
+Despliegue: El proyecto será empaquetado en un stack de Docker y será desplegado en AWS
+Servidores de Base de Datos: Se utilizarán PostgreSQL y MongoDB como servidores de bases de datos, configurado dentro del stack de Docker para facilitar su gestión y portabilidad.
+Framework de Desarrollo Backend: Para el desarrollo del Back-End se utilizará Spring Boot, un framework eficiente para aplicaciones de mediana y alta complejidad.
+Frontend: La interfaz tanto web como móvil será construida con Flutter, aprovechando su capacidad para construir interfaces de usuario altamente interactivas y multiplataforma.
+Control de versiones: Se utilizará Git como sistema de control de versiones, con repositorios alojados en GitHub para la colaboración del equipo.
+
+5.3 Integraciones
+Pasarelas de Pago: KuenteCO se integrará con Mercado pago para permitir el procesamiento seguro de pagos.
+API de Bancos: Para automatizar la importación de datos financieros y sincronizar transacciones, se integrarán APIs del API Market de Bancolombia.
+Servicio de Email: Para la activación o modificación de la contraseña, el sistema se integrará con servicios de email como SendGrid para recibir el código de validación.
+Autenticación: Para la gestión de usuarios, se integrará JWT (JSON Web Tokens), permitiendo a los usuarios iniciar sesión en nuestro aplicativo.
+Implementación de IA: Para la generación de informes en base a los datos financieros del usuario integramos OpenAI y Deepseek.
+Apéndices
+6.1 Apéndice A: Glosario
+API (Interfaz de Programación de Aplicaciones): Conjunto de reglas y definiciones que permite la comunicación entre diferentes sistemas de software.
+Base de Datos PostgreSQL: Sistema de gestión de bases de datos relacional utilizado para almacenar y administrar la información del sistema KuenteCO.
+Flutter: Framework de desarrollo de interfaces de usuario utilizado en la capa de presentación del sistema.
+OAuth 2.0: Protocolo de autorización que permite el acceso seguro a recursos protegidos sin compartir credenciales de usuario.
+Open Banking: Estándar de integración bancaria que permite la conexión segura de aplicaciones con servicios financieros.
+Spring Boot: Framework de desarrollo utilizado en la capa de lógica de negocio del sistema.
+
+6.2 Apéndice B: Diagramas Adicionales
+6.2.1 Diagrama de Arquitectura del Sistema
+Arquitectura
+6.2.2 Diagrama de casos de uso
+Diagrama Casos de Uso.png
+6.2.3 Modelo lógico
+Modelo Logico
