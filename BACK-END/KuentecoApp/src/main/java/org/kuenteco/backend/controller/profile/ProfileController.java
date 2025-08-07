@@ -102,7 +102,7 @@ public class ProfileController implements ProfileResource {
                 HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id, HttpServletRequest request) {
         profileService.deleteProfile(id);
         return new ResponseEntity<>(

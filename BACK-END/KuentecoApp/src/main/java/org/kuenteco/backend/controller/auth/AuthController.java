@@ -132,7 +132,7 @@ public class AuthController implements AuthResource {
                 HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping()
+    @DeleteMapping("/user/delete")
     public ResponseEntity<?> delete() throws IOException {
         userService.deleteUser();
         return ResponseEntity.noContent().build();
@@ -160,7 +160,7 @@ public class AuthController implements AuthResource {
                 HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/user/image/delete")
     public ResponseEntity<?> deleteImage(HttpServletResponse response) throws IOException {
 
         imageService.deleteImage(response);
