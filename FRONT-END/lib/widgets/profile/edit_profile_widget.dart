@@ -103,6 +103,9 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
+    final String? imageUrl = widget.profile.image?.imageUrl;
+    final bool hasRemoteImage = imageUrl != null && imageUrl.isNotEmpty;
+
     return AlertDialog(
       title: const Text('Editar perfil'),
       content: SingleChildScrollView(
@@ -111,20 +114,21 @@ class _EditProfileState extends State<EditProfile> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              GestureDetector(
-                onTap: _isLoading ? null : _pickImage,
-                child: CircleAvatar(
-                  radius: 40,
-                  backgroundImage: _selectedImageFile != null
-                      ? FileImage(_selectedImageFile!)
-                      : NetworkImage(widget.profile.image?.imageUrl ?? '') as ImageProvider,
-                  child: _selectedImageFile == null &&
-                      (widget.profile.image?.imageUrl == null ||
-                          widget.profile.image!.imageUrl.isEmpty)
-                      ? const Icon(Icons.person, size: 40)
-                      : null,
-                ),
-              ),
+              // GestureDetector(
+              //   onTap: _isLoading ? null : _pickImage,
+              //   child: CircleAvatar(
+              //     radius: 40,
+              //     backgroundColor: Colors.grey.shade300,
+              //     backgroundImage: _selectedImageFile != null
+              //         ? FileImage(_selectedImageFile!)
+              //         : hasRemoteImage
+              //         ? NetworkImage(imageUrl!)
+              //         : null,
+              //     child: _selectedImageFile == null && !hasRemoteImage
+              //         ? const Icon(Icons.person, size: 40, color: Colors.white)
+              //         : null,
+              //   ),
+              // ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _usernameController,
