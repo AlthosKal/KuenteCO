@@ -50,7 +50,7 @@ class UserService {
 
     /// Eliminar el usuario
   Future<void> deleteUser() async {
-    final response = await _apiClient.deleteApp('/auth/delete');
+    final response = await _apiClient.deleteApp('/auth/user/delete');
     if (response.statusCode != 204) {
       throw Exception('Error al eliminar usuario: ${response.statusCode}');
     }

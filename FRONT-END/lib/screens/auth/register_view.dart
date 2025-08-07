@@ -90,7 +90,7 @@ class _RegisterFormState extends State<RegisterForm> {
             CustomFormField(
               controller: _usernameController,
               focusNode: _usernameFocusNode,
-              labelText: 'Nombre Completo',
+              labelText: 'Usuario',
               keyboardType: TextInputType.name,
               textInputAction: TextInputAction.next,
               validator: (value) =>
