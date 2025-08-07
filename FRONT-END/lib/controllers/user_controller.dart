@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../core/services/app/user_service.dart';
 import '../dto/auth/response/user_detail_dto.dart';
@@ -28,14 +29,14 @@ class UserController extends ChangeNotifier {
     }
   }
 
-  /// Actualizar datos de usuario
-  Future<void> updateUser(UserDetailDTO updatedUser) async {
+  /// Actualizar contraseña de usuario
+  Future<void> updateUserPassword(UserDetailDTO updatedUserPassword) async {
     try {
       isLoading.value = true;
-      final result = await _userService.updateUser(updatedUser);
+      final result = await _userService.updateUserPassword(updatedUserPassword);
       user.value = result;
       userImage = result.image;
-      print("✅ Usuario actualizado correctamente");
+      print("✅ Contraseña de usuario correctamente actualizada");
     } catch (e) {
       print("🛑 Error actualizando usuario: $e");
     } finally {
@@ -45,32 +46,58 @@ class UserController extends ChangeNotifier {
   }
 
   /// Subir imagen de usuario
-  Future<void> uploadUserImage(Uint8List imageBytes, String fileName) async {
+  Future<void> uploadUserImage(MultipartFile multipartfile, String fileName) async {
     try {
       isLoading.value = true;
-      final result = await _userService.uploadUserImage(imageBytes, fileName);
+      final result = await _userService.uploadUserImage(multipartfile, fileName);
       userImage = result;
+      // CRÍTICO: Actualizar user.value para que la vista se refresque
+      if (user.value != null) {
+        final updatedUser = UserDetailDTO(
+          version: user.value!.version,
+          image: result,
+          username: user.value!.username,
+          email: user.value!.email,
+          userType: user.value!.userType,
+          subscriptionType: user.value!.subscriptionType,
+          state: user.value!.state,
+        );
+        user.value = updatedUser; // Esto dispara el ValueListenableBuilder
+      }
       print("✅ Imagen de usuario subida correctamente");
     } catch (e) {
       print("🛑 Error subiendo imagen: $e");
+      rethrow; // Re-lanza el error para que la vista lo maneje
     } finally {
       isLoading.value = false;
-      notifyListeners();
     }
   }
 
   /// Actualizar imagen de usuario
-  Future<void> updateUserImage(Uint8List imageBytes, String fileName) async {
+  Future<void> updateUserImage(MultipartFile multipartfile, String fileName) async {
     try {
       isLoading.value = true;
-      final result = await _userService.updateUserImage(imageBytes, fileName);
+      final result = await _userService.updateUserImage(multipartfile, fileName);
       userImage = result;
+      // CRÍTICO: Actualizar user.value para que la vista se refresque
+      if (user.value != null) {
+        final updatedUser = UserDetailDTO(
+          version: user.value!.version,
+          image: result,
+          username: user.value!.username,
+          email: user.value!.email,
+          userType: user.value!.userType,
+          subscriptionType: user.value!.subscriptionType,
+          state: user.value!.state,
+        );
+        user.value = updatedUser; // Esto dispara el ValueListenableBuilder
+      }
       print("✅ Imagen de usuario actualizada correctamente");
     } catch (e) {
       print("🛑 Error actualizando imagen: $e");
+      rethrow; // Re-lanza el error para que la vista lo maneje
     } finally {
       isLoading.value = false;
-      notifyListeners();
     }
   }
 
@@ -84,6 +111,18 @@ class UserController extends ChangeNotifier {
       isLoading.value = true;
       await _userService.deleteUserImage();
       userImage = null;
+      // Actualizar también la información completa del usuario
+      if (user.value != null) {
+        user.value = UserDetailDTO(
+          version: user.value!.version,
+          image: null,
+          username: user.value!.username,
+          email: user.value!.email,
+          userType: user.value!.userType,
+          subscriptionType: user.value!.subscriptionType,
+          state: user.value!.state,
+        );
+      }
       print("✅ Imagen de usuario eliminada correctamente");
     } catch (e) {
       print("🛑 Error eliminando imagen: $e");

@@ -93,7 +93,11 @@ class ApiClient {
 
   Future<Response> postApp(String path, dynamic data) async {
     try {
-      return await _dioApp.post(path, data: data);
+      // Si es FormData, permitir que Dio maneje el Content-Type automáticamente
+      final options = data is FormData 
+          ? Options(headers: {'Accept': 'application/json'}) 
+          : null;
+      return await _dioApp.post(path, data: data, options: options);
     } on DioException catch (e) {
       final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al enviar datos.';
       throw Exception(mensaje);
@@ -111,7 +115,11 @@ class ApiClient {
 
   Future<Response> patchApp(String path, [dynamic data]) async {
     try {
-      return await _dioApp.patch(path, data: data);
+      // Si es FormData, permitir que Dio maneje el Content-Type automáticamente
+      final options = data is FormData 
+          ? Options(headers: {'Accept': 'application/json'}) 
+          : null;
+      return await _dioApp.patch(path, data: data, options: options);
     } on DioException catch (e) {
       final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al modificar datos.';
       throw Exception(mensaje);
