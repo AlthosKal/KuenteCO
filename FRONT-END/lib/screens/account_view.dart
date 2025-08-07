@@ -18,15 +18,13 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen> {
   Uint8List? _selectedImageBytes;
   String? _selectedImageName;
-  
+
   late UserController userController;
 
   @override
   void initState() {
     super.initState();
-    // Usar el UserController global del Provider
     userController = Provider.of<UserController>(context, listen: false);
-    // Recargar la información del usuario
     userController.loadUser().then((_) {
       if (mounted) {
         setState(() {
@@ -40,7 +38,6 @@ class _AccountScreenState extends State<AccountScreen> {
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
     if (pickedFile != null) {
       final bytes = await pickedFile.readAsBytes();
       setState(() {
@@ -66,21 +63,6 @@ class _AccountScreenState extends State<AccountScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Cuenta'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_forever),
-            tooltip: 'Eliminar cuenta',
-            onPressed: () async {
-              try {
-                await userController.deleteUser();
-                _showSnackBar('Usuario eliminado correctamente');
-                // TODO: Redirigir si es necesario
-              } catch (e) {
-                _showSnackBar('Error al eliminar usuario');
-              }
-            },
-          ),
-        ],
       ),
       body: Center(
         child: ValueListenableBuilder<UserDetailDTO?>(
@@ -88,11 +70,6 @@ class _AccountScreenState extends State<AccountScreen> {
           builder: (context, user, _) {
             final ImageDTO? currentImage = user?.image;
             final String? imageUrl = currentImage?.imageUrl;
-
-            print("🖼️ Usuario completo: ${user?.username} - Email: ${user?.email}");
-            print("🖼️ Imagen cargada del backend: $imageUrl");
-            print("🖼️ ImageId: ${currentImage?.imageId}");
-            print("🖼️ ImageName: ${currentImage?.name}");
 
             Widget avatar = ClipOval(
               child: SizedBox(
@@ -113,13 +90,12 @@ class _AccountScreenState extends State<AccountScreen> {
                       child: CircularProgressIndicator(
                         value: loadingProgress.expectedTotalBytes != null
                             ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
+                            loadingProgress.expectedTotalBytes!
                             : null,
                       ),
                     );
                   },
                   errorBuilder: (context, error, stackTrace) {
-                    print("❌ Error cargando imagen: $error");
                     return const Icon(Icons.person, size: 100);
                   },
                 )
@@ -127,112 +103,137 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
             );
 
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                avatar,
-                const SizedBox(height: 16),
-                
-                // DEBUG INFO - Mostrar toda la información del usuario
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  margin: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8),
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 32),
+                  avatar,
+                  const SizedBox(height: 16),
+                  Text(
+                    user?.username ?? 'Usuario desconocido',
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('DEBUG INFO:', style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text('Usuario: ${user?.username ?? "null"}'),
-                      Text('Email: ${user?.email ?? "null"}'),
-                      Text('Estado: ${user?.state ?? "null"}'),
-                      Text('Imagen completa: ${user?.image?.toJson() ?? "null"}'),
-                      Text('ImageUrl: ${imageUrl ?? "null"}'),
-                      Text('ImageId: ${currentImage?.imageId ?? "null"}'),
-                      Text('ImageName: ${currentImage?.name ?? "null"}'),
-                    ],
-                  ),
-                ),
-                
-                if (currentImage != null && currentImage.name != null) ...[
-                  Text('Nombre: ${currentImage.name}'),
                   const SizedBox(height: 8),
-                ],
-                ValueListenableBuilder<bool>(
-                  valueListenable: userController.isLoading,
-                  builder: (context, isLoading, _) {
-                    if (isLoading) return const CircularProgressIndicator();
+                  Text(
+                    user?.email ?? 'Correo no disponible',
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 24),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: userController.isLoading,
+                    builder: (context, isLoading, _) {
+                      if (isLoading) return const CircularProgressIndicator();
+                      return Column(
+                        children: [
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.upload),
+                            label: const Text('Subir nueva imagen'),
+                            onPressed: () async {
+                              await _pickImage();
+                              if (_selectedImageBytes != null && _selectedImageName != null) {
+                                try {
+                                  final multipartFile = MultipartFile.fromBytes(
+                                    _selectedImageBytes!,
+                                    filename: _selectedImageName!,
+                                  );
+                                  await userController.uploadUserImage(
+                                      multipartFile, _selectedImageName!);
+                                  await userController.loadUser(); // recargar datos
+                                  _showSnackBar('Imagen subida correctamente');
+                                  _clearSelectedImage();
+                                } catch (e) {
+                                  _showSnackBar('Error al subir la imagen');
+                                }
+                              }
+                            },
+                          ),
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.update),
+                            label: const Text('Actualizar imagen'),
+                            onPressed: () async {
+                              await _pickImage();
+                              if (_selectedImageBytes != null && _selectedImageName != null) {
+                                try {
+                                  final multipartFile = MultipartFile.fromBytes(
+                                    _selectedImageBytes!,
+                                    filename: _selectedImageName!,
+                                  );
+                                  await userController.updateUserImage(
+                                      multipartFile, _selectedImageName!);
+                                  await userController.loadUser(); // recargar datos
+                                  _showSnackBar('Imagen actualizada correctamente');
+                                  _clearSelectedImage();
+                                } catch (e) {
+                                  _showSnackBar('Error al actualizar la imagen');
+                                }
+                              }
+                            },
+                          ),
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.delete),
+                            label: const Text('Eliminar imagen'),
+                            onPressed: () async {
+                              try {
+                                await userController.deleteUserImage();
+                                await userController.loadUser(); // recargar datos
+                                _showSnackBar('Imagen eliminada');
+                              } catch (e) {
+                                _showSnackBar('Error al eliminar la imagen');
+                              }
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 40),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                      icon: const Icon(Icons.delete_forever),
+                      label: const Text('Eliminar cuenta'),
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Confirmar eliminación'),
+                            content: const Text(
+                                '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Cancelar'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text(
+                                  'Eliminar',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
 
-                    return Column(
-                      children: [
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.upload),
-                          label: const Text('Subir nueva'),
-                          onPressed: () async {
-                            await _pickImage();
-                            if (_selectedImageBytes != null && _selectedImageName != null) {
-                              try {
-                                final multipartFile = MultipartFile.fromBytes(
-                                  _selectedImageBytes!,
-                                  filename: _selectedImageName!,
-                                );
-                                await userController.uploadUserImage(
-                                  multipartFile,
-                                  _selectedImageName!,
-                                );
-                                _showSnackBar('Imagen subida correctamente');
-                                _clearSelectedImage();
-                                // NO necesario: await userController.loadUser(); // Ya se actualiza automáticamente
-                              } catch (e) {
-                                _showSnackBar('Error al subir la imagen');
-                              }
-                            }
-                          },
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.update),
-                          label: const Text('Actualizar'),
-                          onPressed: () async {
-                            await _pickImage();
-                            if (_selectedImageBytes != null && _selectedImageName != null) {
-                              try {
-                                final multipartFile = MultipartFile.fromBytes(
-                                  _selectedImageBytes!,
-                                  filename: _selectedImageName!,
-                                );
-                                await userController.updateUserImage(
-                                  multipartFile,
-                                  _selectedImageName!,
-                                );
-                                _showSnackBar('Imagen actualizada correctamente');
-                                _clearSelectedImage();
-                                // NO necesario: await userController.loadUser(); // Ya se actualiza automáticamente
-                              } catch (e) {
-                                _showSnackBar('Error al actualizar la imagen');
-                              }
-                            }
-                          },
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.delete),
-                          label: const Text('Eliminar'),
-                          onPressed: () async {
-                            try {
-                              await userController.deleteUserImage();
-                              _showSnackBar('Imagen eliminada');
-                              // NO necesario: await userController.loadUser(); // Ya se actualiza automáticamente
-                            } catch (e) {
-                              _showSnackBar('Error al eliminar la imagen');
-                            }
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ],
+                        if (confirm == true) {
+                          try {
+                            await userController.deleteUser();
+                            _showSnackBar('Cuenta eliminada correctamente');
+                            // Podrías navegar al login aquí si quieres
+                          } catch (e) {
+                            _showSnackBar('Error al eliminar la cuenta');
+                          }
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
             );
           },
         ),
