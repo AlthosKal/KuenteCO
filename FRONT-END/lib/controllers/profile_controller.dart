@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -6,7 +7,6 @@ import '../dto/image/image_dto.dart';
 import '../dto/profile/new_profile_dto.dart';
 import '../dto/profile/profile_detail_dto.dart';
 import '../dto/profile/update_profile_dto.dart';
-import 'dart:io';
 
 class ProfileController {
   final ProfileService _profileService;
@@ -122,38 +122,42 @@ class ProfileController {
   }
 
   /// ✅ Subir imagen de perfil (cuando aún no tiene)
-  Future<ImageDTO?> uploadProfileImage(File imageFile) async {
+  Future<ImageDTO?> uploadProfileImage(Uint8List bytes, String fileName) async {
     if (isLoading.value) return null;
     isLoading.value = true;
     try {
-      final fileName = imageFile.path.split('/').last;
-      final multipartFile = await MultipartFile.fromFile(
-        imageFile.path,
+      final multipartFile = MultipartFile.fromBytes(
+        bytes,
         filename: fileName,
       );
 
       final result = await _profileService.uploadProfileImage(multipartFile, fileName);
       await loadAuthenticatedProfile();
       return result;
+    } catch (e) {
+      debugPrint('🔴 Error uploading profile image: $e');
+      rethrow;
     } finally {
       isLoading.value = false;
     }
   }
 
   /// ✅ Actualizar imagen de perfil (cuando ya tiene una)
-  Future<ImageDTO?> updateProfileImage(File imageFile) async {
+  Future<ImageDTO?> updateProfileImage(Uint8List bytes, String fileName) async {
     if (isLoading.value) return null;
     isLoading.value = true;
     try {
-      final fileName = imageFile.path.split('/').last;
-      final multipartFile = await MultipartFile.fromFile(
-        imageFile.path,
+      final multipartFile = MultipartFile.fromBytes(
+        bytes,
         filename: fileName,
       );
 
       final result = await _profileService.updateProfileImage(multipartFile, fileName);
       await loadAuthenticatedProfile();
       return result;
+    } catch (e) {
+      debugPrint('🔴 Error updating profile image: $e');
+      rethrow;
     } finally {
       isLoading.value = false;
     }
@@ -166,6 +170,9 @@ class ProfileController {
     try {
       await _profileService.deleteProfileImage();
       await loadAuthenticatedProfile();
+    } catch (e) {
+      debugPrint('🔴 Error deleting profile image: $e');
+      rethrow;
     } finally {
       isLoading.value = false;
     }

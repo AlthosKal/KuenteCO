@@ -1,5 +1,5 @@
-import 'package:KuenteCO/widgets/user/profile_buttom_business_widget.dart';
-import 'package:KuenteCO/widgets/user/profile_buttom_personal_widget.dart';
+import 'package:KuenteCO/widgets/user/user_buttom_business_widget.dart';
+import 'package:KuenteCO/widgets/user/user_buttom_personal_widget.dart';
 import 'package:flutter/material.dart';
 import '../../../core/services/app/auth_service.dart';
 import '../../../dto/auth/response/user_detail_dto.dart';
