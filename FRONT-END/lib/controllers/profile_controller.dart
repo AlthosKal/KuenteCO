@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../core/services/app/profile_service.dart';
@@ -95,12 +96,15 @@ class ProfileController {
     if (isLoading.value) return null;
     isLoading.value = true;
     try {
-      final result = await _profileService.uploadProfileImage(imageFile);
+      final fileName = imageFile.path.split('/').last;
+      final multipartFile = await MultipartFile.fromFile(
+        imageFile.path,
+        filename: fileName,
+      );
+
+      final result = await _profileService.uploadProfileImage(multipartFile, fileName);
       await loadAuthenticatedProfile();
       return result;
-    } catch (e) {
-      debugPrint('🔴 Error uploading profile image: $e');
-      rethrow;
     } finally {
       isLoading.value = false;
     }
@@ -111,12 +115,15 @@ class ProfileController {
     if (isLoading.value) return null;
     isLoading.value = true;
     try {
-      final result = await _profileService.updateProfileImage(imageFile);
+      final fileName = imageFile.path.split('/').last;
+      final multipartFile = await MultipartFile.fromFile(
+        imageFile.path,
+        filename: fileName,
+      );
+
+      final result = await _profileService.updateProfileImage(multipartFile, fileName);
       await loadAuthenticatedProfile();
       return result;
-    } catch (e) {
-      debugPrint('🔴 Error updating profile image: $e');
-      rethrow;
     } finally {
       isLoading.value = false;
     }
@@ -129,13 +136,11 @@ class ProfileController {
     try {
       await _profileService.deleteProfileImage();
       await loadAuthenticatedProfile();
-    } catch (e) {
-      debugPrint('🔴 Error deleting profile image: $e');
-      rethrow;
     } finally {
       isLoading.value = false;
     }
   }
+
 
   void dispose() {
     isLoading.dispose();

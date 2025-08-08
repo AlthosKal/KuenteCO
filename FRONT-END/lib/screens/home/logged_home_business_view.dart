@@ -74,12 +74,6 @@ class LoggedHomeBusinessView extends StatelessWidget {
                               ),
                             ],
                           ),
-
-                          /// 🖼️ AVATAR DEL PERFIL
-                          CircleAvatar(
-                            radius: 26,
-                            backgroundImage: NetworkImage(profileImageUrl),
-                          ),
                         ],
                       ),
 

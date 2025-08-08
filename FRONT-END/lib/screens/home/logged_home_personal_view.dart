@@ -74,10 +74,6 @@ class LoggedHomePersonalView extends StatelessWidget {
                               ),
                             ],
                           ),
-                          CircleAvatar(
-                            radius: 24,
-                            backgroundImage: NetworkImage(profileImageUrl),
-                          ),
                         ],
                       ),
                       const SizedBox(height: 12),

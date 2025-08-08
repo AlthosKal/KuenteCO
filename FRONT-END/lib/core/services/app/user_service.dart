@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import '../../../dto/auth/response/user_detail_dto.dart';
 import '../../../dto/image/image_dto.dart';
@@ -12,31 +11,9 @@ class UserService {
   /// Obtener el detalle de usuario
   Future<UserDetailDTO> getUserDetail() async {
     final response = await _apiClient.getApp('/auth/user/details');
-
-    print('🔍 DEBUG: StatusCode: ${response.statusCode}');
-    print('🔍 DEBUG: Response completa: ${response.data}');
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> json = response.data;
-      
-      // Si la respuesta está envuelta en un objeto con 'data'
-      final actualData = json['data'] ?? json;
-      print('🔍 DEBUG: Data actual: $actualData');
-      
-      // Verificar específicamente la imagen
-      if (actualData['image'] != null) {
-        print('🖼️ DEBUG: Imagen encontrada: ${actualData['image']}');
-      } else {
-        print('❌ DEBUG: No hay imagen en la respuesta');
-      }
-      final userDetailDTO = UserDetailDTO.fromJson(actualData);
-      print('🔍 DEBUG: UserDetailDTO creado: ${userDetailDTO.toJson()}');
-      
-      return userDetailDTO;
-    }
-
-    // Si no es 200, lanza excepción explícita
-    throw Exception('Error al obtener usuario: ${response.statusCode}');
+    final Map<String, dynamic> json = response.data;
+    final actualData = json['data'] ?? json;
+    return UserDetailDTO.fromJson(actualData);
   }
 
     /// Eliminar el usuario

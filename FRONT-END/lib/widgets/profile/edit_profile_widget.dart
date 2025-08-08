@@ -1,18 +1,19 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import '../../core/services/app/profile_service.dart';
-import '../../dto/image/image_dto.dart';
+import 'package:KuenteCO/widgets/profile/profile_image_widget.dart';
+import '../../controllers/profile_controller.dart';
 import '../../dto/profile/update_profile_dto.dart';
 import '../../dto/profile/profile_detail_dto.dart';
+import '../../core/services/app/profile_service.dart';
 
 class EditProfile extends StatefulWidget {
   final ProfileDetailDTO profile;
+  final ProfileController profileController;
   final VoidCallback? onSuccess;
 
   const EditProfile({
     super.key,
     required this.profile,
+    required this.profileController,
     this.onSuccess,
   });
 
@@ -22,13 +23,11 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   final _formKey = GlobalKey<FormState>();
-  final _picker = ImagePicker();
 
   late TextEditingController _usernameController;
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
 
-  File? _selectedImageFile;
   bool _isLoading = false;
 
   @override
@@ -47,36 +46,19 @@ class _EditProfileState extends State<EditProfile> {
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImageFile = File(pickedFile.path);
-      });
-    }
-  }
-
-  Future<ImageDTO> _uploadImage(File imageFile) async {
-    // Implementa tu lógica de subida de imagen aquí
-    throw UnimplementedError("Falta implementar la subida de imagen.");
-  }
-
   Future<void> _editProfile() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     setState(() => _isLoading = true);
 
     try {
-      ImageDTO finalImageDTO = widget.profile.image!;
-      if (_selectedImageFile != null) {
-        finalImageDTO = await _uploadImage(_selectedImageFile!);
-      }
-
       final dto = UpdateProfileDTO(
         id: widget.profile.id,
         username: _usernameController.text.trim(),
         email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-        image: finalImageDTO,
+        password: _passwordController.text.trim().isEmpty
+            ? null
+            : _passwordController.text.trim(),
+        image: widget.profileController.authenticatedProfile.value?.image,
       );
 
       await ProfileService().updateProfile(dto);
@@ -103,9 +85,6 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
-    final String? imageUrl = widget.profile.image?.imageUrl;
-    final bool hasRemoteImage = imageUrl != null && imageUrl.isNotEmpty;
-
     return AlertDialog(
       title: const Text('Editar perfil'),
       content: SingleChildScrollView(
@@ -114,25 +93,13 @@ class _EditProfileState extends State<EditProfile> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // GestureDetector(
-              //   onTap: _isLoading ? null : _pickImage,
-              //   child: CircleAvatar(
-              //     radius: 40,
-              //     backgroundColor: Colors.grey.shade300,
-              //     backgroundImage: _selectedImageFile != null
-              //         ? FileImage(_selectedImageFile!)
-              //         : hasRemoteImage
-              //         ? NetworkImage(imageUrl!)
-              //         : null,
-              //     child: _selectedImageFile == null && !hasRemoteImage
-              //         ? const Icon(Icons.person, size: 40, color: Colors.white)
-              //         : null,
-              //   ),
-              // ),
+              // Aquí usamos tu ProfileImageWidget actual
+              ProfileImageWidget(profileController: widget.profileController),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _usernameController,
-                decoration: const InputDecoration(labelText: 'Nombre de usuario'),
+                decoration:
+                const InputDecoration(labelText: 'Nombre de usuario'),
                 enabled: !_isLoading,
                 validator: (value) =>
                 value == null || value.isEmpty ? 'Campo requerido' : null,
@@ -140,10 +107,12 @@ class _EditProfileState extends State<EditProfile> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Correo electrónico'),
+                decoration:
+                const InputDecoration(labelText: 'Correo electrónico'),
                 enabled: !_isLoading,
-                validator: (value) =>
-                value == null || !value.contains('@') ? 'Correo inválido' : null,
+                validator: (value) => value == null || !value.contains('@')
+                    ? 'Correo inválido'
+                    : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
@@ -151,8 +120,9 @@ class _EditProfileState extends State<EditProfile> {
                 obscureText: true,
                 decoration: const InputDecoration(labelText: 'Contraseña'),
                 enabled: !_isLoading,
-                validator: (value) =>
-                value == null || value.length < 6 ? 'Mínimo 6 caracteres' : null,
+                validator: (value) => value != null && value.isNotEmpty && value.length < 6
+                    ? 'Mínimo 6 caracteres'
+                    : null,
               ),
             ],
           ),
