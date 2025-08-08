@@ -4,6 +4,8 @@ WORKDIR /workspace
 
 ENV SPRING_OUTPUT_ANSI_ENABLED=ALWAYS
 
+COPY .env.docker /workspace/.env
+
 # Copy pom.xml and download dependencies (cached layer)
 COPY pom.xml .
 RUN mvn dependency:go-offline
@@ -35,6 +37,7 @@ COPY --from=builder /workspace/dependencies/ ./
 COPY --from=builder /workspace/spring-boot-loader/ ./
 COPY --from=builder /workspace/snapshot-dependencies/ ./
 COPY --from=builder /workspace/application/ ./
+COPY .env.docker /workspace/.env
 
 # Expose the port that Spring Boot will run on
 EXPOSE 7070
