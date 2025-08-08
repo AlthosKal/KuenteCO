@@ -30,14 +30,8 @@ COPY init-slave.sh /docker-entrypoint-initdb.d/
 # Dar permisos de ejecución al script
 RUN chmod +x /docker-entrypoint-initdb.d/init-slave.sh
 
-# Variables de entorno por defecto
-ENV POSTGRES_USER=slave
-ENV POSTGRES_PASSWORD=root
-ENV POSTGRES_DB=KuenteCO
-ENV MASTER_HOST=postgres-master-database
-ENV MASTER_PORT=5432
-ENV REPLICATOR_USER=replicator
-ENV REPLICATOR_PASSWORD=root
+# Copiar archivo de variables de entorno
+COPY .env.docker /.env.docker
 
 # Exponer puerto de PostgreSQL
 EXPOSE 5432

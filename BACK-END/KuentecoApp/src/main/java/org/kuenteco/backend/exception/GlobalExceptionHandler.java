@@ -314,4 +314,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }
+
+    @ExceptionHandler(ImageException.class)
+    public ResponseEntity<ApiResponse<Void>> handleImageException(
+            ImageException ex, HttpServletRequest request) {
+        log.error("Error general del servicio de Imagenes: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
+    }
 }

@@ -1,0 +1,16 @@
+# Archivos de configuración con credenciales
+*.env.docker
+.env.docker
+
+# Backups de base de datos
+*.sql.gz
+*.sql.bak
+*.dump
+
+# Archivos temporales
+*.tmp
+*.log
+
+# Datos de contenedores
+data/
+volumes/

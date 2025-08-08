@@ -1,4 +1,6 @@
 services:
+
+#FRONT DE LA APLICACION
   kuenteco-ui:
     image: yefff/image-frontend-kuenteco-ui:1.0.2
     container_name: KuentecoUi
@@ -11,15 +13,12 @@ services:
       - kuenteco-network
     restart: unless-stopped
 
+# API KUENTECO-APP DEL BACKEND DE LA APLICACION
   kuenteco-app:
-    image: yefff/image-backend-kuenteco-app:1.0.1
+    image: yefff/image-backend-kuenteco-app:1.0.2
     container_name: KuentecoApp
-    volumes:
-      - ./.env.docker:/workspace/.env
-    #ports:
-    #  - "8080:8080"
-    env_file:
-    - .env.docker
+    ports:
+      - "8080:8080"
     depends_on:
       postgres-master-database:
         condition: service_healthy
@@ -28,83 +27,67 @@ services:
     networks:
       - kuenteco-network
     restart: unless-stopped
+
+#BASE DE DATOS POSTGRESQL MAESTRA
   postgres-master-database:
-    image: yefff/image-master-kuenteco:1.1.0
+    image: yefff/image-master-kuenteco:1.1.1
     container_name: DatabaseMasterKuenteCO
-    environment:
-      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME_MASTER}
-      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD_MASTER}
-      POSTGRES_DB: KuenteCO
-      REPLICATOR_USER: replicator
-      REPLICATOR_PASSWORD: ${SPRING_DATASOURCE_PASSWORD_SLAVE}
     volumes:
       - postgres-master-data:/var/lib/postgresql/data
-      - ./Database/db:/db
-    #ports:
-    #  - "5432:5432"
+    ports:
+      - "5432:5432"
     networks:
       - kuenteco-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${SPRING_DATASOURCE_USERNAME_MASTER} -d KuenteCO"]
+      test: ["CMD-SHELL", "pg_isready -U master -d KuenteCO"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 250s
     restart: unless-stopped
+
+#BASE DE DATOS POSTGRESQL REPLICA
   postgres-replica-database:
-    image: yefff/image-slave-kuenteco:1.1.0
+    image: yefff/image-slave-kuenteco:1.1.1
     container_name: DatabaseSlaveKuenteCO
-    environment:
-      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME_SLAVE}
-      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD_SLAVE}
-      POSTGRES_DB: KuenteCO
-      MASTER_HOST: postgres-master-database
-      MASTER_PORT: 5432
-      REPLICATOR_USER: replicator
-      REPLICATOR_PASSWORD: ${SPRING_DATASOURCE_PASSWORD_SLAVE}
-      PGUSER: ${SPRING_DATASOURCE_USERNAME_SLAVE}
     volumes:
       - postgres-replica-data:/var/lib/postgresql/data
-    #ports:
-    #  - "5433:5432"
+    ports:
+      - "5433:5432"
     networks:
       - kuenteco-network
     depends_on:
       postgres-master-database:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${SPRING_DATASOURCE_USERNAME_SLAVE} -d KuenteCO || pg_isready"]
+      test: ["CMD-SHELL", "pg_isready -U replicator -d KuenteCO || pg_isready"]
       interval: 15s
       timeout: 10s
       retries: 10
       start_period: 250s
     restart: unless-stopped
+
+# API KUENTECO-CHAT DEL BACKEND DE LA APLICACION
   kuenteco-chat:
-    image: yefff/image-backend-kuenteco-chat:1.0.1
+    image: yefff/image-backend-kuenteco-chat:1.0.2
     container_name: KuentecoChat
-    volumes:
-      - ./.env.docker:/workspace/.env
-    #ports:
-    #  - "7070:7070"
-    env_file:
-      - .env.docker
+    ports:
+      - "7070:7070"
     depends_on:
       mongo-database:
         condition: service_healthy
     networks:
       - kuenteco-network
     restart: unless-stopped
+
+# BASE DE DATOS MONGODB
   mongo-database:
-    image: mongo:latest
+    image: yefff/image-mongo-kuenteco:1.0.0
     container_name: MongoDatabase
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
     volumes:
       - mongo-kuenteco-data:/data/db
-    #ports:
-    #  - "27017:27017"
+    ports:
+      - "27017:27017"
     networks:
       - kuenteco-network
     command: ["mongod", "--bind_ip_all"]
