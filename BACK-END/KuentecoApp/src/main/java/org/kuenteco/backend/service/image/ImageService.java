@@ -13,5 +13,7 @@ public interface ImageService {
 
     void deleteImage(HttpServletResponse response) throws IOException;
 
+    Image uploadImage(MultipartFile file) throws IOException;
+
     void removeImage(Image image) throws IOException;
 }

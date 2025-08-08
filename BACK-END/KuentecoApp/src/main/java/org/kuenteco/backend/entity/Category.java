@@ -20,15 +20,24 @@ public class Category {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_user", nullable = false,
-            foreignKey = @ForeignKey(name = "fk_user",
-                    foreignKeyDefinition = "FOREIGN KEY (id_user) REFERENCES kuentecouser(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
+    @JoinColumn(
+            name = "id_user",
+            nullable = false,
+            foreignKey =
+                    @ForeignKey(
+                            name = "fk_user",
+                            foreignKeyDefinition =
+                                    "FOREIGN KEY (id_user) REFERENCES kuentecouser(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "id_budget",
-            foreignKey = @ForeignKey(name = "fk_budget",
-                    foreignKeyDefinition = "FOREIGN KEY (id_budget) REFERENCES budget(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
+    @JoinColumn(
+            name = "id_budget",
+            foreignKey =
+                    @ForeignKey(
+                            name = "fk_budget",
+                            foreignKeyDefinition =
+                                    "FOREIGN KEY (id_budget) REFERENCES budget(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
     private Budget budget;
 
     private String name;
