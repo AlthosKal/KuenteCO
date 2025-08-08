@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/services/app/auth_service.dart';
 import '../../routes/app_routes.dart';
 
 class ProfileButtonBusiness extends StatelessWidget {
@@ -28,7 +29,7 @@ class ProfileButtonBusiness extends StatelessWidget {
         ),
         PopupMenuItem<String>(
           value: 'add_profile',
-          child: Text('Agregar perfil'),
+          child: Text('Perfiles'),
         ),
         PopupMenuItem<String>(
           value: 'subscription',
@@ -51,8 +52,6 @@ class ProfileButtonBusiness extends StatelessWidget {
             Navigator.pushNamed(context, AppRoutes.suscriptions);
             break;
           case 'logout':
-          // aquí tu lógica para cerrar sesión
-          // por ejemplo:
             _logout(context);
             break;
         }
@@ -60,8 +59,16 @@ class ProfileButtonBusiness extends StatelessWidget {
     );
   }
 
-  void _logout(BuildContext context) {
-    print("Cerrando sesión...");
-    Navigator.pushReplacementNamed(context, AppRoutes.login);
+  Future<void> _logout(BuildContext context) async {
+    try {
+      final authService = AuthService();
+      await authService.logout();
+      Navigator.pushReplacementNamed(context, AppRoutes.homeGuest);
+    } catch (e) {
+      print("❌ Error al cerrar sesión: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cerrar sesión: $e')),
+      );
+    }
   }
 }
