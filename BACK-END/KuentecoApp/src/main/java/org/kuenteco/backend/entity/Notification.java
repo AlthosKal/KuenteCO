@@ -24,15 +24,23 @@ public class Notification {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_user",
-            foreignKey = @ForeignKey(name = "fk_user",
-                    foreignKeyDefinition = "FOREIGN KEY (id_user) REFERENCES kuentecouser(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
+    @JoinColumn(
+            name = "id_user",
+            foreignKey =
+                    @ForeignKey(
+                            name = "fk_user",
+                            foreignKeyDefinition =
+                                    "FOREIGN KEY (id_user) REFERENCES kuentecouser(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "id_profile",
-            foreignKey = @ForeignKey(name = "fk_profile",
-                    foreignKeyDefinition = "FOREIGN KEY (id_profile) REFERENCES profile(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
+    @JoinColumn(
+            name = "id_profile",
+            foreignKey =
+                    @ForeignKey(
+                            name = "fk_profile",
+                            foreignKeyDefinition =
+                                    "FOREIGN KEY (id_profile) REFERENCES profile(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
     private Profile profile;
 
     @Column(name = "date_send")

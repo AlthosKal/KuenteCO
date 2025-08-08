@@ -193,6 +193,7 @@ public class ImageServiceImpl implements ImageService {
         }
     }
 
+    @Override
     public Image uploadImage(MultipartFile file) throws IOException {
         Map uploadResult = cloudinaryService.upload(file);
         String imageUrl = (String) uploadResult.get("url");

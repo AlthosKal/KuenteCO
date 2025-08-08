@@ -6,7 +6,6 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.config.jwt.AuthCredentials;
-import org.kuenteco.backend.dto.auth.DeleteUserDTO;
 import org.kuenteco.backend.dto.auth.UserDetailDTO;
 import org.kuenteco.backend.entity.Subscription;
 import org.kuenteco.backend.entity.User;
@@ -99,6 +98,5 @@ public class UserServiceImpl implements UserService {
         if (image != null) {
             imageService.removeImage(user.getImage());
         }
-
     }
 }

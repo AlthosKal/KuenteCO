@@ -17,9 +17,13 @@ public class Budget {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_user",
-            foreignKey = @ForeignKey(name = "fk_user",
-                    foreignKeyDefinition = "FOREIGN KEY (id_user) REFERENCES kuentecouser(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
+    @JoinColumn(
+            name = "id_user",
+            foreignKey =
+                    @ForeignKey(
+                            name = "fk_user",
+                            foreignKeyDefinition =
+                                    "FOREIGN KEY (id_user) REFERENCES kuentecouser(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
     private User user;
 
     private String name;

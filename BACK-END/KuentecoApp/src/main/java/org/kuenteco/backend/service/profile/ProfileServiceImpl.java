@@ -1,10 +1,10 @@
 package org.kuenteco.backend.service.profile;
 
 import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
-import static org.kuenteco.backend.service.user.SendgridServiceImpl.verificationCodes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,9 +12,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.config.jwt.JwtUtil;
-import org.kuenteco.backend.dto.auth.ChangePasswordDTO;
 import org.kuenteco.backend.dto.auth.LoginDTO;
 import org.kuenteco.backend.dto.auth.TokenResponseDTO;
+import org.kuenteco.backend.dto.profile.ChangePasswordDTO;
 import org.kuenteco.backend.dto.profile.NewProfileDTO;
 import org.kuenteco.backend.dto.profile.ProfileDetailDTO;
 import org.kuenteco.backend.dto.profile.UpdateProfileDTO;
@@ -38,6 +38,7 @@ import org.kuenteco.backend.repository.slave.SlaveSubscriptionRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.kuenteco.backend.service.auth.CookieService;
 import org.kuenteco.backend.service.auth.TokenBlacklistService;
+import org.kuenteco.backend.service.image.ImageService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -61,6 +62,7 @@ public class ProfileServiceImpl implements ProfileService {
     private final ProfileDetailMapper profileDetailMapper;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TransactionTemplate transactionTemplate;
+    private final ImageService imageService;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final CookieService cookieService;
@@ -179,6 +181,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
+    @Transactional
     public void updateProfile(UpdateProfileDTO dto) {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
@@ -186,40 +189,41 @@ public class ProfileServiceImpl implements ProfileService {
                 slaveUserRepository
                         .findByEmail(email)
                         .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-        if (existsByProfileName(dto.getUsername(), user))
-            throw new ProfileException("Cuenta con este nombre ya existente");
+
+        Profile profile =
+                slaveProfileRepository
+                        .findByUserAndId(user, dto.getId())
+                        .orElseThrow(() -> new ProfileException("Perfil no encontrado"));
+        if (!dto.getEmail().equalsIgnoreCase(profile.getEmail())
+                && slaveProfileRepository.existsByEmail(email)) {
+            throw new ProfileException("El correo ya está en uso por otro perfil");
+        }
+        // Actualiza la imagen si viene en el DTO
         log.info("Actualizando nuevo perfil {}", dto.getEmail());
+        updateProfileMapper.toEntity(dto, profile);
 
-        transactionTemplate.execute(
-                status -> {
-                    Profile profile = updateProfileMapper.toEntity(dto);
-                    profile.setPassword(passwordEncoder.encode(dto.getPassword()));
-                    profile.setUser(user);
-
-                    masterProfileRepository.save(profile);
-                    return "Perfil actualizado correctamente";
-                });
+        masterProfileRepository.save(profile);
     }
 
     @Override
-    public String changePasswordWithVerification(ChangePasswordDTO changePasswordDTO) {
-        // Usar transacción para cambiar la contraseña
-        return transactionTemplate.execute(
-                status -> {
-                    // Buscar directamente en la base de datos maestra
-                    Profile profile =
-                            slaveProfileRepository
-                                    .findByEmail(changePasswordDTO.getEmail())
-                                    .orElseThrow(() -> new AuthException("Usuario no encontrado"));
+    @Transactional
+    public String changePassword(ChangePasswordDTO dto) {
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        // Buscar directamente en la base de datos maestra
+        if (dto.getNewPassword().equals(dto.getConfirmPassword())) {
+            Profile profile =
+                    slaveProfileRepository
+                            .findByEmail(email)
+                            .orElseThrow(() -> new AuthException("Perfil no encontrado"));
 
-                    profile.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
-                    masterProfileRepository.save(profile);
+            profile.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+            masterProfileRepository.save(profile);
 
-                    // Eliminar el código después de usarlo
-                    verificationCodes.remove(changePasswordDTO.getEmail());
+            return "Contraseña actualizada correctamente";
+        }
 
-                    return "Contraseña actualizada correctamente";
-                });
+        return "Las contraseñas no coinciden";
     }
 
     @Override

@@ -19,9 +19,14 @@ public class MercadoPagoPayment {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_preapproval", nullable = false,
-            foreignKey = @ForeignKey(name = "fk_preapproval",
-                    foreignKeyDefinition = "FOREIGN KEY (id_preapproval) REFERENCES mercadopago_preapproval(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
+    @JoinColumn(
+            name = "id_preapproval",
+            nullable = false,
+            foreignKey =
+                    @ForeignKey(
+                            name = "fk_preapproval",
+                            foreignKeyDefinition =
+                                    "FOREIGN KEY (id_preapproval) REFERENCES mercadopago_preapproval(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
     private MercadoPagoPreapproval preapproval;
 
     @Column(name = "payment_id", unique = true)
