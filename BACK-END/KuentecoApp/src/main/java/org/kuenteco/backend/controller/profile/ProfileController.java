@@ -17,6 +17,7 @@ import org.kuenteco.backend.exception.ApiResponse;
 import org.kuenteco.backend.service.image.ImageService;
 import org.kuenteco.backend.service.profile.ProfileService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -69,10 +70,13 @@ public class ProfileController implements ProfileResource {
                 HttpStatus.CREATED);
     }
 
-    @PatchMapping("/update")
-    public ResponseEntity<?> update(@RequestBody UpdateProfileDTO dto, HttpServletRequest request)
+    @PatchMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> update(
+            @RequestPart("profile") UpdateProfileDTO dto,
+            @RequestPart(value = "image", required = false) MultipartFile file,
+            HttpServletRequest request)
             throws IOException {
-        profileService.updateProfile(dto);
+        profileService.updateProfile(dto, file);
         return new ResponseEntity<>(
                 ApiResponse.ok("Perfil actualizado correctamente", null, request.getRequestURI()),
                 HttpStatus.CREATED);

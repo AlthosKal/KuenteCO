@@ -5,6 +5,7 @@ import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,6 +23,7 @@ import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.Role;
 import org.kuenteco.backend.entity.Subscription;
 import org.kuenteco.backend.entity.User;
+import org.kuenteco.backend.entity.extra.Image;
 import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.SubscriptionType;
 import org.kuenteco.backend.enums.UserType;
@@ -46,6 +48,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
@@ -182,7 +185,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     @Transactional
-    public void updateProfile(UpdateProfileDTO dto) {
+    public void updateProfile(UpdateProfileDTO dto, MultipartFile file) throws IOException {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
         User user =
@@ -202,6 +205,16 @@ public class ProfileServiceImpl implements ProfileService {
         log.info("Actualizando nuevo perfil {}", dto.getEmail());
         updateProfileMapper.toEntity(dto, profile);
 
+        // Actualizar imagen si se envió archivo
+        if (file != null && !file.isEmpty()) {
+            Image oldImage = profile.getImage();
+            Image newImage = imageService.uploadImage(file);
+            profile.setImage(newImage);
+
+            if (oldImage != null) {
+                imageService.removeImage(oldImage);
+            }
+        }
         masterProfileRepository.save(profile);
     }
 

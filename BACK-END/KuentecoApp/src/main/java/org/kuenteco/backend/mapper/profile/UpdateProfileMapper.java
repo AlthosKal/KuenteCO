@@ -15,7 +15,6 @@ public interface UpdateProfileMapper {
     @Mappings({
         @Mapping(target = "username", source = "username"),
         @Mapping(target = "email", source = "email"),
-        @Mapping(target = "image", source = "image"),
         @Mapping(
                 target = "startDate",
                 expression = "java(new java.sql.Timestamp(System.currentTimeMillis()))"),
@@ -24,6 +23,4 @@ public interface UpdateProfileMapper {
         @Mapping(target = "password", ignore = true)
     })
     void toEntity(UpdateProfileDTO dto, @MappingTarget Profile entity);
-
-    void toEntityImage(ImageDTO dto, @MappingTarget Image entity);
 }

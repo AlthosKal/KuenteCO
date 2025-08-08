@@ -150,9 +150,10 @@ public interface ProfileResource {
                                                     @Schema(
                                                             implementation =
                                                                     UpdateProfileDTO.class))))
-    @PatchMapping("/update")
+    @PatchMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<?> update(
-            @RequestBody UpdateProfileDTO dto,
+            @RequestPart("profile") UpdateProfileDTO dto,
+            @RequestPart(value = "image", required = false) MultipartFile file,
             HttpServletRequest request)
             throws IOException;
 

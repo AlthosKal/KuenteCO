@@ -4,7 +4,6 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.kuenteco.backend.dto.image.ImageDTO;
 
 @Data
 @AllArgsConstructor
@@ -17,6 +16,4 @@ public class UpdateProfileDTO {
     private String username;
 
     private String email;
-
-    private ImageDTO image;
 }
