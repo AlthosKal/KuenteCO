@@ -28,10 +28,8 @@ COPY init-master.sh /docker-entrypoint-initdb.d/init-master.sh
 # Asegurar permisos de ejecución
 RUN chmod +x /docker-entrypoint-initdb.d/init-master.sh
 
-# Variables de entorno por defecto
-ENV POSTGRES_USER=master
-ENV POSTGRES_PASSWORD=root
-ENV POSTGRES_DB=KuenteCO
+# Copiar archivo de variables de entorno
+COPY .env.docker /.env.docker
 
 # Exponer puerto de PostgreSQL
 EXPOSE 5432

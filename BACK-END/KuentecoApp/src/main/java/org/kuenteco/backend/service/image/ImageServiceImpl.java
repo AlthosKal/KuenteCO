@@ -13,6 +13,7 @@ import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.entity.extra.Image;
 import org.kuenteco.backend.enums.RoleList;
+import org.kuenteco.backend.exception.exceptions.ImageException;
 import org.kuenteco.backend.mapper.image.ImageMapper;
 import org.kuenteco.backend.repository.master.MasterImageRepository;
 import org.kuenteco.backend.repository.master.MasterProfileRepository;
@@ -45,10 +46,10 @@ public class ImageServiceImpl implements ImageService {
                 User user =
                         slaveUserRepository
                                 .findByEmail(email)
-                                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                                .orElseThrow(() -> new ImageException("Usuario no encontrado"));
                 // Verificar si ya tiene una imagen previa
                 if (user.getImage() != null) {
-                    throw new RuntimeException("El usuario ya tiene una imagen de perfil");
+                    throw new ImageException("El usuario ya tiene una imagen de perfil");
                 }
 
                 // Subir la nueva imagen
@@ -62,10 +63,10 @@ public class ImageServiceImpl implements ImageService {
                 Profile profile =
                         slaveProfileRepository
                                 .findByEmail(email)
-                                .orElseThrow(() -> new RuntimeException("Perfil no encontrado"));
+                                .orElseThrow(() -> new ImageException("Perfil no encontrado"));
                 // Verificar si ya tiene una imagen previa
                 if (profile.getImage() != null) {
-                    throw new RuntimeException(
+                    throw new ImageException(
                             "El usuario ya tiene una imagen de perfil. Utilice updateImage para actualizarla.");
                 }
 
@@ -91,9 +92,9 @@ public class ImageServiceImpl implements ImageService {
                 User user =
                         slaveUserRepository
                                 .findByEmail(email)
-                                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                                .orElseThrow(() -> new ImageException("Usuario no encontrado"));
                 if (user.getImage() == null) {
-                    throw new RuntimeException(
+                    throw new ImageException(
                             "El usuario no tiene una imagen de perfil para actualizar.");
                 }
 
@@ -116,9 +117,9 @@ public class ImageServiceImpl implements ImageService {
                 Profile profile =
                         slaveProfileRepository
                                 .findByEmail(email)
-                                .orElseThrow(() -> new RuntimeException("Perfil no encontrado"));
+                                .orElseThrow(() -> new ImageException("Perfil no encontrado"));
                 if (profile.getImage() == null) {
-                    throw new RuntimeException(
+                    throw new ImageException(
                             "El perfil no tiene una imagen de perfil para actualizar.");
                 }
 
@@ -153,10 +154,10 @@ public class ImageServiceImpl implements ImageService {
                 User user =
                         slaveUserRepository
                                 .findByEmail(email)
-                                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                                .orElseThrow(() -> new ImageException("Usuario no encontrado"));
                 // Verificar si tiene imagen para eliminar
                 if (user.getImage() == null) {
-                    throw new RuntimeException(
+                    throw new ImageException(
                             "El usuario no tiene una imagen de perfil para eliminar.");
                 }
 
@@ -173,10 +174,10 @@ public class ImageServiceImpl implements ImageService {
                 Profile profile =
                         slaveProfileRepository
                                 .findByEmail(email)
-                                .orElseThrow(() -> new RuntimeException("Perfil no encontrado"));
+                                .orElseThrow(() -> new ImageException("Perfil no encontrado"));
                 // Verificar si tiene imagen para eliminar
                 if (profile.getImage() == null) {
-                    throw new RuntimeException(
+                    throw new ImageException(
                             "El perfil no tiene una imagen de perfil para eliminar.");
                 }
 
