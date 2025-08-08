@@ -31,9 +31,27 @@ class ProfileService {
     await _api.postApp('/profile/add', dto.toJson());
   }
 
+  /// Iniciar sesión con un perfil
+  Future<void> profileLogin(int profileId, String password) async {
+    final payload = {
+      'profileId': profileId,
+      'password': password,
+    };
+    await _api.postApp('/profile/login', payload);
+  }
+
   /// ✅ Actualizar perfil
   Future<void> updateProfile(UpdateProfileDTO dto) async {
     await _api.putApp('/profile/update', dto.toJson());
+  }
+
+  /// Cambiar contraseña
+  Future<void> changeProfilePassword(String currentPassword, String newPassword) async {
+    final payload = {
+      'currentPassword': currentPassword,
+      'newPassword': newPassword,
+    };
+    await _api.patchApp('/profile/change-password', payload);
   }
 
   /// ✅ Eliminar perfil

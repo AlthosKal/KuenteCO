@@ -91,6 +91,36 @@ class ProfileController {
     }
   }
 
+  /// Iniciar sesión con un perfil
+  Future<void> profileLogin(int profileId, String password) async {
+    if (isLoading.value) return;
+    isLoading.value = true;
+    try {
+      await _profileService.profileLogin(profileId, password);
+      // Actualizar el perfil autenticado después del login
+      await loadAuthenticatedProfile();
+    } catch (e) {
+      debugPrint('🔴 Error logging in with profile: $e');
+      rethrow;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Cambiar contraseña del perfil
+  Future<void> changeProfilePassword(String currentPassword, String newPassword) async {
+    if (isLoading.value) return;
+    isLoading.value = true;
+    try {
+      await _profileService.changeProfilePassword(currentPassword, newPassword);
+    } catch (e) {
+      debugPrint('🔴 Error changing profile password: $e');
+      rethrow;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   /// ✅ Subir imagen de perfil (cuando aún no tiene)
   Future<ImageDTO?> uploadProfileImage(File imageFile) async {
     if (isLoading.value) return null;
