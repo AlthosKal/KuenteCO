@@ -65,7 +65,6 @@ class _EditProfileState extends State<EditProfile> {
         id: widget.profile.id,
         username: _usernameController.text.trim(),
         email: _emailController.text.trim(),
-        password: null,
         image: widget.profileController.authenticatedProfile.value?.image,
       );
 
