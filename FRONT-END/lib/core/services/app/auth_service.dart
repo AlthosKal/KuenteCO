@@ -51,7 +51,7 @@ class AuthService {
 
     // ✅ Guardamos token y rol
     await _storage.write(key: 'Authorization', value: apiResponse.data.token);
-    await _storage.write(key: 'type', value: apiResponse.data.type);
+    await _storage.write(key: 'role', value: apiResponse.data.type);
 
     return apiResponse.data;
   }
