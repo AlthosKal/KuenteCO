@@ -3,7 +3,8 @@ import 'package:KuenteCO/widgets/profile/profile_image_widget.dart';
 import '../../controllers/profile_controller.dart';
 import '../../dto/profile/update_profile_dto.dart';
 import '../../dto/profile/profile_detail_dto.dart';
-import '../common/primary_buttom_widget.dart'; // tu botón personalizado
+import '../../screens/auth/verification_code_email_view.dart';
+import '../common/primary_buttom_widget.dart';
 
 class EditProfile extends StatefulWidget {
   final ProfileDetailDTO profile;
@@ -39,8 +40,7 @@ class _EditProfileState extends State<EditProfile> {
     super.initState();
     _usernameController =
         TextEditingController(text: widget.profile.username);
-    _emailController =
-        TextEditingController(text: widget.profile.email);
+    _emailController = TextEditingController(text: widget.profile.email);
     _currentPasswordController = TextEditingController();
     _newPasswordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
@@ -141,7 +141,7 @@ class _EditProfileState extends State<EditProfile> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
+              /// --- Encabezado ---
               Row(
                 children: [
                   const Icon(Icons.edit, color: Colors.purple),
@@ -209,24 +209,22 @@ class _EditProfileState extends State<EditProfile> {
                   ],
                 ),
               ),
+
               const SizedBox(height: 12),
-              Form(
-                key: _passwordFormKey,
-                child: Column(
-                  children: [
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      child: PrimaryButton(
-                        onPressed:
-                        _isChangingPassword ? null : _changePassword,
-                        label: _isChangingPassword
-                            ? 'Cambiando...'
-                            : 'Cambiar Contraseña',
-                        isLoading: _isChangingPassword,
+
+              /// --- Botón cambiar contraseña ---
+              SizedBox(
+                width: double.infinity,
+                child: PrimaryButton(
+                  label: "Cambiar contraseña",
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            VerificationCodeScreen(email: ''),
                       ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
             ],

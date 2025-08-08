@@ -108,8 +108,7 @@ class _AccountScreenState extends State<AccountScreen> {
                           try {
                             await userController.deleteUser();
                             _showSnackBar('Cuenta eliminada correctamente');
-                            // Podrías redirigir al login si quieres
-                            // Navigator.pushReplacementNamed(context, '/login');
+                            Navigator.pushReplacementNamed(context, '/');
                           } catch (e) {
                             _showSnackBar('Error al eliminar la cuenta');
                           }
