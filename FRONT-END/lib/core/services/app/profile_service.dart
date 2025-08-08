@@ -42,7 +42,7 @@ class ProfileService {
 
   /// ✅ Actualizar perfil
   Future<void> updateProfile(UpdateProfileDTO dto) async {
-    await _api.putApp('/profile/update', dto.toJson());
+    await _api.patchApp('/profile/update', dto.toJson());
   }
 
   /// Cambiar contraseña
