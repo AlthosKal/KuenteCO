@@ -6,24 +6,24 @@ class UpdateProfileDTO {
   final int id;
   final String username;
   final String email;
-  final String password;
-  final ImageDTO image;
+  final String? password;
+  final ImageDTO? image;
 
   UpdateProfileDTO({
     required this.id,
     required this.username,
     required this.email,
-    required this.password,
-    required this.image,
+    this.password,
+    this.image,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'id':id,
+      'id': id,
       'username': username,
       'email': email,
       'password': password,
-      'image': image,
+      'image': image?.toJson(),
     };
   }
 }
