@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/services/app/auth_service.dart';
 import '../../routes/app_routes.dart';
 
 class ProfileButtonPersonal extends StatelessWidget {
@@ -51,13 +52,16 @@ class ProfileButtonPersonal extends StatelessWidget {
     );
   }
 
-  void _logout(BuildContext context) {
-    // Aquí puedes borrar token si lo deseas
-    print("Cerrando sesión...");
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      AppRoutes.login,
-          (route) => false,
-    );
+  Future<void> _logout(BuildContext context) async {
+    try {
+      final authService = AuthService(); // o la forma en que lo instancies en tu app
+      await authService.logout();
+      Navigator.pushReplacementNamed(context, AppRoutes.homeGuest);
+    } catch (e) {
+      print("❌ Error al cerrar sesión: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cerrar sesión: $e')),
+      );
+    }
   }
 }
