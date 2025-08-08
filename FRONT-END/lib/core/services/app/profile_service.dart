@@ -66,8 +66,8 @@ class ProfileService {
     });
 
     final response = await _api.postApp('/profile/image/add', formData);
-    if (response.statusCode == 200) {
-      return ImageDTO.fromJson(response.data);
+    if (response.statusCode == 201) {
+      return ImageDTO.fromJson(response.data['data']);
     } else {
       throw Exception('Error al subir imagen de perfil: ${response.statusCode}');
     }
@@ -81,7 +81,7 @@ class ProfileService {
 
     final response = await _api.patchApp('/profile/image/update', formData);
     if (response.statusCode == 200) {
-      return ImageDTO.fromJson(response.data);
+      return ImageDTO.fromJson(response.data['data']);
     } else {
       throw Exception('Error al actualizar imagen de perfil: ${response.statusCode}');
     }

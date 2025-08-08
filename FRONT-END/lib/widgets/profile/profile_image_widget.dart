@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../controllers/profile_controller.dart';
@@ -24,7 +23,6 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
     if (pickedFile == null) return;
 
     final bytes = await pickedFile.readAsBytes();
-    final file = File(pickedFile.path);
 
     setState(() => _selectedImageBytes = bytes);
 
@@ -33,10 +31,10 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
           widget.profileController.authenticatedProfile.value?.image;
 
       if (currentImage == null) {
-        await widget.profileController.uploadProfileImage(file);
+        await widget.profileController.uploadProfileImage(bytes, pickedFile.name);
         _showSnackBar('Imagen de perfil subida correctamente');
       } else {
-        await widget.profileController.updateProfileImage(file);
+        await widget.profileController.updateProfileImage(bytes, pickedFile.name);
         _showSnackBar('Imagen de perfil actualizada correctamente');
       }
 
