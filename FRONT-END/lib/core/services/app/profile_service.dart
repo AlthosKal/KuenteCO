@@ -1,11 +1,8 @@
-import 'dart:io';
 import 'package:dio/dio.dart';
 import '../../../dto/profile/new_profile_dto.dart';
 import '../../../dto/profile/profile_detail_dto.dart';
 import '../../../dto/profile/update_profile_dto.dart';
-import '../../../dto/auth/response/user_detail_dto.dart';
 import '../../../dto/image/image_dto.dart';
-import '../../exceptions/api_response.dart';
 import '../api_client.dart';
 
 class ProfileService {
@@ -23,22 +20,24 @@ class ProfileService {
   /// ✅ Obtener perfil autenticado
   Future<ProfileDetailDTO> getAuthenticatedProfile() async {
     final response = await _api.getApp('/profile/details');
-    return ProfileDetailDTO.fromJson(response.data['data']);
+    final Map<String, dynamic> json = response.data;
+    final actualData = json['data'] ?? json;
+    return ProfileDetailDTO.fromJson(actualData);
   }
 
-  /// ✅ Obtener usuario autenticado
-  Future<UserDetailDTO> getAuthenticatedUser() async {
-    final response = await _api.getApp('/auth/user/details');
-    final apiResponse = ApiResponse<UserDetailDTO>.fromJson(
-      response.data,
-          (data) => UserDetailDTO.fromJson(data),
-    );
-    return apiResponse.data;
-  }
 
   /// ✅ Crear perfil
   Future<void> createProfile(NewProfileDTO dto) async {
     await _api.postApp('/profile/add', dto.toJson());
+  }
+
+  /// Iniciar sesión con un perfil
+  Future<void> profileLogin(int profileId, String password) async {
+    final payload = {
+      'profileId': profileId,
+      'password': password,
+    };
+    await _api.postApp('/profile/login', payload);
   }
 
   /// ✅ Actualizar perfil
@@ -46,41 +45,53 @@ class ProfileService {
     await _api.putApp('/profile/update', dto.toJson());
   }
 
+  /// Cambiar contraseña
+  Future<void> changeProfilePassword(String currentPassword, String newPassword) async {
+    final payload = {
+      'currentPassword': currentPassword,
+      'newPassword': newPassword,
+    };
+    await _api.patchApp('/profile/change-password', payload);
+  }
+
   /// ✅ Eliminar perfil
   Future<void> deleteProfile(int id) async {
-    await _api.deleteApp('/profile/$id');
+    await _api.deleteApp('/profile/delete/$id');
   }
 
-  /// ✅ Subir imagen de perfil
-  Future<ImageDTO> uploadProfileImage(File imageFile) async {
+  /// Subir imagen de perfil
+  Future<ImageDTO> uploadProfileImage(MultipartFile multipartfile, String fileName) async {
     final formData = FormData.fromMap({
-      'image': await MultipartFile.fromFile(imageFile.path),
+      'image': multipartfile,
     });
 
-    final response = await _api.postApp('/auth/user/image/add', formData);
-    final apiResponse = ApiResponse<ImageDTO>.fromJson(
-      response.data,
-          (data) => ImageDTO.fromJson(data),
-    );
-    return apiResponse.data;
+    final response = await _api.postApp('/auth/profile/image/add', formData);
+    if (response.statusCode == 200) {
+      return ImageDTO.fromJson(response.data);
+    } else {
+      throw Exception('Error al subir imagen de perfil: ${response.statusCode}');
+    }
   }
 
-  /// ✅ Actualizar imagen de perfil
-  Future<ImageDTO> updateProfileImage(File imageFile) async {
+  /// Actualizar imagen de perfil
+  Future<ImageDTO> updateProfileImage(MultipartFile multipartfile, String fileName) async {
     final formData = FormData.fromMap({
-      'image': await MultipartFile.fromFile(imageFile.path),
+      'image': multipartfile,
     });
 
-    final response = await _api.postApp('/auth/user/image/update', formData);
-    final apiResponse = ApiResponse<ImageDTO>.fromJson(
-      response.data,
-          (data) => ImageDTO.fromJson(data),
-    );
-    return apiResponse.data;
+    final response = await _api.patchApp('/auth/profile/image/update', formData);
+    if (response.statusCode == 200) {
+      return ImageDTO.fromJson(response.data);
+    } else {
+      throw Exception('Error al actualizar imagen de perfil: ${response.statusCode}');
+    }
   }
 
-  /// ✅ Eliminar imagen de perfil
+  /// Eliminar imagen de perfil
   Future<void> deleteProfileImage() async {
-    await _api.deleteApp('/auth/user/image/delete');
+    final response = await _api.deleteApp('/auth/profile/image/delete');
+    if (response.statusCode != 204) {
+      throw Exception('Error al eliminar imagen de perfil: ${response.statusCode}');
+    }
   }
 }

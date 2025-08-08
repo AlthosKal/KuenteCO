@@ -51,7 +51,7 @@ class AuthService {
 
     // ✅ Guardamos token y rol
     await _storage.write(key: 'Authorization', value: apiResponse.data.token);
-    await _storage.write(key: 'role', value: apiResponse.data.type);
+    await _storage.write(key: 'type', value: apiResponse.data.type);
 
     return apiResponse.data;
   }
@@ -107,23 +107,6 @@ class AuthService {
     });
 
     final response = await _api.postApp('/auth/user/image/add', formData);
-    final json = response.data;
-
-    final apiResponse = ApiResponse<ImageDTO>.fromJson(
-      json,
-          (data) => ImageDTO.fromJson(data),
-    );
-
-    return apiResponse.data;
-  }
-
-  /// 🔄 ACTUALIZAR IMAGEN DE PERFIL
-  Future<ImageDTO> updateProfileImage(File imageFile) async {
-    final formData = FormData.fromMap({
-      'image': await MultipartFile.fromFile(imageFile.path),
-    });
-
-    final response = await _api.postApp('/auth/user/image/update', formData);
     final json = response.data;
 
     final apiResponse = ApiResponse<ImageDTO>.fromJson(
