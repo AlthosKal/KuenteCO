@@ -65,7 +65,7 @@ class ProfileService {
       'image': multipartfile,
     });
 
-    final response = await _api.postApp('/auth/profile/image/add', formData);
+    final response = await _api.postApp('/profile/image/add', formData);
     if (response.statusCode == 200) {
       return ImageDTO.fromJson(response.data);
     } else {
@@ -79,7 +79,7 @@ class ProfileService {
       'image': multipartfile,
     });
 
-    final response = await _api.patchApp('/auth/profile/image/update', formData);
+    final response = await _api.patchApp('/profile/image/update', formData);
     if (response.statusCode == 200) {
       return ImageDTO.fromJson(response.data);
     } else {
@@ -89,7 +89,7 @@ class ProfileService {
 
   /// Eliminar imagen de perfil
   Future<void> deleteProfileImage() async {
-    final response = await _api.deleteApp('/auth/profile/image/delete');
+    final response = await _api.deleteApp('/profile/delete');
     if (response.statusCode != 204) {
       throw Exception('Error al eliminar imagen de perfil: ${response.statusCode}');
     }
