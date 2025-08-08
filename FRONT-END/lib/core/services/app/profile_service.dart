@@ -26,16 +26,6 @@ class ProfileService {
     return ProfileDetailDTO.fromJson(response.data['data']);
   }
 
-  /// ✅ Obtener usuario autenticado
-  Future<UserDetailDTO> getAuthenticatedUser() async {
-    final response = await _api.getApp('/auth/user/details');
-    final apiResponse = ApiResponse<UserDetailDTO>.fromJson(
-      response.data,
-          (data) => UserDetailDTO.fromJson(data),
-    );
-    return apiResponse.data;
-  }
-
   /// ✅ Crear perfil
   Future<void> createProfile(NewProfileDTO dto) async {
     await _api.postApp('/profile/add', dto.toJson());
@@ -48,7 +38,7 @@ class ProfileService {
 
   /// ✅ Eliminar perfil
   Future<void> deleteProfile(int id) async {
-    await _api.deleteApp('/profile/$id');
+    await _api.deleteApp('/profile/delete/$id');
   }
 
   /// ✅ Subir imagen de perfil
@@ -57,7 +47,7 @@ class ProfileService {
       'image': await MultipartFile.fromFile(imageFile.path),
     });
 
-    final response = await _api.postApp('/auth/user/image/add', formData);
+    final response = await _api.postApp('/auth/profile/image/add', formData);
     final apiResponse = ApiResponse<ImageDTO>.fromJson(
       response.data,
           (data) => ImageDTO.fromJson(data),
@@ -65,22 +55,25 @@ class ProfileService {
     return apiResponse.data;
   }
 
-  /// ✅ Actualizar imagen de perfil
+  /// 🔄 ACTUALIZAR IMAGEN DE PERFIL
   Future<ImageDTO> updateProfileImage(File imageFile) async {
     final formData = FormData.fromMap({
       'image': await MultipartFile.fromFile(imageFile.path),
     });
 
     final response = await _api.postApp('/auth/user/image/update', formData);
+    final json = response.data;
+
     final apiResponse = ApiResponse<ImageDTO>.fromJson(
-      response.data,
+      json,
           (data) => ImageDTO.fromJson(data),
     );
+
     return apiResponse.data;
   }
 
   /// ✅ Eliminar imagen de perfil
   Future<void> deleteProfileImage() async {
-    await _api.deleteApp('/auth/user/image/delete');
+    await _api.deleteApp('/auth/profile/image/delete');
   }
 }

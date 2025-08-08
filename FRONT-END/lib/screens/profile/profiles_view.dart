@@ -38,12 +38,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  void _onAccountEdited(ProfileDetailDTO profile) {
-    // Lógica para editar (si quieres abrir un formulario de edición)
-    // Ejemplo: navegar a EditProfileWidget
-    print("Editar perfil ${profile.username}");
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -29,13 +29,6 @@ class UserService {
       } else {
         print('❌ DEBUG: No hay imagen en la respuesta');
       }
-
-      actualData['username'] ??= '';
-      actualData['email'] ??= '';
-      actualData['userType'] ??= '';
-      actualData['subscriptionType'] ??= '';
-      actualData['state'] ??= '';
-
       final userDetailDTO = UserDetailDTO.fromJson(actualData);
       print('🔍 DEBUG: UserDetailDTO creado: ${userDetailDTO.toJson()}');
       
@@ -45,8 +38,6 @@ class UserService {
     // Si no es 200, lanza excepción explícita
     throw Exception('Error al obtener usuario: ${response.statusCode}');
   }
-
-
 
     /// Eliminar el usuario
   Future<void> deleteUser() async {
@@ -89,16 +80,6 @@ class UserService {
     final response = await _apiClient.deleteApp('/auth/user/image/delete');
     if (response.statusCode != 204) {
       throw Exception('Error al eliminar imagen: ${response.statusCode}');
-    }
-  }
-
-  /// Actualizar contraseña
-  Future<UserDetailDTO> updateUserPassword(UserDetailDTO updatedUser) async {
-    final response = await _apiClient.patchApp('/auth/change-password', updatedUser.toJson());
-    if (response.statusCode == 200) {
-      return UserDetailDTO.fromJson(response.data);
-    } else {
-      throw Exception('Error al actualizar contraseña: ${response.statusCode}');
     }
   }
 }

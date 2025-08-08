@@ -29,21 +29,7 @@ class UserController extends ChangeNotifier {
     }
   }
 
-  /// Actualizar contraseña de usuario
-  Future<void> updateUserPassword(UserDetailDTO updatedUserPassword) async {
-    try {
-      isLoading.value = true;
-      final result = await _userService.updateUserPassword(updatedUserPassword);
-      user.value = result;
-      userImage = result.image;
-      print("✅ Contraseña de usuario correctamente actualizada");
-    } catch (e) {
-      print("🛑 Error actualizando usuario: $e");
-    } finally {
-      isLoading.value = false;
-      notifyListeners();
-    }
-  }
+
 
   /// Subir imagen de usuario
   Future<void> uploadUserImage(MultipartFile multipartfile, String fileName) async {
