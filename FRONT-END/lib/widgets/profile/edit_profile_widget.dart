@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:KuenteCO/widgets/profile/profile_image_widget.dart';
 import '../../controllers/profile_controller.dart';
 import '../../dto/profile/update_profile_dto.dart';
@@ -24,35 +25,32 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   final _formKey = GlobalKey<FormState>();
-  final _passwordFormKey = GlobalKey<FormState>();
 
   late TextEditingController _usernameController;
   late TextEditingController _emailController;
-  late TextEditingController _currentPasswordController;
-  late TextEditingController _newPasswordController;
-  late TextEditingController _confirmPasswordController;
+  
+  // Notifiers para manejar la imagen integrada con update_profile
+  final ValueNotifier<MultipartFile?> _selectedImageNotifier = ValueNotifier(null);
+  final ValueNotifier<bool> _removeImageNotifier = ValueNotifier(false);
 
   bool _isLoading = false;
-  bool _isChangingPassword = false;
 
   @override
   void initState() {
     super.initState();
-    _usernameController =
-        TextEditingController(text: widget.profile.username);
+    _usernameController = TextEditingController(text: widget.profile.username);
     _emailController = TextEditingController(text: widget.profile.email);
-    _currentPasswordController = TextEditingController();
-    _newPasswordController = TextEditingController();
-    _confirmPasswordController = TextEditingController();
+    
+    // Debug: verificar si el profile ya tiene imagen
+    debugPrint('🔍 EditProfile - profile.image: ${widget.profile.image?.imageUrl ?? "NO_IMAGE"}');
   }
 
   @override
   void dispose() {
     _usernameController.dispose();
     _emailController.dispose();
-    _currentPasswordController.dispose();
-    _newPasswordController.dispose();
-    _confirmPasswordController.dispose();
+    _selectedImageNotifier.dispose();
+    _removeImageNotifier.dispose();
     super.dispose();
   }
 
@@ -65,13 +63,22 @@ class _EditProfileState extends State<EditProfile> {
         id: widget.profile.id,
         username: _usernameController.text.trim(),
         email: _emailController.text.trim(),
-        image: widget.profileController.authenticatedProfile.value?.image,
+        removeImage: _removeImageNotifier.value, // 🎯 Sincronizado con widget
       );
 
-      await widget.profileController.updateProfile(dto);
+      debugPrint('🔍 Profile update - removeImage: ${_removeImageNotifier.value}');
+      debugPrint('🔍 Profile update - selectedImage: ${_selectedImageNotifier.value != null ? "YES" : "NO"}');
+
+      // 🎯 Pasar imagen al update_profile del backend
+      await widget.profileController.updateProfile(
+        dto, 
+        imageFile: _selectedImageNotifier.value,
+      );
+      
       widget.onSuccess?.call();
 
       if (mounted) {
+        Navigator.of(context).pop(); // Cerrar el diálogo
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('✅ Perfil actualizado con éxito'),
@@ -90,42 +97,6 @@ class _EditProfileState extends State<EditProfile> {
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _changePassword() async {
-    if (!(_passwordFormKey.currentState?.validate() ?? false)) return;
-
-    setState(() => _isChangingPassword = true);
-    try {
-      await widget.profileController.changeProfilePassword(
-        _currentPasswordController.text.trim(),
-        _newPasswordController.text.trim(),
-      );
-
-      _currentPasswordController.clear();
-      _newPasswordController.clear();
-      _confirmPasswordController.clear();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ Contraseña cambiada con éxito'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('❌ Error al cambiar contraseña: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isChangingPassword = false);
     }
   }
 
@@ -168,8 +139,15 @@ class _EditProfileState extends State<EditProfile> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    ProfileImageWidget(
-                        profileController: widget.profileController),
+                    Center(
+                      child: ProfileImageWidget(
+                        profileController: widget.profileController,
+                        selectedImageNotifier: _selectedImageNotifier,
+                        removeImageNotifier: _removeImageNotifier,
+                        profile: widget.profile, // 🎯 Pasar el profile con la imagen
+                        size: 120,
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _usernameController,

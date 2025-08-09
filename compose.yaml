@@ -38,12 +38,6 @@ services:
       - "5432:5432"
     networks:
       - kuenteco-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U master -d KuenteCO"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 250s
     restart: unless-stopped
 
 #BASE DE DATOS POSTGRESQL REPLICA
@@ -59,12 +53,6 @@ services:
     depends_on:
       postgres-master-database:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U replicator -d KuenteCO || pg_isready"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
-      start_period: 250s
     restart: unless-stopped
 
 # API KUENTECO-CHAT DEL BACKEND DE LA APLICACION
@@ -91,12 +79,6 @@ services:
     networks:
       - kuenteco-network
     command: ["mongod", "--bind_ip_all"]
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand({ ping: 1 })"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 250s
     restart: unless-stopped
 volumes:
   postgres-master-data:

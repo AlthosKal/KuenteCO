@@ -1,7 +1,6 @@
 package org.kuenteco.backend.service.user;
 
 import java.io.IOException;
-import org.kuenteco.backend.dto.auth.DeleteUserDTO;
 import org.kuenteco.backend.dto.auth.UserDetailDTO;
 import org.kuenteco.backend.entity.User;
 

@@ -8,7 +8,7 @@ if [ ! -f "/var/lib/postgresql/data/PG_VERSION" ]; then
     # Configuración inicial
     psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
     -- Crear usuario replicador y configurar extensiones
-    CREATE USER replicator REPLICATION LOGIN ENCRYPTED PASSWORD 'root';
+    CREATE USER replicator REPLICATION LOGIN ENCRYPTED PASSWORD '$REPLICATOR_PASSWORD';
     CREATE EXTENSION IF NOT EXISTS http;
     CREATE EXTENSION IF NOT EXISTS pg_cron;
     GRANT SELECT ON ALL TABLES IN SCHEMA public TO replicator;
@@ -26,7 +26,7 @@ else
     DO \$\$
     BEGIN
         IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'replicator') THEN
-            CREATE USER replicator REPLICATION LOGIN ENCRYPTED PASSWORD 'root';
+            CREATE USER replicator REPLICATION LOGIN ENCRYPTED PASSWORD '$REPLICATOR_PASSWORD';
             GRANT SELECT ON ALL TABLES IN SCHEMA public TO replicator;
             ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO replicator;
         END IF;

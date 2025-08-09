@@ -11,10 +11,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
-import org.kuenteco.backend.dto.auth.ChangePasswordDTO;
 import org.kuenteco.backend.dto.auth.LoginDTO;
 import org.kuenteco.backend.dto.auth.TokenResponseDTO;
 import org.kuenteco.backend.dto.image.ImageDTO;
+import org.kuenteco.backend.dto.profile.ChangePasswordDTO;
 import org.kuenteco.backend.dto.profile.NewProfileDTO;
 import org.kuenteco.backend.dto.profile.ProfileDetailDTO;
 import org.kuenteco.backend.dto.profile.UpdateProfileDTO;
@@ -150,8 +150,12 @@ public interface ProfileResource {
                                                     @Schema(
                                                             implementation =
                                                                     UpdateProfileDTO.class))))
-    @PatchMapping("/update")
-    ResponseEntity<?> update(@RequestBody UpdateProfileDTO dto, HttpServletRequest request);
+    @PatchMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<?> update(
+            @RequestPart("profile") UpdateProfileDTO dto,
+            @RequestPart(value = "image", required = false) MultipartFile file,
+            HttpServletRequest request)
+            throws IOException;
 
     @Operation(
             summary = "Cambiar contraseña del perfil",

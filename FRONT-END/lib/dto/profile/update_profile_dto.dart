@@ -5,12 +5,14 @@ class UpdateProfileDTO {
   final String username;
   final String email;
   final ImageDTO? image;
+  final bool removeImage;
 
   UpdateProfileDTO({
     required this.id,
     required this.username,
     required this.email,
     this.image,
+    required this.removeImage,
   });
 
   Map<String, dynamic> toJson() {
@@ -18,7 +20,7 @@ class UpdateProfileDTO {
       'id': id,
       'username': username,
       'email': email,
-      'image': image?.toJson(),
+      'removeImage': removeImage,
     };
   }
 }

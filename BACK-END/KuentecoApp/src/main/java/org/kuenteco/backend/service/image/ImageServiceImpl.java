@@ -67,7 +67,7 @@ public class ImageServiceImpl implements ImageService {
                 // Verificar si ya tiene una imagen previa
                 if (profile.getImage() != null) {
                     throw new ImageException(
-                            "El usuario ya tiene una imagen de perfil. Utilice updateImage para actualizarla.");
+                            "El perfil ya tiene una imagen de perfil. Utilice updateImage para actualizarla.");
                 }
 
                 // Subir la nueva imagen
@@ -193,6 +193,7 @@ public class ImageServiceImpl implements ImageService {
         }
     }
 
+    @Override
     public Image uploadImage(MultipartFile file) throws IOException {
         Map uploadResult = cloudinaryService.upload(file);
         String imageUrl = (String) uploadResult.get("url");

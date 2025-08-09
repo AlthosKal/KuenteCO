@@ -6,10 +6,10 @@ import jakarta.validation.Valid;
 import java.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.kuenteco.backend.dto.auth.ChangePasswordDTO;
 import org.kuenteco.backend.dto.auth.LoginDTO;
 import org.kuenteco.backend.dto.auth.TokenResponseDTO;
 import org.kuenteco.backend.dto.image.ImageDTO;
+import org.kuenteco.backend.dto.profile.ChangePasswordDTO;
 import org.kuenteco.backend.dto.profile.NewProfileDTO;
 import org.kuenteco.backend.dto.profile.ProfileDetailDTO;
 import org.kuenteco.backend.dto.profile.UpdateProfileDTO;
@@ -17,6 +17,7 @@ import org.kuenteco.backend.exception.ApiResponse;
 import org.kuenteco.backend.service.image.ImageService;
 import org.kuenteco.backend.service.profile.ProfileService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -69,25 +70,22 @@ public class ProfileController implements ProfileResource {
                 HttpStatus.CREATED);
     }
 
-    @PatchMapping("/update")
-    public ResponseEntity<?> update(@RequestBody UpdateProfileDTO dto, HttpServletRequest request) {
-        profileService.updateProfile(dto);
+    @PatchMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> update(
+            @RequestPart("profile") UpdateProfileDTO dto,
+            @RequestPart(value = "image", required = false) MultipartFile file,
+            HttpServletRequest request)
+            throws IOException {
+        profileService.updateProfile(dto, file);
         return new ResponseEntity<>(
-                ApiResponse.ok("Cuenta actualizada correctamente", null, request.getRequestURI()),
+                ApiResponse.ok("Perfil actualizado correctamente", null, request.getRequestURI()),
                 HttpStatus.CREATED);
     }
 
     @PatchMapping("/change-password")
     public ResponseEntity<?> changePassword(
             @Valid @RequestBody ChangePasswordDTO dto, HttpServletRequest request) {
-        if (dto.getCode() == null || dto.getCode().trim().isEmpty()) {
-            log.error("Error: Código de verificación vació");
-            return new ResponseEntity<>(
-                    ApiResponse.error(
-                            "Código de verificación es requerido", request.getRequestURI()),
-                    HttpStatus.BAD_REQUEST);
-        }
-        String message = profileService.changePasswordWithVerification(dto);
+        String message = profileService.changePassword(dto);
         log.info("Contraseña actualizada correctamente");
         return new ResponseEntity<>(
                 ApiResponse.ok(message, dto, request.getRequestURI()), HttpStatus.CREATED);
@@ -132,7 +130,7 @@ public class ProfileController implements ProfileResource {
                 HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/image/delete")
     public ResponseEntity<?> deleteImage(HttpServletResponse response) throws IOException {
 
         imageService.deleteImage(response);
