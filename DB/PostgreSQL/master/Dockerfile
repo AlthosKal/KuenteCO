@@ -31,11 +31,20 @@ RUN chmod +x /docker-entrypoint-initdb.d/init-master.sh
 # Copiar archivo de variables de entorno
 COPY .env.docker /.env.docker
 
+# Crear script de entrada personalizado que carga .env.docker
+RUN echo '#!/bin/bash' > /docker-entrypoint-custom.sh && \
+    echo 'set -a' >> /docker-entrypoint-custom.sh && \
+    echo 'source /.env.docker' >> /docker-entrypoint-custom.sh && \
+    echo 'set +a' >> /docker-entrypoint-custom.sh && \
+    echo 'exec /usr/local/bin/docker-entrypoint.sh "$@"' >> /docker-entrypoint-custom.sh && \
+    chmod +x /docker-entrypoint-custom.sh
+
 HEALTHCHECK --interval=10s --timeout=5s --retries=5 --start-period=250s \
   CMD pg_isready -U master -d KuenteCO
 
 # Exponer puerto de PostgreSQL
 EXPOSE 5432
 
-# Arranque usando el config modificado
+# Usar nuestro script personalizado como entrypoint
+ENTRYPOINT ["/docker-entrypoint-custom.sh"]
 CMD ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
