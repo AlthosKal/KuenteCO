@@ -1,0 +1,168 @@
+import '../../../dto/subscription/request/create_subscription_request_dto.dart';
+import '../../../dto/subscription/response/create_subscription_response_dto.dart';
+import '../../../dto/subscription/response/payment_history_response_dto.dart';
+import '../../../dto/subscription/response/subscription_response_dto.dart';
+import '../../../dto/subscription/subscription_price_config_dto.dart';
+import '../../exceptions/global_exception_handler.dart';
+import '../api_client.dart';
+
+class SubscriptionService {
+  final ApiClient _apiClient;
+
+  SubscriptionService(this._apiClient);
+
+  /// Crear una nueva suscripción
+  Future<CreateSubscriptionResponseDTO> createSubscription(
+      CreateSubscriptionRequestDTO request) {
+    return GlobalExceptionHandler.run(() async {
+      print('🚀 Creando suscripción: ${request.toJson()}');
+      final response = await _apiClient.postApp(
+        '/subscription',
+        request.toJson(),
+      );
+      print('📝 Respuesta de creación: ${response.data}');
+      print('🔎 Tipo de respuesta: ${response.data.runtimeType}');
+      return CreateSubscriptionResponseDTO.fromJson(response.data);
+    });
+  }
+
+  /// Obtener una suscripción por id
+  Future<SubscriptionResponseDTO> getSubscriptionById(int id) {
+    return GlobalExceptionHandler.run(() async {
+      final response = await _apiClient.getApp('/subscription/$id');
+      return SubscriptionResponseDTO.fromJson(response.data);
+    });
+  }
+
+  /// Obtener las suscripciones del usuario actual
+  Future<List<SubscriptionResponseDTO>> getMySubscriptions() {
+    return GlobalExceptionHandler.run(() async {
+      try {
+        print('🔍 Llamando a /subscription/my-subscriptions');
+        final response = await _apiClient.getApp('/subscription/my-subscriptions');
+        print('📝 Respuesta recibida: ${response.data}');
+        print('🔎 Tipo de datos: ${response.data.runtimeType}');
+        
+        // Validar que response.data existe y es del tipo correcto
+        if (response.data == null) {
+          print('⚠️ response.data es null');
+          return <SubscriptionResponseDTO>[];
+        }
+        
+        // Si es una lista, procesarla normalmente
+        if (response.data is List) {
+          final data = response.data as List;
+          return data.map((e) => SubscriptionResponseDTO.fromJson(e)).toList();
+        }
+        
+        // Si es un objeto con una propiedad que contiene datos
+        if (response.data is Map) {
+          final dataMap = response.data as Map<String, dynamic>;
+          
+          // Buscar posibles nombres de claves que contengan la lista
+          if (dataMap.containsKey('data')) {
+            final listData = dataMap['data'];
+            if (listData is List) {
+              return listData.map((e) => SubscriptionResponseDTO.fromJson(e)).toList();
+            } else if (listData is Map) {
+              // El backend devuelve un solo objeto en 'data', no una lista
+              print('📦 Backend devuelve objeto individual, convirtiéndolo a lista');
+              return [SubscriptionResponseDTO.fromJson(listData as Map<String, dynamic>)];
+            }
+          }
+          
+          if (dataMap.containsKey('subscriptions')) {
+            final listData = dataMap['subscriptions'];
+            if (listData is List) {
+              return listData.map((e) => SubscriptionResponseDTO.fromJson(e)).toList();
+            } else if (listData is Map) {
+              return [SubscriptionResponseDTO.fromJson(listData as Map<String, dynamic>)];
+            }
+          }
+          
+          if (dataMap.containsKey('content')) {
+            final listData = dataMap['content'];
+            if (listData is List) {
+              return listData.map((e) => SubscriptionResponseDTO.fromJson(e)).toList();
+            } else if (listData is Map) {
+              return [SubscriptionResponseDTO.fromJson(listData as Map<String, dynamic>)];
+            }
+          }
+        }
+        
+        // Si llegamos aquí, el formato no es el esperado
+        print('⚠️ Formato inesperado en getMySubscriptions: ${response.data.runtimeType}');
+        return <SubscriptionResponseDTO>[];
+        
+      } catch (e) {
+        print('❌ Error en getMySubscriptions: $e');
+        // Si el endpoint no existe o falla, devolver lista vacía
+        return <SubscriptionResponseDTO>[];
+      }
+    });
+  }
+
+  /// Obtener historial de pagos de una suscripción
+  Future<List<PaymentHistoryResponseDTO>> getPaymentHistory(int id) {
+    return GlobalExceptionHandler.run(() async {
+      try {
+        final response = await _apiClient.getApp('/subscription/$id/payment-history');
+        
+        // Validar que response.data existe y es del tipo correcto
+        if (response.data == null) {
+          return <PaymentHistoryResponseDTO>[];
+        }
+        
+        // Si es una lista, procesarla normalmente
+        if (response.data is List) {
+          final data = response.data as List;
+          return data.map((e) => PaymentHistoryResponseDTO.fromJson(e)).toList();
+        }
+        
+        // Si es un objeto con una propiedad que contiene la lista
+        if (response.data is Map) {
+          final dataMap = response.data as Map<String, dynamic>;
+          
+          // Buscar posibles nombres de claves que contengan la lista
+          if (dataMap.containsKey('data')) {
+            final listData = dataMap['data'];
+            if (listData is List) {
+              return listData.map((e) => PaymentHistoryResponseDTO.fromJson(e)).toList();
+            }
+          }
+          
+          if (dataMap.containsKey('payments')) {
+            final listData = dataMap['payments'];
+            if (listData is List) {
+              return listData.map((e) => PaymentHistoryResponseDTO.fromJson(e)).toList();
+            }
+          }
+          
+          if (dataMap.containsKey('content')) {
+            final listData = dataMap['content'];
+            if (listData is List) {
+              return listData.map((e) => PaymentHistoryResponseDTO.fromJson(e)).toList();
+            }
+          }
+        }
+        
+        // Si llegamos aquí, el formato no es el esperado
+        print('⚠️ Formato inesperado en getPaymentHistory: ${response.data.runtimeType}');
+        return <PaymentHistoryResponseDTO>[];
+        
+      } catch (e) {
+        print('❌ Error en getPaymentHistory: $e');
+        return <PaymentHistoryResponseDTO>[];
+      }
+    });
+  }
+
+  /// Obtener configuración de precios de suscripciones (datos hardcodeados - no hay endpoint)
+  Future<List<SubscriptionPriceConfigDTO>> getSubscriptionPrices() {
+    return GlobalExceptionHandler.run(() async {
+      // El backend no tiene endpoint de precios, devolver lista vacía para usar fallback
+      print('💡 No hay endpoint de precios en el backend, usando planes predeterminados');
+      return <SubscriptionPriceConfigDTO>[];
+    });
+  }
+}

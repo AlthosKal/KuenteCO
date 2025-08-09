@@ -1,8 +1,4 @@
-enum SubscriptionType {
-  FREE,
-  BASIC,
-  PREMIUM,
-}
+import '../../../utils/enum/subscription_type_enum.dart';
 
 class CreateSubscriptionRequestDTO {
   final SubscriptionType subscriptionType;
@@ -17,7 +13,7 @@ class CreateSubscriptionRequestDTO {
     return CreateSubscriptionRequestDTO(
       subscriptionType: SubscriptionType.values.firstWhere(
             (e) => e.name == json['subscriptionType'],
-        orElse: () => SubscriptionType.FREE,
+        orElse: () => SubscriptionType.BASIC,
       ),
       backUrl: json['backUrl'],
     );

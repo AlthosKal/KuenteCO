@@ -1,14 +1,5 @@
-enum SubscriptionType {
-  FREE,
-  BASIC,
-  PREMIUM,
-}
-
-enum PreapprovalStatus {
-  PENDING,
-  ACTIVE,
-  CANCELLED,
-}
+import '../../../utils/enum/subscription_type_enum.dart';
+import '../../../utils/enum/preapproval_status_enum.dart';
 
 class CreateSubscriptionResponseDTO {
   final int subscriptionId;

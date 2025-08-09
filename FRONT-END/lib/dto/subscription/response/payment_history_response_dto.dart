@@ -1,9 +1,4 @@
-enum PaymentStatus {
-  APPROVED,
-  PENDING,
-  REJECTED,
-  CANCELLED,
-}
+import '../../../utils/enum/payment_status_enum.dart';
 
 class PaymentHistoryResponseDTO {
   final String paymentId;

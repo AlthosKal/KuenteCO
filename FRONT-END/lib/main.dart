@@ -8,6 +8,8 @@ import 'package:KuenteCO/core/config/is_autenticated.dart';
 import 'package:KuenteCO/controllers/user_controller.dart';
 import 'package:KuenteCO/core/services/app/user_service.dart';
 import 'package:KuenteCO/core/services/api_client.dart';
+import 'package:KuenteCO/controllers/suscription_controller.dart';
+import 'package:KuenteCO/core/services/app/subscription_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,15 +17,19 @@ void main() async {
 
   final role = await getRoleIfAuthenticated();
 
-  // ✅ Crear instancia de ApiClient y UserService
+  // ✅ Crear instancia de ApiClient y servicios
   final apiClient = ApiClient();
   final userService = UserService(apiClient);
+  final subscriptionService = SubscriptionService(apiClient);
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
           create: (_) => UserController(userService: userService)..loadUser(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => SubscriptionController(subscriptionService),
         ),
       ],
       child: MyApp(
