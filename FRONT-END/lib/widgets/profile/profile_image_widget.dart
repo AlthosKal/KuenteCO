@@ -107,28 +107,52 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
             widget.removeImageNotifier?.value != true);
   }
 
+  bool _hasCurrentImageFromProfile(ProfileDetailDTO? profile) {
+    return _selectedImageBytes != null || 
+           (profile?.image?.imageUrl != null && 
+            profile!.image!.imageUrl!.isNotEmpty &&
+            widget.removeImageNotifier?.value != true);
+  }
+
   @override
   Widget build(BuildContext context) {
-    // 🎯 Usar profile pasado directamente en lugar de authenticatedProfile
-    final currentImage = widget.profile?.image;
-    final shouldRemoveImage = widget.removeImageNotifier?.value ?? false;
-    
-    // Debug logs para verificar la imagen
-    debugPrint('🔍 ProfileImageWidget - profile: ${widget.profile != null ? "LOADED" : "NULL"}');
-    debugPrint('🔍 ProfileImageWidget - image: ${currentImage != null ? "FOUND" : "NULL"}');
-    debugPrint('🔍 ProfileImageWidget - imageUrl: ${currentImage?.imageUrl ?? "NO_URL"}');
-    debugPrint('🔍 ProfileImageWidget - shouldRemove: $shouldRemoveImage');
+    // 🎯 Usar getProfileById para obtener datos actualizados automáticamente
+    return FutureBuilder<ProfileDetailDTO>(
+      future: widget.profile != null 
+          ? widget.profileController.getProfileById(widget.profile!.id)
+          : null,
+      builder: (context, snapshot) {
+        ProfileDetailDTO? currentProfile;
+        
+        if (snapshot.hasData) {
+          currentProfile = snapshot.data;
+        } else if (widget.profile != null) {
+          // Usar profile pasado como fallback mientras carga
+          currentProfile = widget.profile;
+        }
+        
+        final currentImage = currentProfile?.image;
+        final shouldRemoveImage = widget.removeImageNotifier?.value ?? false;
+        
+        // Debug logs para verificar la imagen
+        debugPrint('🔍 ProfileImageWidget - profile: ${currentProfile != null ? "LOADED" : "NULL"}');
+        debugPrint('🔍 ProfileImageWidget - image: ${currentImage != null ? "FOUND" : "NULL"}');
+        debugPrint('🔍 ProfileImageWidget - imageUrl: ${currentImage?.imageUrl ?? "NO_URL"}');
+        debugPrint('🔍 ProfileImageWidget - shouldRemove: $shouldRemoveImage');
+        debugPrint('🔍 ProfileImageWidget - snapshot state: ${snapshot.connectionState}');
 
-    return GestureDetector(
-      onTap: _pickImage, // 🎯 Click simple: seleccionar imagen
-      onLongPress: _hasCurrentImage() ? _confirmDeleteImage : null, // 🎯 Click presionado: eliminar
-      child: ClipOval(
-        child: SizedBox(
-          width: widget.size,
-          height: widget.size,
-          child: _buildImageContent(currentImage, shouldRemoveImage),
-        ),
-      ),
+        return GestureDetector(
+          onTap: _pickImage, // 🎯 Click simple: seleccionar imagen
+          onLongPress: _hasCurrentImageFromProfile(currentProfile) ? _confirmDeleteImage : null,
+          child: ClipOval(
+            child: SizedBox(
+              width: widget.size,
+              height: widget.size,
+              child: _buildImageContent(currentImage, shouldRemoveImage),
+            ),
+          ),
+        );
+      },
     );
   }
 
