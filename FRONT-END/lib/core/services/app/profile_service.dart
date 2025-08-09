@@ -27,6 +27,14 @@ class ProfileService {
     return ProfileDetailDTO.fromJson(actualData);
   }
 
+  /// ✅ Obtener perfil por ID
+  Future<ProfileDetailDTO> getProfileById(int id) async {
+    final response = await _api.getApp('/profile/$id');
+    final Map<String, dynamic> json = response.data;
+    final actualData = json['data'] ?? json;
+    return ProfileDetailDTO.fromJson(actualData);
+  }
+
 
   /// ✅ Crear perfil
   Future<void> createProfile(NewProfileDTO dto) async {
