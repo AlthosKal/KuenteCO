@@ -49,6 +49,17 @@ class ProfileController {
     }
   }
 
+  /// ✅ Obtener perfil por ID
+  Future<ProfileDetailDTO> getProfileById(int id) async {
+    try {
+      final result = await _profileService.getProfileById(id);
+      return result;
+    } catch (e) {
+      debugPrint('🔴 Error loading profile by ID: $e');
+      rethrow;
+    }
+  }
+
   Future<void> createProfile(NewProfileDTO dto) async {
     if (isLoading.value) return;
     isLoading.value = true;
