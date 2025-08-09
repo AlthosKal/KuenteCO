@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
 import '../../../dto/profile/new_profile_dto.dart';
 import '../../../dto/profile/profile_detail_dto.dart';
 import '../../../dto/profile/update_profile_dto.dart';
@@ -41,8 +43,25 @@ class ProfileService {
   }
 
   /// ✅ Actualizar perfil
-  Future<void> updateProfile(UpdateProfileDTO dto) async {
-    await _api.patchApp('/profile/update', dto.toJson());
+  Future<void> updateProfile(UpdateProfileDTO dto, {MultipartFile? imageFile}) async {
+    print('🔍 ProfileService - updateProfile called');
+    print('🔍 ProfileService - removeImage: ${dto.removeImage}');
+    print('🔍 ProfileService - imageFile: ${imageFile != null ? "PROVIDED" : "NULL"}');
+    
+    // Crear FormData con profile como texto plano
+    final formData = FormData();
+    
+    // Agregar profile como campo de texto (no como archivo)
+    formData.fields.add(MapEntry('profile', jsonEncode(dto.toJson())));
+    
+    // Agregar la imagen si existe
+    if (imageFile != null) {
+      print('🔍 ProfileService - Adding image to FormData');
+      formData.files.add(MapEntry('image', imageFile));
+    }
+    
+    print('🔍 ProfileService - FormData fields: ${formData.fields.length}, files: ${formData.files.length}');
+    await _api.patchApp('/profile/update', formData);
   }
 
   /// Cambiar contraseña

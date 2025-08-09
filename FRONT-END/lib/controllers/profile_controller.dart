@@ -63,11 +63,11 @@ class ProfileController {
     }
   }
 
-  Future<void> updateProfile(UpdateProfileDTO dto) async {
+  Future<void> updateProfile(UpdateProfileDTO dto, {MultipartFile? imageFile}) async {
     if (isLoading.value) return;
     isLoading.value = true;
     try {
-      await _profileService.updateProfile(dto);
+      await _profileService.updateProfile(dto, imageFile: imageFile);
       await loadAuthenticatedProfile();
     } catch (e) {
       debugPrint('🔴 Error updating profile: $e');

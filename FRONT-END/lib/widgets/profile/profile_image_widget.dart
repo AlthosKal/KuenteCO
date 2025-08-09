@@ -1,13 +1,26 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../controllers/profile_controller.dart';
-import '../../../dto/image/image_dto.dart';
+import 'package:dio/dio.dart';
+import '../../controllers/profile_controller.dart';
+import '../../dto/image/image_dto.dart';
+import '../../dto/profile/profile_detail_dto.dart';
 
 class ProfileImageWidget extends StatefulWidget {
   final ProfileController profileController;
+  final ValueNotifier<MultipartFile?>? selectedImageNotifier;
+  final ValueNotifier<bool>? removeImageNotifier;
+  final ProfileDetailDTO? profile; // Para usar la información del perfil directamente
+  final double size;
 
-  const ProfileImageWidget({super.key, required this.profileController});
+  const ProfileImageWidget({
+    super.key,
+    required this.profileController,
+    this.selectedImageNotifier,
+    this.removeImageNotifier,
+    this.profile,
+    this.size = 150,
+  });
 
   @override
   State<ProfileImageWidget> createState() => _ProfileImageWidgetState();
@@ -15,43 +28,47 @@ class ProfileImageWidget extends StatefulWidget {
 
 class _ProfileImageWidgetState extends State<ProfileImageWidget> {
   Uint8List? _selectedImageBytes;
+  String? _selectedImageName;
 
-  Future<void> _pickImageAndUploadOrUpdate() async {
+  // 🎯 CLICK SIMPLE: Seleccionar imagen
+  Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 800,
+      maxHeight: 800,
+      imageQuality: 85,
+    );
 
     if (pickedFile == null) return;
 
     final bytes = await pickedFile.readAsBytes();
+    final multipartFile = MultipartFile.fromBytes(
+      bytes,
+      filename: pickedFile.name,
+    );
 
-    setState(() => _selectedImageBytes = bytes);
+    setState(() {
+      _selectedImageBytes = bytes;
+      _selectedImageName = pickedFile.name;
+    });
 
-    try {
-      final currentImage =
-          widget.profileController.authenticatedProfile.value?.image;
+    // Notificar al widget padre sobre la imagen seleccionada
+    widget.selectedImageNotifier?.value = multipartFile;
+    widget.removeImageNotifier?.value = false;
 
-      if (currentImage == null) {
-        await widget.profileController.uploadProfileImage(bytes, pickedFile.name);
-        _showSnackBar('Imagen de perfil subida correctamente');
-      } else {
-        await widget.profileController.updateProfileImage(bytes, pickedFile.name);
-        _showSnackBar('Imagen de perfil actualizada correctamente');
-      }
-
-      await widget.profileController.loadAuthenticatedProfile();
-      setState(() => _selectedImageBytes = null);
-    } catch (e) {
-      _showSnackBar('Error al procesar la imagen');
-    }
+    debugPrint('🖼️ Image selected: ${pickedFile.name}');
   }
 
+  // 🎯 CLICK PRESIONADO: Confirmar eliminación
   Future<void> _confirmDeleteImage() async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('¿Eliminar imagen de perfil?'),
-        content:
-        const Text('¿En verdad deseas eliminar esta imagen?'),
+        content: const Text(
+          '¿Estás seguro de que deseas eliminar tu imagen de perfil? Este cambio se aplicará al guardar.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -59,8 +76,10 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Sí, eliminar',
-                style: TextStyle(color: Colors.red)),
+            child: const Text(
+              'Sí, eliminar',
+              style: TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -68,55 +87,115 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
 
     if (confirm != true) return;
 
-    try {
-      await widget.profileController.deleteProfileImage();
-      await widget.profileController.loadAuthenticatedProfile();
-      _showSnackBar('Imagen de perfil eliminada correctamente');
-    } catch (e) {
-      _showSnackBar('Error al eliminar la imagen de perfil');
-    }
+    setState(() {
+      _selectedImageBytes = null;
+      _selectedImageName = null;
+    });
+
+    // Notificar al widget padre que se debe remover la imagen
+    widget.selectedImageNotifier?.value = null;
+    widget.removeImageNotifier?.value = true;
+
+    debugPrint('🗑️ Image marked for removal');
   }
 
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+  bool _hasCurrentImage() {
+    final profile = widget.profile; // 🎯 Usar profile pasado directamente
+    return _selectedImageBytes != null || 
+           (profile?.image?.imageUrl != null && 
+            profile!.image!.imageUrl!.isNotEmpty &&
+            widget.removeImageNotifier?.value != true);
   }
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: widget.profileController.authenticatedProfile,
-      builder: (context, profile, _) {
-        final ImageDTO? currentImage = profile?.image;
-        final String? imageUrl = currentImage?.imageUrl;
+    // 🎯 Usar profile pasado directamente en lugar de authenticatedProfile
+    final currentImage = widget.profile?.image;
+    final shouldRemoveImage = widget.removeImageNotifier?.value ?? false;
+    
+    // Debug logs para verificar la imagen
+    debugPrint('🔍 ProfileImageWidget - profile: ${widget.profile != null ? "LOADED" : "NULL"}');
+    debugPrint('🔍 ProfileImageWidget - image: ${currentImage != null ? "FOUND" : "NULL"}');
+    debugPrint('🔍 ProfileImageWidget - imageUrl: ${currentImage?.imageUrl ?? "NO_URL"}');
+    debugPrint('🔍 ProfileImageWidget - shouldRemove: $shouldRemoveImage');
 
-        return GestureDetector(
-          onTap: _pickImageAndUploadOrUpdate,
-          onLongPress:
-          currentImage != null ? _confirmDeleteImage : null,
-          child: ClipOval(
-            child: SizedBox(
-              width: 150,
-              height: 150,
-              child: _selectedImageBytes != null
-                  ? Image.memory(_selectedImageBytes!, fit: BoxFit.cover)
-                  : (imageUrl != null && imageUrl.isNotEmpty)
-                  ? Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return const Center(
-                      child: CircularProgressIndicator());
-                },
-                errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.person, size: 100),
-              )
-                  : const Icon(Icons.person, size: 100),
+    return GestureDetector(
+      onTap: _pickImage, // 🎯 Click simple: seleccionar imagen
+      onLongPress: _hasCurrentImage() ? _confirmDeleteImage : null, // 🎯 Click presionado: eliminar
+      child: ClipOval(
+        child: SizedBox(
+          width: widget.size,
+          height: widget.size,
+          child: _buildImageContent(currentImage, shouldRemoveImage),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageContent(ImageDTO? currentImage, bool shouldRemoveImage) {
+    // Si hay una imagen seleccionada localmente, mostrarla
+    if (_selectedImageBytes != null) {
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.memory(
+            _selectedImageBytes!,
+            fit: BoxFit.cover,
+          ),
+          Container(
+            color: Colors.black26,
+            child: const Center(
+              child: Text(
+                'Nueva\nImagen',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
-        );
-      },
+        ],
+      );
+    }
+
+    // Si se marcó para eliminar, mostrar placeholder
+    if (shouldRemoveImage) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.person_off, size: 40, color: Colors.grey),
+            SizedBox(height: 4),
+            Text(
+              'Se eliminará',
+              style: TextStyle(fontSize: 10, color: Colors.grey),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Si hay imagen actual, mostrarla
+    final imageUrl = currentImage?.imageUrl;
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      return Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return const Center(child: CircularProgressIndicator());
+        },
+        errorBuilder: (context, error, stackTrace) => const Center(
+          child: Icon(Icons.person, size: 60, color: Colors.grey),
+        ),
+      );
+    }
+
+    // Sin imagen - mostrar placeholder
+    return const Center(
+      child: Icon(Icons.person, size: 60, color: Colors.grey),
     );
   }
 }
