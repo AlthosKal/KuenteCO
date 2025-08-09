@@ -1,5 +1,6 @@
 package org.kuenteco.backend.controller.profile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -44,6 +45,14 @@ public class ProfileController implements ProfileResource {
                 HttpStatus.OK);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getProfileById(HttpServletRequest request, @PathVariable Integer id) {
+        Object result = profileService.getProfileById(id);
+        return new ResponseEntity<>(
+                ApiResponse.ok("Cuentas Obtenidas correctamente", result, request.getRequestURI()),
+                HttpStatus.OK);
+    }
+
     @GetMapping("/details")
     public ResponseEntity<?> getAuthenticatedProfile(HttpServletRequest request) {
         ProfileDetailDTO dto = profileService.getProfileDetails();
@@ -72,10 +81,13 @@ public class ProfileController implements ProfileResource {
 
     @PatchMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> update(
-            @RequestPart("profile") UpdateProfileDTO dto,
+            @RequestPart("profile") String json,
             @RequestPart(value = "image", required = false) MultipartFile file,
             HttpServletRequest request)
             throws IOException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        UpdateProfileDTO dto = mapper.readValue(json, UpdateProfileDTO.class);
         profileService.updateProfile(dto, file);
         return new ResponseEntity<>(
                 ApiResponse.ok("Perfil actualizado correctamente", null, request.getRequestURI()),

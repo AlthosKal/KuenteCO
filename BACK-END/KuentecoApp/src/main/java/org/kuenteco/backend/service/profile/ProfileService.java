@@ -16,6 +16,8 @@ public interface ProfileService {
 
     Object getProfiles();
 
+    Object getProfileById(Integer id);
+
     ProfileDetailDTO getProfileDetails();
 
     void registerProfile(NewProfileDTO dto);

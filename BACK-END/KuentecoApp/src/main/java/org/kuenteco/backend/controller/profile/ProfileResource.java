@@ -152,7 +152,7 @@ public interface ProfileResource {
                                                                     UpdateProfileDTO.class))))
     @PatchMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<?> update(
-            @RequestPart("profile") UpdateProfileDTO dto,
+            @RequestPart("profile") String json,
             @RequestPart(value = "image", required = false) MultipartFile file,
             HttpServletRequest request)
             throws IOException;

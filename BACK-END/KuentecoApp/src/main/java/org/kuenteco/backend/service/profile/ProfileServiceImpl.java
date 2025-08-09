@@ -121,6 +121,30 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
+    public Object getProfileById(Integer id) {
+        // Obtener el usuario autenticado
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new ProfileException("Endpoint solo disponible para usuarios");
+        }
+        User user =
+                slaveUserRepository
+                        .findByEmail(email)
+                        .orElseThrow(() -> new ProfileException("Usuario no encontrado"));
+
+        // Obtener las cuentas del usuario
+        Profile profile = slaveProfileRepository.findByUserAndId(user, id).orElseThrow(()-> new ProfileException("Perfil no encontrado"));
+
+        // Devolver las cuentas del usuario
+        return profileDetailMapper.toDto(profile);
+    }
+
+
+
+    @Override
     public ProfileDetailDTO getProfileDetails() {
         Profile profile = getDetails();
         return profileDetailMapper.toDto(profile);
