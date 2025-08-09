@@ -16,7 +16,7 @@ import '../screens/legal/privacy_view.dart';
 import '../screens/legal/terms_logged_view.dart';
 import '../screens/legal/terms_view.dart';
 import '../screens/profile/profiles_view.dart';
-import '../screens/profile/subscriptions_view.dart';
+import '../screens/subscriptions_view.dart';
 import 'app_routes.dart';
 
 class RouteGenerator {
