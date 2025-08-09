@@ -188,35 +188,46 @@ public class ProfileServiceImpl implements ProfileService {
     public void updateProfile(UpdateProfileDTO dto, MultipartFile file) throws IOException {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
-        User user =
-                slaveUserRepository
-                        .findByEmail(email)
-                        .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        Profile profile =
-                slaveProfileRepository
-                        .findByUserAndId(user, dto.getId())
-                        .orElseThrow(() -> new ProfileException("Perfil no encontrado"));
-        if (!dto.getEmail().equalsIgnoreCase(profile.getEmail())
-                && slaveProfileRepository.existsByEmail(email)) {
+        User user = slaveUserRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        Profile profile = slaveProfileRepository
+                .findByUserAndId(user, dto.getId())
+                .orElseThrow(() -> new ProfileException("Perfil no encontrado"));
+
+        // Validar email único
+        if (dto.getEmail() != null &&
+                !dto.getEmail().equalsIgnoreCase(profile.getEmail()) &&
+                slaveProfileRepository.existsByEmail(dto.getEmail())) {
             throw new ProfileException("El correo ya está en uso por otro perfil");
         }
-        // Actualiza la imagen si viene en el DTO
-        log.info("Actualizando nuevo perfil {}", dto.getEmail());
+
+        // Actualizar datos básicos
         updateProfileMapper.toEntity(dto, profile);
 
-        // Actualizar imagen si se envió archivo
+        // 1️⃣ Eliminar imagen si se solicita
+        if (dto.isRemoveImage() && profile.getImage() != null) {
+            imageService.removeImage(profile.getImage());
+            profile.setImage(null);
+        }
+
+        // 2️⃣ Subir nueva imagen si viene archivo
         if (file != null && !file.isEmpty()) {
             Image oldImage = profile.getImage();
             Image newImage = imageService.uploadImage(file);
             profile.setImage(newImage);
 
+            // Si había una imagen previa distinta, la borramos
             if (oldImage != null) {
                 imageService.removeImage(oldImage);
             }
         }
+
         masterProfileRepository.save(profile);
     }
+
 
     @Override
     @Transactional

@@ -16,4 +16,6 @@ public class UpdateProfileDTO {
     private String username;
 
     private String email;
+
+    private boolean removeImage;
 }

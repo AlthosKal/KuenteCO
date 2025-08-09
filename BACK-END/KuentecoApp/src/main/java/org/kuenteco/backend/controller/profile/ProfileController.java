@@ -130,7 +130,7 @@ public class ProfileController implements ProfileResource {
                 HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/image/delete")
     public ResponseEntity<?> deleteImage(HttpServletResponse response) throws IOException {
 
         imageService.deleteImage(response);
