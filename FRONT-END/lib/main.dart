@@ -35,6 +35,8 @@ void main() async {
       child: MyApp(
         initialRoute: role == null
             ? AppRoutes.homeGuest
+            : role == 'ROLE_PROFILE'
+            ? AppRoutes.homeProfile
             : role == 'personal'
             ? AppRoutes.homePersonal
             : AppRoutes.homeBusiness,
