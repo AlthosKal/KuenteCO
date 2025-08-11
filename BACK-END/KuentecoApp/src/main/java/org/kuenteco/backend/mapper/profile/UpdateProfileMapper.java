@@ -1,9 +1,7 @@
 package org.kuenteco.backend.mapper.profile;
 
-import org.kuenteco.backend.dto.image.ImageDTO;
 import org.kuenteco.backend.dto.profile.UpdateProfileDTO;
 import org.kuenteco.backend.entity.Profile;
-import org.kuenteco.backend.entity.extra.Image;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -20,7 +18,8 @@ public interface UpdateProfileMapper {
                 expression = "java(new java.sql.Timestamp(System.currentTimeMillis()))"),
         @Mapping(target = "user", ignore = true),
         @Mapping(target = "role", ignore = true),
-        @Mapping(target = "password", ignore = true)
+        @Mapping(target = "password", ignore = true),
+            @Mapping(target = "image", ignore = true)
     })
     void toEntity(UpdateProfileDTO dto, @MappingTarget Profile entity);
 }

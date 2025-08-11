@@ -22,11 +22,18 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     @Override
     public Map upload(MultipartFile multipartFile) throws IOException {
         File file = convert(multipartFile);
-        Map result = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
-        if (!Files.deleteIfExists(file.toPath())) {
-            throw new IOException("Failed to delete temporary file: " + file.getAbsolutePath());
+        try {
+            Map params = ObjectUtils.asMap("secure", true);
+            Map result = cloudinary.uploader().upload(file, params);
+
+            // Siempre leer secure_url para HTTPS
+            String secureUrl = (String) result.get("secure_url");
+            result.put("url", secureUrl); // reemplaza por HTTPS
+
+            return result;
+        } finally {
+            Files.deleteIfExists(file.toPath());
         }
-        return result;
     }
 
     @Override
@@ -35,10 +42,11 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     }
 
     private File convert(MultipartFile multipartFile) throws IOException {
-        File file = new File(Objects.requireNonNull(multipartFile.getOriginalFilename()));
-        FileOutputStream fo = new FileOutputStream(file);
-        fo.write(multipartFile.getBytes());
-        fo.close();
+        File file = File.createTempFile("upload-", "-" + Objects.requireNonNull(multipartFile.getOriginalFilename()));
+        try (FileOutputStream fo = new FileOutputStream(file)) {
+            fo.write(multipartFile.getBytes());
+        }
         return file;
     }
 }
+

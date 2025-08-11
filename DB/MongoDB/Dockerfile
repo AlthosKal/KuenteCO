@@ -17,4 +17,5 @@ CMD ["mongod"]
 
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
   CMD [ "mongosh", "--eval", "db.adminCommand({ ping: 1 })" ]
+
 EXPOSE 27017

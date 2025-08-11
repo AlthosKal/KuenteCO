@@ -40,6 +40,7 @@ import org.kuenteco.backend.repository.slave.SlaveSubscriptionRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.hibernate.Hibernate;
 
 @Slf4j
 @Service
@@ -205,13 +206,15 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
                                 () ->
                                         new SubscriptionMercadoPagoException(
                                                 "Subscripción no encontrada"));
+
+        if (subscription.getType().equals(SubscriptionType.BASIC)) {
+            return preapprovalMapper.toDTO(subscription, null);
+        }
         MercadoPagoPreapproval mercadoPagoPreapproval =
                 slaveMercadoPagoPreapprovalRepository
                         .findByUser(user)
                         .orElseThrow(
-                                () ->
-                                        new SubscriptionMercadoPagoException(
-                                                "Subscripción no encontrada"));
+                                () -> new SubscriptionMercadoPagoException("Pago no encontrado"));
         return preapprovalMapper.toDTO(subscription, mercadoPagoPreapproval);
     }
 
@@ -278,13 +281,27 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
                 pendingSubscription.setUpdatedAt(LocalDateTime.now());
                 masterSubscriptionRepository.save(pendingSubscription);
 
-                // Cancelar preapproval asociado
-                if (pendingSubscription.getMercadoPagoPreapproval() != null) {
-                    MercadoPagoPreapproval pendingPreapproval =
-                            pendingSubscription.getMercadoPagoPreapproval();
-                    pendingPreapproval.setStatus(PreapprovalStatus.CANCELLED);
-                    pendingPreapproval.setLastModified(LocalDateTime.now());
-                    masterMercadoPagoPreapprovalRepository.save(pendingPreapproval);
+                // Cancelar preapproval asociado - Inicializar la relación lazy de manera segura
+                try {
+                    Hibernate.initialize(pendingSubscription.getMercadoPagoPreapproval());
+                    if (pendingSubscription.getMercadoPagoPreapproval() != null) {
+                        MercadoPagoPreapproval pendingPreapproval =
+                                pendingSubscription.getMercadoPagoPreapproval();
+                        pendingPreapproval.setStatus(PreapprovalStatus.CANCELLED);
+                        pendingPreapproval.setLastModified(LocalDateTime.now());
+                        masterMercadoPagoPreapprovalRepository.save(pendingPreapproval);
+                    }
+                } catch (org.hibernate.LazyInitializationException e) {
+                    // Si no se puede inicializar, buscar por ID directamente
+                    log.warn("No se pudo inicializar MercadoPagoPreapproval para subscription {}, buscando por base de datos", pendingSubscription.getId());
+                    Optional<MercadoPagoPreapproval> preapprovalOpt = 
+                            slaveMercadoPagoPreapprovalRepository.findByUser(user);
+                    if (preapprovalOpt.isPresent()) {
+                        MercadoPagoPreapproval pendingPreapproval = preapprovalOpt.get();
+                        pendingPreapproval.setStatus(PreapprovalStatus.CANCELLED);
+                        pendingPreapproval.setLastModified(LocalDateTime.now());
+                        masterMercadoPagoPreapprovalRepository.save(pendingPreapproval);
+                    }
                 }
             }
         }
