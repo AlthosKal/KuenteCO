@@ -38,20 +38,11 @@ class SubscriptionController extends ChangeNotifier {
     }
   }
 
-  /// Cargar precios de suscripción
+  /// Los precios son estéticos, no se cargan del backend
   Future<void> loadSubscriptionPrices() async {
-    _setLoading(true);
-    try {
-      subscriptionPrices = await _subscriptionService.getSubscriptionPrices();
-      errorMessage = null;
-      print('✅ Precios cargados: ${subscriptionPrices.length} planes');
-    } catch (e) {
-      print('❌ Error cargando precios: $e');
-      errorMessage = 'No se pudieron cargar los precios. Mostrando planes predeterminados.';
-      // No bloquear la UI, dejar que use fallback
-    } finally {
-      _setLoading(false);
-    }
+    // Los precios están hardcodeados, MercadoPago maneja los precios reales
+    subscriptionPrices = <SubscriptionPriceConfigDTO>[];
+    print('💰 Usando precios estéticos - MercadoPago maneja los precios reales');
   }
 
   Future<void> loadSubscriptionById(int id) async {

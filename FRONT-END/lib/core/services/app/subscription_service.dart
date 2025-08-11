@@ -17,7 +17,7 @@ class SubscriptionService {
     return GlobalExceptionHandler.run(() async {
       print('🚀 Creando suscripción: ${request.toJson()}');
       final response = await _apiClient.postApp(
-        '/subscription',
+        '/subscription/add',
         request.toJson(),
       );
       print('📝 Respuesta de creación: ${response.data}');
@@ -39,7 +39,7 @@ class SubscriptionService {
     return GlobalExceptionHandler.run(() async {
       try {
         print('🔍 Llamando a /subscription/my-subscriptions');
-        final response = await _apiClient.getApp('/subscription/my-subscriptions');
+        final response = await _apiClient.getApp('/subscription');
         print('📝 Respuesta recibida: ${response.data}');
         print('🔎 Tipo de datos: ${response.data.runtimeType}');
         

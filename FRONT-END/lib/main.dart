@@ -8,7 +8,7 @@ import 'package:KuenteCO/core/config/is_autenticated.dart';
 import 'package:KuenteCO/controllers/user_controller.dart';
 import 'package:KuenteCO/core/services/app/user_service.dart';
 import 'package:KuenteCO/core/services/api_client.dart';
-import 'package:KuenteCO/controllers/suscription_controller.dart';
+import 'package:KuenteCO/controllers/subscription_controller.dart';
 import 'package:KuenteCO/core/services/app/subscription_service.dart';
 
 void main() async {

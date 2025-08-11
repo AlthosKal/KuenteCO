@@ -2,11 +2,11 @@ import '../../../utils/enum/subscription_type_enum.dart';
 
 class CreateSubscriptionRequestDTO {
   final SubscriptionType subscriptionType;
-  final String? backUrl;
+  String backUrl = "https://github.com/AlthosKal/KuenteCO";
 
   CreateSubscriptionRequestDTO({
     required this.subscriptionType,
-    this.backUrl,
+    required this.backUrl,
   });
 
   factory CreateSubscriptionRequestDTO.fromJson(Map<String, dynamic> json) {
@@ -22,7 +22,7 @@ class CreateSubscriptionRequestDTO {
   Map<String, dynamic> toJson() {
     return {
       'subscriptionType': subscriptionType.name,
-      if (backUrl != null) 'backUrl': backUrl,
+      'backUrl': backUrl,
     };
   }
 }

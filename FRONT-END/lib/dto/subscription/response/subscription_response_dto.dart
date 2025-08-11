@@ -53,10 +53,10 @@ class SubscriptionResponseDTO {
       startDate: DateTime.parse(json['startDate']),
       expirationDate: DateTime.parse(json['expirationDate']),
       nextPaymentDate: DateTime.parse(json['nextPaymentDate']),
-      isAutoRenewable: json['isAutoRenewable'],
-      paymentMethodId: json['paymentMethodId'],
-      cardLastFourDigits: json['cardLastFourDigits'],
-      cardBrand: json['cardBrand'],
+      isAutoRenewable: json['isAutoRenewable'] ?? false,
+      paymentMethodId: json['paymentMethodId'] as String?,
+      cardLastFourDigits: json['cardLastFourDigits'] as String?,
+      cardBrand: json['cardBrand'] as String?,
     );
   }
 

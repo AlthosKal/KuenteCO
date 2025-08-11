@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../dto/subscription/request/create_subscription_request_dto.dart';
-import '../controllers/suscription_controller.dart';
+import '../controllers/subscription_controller.dart';
 import '../widgets/common/primary_buttom_widget.dart';
 import '../utils/enum/subscription_type_enum.dart';
 
@@ -26,10 +26,24 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
   }
 
   Future<void> _subscribe(SubscriptionType type) async {
+    print('🎯 Intentando suscribirse al plan: ${type.name}');
+    
+    // No permitir suscripción al Plan Básico (es gratuito y por defecto)
+    if (type == SubscriptionType.BASIC) {
+      print('🚫 Bloqueando suscripción al Plan Básico');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('El Plan Básico es gratuito e incluido por defecto'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+    
     final controller = Provider.of<SubscriptionController>(context, listen: false);
     
     final response = await controller.createSubscription(
-      CreateSubscriptionRequestDTO(subscriptionType: type),
+      CreateSubscriptionRequestDTO(subscriptionType: type, backUrl: ''),
     );
 
     if (controller.errorMessage == null && response != null && response.initPoint.isNotEmpty) {
@@ -114,30 +128,29 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
                 ),
                 const SizedBox(height: 16),
                 
-                // Banner informativo si estamos usando fallback
-                if (controller.subscriptionPrices.isEmpty && !controller.isLoading)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.amber.shade50,
-                      border: Border.all(color: Colors.amber.shade300),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.info_outline, color: Colors.amber.shade700),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Mostrando planes predeterminados. Toca "Reintentar" para cargar desde el servidor.',
-                            style: TextStyle(color: Colors.amber.shade800),
-                          ),
-                        ),
-                      ],
-                    ),
+                // Banner informativo sobre precios estéticos
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    border: Border.all(color: Colors.blue.shade300),
+                    borderRadius: BorderRadius.circular(8),
                   ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info_outline, color: Colors.blue.shade700),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Los precios mostrados son referenciales. MercadoPago maneja los precios y pagos reales.',
+                          style: TextStyle(color: Colors.blue.shade800),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 
                 // Lista de planes
                 if (controller.subscriptionPrices.isEmpty)
@@ -209,25 +222,28 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
   }
 
   Widget _buildFallbackPlans(SubscriptionController controller) {
-    // Planes hardcodeados como fallback si no se pueden cargar desde el backend
+    // Planes estéticos - los precios reales los maneja MercadoPago
     final fallbackPlans = [
       {
         'type': SubscriptionType.BASIC,
         'title': 'Plan Básico',
-        'description': 'Funcionalidades básicas',
-        'price': 'Gratis'
+        'description': 'Funcionalidades básicas\nIncluido por defecto',
+        'price': 'Gratis',
+        'isDefault': true, // Plan por defecto
       },
       {
         'type': SubscriptionType.STANDARD,
         'title': 'Plan Estándar',
-        'description': 'Acceso completo por 1 mes',
-        'price': '\$20.000 COP'
+        'description': 'Acceso completo\nSin anuncios',
+        'price': '\$20.000 COP',
+        'isDefault': false,
       },
       {
         'type': SubscriptionType.PREMIUM,
         'title': 'Plan Premium',
-        'description': 'Acceso completo por 3 meses',
-        'price': '\$50.000 COP'
+        'description': 'Acceso completo\nFuncionalidades avanzadas',
+        'price': '\$50.000 COP',
+        'isDefault': false,
       },
     ];
 
@@ -241,7 +257,9 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
           subscriptionType: plan['type'] as SubscriptionType,
           loading: controller.isLoading,
           onSubscribe: () => _subscribe(plan['type'] as SubscriptionType),
-          isActive: _isCurrentlySubscribed(controller, plan['type'] as SubscriptionType),
+          isActive: _isCurrentlySubscribed(controller, plan['type'] as SubscriptionType) || 
+                   (plan['isDefault'] == true), // Plan Básico siempre activo
+          isDefault: plan['isDefault'] == true,
         ),
       )).toList(),
     );
@@ -277,6 +295,7 @@ class _PlanCard extends StatelessWidget {
   final VoidCallback onSubscribe;
   final bool loading;
   final bool isActive;
+  final bool isDefault;
 
   const _PlanCard({
     required this.title,
@@ -286,6 +305,7 @@ class _PlanCard extends StatelessWidget {
     required this.onSubscribe,
     required this.loading,
     this.isActive = false,
+    this.isDefault = false,
   });
 
   @override
@@ -350,9 +370,9 @@ class _PlanCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: PrimaryButton(
-                label: isActive ? 'Plan Activo' : 'Suscribirse',
+                label: isActive ? 'Plan Activo' : (isDefault ? 'Plan Gratuito' : 'Suscribirse'),
                 isLoading: loading,
-                onPressed: (loading || isActive) ? null : onSubscribe,
+                onPressed: (loading || isActive || isDefault) ? null : onSubscribe,
               ),
             ),
           ],
