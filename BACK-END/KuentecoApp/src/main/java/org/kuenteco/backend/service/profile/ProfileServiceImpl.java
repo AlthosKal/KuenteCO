@@ -136,13 +136,14 @@ public class ProfileServiceImpl implements ProfileService {
                         .orElseThrow(() -> new ProfileException("Usuario no encontrado"));
 
         // Obtener las cuentas del usuario
-        Profile profile = slaveProfileRepository.findByUserAndId(user, id).orElseThrow(()-> new ProfileException("Perfil no encontrado"));
+        Profile profile =
+                slaveProfileRepository
+                        .findByUserAndId(user, id)
+                        .orElseThrow(() -> new ProfileException("Perfil no encontrado"));
 
         // Devolver las cuentas del usuario
         return profileDetailMapper.toDto(profile);
     }
-
-
 
     @Override
     public ProfileDetailDTO getProfileDetails() {
@@ -213,18 +214,20 @@ public class ProfileServiceImpl implements ProfileService {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
 
-        User user = slaveUserRepository
-                .findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        User user =
+                slaveUserRepository
+                        .findByEmail(email)
+                        .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        Profile profile = slaveProfileRepository
-                .findByUserAndId(user, dto.getId())
-                .orElseThrow(() -> new ProfileException("Perfil no encontrado"));
+        Profile profile =
+                slaveProfileRepository
+                        .findByUserAndId(user, dto.getId())
+                        .orElseThrow(() -> new ProfileException("Perfil no encontrado"));
 
         // Validar email único
-        if (dto.getEmail() != null &&
-                !dto.getEmail().equalsIgnoreCase(profile.getEmail()) &&
-                slaveProfileRepository.existsByEmail(dto.getEmail())) {
+        if (dto.getEmail() != null
+                && !dto.getEmail().equalsIgnoreCase(profile.getEmail())
+                && slaveProfileRepository.existsByEmail(dto.getEmail())) {
             throw new ProfileException("El correo ya está en uso por otro perfil");
         }
 
@@ -251,7 +254,6 @@ public class ProfileServiceImpl implements ProfileService {
 
         masterProfileRepository.save(profile);
     }
-
 
     @Override
     @Transactional
