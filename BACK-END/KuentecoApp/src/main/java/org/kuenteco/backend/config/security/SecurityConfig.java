@@ -47,7 +47,9 @@ public class SecurityConfig {
                                                 "/api-docs/**",
                                                 "/api/api-docs/**",
                                                 "/v3/api-docs/**",
-                                                "/webjars/**")
+                                                "/webjars/**",
+                                                // Webhooks de MercadoPago (públicos)
+                                                "/v1/subscription/webhook/**")
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())

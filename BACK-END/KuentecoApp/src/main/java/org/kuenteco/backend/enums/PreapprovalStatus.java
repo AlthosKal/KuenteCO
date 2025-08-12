@@ -5,5 +5,6 @@ public enum PreapprovalStatus {
     AUTHORIZED,
     PAUSED,
     CANCELLED,
+    REJECTED,
     FINISHED
 }

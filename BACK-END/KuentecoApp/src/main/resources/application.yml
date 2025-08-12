@@ -28,6 +28,14 @@ cloudinary:
 
 mercadopago:
   access-token: ${MERCADOPAGO_ACCESS_TOKEN}
+  public-key: ${MERCADOPAGO_PUBLIC_KEY}
+  webhooks:
+    base-url: ${MERCADOPAGO_WEBHOOK_BASE_URL}
+    preapproval-url: ${MERCADOPAGO_WEBHOOK_PREAPPROVAL_URL}
+    payment-url: ${MERCADOPAGO_WEBHOOK_PAYMENT_URL}
+    generic-url: ${MERCADOPAGO_WEBHOOK_GENERIC_URL}
+    secret: ${MERCADOPAGO_WEBHOOK_SECRET}
+    skip-validation: ${MERCADOPAGO_WEBHOOK_SKIP_VALIDATION:false}
 
 bancolombia:
   sandbox:
