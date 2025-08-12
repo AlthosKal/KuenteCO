@@ -14,6 +14,7 @@ import org.kuenteco.backend.dto.subscription.response.SubscriptionResponseDTO;
 import org.kuenteco.backend.exception.ApiResponse;
 import org.kuenteco.backend.service.subscription.MercadoPagoPaymentService;
 import org.kuenteco.backend.service.subscription.MercadoPagoService;
+import org.kuenteco.backend.service.webhook.MercadoPagoWebhookService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ public class SubscriptionController implements SubscriptionResource {
 
     private final MercadoPagoService mercadoPagoService;
     private final MercadoPagoPaymentService mercadoPagoPaymentService;
+    private final MercadoPagoWebhookService mercadoPagoWebhookService;
 
     /**
      * Crea una nueva suscripción en Mercado Pago
@@ -198,9 +200,15 @@ public class SubscriptionController implements SubscriptionResource {
                     if (preapprovalId != null) {
                         log.info("Procesando webhook para preapproval ID: {}, action: {}", preapprovalId, action);
                         
-                        // Procesar el webhook de manera asíncrona para responder rápido a MercadoPago
-                        // TODO: Implementar servicio para procesar webhooks
-                        // mercadoPagoWebhookService.processPreapprovalWebhook(preapprovalId, action, notification);
+                        // Validar webhook con respuesta apropiada
+                        if (mercadoPagoWebhookService.isValidWebhook(notification, headers)) {
+                            // Procesar el webhook de manera asíncrona para responder rápido a MercadoPago
+                            mercadoPagoWebhookService.processPreapprovalWebhook(preapprovalId, action, notification);
+                        } else {
+                            log.warn("Webhook inválido rechazado: preapprovalId={}", preapprovalId);
+                            // Retornar 401 para webhooks inválidos para que MercadoPago no los reenvíe
+                            return ResponseEntity.status(401).body("UNAUTHORIZED");
+                        }
                         
                         return ResponseEntity.ok("OK");
                     }
@@ -250,8 +258,13 @@ public class SubscriptionController implements SubscriptionResource {
                     if (paymentId != null) {
                         log.info("Procesando webhook para payment ID: {}, action: {}", paymentId, action);
                         
-                        // TODO: Implementar servicio para procesar webhooks de pagos
-                        // mercadoPagoWebhookService.processPaymentWebhook(paymentId, action, notification);
+                        // Validar y procesar webhook de pago
+                        if (mercadoPagoWebhookService.isValidWebhook(notification, headers)) {
+                            mercadoPagoWebhookService.processPaymentWebhook(paymentId, action, notification);
+                        } else {
+                            log.warn("Webhook de pago inválido rechazado: paymentId={}", paymentId);
+                            return ResponseEntity.ok("INVALID");
+                        }
                         
                         return ResponseEntity.ok("OK");
                     }
@@ -290,8 +303,13 @@ public class SubscriptionController implements SubscriptionResource {
             
             log.info("Procesando webhook genérico: action={}, type={}", action, type);
             
-            // TODO: Implementar lógica para procesar webhooks genéricos
-            // mercadoPagoWebhookService.processGenericWebhook(notification);
+            // Procesar webhook genérico
+            if (mercadoPagoWebhookService.isValidWebhook(notification, headers)) {
+                mercadoPagoWebhookService.processGenericWebhook(notification);
+            } else {
+                log.warn("Webhook genérico inválido rechazado");
+                return ResponseEntity.ok("INVALID");
+            }
             
             return ResponseEntity.ok("OK");
             

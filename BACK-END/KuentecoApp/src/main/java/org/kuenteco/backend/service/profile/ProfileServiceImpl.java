@@ -176,7 +176,7 @@ public class ProfileServiceImpl implements ProfileService {
 
         Subscription subscription =
                 slaveSubscriptionRepository
-                        .findByUser(user)
+                        .getSubscriptionByUser(user)
                         .orElseThrow(
                                 () -> new IllegalArgumentException("Subscription no encontrada"));
         if (slaveProfileRepository.count() > 3
@@ -295,6 +295,12 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void deleteProfile(Integer id) {
+        // Obtener el usuario autenticado
+        AuthCredentials credentials = getCredentials();
+        RoleList role = credentials.role();
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new ProfileException("Endpoint solo disponible para usuarios");
+        }
         masterProfileRepository.deleteById(id);
     }
 

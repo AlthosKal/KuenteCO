@@ -18,9 +18,10 @@ public class Subscription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "id_user",
+            nullable = false,
             foreignKey =
                     @ForeignKey(
                             name = "fk_user",

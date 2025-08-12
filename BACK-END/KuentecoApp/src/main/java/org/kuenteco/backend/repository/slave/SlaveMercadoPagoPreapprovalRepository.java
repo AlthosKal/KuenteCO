@@ -16,5 +16,13 @@ public interface SlaveMercadoPagoPreapprovalRepository
 
     Optional<MercadoPagoPreapproval> findByPreapprovalId(String preapprovalId);
 
-    Optional<MercadoPagoPreapproval> findByUser(User user);
+    // Obtiene el preapproval más reciente del usuario
+    Optional<MercadoPagoPreapproval> findFirstByUserOrderByIdDesc(User user);
+    
+    // Mantener compatibilidad usando el más reciente
+    default Optional<MercadoPagoPreapproval> findByUser(User user) {
+        return findFirstByUserOrderByIdDesc(user);
+    }
+    
+    Optional<MercadoPagoPreapproval> findByExternalReference(String externalReference);
 }
