@@ -31,7 +31,7 @@ class UserService {
     });
 
     final response = await _apiClient.postApp('/auth/user/image/add', formData);
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       return ImageDTO.fromJson(response.data);
     } else {
       throw Exception('Error al subir imagen: ${response.statusCode}');
