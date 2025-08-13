@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../core/exceptions/global_exception_handler.dart';
 import '../core/services/app/auth_service.dart';
-import '../dto/auth/request/validate_verification_code_dto.dart';
+import '../dto/app/auth/request/validate_verification_code_dto.dart';
 import '../provider/toast_helper.dart';
 import '../routes/app_routes.dart';
 import '../screens/auth/password_recovery_view.dart';

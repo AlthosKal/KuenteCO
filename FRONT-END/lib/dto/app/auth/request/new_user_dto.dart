@@ -1,6 +1,4 @@
-
-
-import '../../../utils/enum/user_type_enum.dart';
+import '../../../../utils/enum/user_type_enum.dart';
 
 class NewUserDTO {
   final String username;

@@ -1,4 +1,4 @@
-import '../../utils/enum/state_enum.dart';
+import '../../../utils/enum/state_enum.dart';
 
 class DescriptionCategory {
   final String name;

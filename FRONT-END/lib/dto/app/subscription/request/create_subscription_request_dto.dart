@@ -1,4 +1,4 @@
-import '../../../utils/enum/subscription_type_enum.dart';
+import '../../../../utils/enum/subscription_type_enum.dart';
 
 class CreateSubscriptionRequestDTO {
   final SubscriptionType subscriptionType;

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/services/app/profile_service.dart';
-import '../../dto/profile/new_profile_dto.dart';
-
+import '../../dto/app/profile/new_profile_dto.dart';
 
 class CreateProfileWidget extends StatefulWidget {
   final VoidCallback onProfileCreated;
