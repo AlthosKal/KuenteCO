@@ -102,12 +102,28 @@ class ProfileController {
     }
   }
 
-  /// Iniciar sesión con un perfil
+  /// Iniciar sesión con un perfil usando ID (método legacy)
   Future<void> profileLogin(int profileId, String password) async {
     if (isLoading.value) return;
     isLoading.value = true;
     try {
-      await _profileService.profileLogin(profileId, password);
+      // Este método mantendremos para compatibilidad, pero realmente necesitaríamos 
+      // implementar la lógica para obtener las credenciales por profileId
+      throw UnimplementedError('Use profileLoginDirect instead');
+    } catch (e) {
+      debugPrint('🔴 Error logging in with profile: $e');
+      rethrow;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Iniciar sesión con un perfil usando credenciales directas
+  Future<void> profileLoginDirect(String nameOrEmail, String password) async {
+    if (isLoading.value) return;
+    isLoading.value = true;
+    try {
+      final tokenResponse = await _profileService.profileLogin(nameOrEmail, password);
       // Actualizar el perfil autenticado después del login
       await loadAuthenticatedProfile();
     } catch (e) {

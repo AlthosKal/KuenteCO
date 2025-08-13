@@ -1,212 +1,381 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../../widgets/common/background/background_widget.dart';
-import '../../widgets/common/footer/footer_logged_widget.dart';
-import '../../widgets/common/navbar/navbar_logged_widget.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../dto/subscription/request/create_subscription_request_dto.dart';
+import '../controllers/subscription_controller.dart';
+import '../widgets/common/primary_buttom_widget.dart';
+import '../utils/enum/subscription_type_enum.dart';
 
-class SubscriptionPlansView extends StatelessWidget {
+class SubscriptionPlansView extends StatefulWidget {
   const SubscriptionPlansView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Background(
-      opacity: 0.3, // 👈 oscurece un poco la imagen para mejorar contraste
-      child: Column(
-        children: [
-          /// 🔝 Navbar fijo
-          KuentecoLoggedNavbar(
-            currentRoute: '/subscription',
-            onLogout: () => print("Cerrar sesión"),
-          ),
-
-          /// 📜 Contenido scrollable de los planes
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(vertical: 50),
-              child: Column(
-                children: [
-                  const Text(
-                    'Planes de Suscripción',
-                    style: TextStyle(
-                      fontSize: 34,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-
-                  /// 📦 Contenedores de planes con límite de ancho
-                  Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1100),
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          // 📱 En pantallas chicas (mobile) apila en columna
-                          if (constraints.maxWidth < 800) {
-                            return Column(
-                              children: [
-                                _PlanCard.basic(),
-                                const SizedBox(height: 20),
-                                _PlanCard.standard(),
-                                const SizedBox(height: 20),
-                                _PlanCard.premium(),
-                              ],
-                            );
-                          }
-
-                          // 💻 En pantallas grandes muestra en fila
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(child: _PlanCard.basic()),
-                              const SizedBox(width: 20),
-                              Expanded(child: _PlanCard.standard()),
-                              const SizedBox(width: 20),
-                              Expanded(child: _PlanCard.premium()),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          /// 👣 Footer fijo al final
-          const FooterLoggedWidget(),
-        ],
-      ),
-    );
-  }
+  State<SubscriptionPlansView> createState() => _SubscriptionPlansViewState();
 }
 
-/// 🎨 Widget para los 3 planes con Blur y Transparencia
-class _PlanCard extends StatelessWidget {
-  final String title;
-  final List<String> features;
-  final String price;
-  final bool isAcquired;
+class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
+  @override
+  void initState() {
+    super.initState();
+    // Cargar precios al inicializar la vista
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = Provider.of<SubscriptionController>(context, listen: false);
+      controller.loadSubscriptionPrices();
+      controller.loadMySubscriptions(); // También cargar suscripciones existentes
+    });
+  }
 
-  const _PlanCard._({
-    required this.title,
-    required this.features,
-    required this.price,
-    this.isAcquired = false,
-  });
+  Future<void> _subscribe(SubscriptionType type) async {
+    print('🎯 Intentando suscribirse al plan: ${type.name}');
+    
+    // No permitir suscripción al Plan Básico (es gratuito y por defecto)
+    if (type == SubscriptionType.BASIC) {
+      print('🚫 Bloqueando suscripción al Plan Básico');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('El Plan Básico es gratuito e incluido por defecto'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+    
+    final controller = Provider.of<SubscriptionController>(context, listen: false);
+    
+    final response = await controller.createSubscription(
+      CreateSubscriptionRequestDTO(subscriptionType: type, backUrl: ''),
+    );
 
-  /// 🔵 Plan Básico
-  factory _PlanCard.basic() => const _PlanCard._(
-    title: 'Básico ✓',
-    features: [
-      'Contiene anuncios',
-      'Algunas funciones están limitadas',
-      'Solo puedes crear hasta 4 rubros',
-      'Acceso a 3 perfiles',
-    ],
-    price: 'Gratis',
-    isAcquired: true,
-  );
-
-  /// 🟣 Plan Estándar
-  factory _PlanCard.standard() => const _PlanCard._(
-    title: 'Estándar ☆',
-    features: [
-      'Sin anuncios',
-      'Mayor cantidad de rubros disponibles hasta 10',
-      'Acceso a reportes personalizados',
-      'Acceso a 5 perfiles',
-    ],
-    price: '\$ 12.900',
-  );
-
-  /// 🏆 Plan Premium
-  factory _PlanCard.premium() => const _PlanCard._(
-    title: 'Premium 👜',
-    features: [
-      'Sin anuncios',
-      'Rubros ilimitados',
-      'Acceso a múltiples perfiles sin límites',
-      'Soporte prioritario',
-    ],
-    price: '\$ 24.900',
-  );
+    if (controller.errorMessage == null && response != null && response.initPoint.isNotEmpty) {
+      // Usar initPoint que es la URL de pago de MercadoPago
+      final uri = Uri.parse(response.initPoint);
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No se pudo abrir el enlace de pago')),
+          );
+        }
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(controller.errorMessage ?? 'Error al crear la suscripción'),
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.3)),
-          ),
-          child: Column(
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Planes de Suscripción'),
+        backgroundColor: Colors.purple,
+        foregroundColor: Colors.white,
+      ),
+      body: Consumer<SubscriptionController>(builder: (context, controller, child) {
+        if (controller.isLoading && controller.subscriptionPrices.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        // Mostrar mensaje de error si existe, pero no bloquear la UI
+        if (controller.errorMessage != null) {
+          // Solo mostrar un SnackBar o un banner, no bloquear toda la pantalla
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(controller.errorMessage ?? 'Error desconocido'),
+                  action: SnackBarAction(
+                    label: 'Reintentar',
+                    onPressed: () {
+                      controller.loadSubscriptionPrices();
+                      controller.loadMySubscriptions();
+                    },
+                  ),
+                  duration: const Duration(seconds: 4),
                 ),
-              ),
-              const SizedBox(height: 16),
-              for (var feature in features)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
+              );
+            }
+          });
+        }
+
+        return RefreshIndicator(
+          onRefresh: () async {
+            await controller.loadSubscriptionPrices();
+            await controller.loadMySubscriptions();
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Mostrar suscripción actual si existe
+                if (controller.mySubscriptions.isNotEmpty) ...
+                  _buildCurrentSubscriptionSection(controller),
+                
+                const SizedBox(height: 24),
+                
+                // Título de planes disponibles
+                Text(
+                  'Planes Disponibles',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                // Banner informativo sobre precios estéticos
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    border: Border.all(color: Colors.blue.shade300),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   child: Row(
                     children: [
-                      const Icon(Icons.check, color: Colors.white, size: 20),
+                      Icon(Icons.info_outline, color: Colors.blue.shade700),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          feature,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
+                          'Los precios mostrados son referenciales. MercadoPago maneja los precios y pagos reales.',
+                          style: TextStyle(color: Colors.blue.shade800),
                         ),
                       ),
                     ],
                   ),
                 ),
-              const SizedBox(height: 20),
-              Text(
-                price,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 20),
+                
+                // Lista de planes
+                if (controller.subscriptionPrices.isEmpty)
+                  _buildFallbackPlans(controller)
+                else
+                  ...controller.subscriptionPrices.map((price) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _PlanCard(
+                      title: _getPlanTitle(price.type),
+                      description: price.description,
+                      price: '${price.monthlyPrice} ${price.currencyId}',
+                      subscriptionType: price.type,
+                      loading: controller.isLoading,
+                      onSubscribe: () => _subscribe(price.type),
+                      isActive: _isCurrentlySubscribed(controller, price.type),
+                    ),
+                  )),
+              ],
+            ),
+          ),
+        );
+      }),
+    );
+  }
 
-              /// Botón dinámico según plan
-              ElevatedButton(
-                onPressed: isAcquired ? null : () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                  isAcquired ? Colors.grey : Colors.deepPurple,
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+  List<Widget> _buildCurrentSubscriptionSection(SubscriptionController controller) {
+    // Mostrar cualquier suscripción (ACTIVE, PENDING, etc.)
+    final activeSub = controller.mySubscriptions.firstOrNull;
+    
+    if (activeSub == null) return [];
+
+    return [
+      Card(
+        color: Colors.green.shade50,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green.shade600),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Suscripción Actual',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green.shade700,
+                    ),
                   ),
-                ),
-                child: Text(
-                  isAcquired ? 'Adquirido' : 'Suscribirse',
-                  style: const TextStyle(fontSize: 16, color: Colors.white),
-                ),
+                ],
               ),
+              const SizedBox(height: 8),
+              Text('Plan: ${_getPlanTitle(activeSub.subscriptionType)}'),
+              Text('Estado: ${activeSub.subscriptionState.name}'),
+              Text('Próximo pago: ${_formatDate(activeSub.nextPaymentDate)}'),
+              Text('Renovación automática: ${activeSub.isAutoRenewable ? "Sí" : "No"}'),
+              if (activeSub.cardLastFourDigits != null)
+                Text('Tarjeta: **** ${activeSub.cardLastFourDigits}'),
+              if (activeSub.cardBrand != null)
+                Text('Tipo: ${activeSub.cardBrand}'),
             ],
           ),
+        ),
+      ),
+      const SizedBox(height: 16),
+    ];
+  }
+
+  Widget _buildFallbackPlans(SubscriptionController controller) {
+    // Planes estéticos - los precios reales los maneja MercadoPago
+    final fallbackPlans = [
+      {
+        'type': SubscriptionType.BASIC,
+        'title': 'Plan Básico',
+        'description': 'Funcionalidades básicas\nIncluido por defecto',
+        'price': 'Gratis',
+        'isDefault': true, // Plan por defecto
+      },
+      {
+        'type': SubscriptionType.STANDARD,
+        'title': 'Plan Estándar',
+        'description': 'Acceso completo\nSin anuncios',
+        'price': '\$20.000 COP',
+        'isDefault': false,
+      },
+      {
+        'type': SubscriptionType.PREMIUM,
+        'title': 'Plan Premium',
+        'description': 'Acceso completo\nFuncionalidades avanzadas',
+        'price': '\$50.000 COP',
+        'isDefault': false,
+      },
+    ];
+
+    return Column(
+      children: fallbackPlans.map((plan) => Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: _PlanCard(
+          title: plan['title'] as String,
+          description: plan['description'] as String,
+          price: plan['price'] as String,
+          subscriptionType: plan['type'] as SubscriptionType,
+          loading: controller.isLoading,
+          onSubscribe: () => _subscribe(plan['type'] as SubscriptionType),
+          isActive: _isCurrentlySubscribed(controller, plan['type'] as SubscriptionType) || 
+                   (plan['isDefault'] == true), // Plan Básico siempre activo
+          isDefault: plan['isDefault'] == true,
+        ),
+      )).toList(),
+    );
+  }
+
+  String _getPlanTitle(SubscriptionType type) {
+    switch (type) {
+      case SubscriptionType.BASIC:
+        return 'Plan Básico';
+      case SubscriptionType.STANDARD:
+        return 'Plan Estándar';
+      case SubscriptionType.PREMIUM:
+        return 'Plan Premium';
+    }
+  }
+
+  bool _isCurrentlySubscribed(SubscriptionController controller, SubscriptionType type) {
+    return controller.mySubscriptions.any(
+      (sub) => sub.subscriptionType == type && sub.subscriptionState.name == 'ACTIVE',
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+}
+
+class _PlanCard extends StatelessWidget {
+  final String title;
+  final String description;
+  final String price;
+  final SubscriptionType subscriptionType;
+  final VoidCallback onSubscribe;
+  final bool loading;
+  final bool isActive;
+  final bool isDefault;
+
+  const _PlanCard({
+    required this.title,
+    required this.description,
+    required this.price,
+    required this.subscriptionType,
+    required this.onSubscribe,
+    required this.loading,
+    this.isActive = false,
+    this.isDefault = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: isActive ? 8 : 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: isActive 
+          ? BorderSide(color: Colors.green.shade400, width: 2)
+          : BorderSide.none,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                if (isActive)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      'ACTIVO',
+                      style: TextStyle(
+                        color: Colors.green.shade700,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              description,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              price,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                color: Colors.purple,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: PrimaryButton(
+                label: isActive ? 'Plan Activo' : (isDefault ? 'Plan Gratuito' : 'Suscribirse'),
+                isLoading: loading,
+                onPressed: (loading || isActive || isDefault) ? null : onSubscribe,
+              ),
+            ),
+          ],
         ),
       ),
     );
