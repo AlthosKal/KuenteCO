@@ -26,19 +26,21 @@ class CreateSubscriptionResponseDTO {
 
   factory CreateSubscriptionResponseDTO.fromJson(Map<String, dynamic> json) {
     return CreateSubscriptionResponseDTO(
-      subscriptionId: json['subscriptionId'],
-      preapprovalId: json['preapprovalId'],
-      initPoint: json['initPoint'],
-      externalReference: json['externalReference'],
+      subscriptionId: json['subscriptionId'] != null ? int.tryParse(json['subscriptionId'].toString()) ?? 0 : 0,
+      preapprovalId: json['preapprovalId']?.toString() ?? '',
+      initPoint: json['initPoint']?.toString() ?? '',
+      externalReference: json['externalReference']?.toString() ?? '',
       subscriptionType: SubscriptionType.values.firstWhere(
-            (e) => e.name == json['subscriptionType'],
+            (e) => e.name == json['subscriptionType']?.toString(),
+        orElse: () => SubscriptionType.BASIC,
       ),
-      monthlyAmount: (json['monthlyAmount'] as num).toDouble(),
+      monthlyAmount: json['monthlyAmount'] != null ? double.tryParse(json['monthlyAmount'].toString()) ?? 0.0 : 0.0,
       status: PreapprovalStatus.values.firstWhere(
-            (e) => e.name == json['status'],
+            (e) => e.name == json['status']?.toString(),
+        orElse: () => PreapprovalStatus.PENDING,
       ),
-      createdAt: DateTime.parse(json['createdAt']),
-      nextPaymentDate: DateTime.parse(json['nextPaymentDate']),
+      createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now() : DateTime.now(),
+      nextPaymentDate: json['nextPaymentDate'] != null ? DateTime.tryParse(json['nextPaymentDate'].toString()) ?? DateTime.now() : DateTime.now(),
     );
   }
 

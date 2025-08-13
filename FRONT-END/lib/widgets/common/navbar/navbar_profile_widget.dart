@@ -72,7 +72,6 @@ class _KuentecoProfileLoggedNavbarState extends State<KuentecoProfileNavbar> {
         scrollDirection: Axis.horizontal,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: _buildNavigationButtons(context),
         ),
       ),
       const SizedBox(height: 10),
@@ -87,21 +86,11 @@ class _KuentecoProfileLoggedNavbarState extends State<KuentecoProfileNavbar> {
       Expanded(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: _buildNavigationButtons(context),
         ),
       ),
       _buildProfileButton(context),
     ],
   );
-
-  /// ✅ Botones de navegación específicos para perfiles
-  List<Widget> _buildNavigationButtons(BuildContext context) => [
-    // _buildButton(context, 'Mi Perfil', AppRoutes.logged),
-    // const SizedBox(width: 20),
-    _buildButton(context, 'Servicios', '/profile/services'),
-    const SizedBox(width: 20),
-    _buildButton(context, 'Pedidos', '/profile/orders'),
-  ];
 
   /// ✅ Logo que navega a la vista principal del perfil
   Widget _buildLogo(BuildContext context, bool isSmallScreen) {

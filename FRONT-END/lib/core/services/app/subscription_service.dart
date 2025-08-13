@@ -22,7 +22,15 @@ class SubscriptionService {
       );
       print('📝 Respuesta de creación: ${response.data}');
       print('🔎 Tipo de respuesta: ${response.data.runtimeType}');
-      return CreateSubscriptionResponseDTO.fromJson(response.data);
+      
+      // El backend envía la respuesta en formato {success, message, data}
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+        return CreateSubscriptionResponseDTO.fromJson(responseData['data']);
+      } else {
+        // Fallback si la estructura cambia
+        return CreateSubscriptionResponseDTO.fromJson(responseData);
+      }
     });
   }
 
