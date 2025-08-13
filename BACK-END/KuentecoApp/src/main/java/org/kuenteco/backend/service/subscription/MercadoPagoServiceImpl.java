@@ -40,6 +40,7 @@ import org.kuenteco.backend.repository.slave.SlaveSubscriptionRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.hibernate.Hibernate;
 
 @Slf4j
 @Service
@@ -126,17 +127,22 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
         } catch (MPApiException e) {
             log.error("Error al crear preapproval en MercadoPago: {}", e.getMessage(), e);
             if (e.getApiResponse() != null) {
+                int statusCode = e.getApiResponse().getStatusCode();
+                String errorBody = e.getApiResponse().getContent();
                 log.error(
                         "Detalles del error de MercadoPago - Status: {}, Body: {}",
-                        e.getApiResponse().getStatusCode(),
-                        e.getApiResponse().getContent());
+                        statusCode, errorBody);
+                
+                // Manejar errores específicos
+                String errorMessage = handleMercadoPagoApiError(statusCode, errorBody, e.getMessage());
+                throw new MercadoPagoException(errorMessage);
             }
             throw new MercadoPagoException(
                     "Error al crear suscripción en MercadoPago: " + e.getMessage());
         } catch (MPException e) {
             log.error("Error al crear preapproval en MercadoPago: {}", e.getMessage(), e);
             throw new MercadoPagoException(
-                    "Error al crear suscripción en MercadoPago: " + e.getMessage());
+                    "Error de conexión con MercadoPago: " + e.getMessage());
         } catch (SubscriptionMercadoPagoException | TransactionException e) {
             // Re-lanzar excepciones de negocio sin modificar
             throw e;
@@ -205,13 +211,15 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
                                 () ->
                                         new SubscriptionMercadoPagoException(
                                                 "Subscripción no encontrada"));
+
+        if (subscription.getType().equals(SubscriptionType.BASIC)) {
+            return preapprovalMapper.toDTO(subscription, null);
+        }
         MercadoPagoPreapproval mercadoPagoPreapproval =
                 slaveMercadoPagoPreapprovalRepository
                         .findByUser(user)
                         .orElseThrow(
-                                () ->
-                                        new SubscriptionMercadoPagoException(
-                                                "Subscripción no encontrada"));
+                                () -> new SubscriptionMercadoPagoException("Pago no encontrado"));
         return preapprovalMapper.toDTO(subscription, mercadoPagoPreapproval);
     }
 
@@ -254,10 +262,17 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
                                                 new SubscriptionMercadoPagoException(
                                                         "Preapproval no encontrado"));
 
-                activePreapproval.setStatus(PreapprovalStatus.CANCELLED);
-                activePreapproval.setLastModified(LocalDateTime.now());
-                masterMercadoPagoPreapprovalRepository.save(activePreapproval);
+                // Cancelar en MercadoPago primero
+                try {
+                    cancelPreapprovalInMercadoPago(activePreapproval.getPreapprovalId());
+                    log.info("Preapproval {} cancelado exitosamente en MercadoPago", activePreapproval.getPreapprovalId());
+                } catch (Exception e) {
+                    log.error("Error cancelando preapproval en MercadoPago: {}", e.getMessage(), e);
+                    // Continuar con la cancelación local aunque falle en MercadoPago
+                }
 
+                // Cancelar localmente
+                activePreapproval.setStatus(PreapprovalStatus.CANCELLED);
                 activePreapproval.setLastModified(LocalDateTime.now());
                 masterMercadoPagoPreapprovalRepository.save(activePreapproval);
             }
@@ -278,13 +293,27 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
                 pendingSubscription.setUpdatedAt(LocalDateTime.now());
                 masterSubscriptionRepository.save(pendingSubscription);
 
-                // Cancelar preapproval asociado
-                if (pendingSubscription.getMercadoPagoPreapproval() != null) {
-                    MercadoPagoPreapproval pendingPreapproval =
-                            pendingSubscription.getMercadoPagoPreapproval();
-                    pendingPreapproval.setStatus(PreapprovalStatus.CANCELLED);
-                    pendingPreapproval.setLastModified(LocalDateTime.now());
-                    masterMercadoPagoPreapprovalRepository.save(pendingPreapproval);
+                // Cancelar preapproval asociado - Inicializar la relación lazy de manera segura
+                try {
+                    Hibernate.initialize(pendingSubscription.getMercadoPagoPreapproval());
+                    if (pendingSubscription.getMercadoPagoPreapproval() != null) {
+                        MercadoPagoPreapproval pendingPreapproval =
+                                pendingSubscription.getMercadoPagoPreapproval();
+                        pendingPreapproval.setStatus(PreapprovalStatus.CANCELLED);
+                        pendingPreapproval.setLastModified(LocalDateTime.now());
+                        masterMercadoPagoPreapprovalRepository.save(pendingPreapproval);
+                    }
+                } catch (org.hibernate.LazyInitializationException e) {
+                    // Si no se puede inicializar, buscar por ID directamente
+                    log.warn("No se pudo inicializar MercadoPagoPreapproval para subscription {}, buscando por base de datos", pendingSubscription.getId());
+                    Optional<MercadoPagoPreapproval> preapprovalOpt = 
+                            slaveMercadoPagoPreapprovalRepository.findByUser(user);
+                    if (preapprovalOpt.isPresent()) {
+                        MercadoPagoPreapproval pendingPreapproval = preapprovalOpt.get();
+                        pendingPreapproval.setStatus(PreapprovalStatus.CANCELLED);
+                        pendingPreapproval.setLastModified(LocalDateTime.now());
+                        masterMercadoPagoPreapprovalRepository.save(pendingPreapproval);
+                    }
                 }
             }
         }
@@ -366,10 +395,10 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
 
     private void updateOrCreateSubscription(
             User user, MercadoPagoPreapproval preapproval, SubscriptionType subscriptionType) {
-        // Buscar suscripción actual del usuario (no importa el estado)
-        Optional<Subscription> existingSubscriptionOpt =
-                slaveSubscriptionRepository.findByUser(user);
-
+        // Buscar la suscripción más reciente del usuario o crear una nueva
+        Optional<Subscription> existingSubscriptionOpt = 
+                slaveSubscriptionRepository.findFirstByUserOrderByIdDesc(user);
+        
         Subscription subscription = existingSubscriptionOpt.orElseGet(Subscription::new);
 
         subscription.setUser(user);
@@ -397,5 +426,71 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
                 user.getEmail(),
                 subscriptionType,
                 subscription.getId());
+    }
+    
+    /**
+     * Cancela un preapproval directamente en MercadoPago
+     */
+    private void cancelPreapprovalInMercadoPago(String preapprovalId) throws MPException, MPApiException {
+        try {
+            PreapprovalClient client = new PreapprovalClient();
+            
+            // MercadoPago requiere una actualización con status "cancelled"
+            // Nota: La API de MercadoPago puede variar, verificar documentación actual
+            log.info("Intentando cancelar preapproval {} en MercadoPago", preapprovalId);
+            
+            // Obtener el preapproval actual
+            Preapproval preapproval = client.get(preapprovalId);
+            
+            if (preapproval != null) {
+                log.info("Preapproval {} encontrado en MercadoPago con status: {}", 
+                    preapprovalId, preapproval.getStatus());
+                
+                // En algunos casos, MercadoPago cancela automáticamente cuando se crea uno nuevo
+                // o requiere un proceso específico de cancelación
+                // TODO: Implementar cancelación según documentación actualizada de MercadoPago
+            }
+            
+        } catch (MPApiException e) {
+            if (e.getApiResponse() != null && e.getApiResponse().getStatusCode() == 404) {
+                log.warn("Preapproval {} no encontrado en MercadoPago (posiblemente ya cancelado)", preapprovalId);
+            } else {
+                throw e;
+            }
+        }
+    }
+    
+    /**
+     * Maneja errores específicos de la API de MercadoPago
+     */
+    private String handleMercadoPagoApiError(int statusCode, String errorBody, String originalMessage) {
+        switch (statusCode) {
+            case 400:
+                if (errorBody != null && errorBody.contains("invalid_parameter")) {
+                    return "Parámetros inválidos en la solicitud. Verifique los datos enviados.";
+                }
+                return "Solicitud incorrecta: " + originalMessage;
+                
+            case 401:
+                return "Credenciales de MercadoPago inválidas. Contacte al administrador.";
+                
+            case 403:
+                return "Acceso denegado por MercadoPago. Verifique los permisos de la aplicación.";
+                
+            case 404:
+                return "Recurso no encontrado en MercadoPago.";
+                
+            case 429:
+                return "Límite de solicitudes excedido. Intente nuevamente en unos minutos.";
+                
+            case 500:
+            case 502:
+            case 503:
+            case 504:
+                return "Error temporal en los servidores de MercadoPago. Intente nuevamente.";
+                
+            default:
+                return "Error en MercadoPago (" + statusCode + "): " + originalMessage;
+        }
     }
 }

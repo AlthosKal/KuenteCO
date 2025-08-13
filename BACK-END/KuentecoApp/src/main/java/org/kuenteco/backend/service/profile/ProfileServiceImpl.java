@@ -136,13 +136,14 @@ public class ProfileServiceImpl implements ProfileService {
                         .orElseThrow(() -> new ProfileException("Usuario no encontrado"));
 
         // Obtener las cuentas del usuario
-        Profile profile = slaveProfileRepository.findByUserAndId(user, id).orElseThrow(()-> new ProfileException("Perfil no encontrado"));
+        Profile profile =
+                slaveProfileRepository
+                        .findByUserAndId(user, id)
+                        .orElseThrow(() -> new ProfileException("Perfil no encontrado"));
 
         // Devolver las cuentas del usuario
         return profileDetailMapper.toDto(profile);
     }
-
-
 
     @Override
     public ProfileDetailDTO getProfileDetails() {
@@ -175,7 +176,7 @@ public class ProfileServiceImpl implements ProfileService {
 
         Subscription subscription =
                 slaveSubscriptionRepository
-                        .findByUser(user)
+                        .getSubscriptionByUser(user)
                         .orElseThrow(
                                 () -> new IllegalArgumentException("Subscription no encontrada"));
         if (slaveProfileRepository.count() > 3
@@ -213,18 +214,20 @@ public class ProfileServiceImpl implements ProfileService {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
 
-        User user = slaveUserRepository
-                .findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        User user =
+                slaveUserRepository
+                        .findByEmail(email)
+                        .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        Profile profile = slaveProfileRepository
-                .findByUserAndId(user, dto.getId())
-                .orElseThrow(() -> new ProfileException("Perfil no encontrado"));
+        Profile profile =
+                slaveProfileRepository
+                        .findByUserAndId(user, dto.getId())
+                        .orElseThrow(() -> new ProfileException("Perfil no encontrado"));
 
         // Validar email único
-        if (dto.getEmail() != null &&
-                !dto.getEmail().equalsIgnoreCase(profile.getEmail()) &&
-                slaveProfileRepository.existsByEmail(dto.getEmail())) {
+        if (dto.getEmail() != null
+                && !dto.getEmail().equalsIgnoreCase(profile.getEmail())
+                && slaveProfileRepository.existsByEmail(dto.getEmail())) {
             throw new ProfileException("El correo ya está en uso por otro perfil");
         }
 
@@ -251,7 +254,6 @@ public class ProfileServiceImpl implements ProfileService {
 
         masterProfileRepository.save(profile);
     }
-
 
     @Override
     @Transactional
@@ -293,6 +295,12 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void deleteProfile(Integer id) {
+        // Obtener el usuario autenticado
+        AuthCredentials credentials = getCredentials();
+        RoleList role = credentials.role();
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new ProfileException("Endpoint solo disponible para usuarios");
+        }
         masterProfileRepository.deleteById(id);
     }
 

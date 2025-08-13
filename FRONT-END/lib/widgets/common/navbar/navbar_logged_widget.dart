@@ -138,6 +138,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
   );
 
   /// ✅ Logo con navegación dinámica según tipo de autenticación
+  
   Widget _buildLogo(BuildContext context, bool isSmallScreen) {
     final double defaultWidth = isSmallScreen ? 220.0 : 250.0;
     final double defaultHeight = isSmallScreen ? 55.0 : 62.5;
