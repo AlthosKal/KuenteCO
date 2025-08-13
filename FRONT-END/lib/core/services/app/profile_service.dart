@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../dto/auth/response/token_response_dto.dart';
 import '../../../dto/profile/new_profile_dto.dart';
@@ -32,6 +33,28 @@ class ProfileService {
 
   /// ✅ Obtener perfil por ID
   Future<ProfileDetailDTO> getProfileById(int id) async {
+    // ✅ Verificar si estamos ejecutando como perfil
+    final role = await _storage.read(key: 'role');
+    
+    if (role == 'ROLE_PROFILE') {
+      // Si estamos como perfil, intentar obtener el perfil autenticado primero
+      // para ver si coincide con el ID solicitado
+      try {
+        final authenticatedProfile = await getAuthenticatedProfile();
+        if (authenticatedProfile.id == id) {
+          // Si el ID coincide con el perfil autenticado, devolver ese
+          return authenticatedProfile;
+        }
+      } catch (e) {
+        // Si falla obtener el perfil autenticado, continuar con el método original
+        debugPrint('🔴 Error getting authenticated profile, falling back to getProfileById: $e');
+      }
+      
+      // Si el ID no coincide o hubo error, intentar el endpoint original
+      // (esto podría fallar si el perfil no tiene permisos)
+    }
+    
+    // Método original para usuarios o cuando no coincide el ID
     final response = await _api.getApp('/profile/$id');
     final Map<String, dynamic> json = response.data;
     final actualData = json['data'] ?? json;
