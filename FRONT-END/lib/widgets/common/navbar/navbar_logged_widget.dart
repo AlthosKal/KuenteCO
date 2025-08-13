@@ -75,7 +75,6 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
         scrollDirection: Axis.horizontal,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: _buildNavigationButtons(context),
         ),
       ),
       const SizedBox(height: 10),
@@ -90,21 +89,11 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
       Expanded(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: _buildNavigationButtons(context),
         ),
       ),
       _buildProfileButton(context),
     ],
   );
-
-  /// ✅ Botones de navegación
-  List<Widget> _buildNavigationButtons(BuildContext context) => [
-    _buildButton(context, 'Inicio', AppRoutes.homePersonal),
-    const SizedBox(width: 20),
-    _buildButton(context, 'Rubros', '/Category_view'),
-    const SizedBox(width: 20),
-    _buildButton(context, 'Presupuestos', '/Account_home_view'),
-  ];
 
   /// ✅ Logo con navegación dinámica según tipo de usuario
   Widget _buildLogo(BuildContext context, bool isSmallScreen) {
