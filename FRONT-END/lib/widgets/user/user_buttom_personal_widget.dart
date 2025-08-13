@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import '../../core/services/app/auth_service.dart';
 import '../../routes/app_routes.dart';
 
-class ProfileButtonPersonal extends StatelessWidget {
+class UserButtomPersonalWidget extends StatelessWidget {
   final String? profileImageUrl;
 
-  const ProfileButtonPersonal({
+  const UserButtomPersonalWidget({
     super.key,
     this.profileImageUrl,
   });
@@ -54,7 +54,7 @@ class ProfileButtonPersonal extends StatelessWidget {
 
   Future<void> _logout(BuildContext context) async {
     try {
-      final authService = AuthService(); // o la forma en que lo instancies en tu app
+      final authService = AuthService();
       await authService.logout();
       Navigator.pushReplacementNamed(context, AppRoutes.homeGuest);
     } catch (e) {

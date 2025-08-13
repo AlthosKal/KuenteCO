@@ -1,16 +1,17 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 import '../../controllers/profile_controller.dart';
-import '../../dto/image/image_dto.dart';
-import '../../dto/profile/profile_detail_dto.dart';
+import '../../dto/app/image/image_dto.dart';
+import '../../dto/app/profile/profile_detail_dto.dart';
 
 class ProfileImageWidget extends StatefulWidget {
   final ProfileController profileController;
   final ValueNotifier<MultipartFile?>? selectedImageNotifier;
   final ValueNotifier<bool>? removeImageNotifier;
-  final ProfileDetailDTO? profile; // Para usar la información del perfil directamente
+  final ProfileDetailDTO? profile;
   final double size;
 
   const ProfileImageWidget({
@@ -29,38 +30,81 @@ class ProfileImageWidget extends StatefulWidget {
 class _ProfileImageWidgetState extends State<ProfileImageWidget> {
   Uint8List? _selectedImageBytes;
   String? _selectedImageName;
+  bool _isPickingImage = false;
 
-  // 🎯 CLICK SIMPLE: Seleccionar imagen
+  // ✅ MÉTODO COMPATIBLE WEB + MÓVIL
   Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 800,
-      maxHeight: 800,
-      imageQuality: 85,
-    );
+    if (_isPickingImage) return; // Prevenir múltiples clicks
 
-    if (pickedFile == null) return;
+    setState(() => _isPickingImage = true);
 
-    final bytes = await pickedFile.readAsBytes();
-    final multipartFile = MultipartFile.fromBytes(
-      bytes,
-      filename: pickedFile.name,
-    );
+    try {
+      final picker = ImagePicker();
 
-    setState(() {
-      _selectedImageBytes = bytes;
-      _selectedImageName = pickedFile.name;
-    });
+      // ✅ Configuración que funciona en ambas plataformas
+      final pickedFile = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: kIsWeb ? null : 800, // Web no soporta bien maxWidth
+        maxHeight: kIsWeb ? null : 800,
+        imageQuality: kIsWeb ? null : 85, // Web usa calidad original
+      );
 
-    // Notificar al widget padre sobre la imagen seleccionada
-    widget.selectedImageNotifier?.value = multipartFile;
-    widget.removeImageNotifier?.value = false;
+      if (pickedFile == null) {
+        debugPrint('📷 Image selection cancelled by user');
+        return;
+      }
 
-    debugPrint('🖼️ Image selected: ${pickedFile.name}');
+      debugPrint('📷 Image picked: ${pickedFile.name} (${pickedFile.path})');
+
+      // ✅ Leer bytes - funciona tanto en web como móvil
+      final bytes = await pickedFile.readAsBytes();
+
+      if (bytes.isEmpty) {
+        debugPrint('❌ Image bytes are empty');
+        _showError('Error: imagen vacía');
+        return;
+      }
+
+      // ✅ Crear MultipartFile con nombre apropiado
+      final fileName = pickedFile.name.isNotEmpty
+          ? pickedFile.name
+          : 'profile_image_${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+      final multipartFile = MultipartFile.fromBytes(
+        bytes,
+        filename: fileName,
+      );
+
+      setState(() {
+        _selectedImageBytes = bytes;
+        _selectedImageName = fileName;
+      });
+
+      // Notificar al widget padre
+      widget.selectedImageNotifier?.value = multipartFile;
+      widget.removeImageNotifier?.value = false;
+
+      debugPrint('✅ Image selected successfully: $fileName (${bytes.length} bytes)');
+
+    } catch (e, stackTrace) {
+      debugPrint('❌ Error picking image: $e');
+      debugPrint('Stack trace: $stackTrace');
+
+      // ✅ Manejo específico de errores por plataforma
+      if (kIsWeb) {
+        if (e.toString().contains('User cancelled') ||
+            e.toString().contains('AbortError')) {
+          debugPrint('🚫 User cancelled image selection on web');
+          return; // No mostrar error si usuario canceló
+        }
+      }
+
+      _showError('Error al seleccionar imagen: ${e.toString()}');
+    } finally {
+      setState(() => _isPickingImage = false);
+    }
   }
 
-  // 🎯 CLICK PRESIONADO: Confirmar eliminación
   Future<void> _confirmDeleteImage() async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -92,48 +136,95 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
       _selectedImageName = null;
     });
 
-    // Notificar al widget padre que se debe remover la imagen
     widget.selectedImageNotifier?.value = null;
     widget.removeImageNotifier?.value = true;
 
     debugPrint('🗑️ Image marked for removal');
   }
 
-  bool _hasCurrentImage() {
-    final profile = widget.profile; // 🎯 Usar profile pasado directamente
-    return _selectedImageBytes != null || 
-           (profile?.image?.imageUrl != null && 
+  void _showError(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  bool _hasCurrentImageFromProfile(ProfileDetailDTO? profile) {
+    return _selectedImageBytes != null ||
+        (profile?.image?.imageUrl != null &&
             profile!.image!.imageUrl!.isNotEmpty &&
             widget.removeImageNotifier?.value != true);
   }
 
   @override
   Widget build(BuildContext context) {
-    // 🎯 Usar profile pasado directamente en lugar de authenticatedProfile
-    final currentImage = widget.profile?.image;
-    final shouldRemoveImage = widget.removeImageNotifier?.value ?? false;
-    
-    // Debug logs para verificar la imagen
-    debugPrint('🔍 ProfileImageWidget - profile: ${widget.profile != null ? "LOADED" : "NULL"}');
-    debugPrint('🔍 ProfileImageWidget - image: ${currentImage != null ? "FOUND" : "NULL"}');
-    debugPrint('🔍 ProfileImageWidget - imageUrl: ${currentImage?.imageUrl ?? "NO_URL"}');
-    debugPrint('🔍 ProfileImageWidget - shouldRemove: $shouldRemoveImage');
+    return FutureBuilder<ProfileDetailDTO>(
+      future: widget.profile != null
+          ? widget.profileController.getProfileById(widget.profile!.id)
+          : null,
+      builder: (context, snapshot) {
+        ProfileDetailDTO? currentProfile;
 
-    return GestureDetector(
-      onTap: _pickImage, // 🎯 Click simple: seleccionar imagen
-      onLongPress: _hasCurrentImage() ? _confirmDeleteImage : null, // 🎯 Click presionado: eliminar
-      child: ClipOval(
-        child: SizedBox(
-          width: widget.size,
-          height: widget.size,
-          child: _buildImageContent(currentImage, shouldRemoveImage),
-        ),
-      ),
+        if (snapshot.hasData) {
+          currentProfile = snapshot.data;
+        } else if (widget.profile != null) {
+          currentProfile = widget.profile;
+        }
+
+        final currentImage = currentProfile?.image;
+        final shouldRemoveImage = widget.removeImageNotifier?.value ?? false;
+
+        debugPrint('🔍 ProfileImageWidget - Building with state:');
+        debugPrint('  - Has profile: ${currentProfile != null}');
+        debugPrint('  - Has image: ${currentImage?.imageUrl?.isNotEmpty == true}');
+        debugPrint('  - Should remove: $shouldRemoveImage');
+        debugPrint('  - Is picking: $_isPickingImage');
+        debugPrint('  - Selected bytes: ${_selectedImageBytes?.length ?? 0}');
+
+        return GestureDetector(
+          onTap: _isPickingImage ? null : _pickImage,
+          onLongPress: _hasCurrentImageFromProfile(currentProfile) && !_isPickingImage
+              ? _confirmDeleteImage
+              : null,
+          child: ClipOval(
+            child: SizedBox(
+              width: widget.size,
+              height: widget.size,
+              child: _buildImageContent(currentImage, shouldRemoveImage),
+            ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildImageContent(ImageDTO? currentImage, bool shouldRemoveImage) {
-    // Si hay una imagen seleccionada localmente, mostrarla
+    // ✅ Mostrar loading si está seleccionando imagen
+    if (_isPickingImage) {
+      return Container(
+        color: Colors.grey[200],
+        child: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 8),
+              Text(
+                'Seleccionando...',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Si hay una imagen seleccionada localmente
     if (_selectedImageBytes != null) {
       return Stack(
         fit: StackFit.expand,
@@ -141,6 +232,12 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
           Image.memory(
             _selectedImageBytes!,
             fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              debugPrint('❌ Error displaying selected image: $error');
+              return const Center(
+                child: Icon(Icons.error, size: 40, color: Colors.red),
+              );
+            },
           ),
           Container(
             color: Colors.black26,
@@ -160,7 +257,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
       );
     }
 
-    // Si se marcó para eliminar, mostrar placeholder
+    // Si se marcó para eliminar
     if (shouldRemoveImage) {
       return const Center(
         child: Column(
@@ -177,7 +274,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
       );
     }
 
-    // Si hay imagen actual, mostrarla
+    // Si hay imagen actual
     final imageUrl = currentImage?.imageUrl;
     if (imageUrl != null && imageUrl.isNotEmpty) {
       return Image.network(
@@ -187,15 +284,32 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
           if (loadingProgress == null) return child;
           return const Center(child: CircularProgressIndicator());
         },
-        errorBuilder: (context, error, stackTrace) => const Center(
-          child: Icon(Icons.person, size: 60, color: Colors.grey),
-        ),
+        errorBuilder: (context, error, stackTrace) {
+          debugPrint('❌ Error loading profile image: $error');
+          return const Center(
+            child: Icon(Icons.person, size: 60, color: Colors.grey),
+          );
+        },
       );
     }
 
-    // Sin imagen - mostrar placeholder
-    return const Center(
-      child: Icon(Icons.person, size: 60, color: Colors.grey),
+    // Sin imagen - placeholder
+    return Container(
+      color: Colors.grey[100],
+      child: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add_photo_alternate, size: 40, color: Colors.grey),
+            SizedBox(height: 4),
+            Text(
+              'Tocar para\nagregar foto',
+              style: TextStyle(fontSize: 10, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

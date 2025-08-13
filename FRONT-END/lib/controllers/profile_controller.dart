@@ -1,16 +1,14 @@
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../core/services/app/profile_service.dart';
-import '../dto/image/image_dto.dart';
-import '../dto/profile/new_profile_dto.dart';
-import '../dto/profile/profile_detail_dto.dart';
-import '../dto/profile/update_profile_dto.dart';
+import '../dto/app/image/image_dto.dart';
+import '../dto/app/profile/new_profile_dto.dart';
+import '../dto/app/profile/profile_detail_dto.dart';
+import '../dto/app/profile/update_profile_dto.dart';
 
 class ProfileController {
   final ProfileService _profileService;
-  final _storage = const FlutterSecureStorage();
 
   final ValueNotifier<bool> isLoading = ValueNotifier(false);
   final ValueNotifier<List<ProfileDetailDTO>> profiles = ValueNotifier([]);
@@ -46,6 +44,17 @@ class ProfileController {
       rethrow;
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  /// ✅ Obtener perfil por ID
+  Future<ProfileDetailDTO> getProfileById(int id) async {
+    try {
+      final result = await _profileService.getProfileById(id);
+      return result;
+    } catch (e) {
+      debugPrint('🔴 Error loading profile by ID: $e');
+      rethrow;
     }
   }
 
@@ -91,12 +100,28 @@ class ProfileController {
     }
   }
 
-  /// Iniciar sesión con un perfil
+  /// Iniciar sesión con un perfil usando ID (método legacy)
   Future<void> profileLogin(int profileId, String password) async {
     if (isLoading.value) return;
     isLoading.value = true;
     try {
-      await _profileService.profileLogin(profileId, password);
+      // Este método mantendremos para compatibilidad, pero realmente necesitaríamos 
+      // implementar la lógica para obtener las credenciales por profileId
+      throw UnimplementedError('Use profileLoginDirect instead');
+    } catch (e) {
+      debugPrint('🔴 Error logging in with profile: $e');
+      rethrow;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Iniciar sesión con un perfil usando credenciales directas
+  Future<void> profileLoginDirect(String nameOrEmail, String password) async {
+    if (isLoading.value) return;
+    isLoading.value = true;
+    try {
+      final tokenResponse = await _profileService.profileLogin(nameOrEmail, password);
       // Actualizar el perfil autenticado después del login
       await loadAuthenticatedProfile();
     } catch (e) {

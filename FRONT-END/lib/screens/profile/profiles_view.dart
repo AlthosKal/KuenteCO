@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../core/services/app/profile_service.dart';
-import '../../dto/profile/profile_detail_dto.dart';
+import '../../dto/app/profile/profile_detail_dto.dart';
 import '../../widgets/profile/create_profile_widget.dart';
 import '../../widgets/profile/delete_profile_widget.dart';
 import '../../widgets/profile/edit_profile_widget.dart';
 import '../../controllers/profile_controller.dart';
+import '../../widgets/profile/profile_buttom_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -90,7 +91,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         future: _profilesFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // Mientras carga, mostrar el botón de agregar perfil
+            // Mientras carga
             return Column(
               children: [
                 const Expanded(
@@ -103,9 +104,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             );
           }
-          
+
           if (snapshot.hasError) {
-            // En caso de error, mostrar solo el botón sin mensaje de error
+            // Error o sin perfiles
             return Column(
               children: [
                 Expanded(
@@ -148,14 +149,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             );
           }
-          
-          // Obtener la lista de perfiles (manejo seguro de null)
+
           final profiles = snapshot.data ?? [];
-          
+
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              // Si no hay perfiles, mostrar un mensaje informativo
               if (profiles.isEmpty)
                 Container(
                   padding: const EdgeInsets.all(32),
@@ -187,8 +186,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                 ),
-              
-              // Mostrar perfiles existentes
+
+              // 🔹 Lista de perfiles usando ProfileButtonWidget
               ...profiles.map((profile) {
                 return Card(
                   shape: RoundedRectangleBorder(
@@ -197,8 +196,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   margin: const EdgeInsets.only(bottom: 16),
                   elevation: 4,
                   child: ListTile(
-                    leading: const CircleAvatar(
-                      child: Icon(Icons.person, size: 28),
+                    leading: ProfileButtonWidget(
+                      profileController: _profileController,
+                      profile: profile,
+                      radius: 24,
                     ),
                     title: Text(
                       profile.username,
@@ -228,13 +229,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                     onTap: () {
-                      print("Perfil seleccionado: ${profile.username}");
+                      debugPrint("Perfil seleccionado: ${profile.username}");
                     },
                   ),
                 );
               }).toList(),
 
-              // Botón para agregar perfil - SIEMPRE visible
               _buildAddProfileButton(),
             ],
           );
@@ -244,7 +244,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-/// Este widget genera el borde punteado tipo imagen
 class DottedBorderCard extends StatelessWidget {
   final Widget child;
   const DottedBorderCard({required this.child, super.key});
@@ -260,8 +259,6 @@ class DottedBorderCard extends StatelessWidget {
           width: 2,
         ),
         borderRadius: BorderRadius.circular(16),
-        // Aquí puedes reemplazar con un paquete como dotted_border
-        // si quieres líneas punteadas reales
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),

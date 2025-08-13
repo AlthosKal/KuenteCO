@@ -1,4 +1,5 @@
 import 'package:KuenteCO/screens/account_view.dart';
+import 'package:KuenteCO/screens/home/logged_home_profile_view.dart';
 import 'package:flutter/material.dart';
 import '../screens/auth/code_recovery_view.dart';
 import '../screens/auth/login_view.dart';
@@ -80,6 +81,26 @@ class RouteGenerator {
         return MaterialPageRoute(
           builder: (_) => FutureBuilder<Widget>(
             future: LoggedHomeBusinessView.create(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+              if (snapshot.hasError) {
+                return Scaffold(
+                  body: Center(child: Text('Error: ${snapshot.error}')),
+                );
+              }
+              return snapshot.data!;
+            },
+          ),
+        );
+
+      case AppRoutes.homeProfile:
+        return MaterialPageRoute(
+          builder: (_) => FutureBuilder<Widget>(
+            future: LoggedHomeProfileView.create(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Scaffold(

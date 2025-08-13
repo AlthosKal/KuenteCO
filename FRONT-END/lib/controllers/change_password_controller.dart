@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../core/exceptions/global_exception_handler.dart';
 import '../core/services/app/auth_service.dart';
-import '../dto/auth/request/change_password_dto.dart';
+import '../dto/app/auth/request/change_password_dto.dart';
 import '../provider/toast_helper.dart';
 import '../routes/app_routes.dart';
 

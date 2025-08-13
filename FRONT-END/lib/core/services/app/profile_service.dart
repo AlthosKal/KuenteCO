@@ -1,14 +1,18 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:http_parser/http_parser.dart';
-import '../../../dto/profile/new_profile_dto.dart';
-import '../../../dto/profile/profile_detail_dto.dart';
-import '../../../dto/profile/update_profile_dto.dart';
-import '../../../dto/image/image_dto.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../../dto/app/auth/response/token_response_dto.dart';
+import '../../../dto/app/image/image_dto.dart';
+import '../../../dto/app/profile/new_profile_dto.dart';
+import '../../../dto/app/profile/profile_detail_dto.dart';
+import '../../../dto/app/profile/update_profile_dto.dart';
+import '../../exceptions/api_response.dart';
 import '../api_client.dart';
 
 class ProfileService {
   final _api = ApiClient();
+  final _storage = const FlutterSecureStorage();
 
   bool get isReady => _api.isInitialized;
 
@@ -27,19 +31,80 @@ class ProfileService {
     return ProfileDetailDTO.fromJson(actualData);
   }
 
+  /// ✅ Obtener perfil por ID
+  Future<ProfileDetailDTO> getProfileById(int id) async {
+    // ✅ Verificar si estamos ejecutando como perfil
+    final role = await _storage.read(key: 'role');
+    
+    if (role == 'ROLE_PROFILE') {
+      // Si estamos como perfil, intentar obtener el perfil autenticado primero
+      // para ver si coincide con el ID solicitado
+      try {
+        final authenticatedProfile = await getAuthenticatedProfile();
+        if (authenticatedProfile.id == id) {
+          // Si el ID coincide con el perfil autenticado, devolver ese
+          return authenticatedProfile;
+        }
+      } catch (e) {
+        // Si falla obtener el perfil autenticado, continuar con el método original
+        debugPrint('🔴 Error getting authenticated profile, falling back to getProfileById: $e');
+      }
+      
+      // Si el ID no coincide o hubo error, intentar el endpoint original
+      // (esto podría fallar si el perfil no tiene permisos)
+    }
+    
+    // Método original para usuarios o cuando no coincide el ID
+    final response = await _api.getApp('/profile/$id');
+    final Map<String, dynamic> json = response.data;
+    final actualData = json['data'] ?? json;
+    return ProfileDetailDTO.fromJson(actualData);
+  }
+
 
   /// ✅ Crear perfil
   Future<void> createProfile(NewProfileDTO dto) async {
     await _api.postApp('/profile/add', dto.toJson());
   }
 
-  /// Iniciar sesión con un perfil
-  Future<void> profileLogin(int profileId, String password) async {
+  /// Iniciar sesión con un perfil usando credenciales directas
+  Future<TokenResponseDTO> profileLogin(String nameOrEmail, String password) async {
     final payload = {
-      'profileId': profileId,
+      'nameOrEmail': nameOrEmail,
       'password': password,
     };
-    await _api.postApp('/profile/login', payload);
+    final response = await _api.postApp('/profile/login', payload);
+    final json = response.data;
+
+    final apiResponse = ApiResponse<TokenResponseDTO>.fromJson(
+      json,
+      (data) {
+        if (data is String) {
+          try {
+            final decoded = jsonDecode(data);
+            if (decoded is Map<String, dynamic>) {
+              return TokenResponseDTO.fromJson(decoded);
+            } else {
+              throw Exception('Cadena no contenía un Map<String, dynamic>: $data');
+            }
+          } catch (_) {
+            throw Exception('No se pudo decodificar JSON del string: $data');
+          }
+        }
+
+        if (data is! Map<String, dynamic>) {
+          throw Exception('Tipo inesperado de data: ${data.runtimeType}');
+        }
+
+        return TokenResponseDTO.fromJson(data);
+      },
+    );
+
+    // ✅ Guardamos token y rol para perfil
+    await _storage.write(key: 'Authorization', value: apiResponse.data.token);
+    await _storage.write(key: 'role', value: 'ROLE_PROFILE'); // Indicamos que es perfil
+
+    return apiResponse.data;
   }
 
   /// ✅ Actualizar perfil
@@ -76,6 +141,13 @@ class ProfileService {
   /// ✅ Eliminar perfil
   Future<void> deleteProfile(int id) async {
     await _api.deleteApp('/profile/delete/$id');
+  }
+
+  /// 🚪 LOGOUT PERFIL
+  Future<void> logout() async {
+    await _api.postApp('/profile/logout', {});
+    await _storage.delete(key: 'Authorization');
+    await _storage.delete(key: 'role');
   }
 
   /// Subir imagen de perfil

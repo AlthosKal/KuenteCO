@@ -1,4 +1,4 @@
-import '../../utils/enum/transaction_type_enum.dart';
+import '../../../utils/enum/transaction_type_enum.dart';
 
 class DescriptionTransaction {
   final String description;

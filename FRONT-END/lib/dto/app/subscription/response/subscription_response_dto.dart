@@ -1,19 +1,6 @@
-enum SubscriptionType {
-  BASIC,
-  PREMIUM,
-}
-
-enum State {
-  ACTIVE,
-  INACTIVE,
-  CANCELLED,
-}
-
-enum PreapprovalStatus {
-  AUTHORIZED,
-  PENDING,
-  CANCELLED,
-}
+import '../../../../utils/enum/preapproval_status_enum.dart';
+import '../../../../utils/enum/state_enum.dart';
+import '../../../../utils/enum/subscription_type_enum.dart';
 
 class SubscriptionResponseDTO {
   final int subscriptionId;
@@ -26,9 +13,9 @@ class SubscriptionResponseDTO {
   final DateTime expirationDate;
   final DateTime nextPaymentDate;
   final bool isAutoRenewable;
-  final String paymentMethodId;
-  final String cardLastFourDigits;
-  final String cardBrand;
+  final String? paymentMethodId;
+  final String? cardLastFourDigits;
+  final String? cardBrand;
 
   SubscriptionResponseDTO({
     required this.subscriptionId,
@@ -41,9 +28,9 @@ class SubscriptionResponseDTO {
     required this.expirationDate,
     required this.nextPaymentDate,
     required this.isAutoRenewable,
-    required this.paymentMethodId,
-    required this.cardLastFourDigits,
-    required this.cardBrand,
+    this.paymentMethodId,
+    this.cardLastFourDigits,
+    this.cardBrand,
   });
 
   factory SubscriptionResponseDTO.fromJson(Map<String, dynamic> json) {
@@ -66,10 +53,10 @@ class SubscriptionResponseDTO {
       startDate: DateTime.parse(json['startDate']),
       expirationDate: DateTime.parse(json['expirationDate']),
       nextPaymentDate: DateTime.parse(json['nextPaymentDate']),
-      isAutoRenewable: json['isAutoRenewable'],
-      paymentMethodId: json['paymentMethodId'],
-      cardLastFourDigits: json['cardLastFourDigits'],
-      cardBrand: json['cardBrand'],
+      isAutoRenewable: json['isAutoRenewable'] ?? false,
+      paymentMethodId: json['paymentMethodId'] as String?,
+      cardLastFourDigits: json['cardLastFourDigits'] as String?,
+      cardBrand: json['cardBrand'] as String?,
     );
   }
 

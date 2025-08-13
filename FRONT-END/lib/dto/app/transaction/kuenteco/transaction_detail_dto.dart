@@ -1,4 +1,4 @@
-import '../../../utils/enum/transaction_type_enum.dart';
+import '../../../../utils/enum/transaction_type_enum.dart';
 import '../../extra/description_transaction_extra.dart';
 
 class TransactionDetailDTO {

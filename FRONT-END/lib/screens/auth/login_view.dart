@@ -1,10 +1,11 @@
-import 'package:KuenteCO/widgets/common/navbar/custom_form_widget.dart';
+import 'package:KuenteCO/controllers/profile_login_controller.dart';
+import 'package:KuenteCO/utils/enum/login_type_enum.dart';
+import 'package:KuenteCO/widgets/common/form/custom_form_widget.dart';
 import 'package:flutter/material.dart';
 import '../../controllers/login_controller.dart';
 import '../../routes/app_routes.dart';
 import '../../widgets/common/background/animated_background_scaffold_widget.dart';
 import '../../widgets/common/blurred_card_widget.dart';
-import '../../widgets/common/form/email_form_widget.dart';
 import '../../widgets/common/form/form_title_text_widget.dart';
 import '../../widgets/common/form/password_form_widget.dart';
 import '../../widgets/common/primary_buttom_widget.dart';
@@ -28,10 +29,15 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   final _loginController = LoginController();
+  final _profileLoginController = ProfileLoginController();
   final _nameOrEmailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _nameOrEmailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
+  
+  /// ✅ Estado del tipo de login usando enum
+  final ValueNotifier<LoginType> _selectedLoginType =
+      ValueNotifier<LoginType>(LoginType.USER);
 
   @override
   void dispose() {
@@ -40,17 +46,28 @@ class _LoginFormState extends State<LoginForm> {
     _nameOrEmailFocusNode.dispose();
     _passwordFocusNode.dispose();
     _loginController.dispose();
+    _profileLoginController.dispose();
+    _selectedLoginType.dispose();
     super.dispose();
   }
 
   void _submitLogin() {
     if (!_formKey.currentState!.validate()) return;
 
-    _loginController.login(
-      context: context,
-      nameOrEmail: _nameOrEmailController.text,
-      password: _passwordController.text,
-    );
+    // Decidir qué tipo de login usar basado en la selección
+    if (_selectedLoginType.value == LoginType.USER) {
+      _loginController.login(
+        context: context,
+        nameOrEmail: _nameOrEmailController.text,
+        password: _passwordController.text,
+      );
+    } else {
+      _profileLoginController.profileLogin(
+        context: context,
+        nameOrEmail: _nameOrEmailController.text,
+        password: _passwordController.text,
+      );
+    }
   }
 
   @override
@@ -89,6 +106,42 @@ class _LoginFormState extends State<LoginForm> {
             ),
             const SizedBox(height: 10),
 
+            /// 🔥 Selector de tipo de login
+            const Text(
+              'Iniciar sesión como',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            ValueListenableBuilder<LoginType>(
+              valueListenable: _selectedLoginType,
+              builder: (context, selected, _) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildLoginTypeButton(
+                      label: 'Usuario',
+                      icon: Icons.person,
+                      isSelected: selected == LoginType.USER,
+                      onTap: () => _selectedLoginType.value = LoginType.USER,
+                    ),
+                    const SizedBox(width: 10),
+                    _buildLoginTypeButton(
+                      label: 'Perfil',
+                      icon: Icons.account_circle,
+                      isSelected: selected == LoginType.PROFILE,
+                      onTap: () => _selectedLoginType.value = LoginType.PROFILE,
+                    ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 10),
+
             /// ✅ Checkbox de recordar contraseña
             ValueListenableBuilder<bool>(
               valueListenable: _loginController.rememberPassword,
@@ -116,12 +169,22 @@ class _LoginFormState extends State<LoginForm> {
             const SizedBox(height: 20),
 
             /// ✅ Botón de login
-            ValueListenableBuilder<bool>(
-              valueListenable: _loginController.isLoading,
-              builder: (context, isLoading, _) {
-                return isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : PrimaryButton(label: 'Ingresar', onPressed: _submitLogin);
+            ValueListenableBuilder<LoginType>(
+              valueListenable: _selectedLoginType,
+              builder: (context, loginType, _) {
+                return ValueListenableBuilder<bool>(
+                  valueListenable: loginType == LoginType.USER
+                      ? _loginController.isLoading
+                      : _profileLoginController.isLoading,
+                  builder: (context, isLoading, _) {
+                    return isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : PrimaryButton(
+                            label: loginType == LoginType.USER ? 'Ingresar' : 'Ingresar como Perfil',
+                            onPressed: _submitLogin,
+                          );
+                  },
+                );
               },
             ),
             const SizedBox(height: 12),
@@ -161,6 +224,42 @@ class _LoginFormState extends State<LoginForm> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// 🎨 Botón custom para Usuario / Perfil
+  Widget _buildLoginTypeButton({
+    required String label,
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.white),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: isSelected ? Colors.purple : Colors.white),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? Colors.purple : Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
