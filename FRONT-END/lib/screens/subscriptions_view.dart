@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../controllers/subscription_controller.dart';
+import 'dart:html' as html;
 import '../dto/app/subscription/request/create_subscription_request_dto.dart';
+import '../controllers/subscription_controller.dart';
 import '../widgets/common/primary_buttom_widget.dart';
 import '../utils/enum/subscription_type_enum.dart';
 
@@ -27,7 +29,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
 
   Future<void> _subscribe(SubscriptionType type) async {
     print('🎯 Intentando suscribirse al plan: ${type.name}');
-    
+
     // No permitir suscripción al Plan Básico (es gratuito y por defecto)
     if (type == SubscriptionType.BASIC) {
       print('🚫 Bloqueando suscripción al Plan Básico');
@@ -39,20 +41,56 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
       );
       return;
     }
-    
+
     final controller = Provider.of<SubscriptionController>(context, listen: false);
-    
+
     final response = await controller.createSubscription(
       CreateSubscriptionRequestDTO(subscriptionType: type, backUrl: ''),
     );
 
     if (controller.errorMessage == null && response != null && response.initPoint.isNotEmpty) {
-      // Usar initPoint que es la URL de pago de MercadoPago
-      final uri = Uri.parse(response.initPoint);
-      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      print('🔗 Abriendo URL de MercadoPago: ${response.initPoint}');
+
+      try {
+        if (kIsWeb) {
+          // ✅ MÉTODO DIRECTO CON DART:HTML - BYPASA CSP Y POLÍTICAS DE NAVEGADOR
+          html.window.open(response.initPoint, '_blank');
+          print('✅ Redirección exitosa con dart:html window.open()');
+
+          // Mostrar mensaje de confirmación
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('✅ Redirigiendo a MercadoPago para completar el pago...'),
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 3),
+              ),
+            );
+          }
+        } else {
+          // Fallback para móvil (mantener url_launcher)
+          final uri = Uri.parse(response.initPoint);
+          if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+            throw Exception('No se pudo abrir con url_launcher');
+          }
+        }
+      } catch (e) {
+        print('❌ Error en redirección: $e');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No se pudo abrir el enlace de pago')),
+            SnackBar(
+              content: Text('Error al abrir el enlace de pago: $e'),
+              backgroundColor: Colors.red,
+              action: SnackBarAction(
+                label: 'Copiar URL',
+                onPressed: () {
+                  // Como fallback, copiar URL al clipboard
+                  if (kIsWeb) {
+                    html.window.navigator.clipboard?.writeText(response.initPoint);
+                  }
+                },
+              ),
+            ),
           );
         }
       }
@@ -61,6 +99,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(controller.errorMessage ?? 'Error al crear la suscripción'),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -115,10 +154,10 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
               children: [
                 // Mostrar suscripción actual si existe
                 if (controller.mySubscriptions.isNotEmpty) ...
-                  _buildCurrentSubscriptionSection(controller),
-                
+                _buildCurrentSubscriptionSection(controller),
+
                 const SizedBox(height: 24),
-                
+
                 // Título de planes disponibles
                 Text(
                   'Planes Disponibles',
@@ -127,31 +166,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                
-                // Banner informativo sobre precios estéticos
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
-                    border: Border.all(color: Colors.blue.shade300),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.info_outline, color: Colors.blue.shade700),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Los precios mostrados son referenciales. MercadoPago maneja los precios y pagos reales.',
-                          style: TextStyle(color: Colors.blue.shade800),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
+
                 // Lista de planes
                 if (controller.subscriptionPrices.isEmpty)
                   _buildFallbackPlans(controller)
@@ -179,7 +194,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
   List<Widget> _buildCurrentSubscriptionSection(SubscriptionController controller) {
     // Mostrar cualquier suscripción (ACTIVE, PENDING, etc.)
     final activeSub = controller.mySubscriptions.firstOrNull;
-    
+
     if (activeSub == null) return [];
 
     return [
@@ -222,7 +237,6 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
   }
 
   Widget _buildFallbackPlans(SubscriptionController controller) {
-    // Planes estéticos - los precios reales los maneja MercadoPago
     final fallbackPlans = [
       {
         'type': SubscriptionType.BASIC,
@@ -257,8 +271,8 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
           subscriptionType: plan['type'] as SubscriptionType,
           loading: controller.isLoading,
           onSubscribe: () => _subscribe(plan['type'] as SubscriptionType),
-          isActive: _isCurrentlySubscribed(controller, plan['type'] as SubscriptionType) || 
-                   (plan['isDefault'] == true), // Plan Básico siempre activo
+          isActive: _isCurrentlySubscribed(controller, plan['type'] as SubscriptionType) ||
+              (plan['isDefault'] == true), // Plan Básico siempre activo
           isDefault: plan['isDefault'] == true,
         ),
       )).toList(),
@@ -278,7 +292,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
 
   bool _isCurrentlySubscribed(SubscriptionController controller, SubscriptionType type) {
     return controller.mySubscriptions.any(
-      (sub) => sub.subscriptionType == type && sub.subscriptionState.name == 'ACTIVE',
+          (sub) => sub.subscriptionType == type && sub.subscriptionState.name == 'ACTIVE',
     );
   }
 
@@ -314,9 +328,9 @@ class _PlanCard extends StatelessWidget {
       elevation: isActive ? 8 : 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: isActive 
-          ? BorderSide(color: Colors.green.shade400, width: 2)
-          : BorderSide.none,
+        side: isActive
+            ? BorderSide(color: Colors.green.shade400, width: 2)
+            : BorderSide.none,
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
