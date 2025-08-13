@@ -1,5 +1,3 @@
-import 'package:KuenteCO/screens/account_view.dart';
-
 class AppRoutes {
   static const homeGuest = '/';
   static const login = '/login';
@@ -12,7 +10,7 @@ class AppRoutes {
   static const chat = '/chat';
   static const chatHistory = '/chat-history';
   static const userDetail = '/user-detail';
-  // static const profile = '/profile';
+  static const homeProfile = '/homeProfile';
   static const suscriptions = '/suscriptions';
   static const contact = '/contact';
   static const contactLogged = '/contactLogged';

@@ -1,23 +1,19 @@
-enum SubscriptionType {
-  FREE,
-  BASIC,
-  PREMIUM,
-}
+import '../../../utils/enum/subscription_type_enum.dart';
 
 class CreateSubscriptionRequestDTO {
   final SubscriptionType subscriptionType;
-  final String? backUrl;
+  String backUrl = "https://github.com/AlthosKal/KuenteCO";
 
   CreateSubscriptionRequestDTO({
     required this.subscriptionType,
-    this.backUrl,
+    required this.backUrl,
   });
 
   factory CreateSubscriptionRequestDTO.fromJson(Map<String, dynamic> json) {
     return CreateSubscriptionRequestDTO(
       subscriptionType: SubscriptionType.values.firstWhere(
             (e) => e.name == json['subscriptionType'],
-        orElse: () => SubscriptionType.FREE,
+        orElse: () => SubscriptionType.BASIC,
       ),
       backUrl: json['backUrl'],
     );
@@ -26,7 +22,7 @@ class CreateSubscriptionRequestDTO {
   Map<String, dynamic> toJson() {
     return {
       'subscriptionType': subscriptionType.name,
-      if (backUrl != null) 'backUrl': backUrl,
+      'backUrl': backUrl,
     };
   }
 }

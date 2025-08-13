@@ -17,8 +17,8 @@ COPY build/web /usr/share/nginx/html
 # Ajustar permisos para el usuario nginx
 RUN chown -R nginx:nginx /usr/share/nginx/html
 
-# Exponer solo puerto 80 (ALB maneja HTTPS)
-EXPOSE 80
+# Exponer puertos 80 y 443 para HTTP y HTTPS
+EXPOSE 80 443
 
 # Health check para ECS
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
