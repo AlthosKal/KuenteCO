@@ -1,13 +1,17 @@
 import 'package:KuenteCO/widgets/user/user_buttom_business_widget.dart';
 import 'package:KuenteCO/widgets/user/user_buttom_personal_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../core/services/app/auth_service.dart';
-import '../../../dto/auth/response/user_detail_dto.dart';
+import '../../../core/services/app/profile_service.dart';
+import '../../../dto/app/auth/response/user_detail_dto.dart';
+import '../../../dto/app/profile/profile_detail_dto.dart';
 import '../../../routes/app_routes.dart';
 import '../../../screens/home/logged_home_business_view.dart';
 import '../../../screens/home/logged_home_personal_view.dart';
+import '../../../screens/home/logged_home_profile_view.dart';
+import '../../profile/profile_buttom_widget.dart';
 
-/// ✅ Navbar principal para usuarios logueados
 class KuentecoLoggedNavbar extends StatefulWidget {
   final String currentRoute;
   final double? logoWidth;
@@ -33,31 +37,69 @@ class KuentecoLoggedNavbar extends StatefulWidget {
 }
 
 class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
-  final AuthService _userService = AuthService();
-  UserDetailDTO? _selectedProfile;
+  final AuthService _authService = AuthService();
+  final ProfileService _profileService = ProfileService();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  
+  UserDetailDTO? _authenticatedUser;
+  ProfileDetailDTO? _authenticatedProfile;
+  String? _currentRole;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadUserProfile();
+    _loadAuthenticatedData();
   }
 
-  /// ✅ Carga el usuario autenticado para mostrar en el botón de perfil
-  Future<void> _loadUserProfile() async {
+  /// ✅ Detecta automáticamente el tipo de autenticación y carga los datos correspondientes
+  Future<void> _loadAuthenticatedData() async {
     try {
-      final user = await _userService.getAuthenticatedUser();
-      if (mounted) {
-        setState(() {
-          _selectedProfile = user;
-        });
+      // Obtener el rol guardado en storage
+      _currentRole = await _storage.read(key: 'role');
+      
+      if (_currentRole == 'ROLE_PROFILE') {
+        // Es un perfil autenticado
+        final profile = await _profileService.getAuthenticatedProfile();
+        if (mounted) {
+          setState(() {
+            _authenticatedProfile = profile;
+            _authenticatedUser = null;
+            _isLoading = false;
+          });
+        }
+      } else {
+        // Es un usuario autenticado (ROLE_USER u otros)
+        final user = await _authService.getAuthenticatedUser();
+        if (mounted) {
+          setState(() {
+            _authenticatedUser = user;
+            _authenticatedProfile = null;
+            _isLoading = false;
+          });
+        }
       }
     } catch (e) {
-      print('Error cargando perfil de usuario: $e');
+      print('Error cargando datos de autenticación: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+        child: Center(
+          child: CircularProgressIndicator(color: Colors.white),
+        ),
+      );
+    }
+
     final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
 
     return Padding(
@@ -95,7 +137,8 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     ],
   );
 
-  /// ✅ Logo con navegación dinámica según tipo de usuario
+  /// ✅ Logo con navegación dinámica según tipo de autenticación
+  
   Widget _buildLogo(BuildContext context, bool isSmallScreen) {
     final double defaultWidth = isSmallScreen ? 220.0 : 250.0;
     final double defaultHeight = isSmallScreen ? 55.0 : 62.5;
@@ -104,39 +147,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     widget.useDefaultLogoSize ? defaultHeight : (widget.logoHeight ?? defaultHeight);
 
     return GestureDetector(
-      onTap: () async {
-        try {
-          final user = await _userService.getAuthenticatedUser();
-
-          if (!mounted) return;
-          if (user.userType.toLowerCase() == 'personal') {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => LoggedHomePersonalView(
-                  userName: user.username,
-                  profileImageUrl: user.image?.imageUrl ?? '',
-                ),
-              ),
-            );
-          } else {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => LoggedHomeBusinessView(
-                  userName: user.username,
-                  profileImageUrl: user.image?.imageUrl ?? '',
-                ),
-              ),
-            );
-          }
-        } catch (e) {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error al cargar usuario: ${e.toString()}')),
-          );
-        }
-      },
+      onTap: () => _navigateToHome(context),
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         child: Image.asset(
@@ -159,107 +170,78 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     );
   }
 
-  /// ✅ Botón de perfil (usa widget personalizado según tipo de usuario)
+  /// ✅ Botón de perfil que detecta automáticamente el tipo de autenticación
   Widget _buildProfileButton(BuildContext context) {
-    if (_selectedProfile?.userType.toLowerCase() == 'personal') {
-      return ProfileButtonPersonal(
-        profileImageUrl: _selectedProfile?.image?.imageUrl ?? '',
+    if (_currentRole == 'ROLE_PROFILE' && _authenticatedProfile != null) {
+      // Es un perfil autenticado - usar ProfileButtonWidget
+      return ProfileButtonWidget(
+        profileImageUrl: _authenticatedProfile!.image?.imageUrl ?? '',
+        profile: _authenticatedProfile,
       );
-    } else {
-      return ProfileButtonBusiness(
-        profileImageUrl: _selectedProfile?.image?.imageUrl ?? '',
-      );
+    } else if (_authenticatedUser != null) {
+      // Es un usuario autenticado - usar widget según su tipo
+      if (_authenticatedUser!.userType.toLowerCase() == 'personal') {
+        return UserButtomPersonalWidget(
+          profileImageUrl: _authenticatedUser!.image?.imageUrl ?? '',
+        );
+      } else {
+        return ProfileButtonBusiness(
+          profileImageUrl: _authenticatedUser!.image?.imageUrl ?? '',
+        );
+      }
     }
+    
+    // Fallback si no hay autenticación
+    return const SizedBox.shrink();
   }
 
-  /// ✅ Maneja las opciones del menú de perfil
-  Future<void> _handleMenuSelection(BuildContext context, String value) async {
-    switch (value) {
-      case 'logout':
-        try {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => const Center(child: CircularProgressIndicator()),
+
+  /// ✅ Navegación dinámica al home según el tipo de autenticación
+  Future<void> _navigateToHome(BuildContext context) async {
+    if (!mounted) return;
+
+    try {
+      if (_currentRole == 'ROLE_PROFILE' && _authenticatedProfile != null) {
+        // Navegar al home del perfil
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => LoggedHomeProfileView(
+              profileName: _authenticatedProfile!.username,
+              profileImageUrl: _authenticatedProfile!.image?.imageUrl ?? '',
+            ),
+          ),
+        );
+      } else if (_authenticatedUser != null) {
+        // Navegar según el tipo de usuario
+        if (_authenticatedUser!.userType.toLowerCase() == 'personal') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => LoggedHomePersonalView(
+                userName: _authenticatedUser!.username,
+                profileImageUrl: _authenticatedUser!.image?.imageUrl ?? '',
+              ),
+            ),
           );
-
-          await _userService.logout();
-
-          if (context.mounted) Navigator.of(context).pop();
-          widget.onLogout();
-
-          if (context.mounted) {
-            Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-          }
-        } catch (e) {
-          if (context.mounted) Navigator.of(context).pop();
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error al cerrar sesión: ${e.toString()}'),
-                duration: const Duration(seconds: 3),
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => LoggedHomeBusinessView(
+                userName: _authenticatedUser!.username,
+                profileImageUrl: _authenticatedUser!.image?.imageUrl ?? '',
               ),
-            );
-          }
+            ),
+          );
         }
-        break;
-
-      case 'contact':
-        _navigateToRoute(context, AppRoutes.contactLogged);
-        break;
-      case 'account':
-        _navigateToRoute(context, '/account');
-        break;
-      case 'add_profile':
-        _navigateToRoute(context, '/add-profile');
-        break;
-      case 'subscription':
-        _navigateToRoute(context, '/subscription');
-        break;
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al navegar: $e')),
+      );
     }
-  }
-
-  /// ✅ Botón genérico de navegación
-  Widget _buildButton(BuildContext context, String text, String route,
-      {Color textColor = Colors.white, bool isLarge = false}) {
-    final bool isActive = widget.currentRoute == route;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => _navigateToRoute(context, route),
-        borderRadius: BorderRadius.circular(8),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: isLarge ? 20 : 16,
-            vertical: isLarge ? 10 : 8,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                text,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: isLarge ? 17 : 16,
-                  fontWeight: isActive ? FontWeight.w900 : FontWeight.bold,
-                ),
-              ),
-              if (isActive)
-                Container(
-                  margin: const EdgeInsets.only(top: 2),
-                  height: 3,
-                  width: 20,
-                  decoration: BoxDecoration(
-                    color: textColor.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   /// ✅ Navegación manteniendo historial (excepto logout)

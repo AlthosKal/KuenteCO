@@ -1,4 +1,4 @@
-import '../../../utils/enum/payment_status_enum.dart';
+import '../../../../utils/enum/payment_status_enum.dart';
 
 class PaymentHistoryResponseDTO {
   final String paymentId;

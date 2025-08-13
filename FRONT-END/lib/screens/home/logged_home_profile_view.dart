@@ -1,12 +1,10 @@
+import 'package:KuenteCO/widgets/common/navbar/navbar_logged_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../controllers/profile_controller.dart';
-import '../../dto/profile/profile_detail_dto.dart';
+import '../../dto/app/profile/profile_detail_dto.dart';
 import '../../widgets/common/background/background_widget.dart';
 import '../../widgets/common/blurred_card_widget.dart';
 import '../../widgets/common/footer/footer_logged_widget.dart';
-import '../../widgets/common/navbar/navbar_profile_widget.dart';
-import '../../widgets/profile/profile_image_widget.dart';
 import '../../core/services/app/profile_service.dart';
 
 class LoggedHomeProfileView extends StatefulWidget {
@@ -57,7 +55,7 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
           child: Column(
             children: [
               /// NAVBAR
-              KuentecoProfileNavbar(
+              KuentecoLoggedNavbar(
                 currentRoute: '/homeProfile',
                 onLogout: () {
                   debugPrint('Cerrando sesión...');
@@ -74,46 +72,35 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
                       if (profile == null) {
                         return const Center(child: CircularProgressIndicator());
                       }
-
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          /// HEADER CON IMAGEN Y NOMBRE
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                          /// HEADER CON NOMBRE
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              ProfileImageWidget(
-                                profileController: _profileController,
-                                profile: profile,
-                                size: 70,
+                              Text(
+                                "¡Hola, ${profile.username}!",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
                               ),
-                              const SizedBox(width: 16),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "¡Hola, ${profile.username}!",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall
-                                        ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    "Bienvenido de nuevo a Kuenteco",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(color: Colors.black54),
-                                  ),
-                                ],
+                              const SizedBox(height: 4),
+                              Text(
+                                "Bienvenido de nuevo a Kuenteco",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(color: Colors.black54),
                               ),
                             ],
                           ),
                           const SizedBox(height: 12),
+
 
                           /// GRID DE 4 CARDS
                           Expanded(

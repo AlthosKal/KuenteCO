@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../navbar/custom_form_widget.dart';
+import 'custom_form_widget.dart';
 
 class EmailFormField extends StatelessWidget {
   final TextEditingController controller;

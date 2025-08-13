@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../core/exceptions/global_exception_handler.dart';
 import '../core/services/app/profile_service.dart';
-import '../dto/auth/request/login_user_dto.dart';
+import '../dto/app/auth/request/login_user_dto.dart';
 import '../provider/toast_helper.dart';
 import '../routes/app_routes.dart';
 
@@ -14,7 +14,7 @@ class ProfileLoginController {
   ProfileLoginController({ProfileService? profileService})
       : _profileService = profileService ?? ProfileService();
 
-  /// 🔥 Método de login directo con perfil
+  /// Login directo con perfil
   Future<void> profileLogin({
     required BuildContext context,
     required String nameOrEmail,

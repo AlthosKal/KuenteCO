@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../../../dto/auth/response/token_response_dto.dart';
-import '../../../dto/profile/new_profile_dto.dart';
-import '../../../dto/profile/profile_detail_dto.dart';
-import '../../../dto/profile/update_profile_dto.dart';
-import '../../../dto/image/image_dto.dart';
+import '../../../dto/app/auth/response/token_response_dto.dart';
+import '../../../dto/app/image/image_dto.dart';
+import '../../../dto/app/profile/new_profile_dto.dart';
+import '../../../dto/app/profile/profile_detail_dto.dart';
+import '../../../dto/app/profile/update_profile_dto.dart';
 import '../../exceptions/api_response.dart';
 import '../api_client.dart';
 
