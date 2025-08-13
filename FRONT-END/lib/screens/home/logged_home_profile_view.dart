@@ -1,10 +1,10 @@
+import 'package:KuenteCO/widgets/common/navbar/navbar_logged_widget.dart';
 import 'package:flutter/material.dart';
 import '../../controllers/profile_controller.dart';
 import '../../dto/app/profile/profile_detail_dto.dart';
 import '../../widgets/common/background/background_widget.dart';
 import '../../widgets/common/blurred_card_widget.dart';
 import '../../widgets/common/footer/footer_logged_widget.dart';
-import '../../widgets/common/navbar/navbar_profile_widget.dart';
 import '../../core/services/app/profile_service.dart';
 
 class LoggedHomeProfileView extends StatefulWidget {
@@ -55,7 +55,7 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
           child: Column(
             children: [
               /// NAVBAR
-              KuentecoProfileNavbar(
+              KuentecoLoggedNavbar(
                 currentRoute: '/homeProfile',
                 onLogout: () {
                   debugPrint('Cerrando sesión...');
