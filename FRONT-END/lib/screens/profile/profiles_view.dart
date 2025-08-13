@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/services/app/profile_service.dart';
-import '../../dto/profile/profile_detail_dto.dart';
+import '../../dto/app/profile/profile_detail_dto.dart';
 import '../../widgets/profile/create_profile_widget.dart';
 import '../../widgets/profile/delete_profile_widget.dart';
 import '../../widgets/profile/edit_profile_widget.dart';

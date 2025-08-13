@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../core/services/app/profile_service.dart';
-import '../../../dto/profile/profile_detail_dto.dart';
-import '../../../routes/app_routes.dart';
+import '../../../dto/app/profile/profile_detail_dto.dart';
 import '../../../screens/home/logged_home_profile_view.dart';
+import '../../profile/profile_buttom_widget.dart';
 
 /// ✅ Navbar principal para perfiles logueados
 class KuentecoProfileNavbar extends StatefulWidget {
@@ -39,7 +39,7 @@ class _KuentecoProfileLoggedNavbarState extends State<KuentecoProfileNavbar> {
     _loadProfileData();
   }
 
-  /// ✅ Carga el perfil autenticado para mostrar en el botón de perfil
+  /// ✅ Carga el perfil autenticado
   Future<void> _loadProfileData() async {
     try {
       final profile = await _profileService.getAuthenticatedProfile();
@@ -70,12 +70,10 @@ class _KuentecoProfileLoggedNavbarState extends State<KuentecoProfileNavbar> {
       const SizedBox(height: 10),
       SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-        ),
+        child: Row(mainAxisAlignment: MainAxisAlignment.center),
       ),
       const SizedBox(height: 10),
-      _buildProfileButton(context),
+      _buildProfileButton(), // ✅ Reemplazado por el nuevo widget
     ],
   );
 
@@ -84,11 +82,9 @@ class _KuentecoProfileLoggedNavbarState extends State<KuentecoProfileNavbar> {
     children: [
       _buildLogo(context, false),
       Expanded(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-        ),
+        child: Row(mainAxisAlignment: MainAxisAlignment.center),
       ),
-      _buildProfileButton(context),
+      _buildProfileButton(),
     ],
   );
 
@@ -118,7 +114,7 @@ class _KuentecoProfileLoggedNavbarState extends State<KuentecoProfileNavbar> {
         } catch (e) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error al cargar perfil: ${e.toString()}')),
+            SnackBar(content: Text('Error al cargar perfil: $e')),
           );
         }
       },
@@ -144,163 +140,10 @@ class _KuentecoProfileLoggedNavbarState extends State<KuentecoProfileNavbar> {
     );
   }
 
-  /// ✅ Botón de perfil para perfiles
-  Widget _buildProfileButton(BuildContext context) {
-    return PopupMenuButton<String>(
-      onSelected: (value) => _handleMenuSelection(context, value),
-      itemBuilder: (context) => [
-        const PopupMenuItem(
-          value: 'profile',
-          child: Row(
-            children: [
-              Icon(Icons.person, size: 20),
-              SizedBox(width: 8),
-              Text('Mi Perfil'),
-            ],
-          ),
-        ),
-        const PopupMenuItem(
-          value: 'settings',
-          child: Row(
-            children: [
-              Icon(Icons.settings, size: 20),
-              SizedBox(width: 8),
-              Text('Configuración'),
-            ],
-          ),
-        ),
-        const PopupMenuItem(
-          value: 'contact',
-          child: Row(
-            children: [
-              Icon(Icons.contact_mail, size: 20),
-              SizedBox(width: 8),
-              Text('Contacto'),
-            ],
-          ),
-        ),
-        const PopupMenuDivider(),
-        const PopupMenuItem(
-          value: 'logout',
-          child: Row(
-            children: [
-              Icon(Icons.logout, size: 20, color: Colors.red),
-              SizedBox(width: 8),
-              Text('Cerrar sesión', style: TextStyle(color: Colors.red)),
-            ],
-          ),
-        ),
-      ],
-      child: Container(
-        padding: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 2),
-        ),
-        child: CircleAvatar(
-          radius: 20,
-          backgroundImage: _selectedProfile?.image?.imageUrl != null
-              ? NetworkImage(_selectedProfile!.image!.imageUrl!)
-              : null,
-          child: _selectedProfile?.image?.imageUrl == null
-              ? const Icon(Icons.person, color: Colors.white)
-              : null,
-        ),
-      ),
+  Widget _buildProfileButton() {
+    return ProfileButtonWidget(
+      profileImageUrl: _selectedProfile?.image?.imageUrl ?? '',
+      profile: _selectedProfile,
     );
-  }
-
-  /// ✅ Maneja las opciones del menú de perfil
-  Future<void> _handleMenuSelection(BuildContext context, String value) async {
-    switch (value) {
-      case 'logout':
-        try {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => const Center(child: CircularProgressIndicator()),
-          );
-
-          // Cerrar sesión usando el endpoint de perfiles
-          await _profileService.logout();
-
-          if (context.mounted) Navigator.of(context).pop();
-          widget.onLogout();
-
-          if (context.mounted) {
-            Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-          }
-        } catch (e) {
-          if (context.mounted) Navigator.of(context).pop();
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error al cerrar sesión: ${e.toString()}'),
-                duration: const Duration(seconds: 3),
-              ),
-            );
-          }
-        }
-        break;
-
-      // case 'profile':
-      //   _navigateToRoute(context, AppRoutes.loggedHomeProfile);
-      //   break;
-      case 'settings':
-        _navigateToRoute(context, '/profile/settings');
-        break;
-      case 'contact':
-        _navigateToRoute(context, AppRoutes.contactLogged);
-        break;
-    }
-  }
-
-  /// ✅ Botón genérico de navegación
-  Widget _buildButton(BuildContext context, String text, String route,
-      {Color textColor = Colors.white, bool isLarge = false}) {
-    final bool isActive = widget.currentRoute == route;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => _navigateToRoute(context, route),
-        borderRadius: BorderRadius.circular(8),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: isLarge ? 20 : 16,
-            vertical: isLarge ? 10 : 8,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                text,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: isLarge ? 17 : 16,
-                  fontWeight: isActive ? FontWeight.w900 : FontWeight.bold,
-                ),
-              ),
-              if (isActive)
-                Container(
-                  margin: const EdgeInsets.only(top: 2),
-                  height: 3,
-                  width: 20,
-                  decoration: BoxDecoration(
-                    color: textColor.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// ✅ Navegación manteniendo historial
-  void _navigateToRoute(BuildContext context, String route) {
-    if (route == widget.currentRoute) return;
-    Navigator.pushNamed(context, route);
   }
 }

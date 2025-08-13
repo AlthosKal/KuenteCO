@@ -2,12 +2,11 @@ import 'package:KuenteCO/widgets/user/user_buttom_business_widget.dart';
 import 'package:KuenteCO/widgets/user/user_buttom_personal_widget.dart';
 import 'package:flutter/material.dart';
 import '../../../core/services/app/auth_service.dart';
-import '../../../dto/auth/response/user_detail_dto.dart';
+import '../../../dto/app/auth/response/user_detail_dto.dart';
 import '../../../routes/app_routes.dart';
 import '../../../screens/home/logged_home_business_view.dart';
 import '../../../screens/home/logged_home_personal_view.dart';
 
-/// ✅ Navbar principal para usuarios logueados
 class KuentecoLoggedNavbar extends StatefulWidget {
   final String currentRoute;
   final double? logoWidth;
@@ -162,7 +161,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
   /// ✅ Botón de perfil (usa widget personalizado según tipo de usuario)
   Widget _buildProfileButton(BuildContext context) {
     if (_selectedProfile?.userType.toLowerCase() == 'personal') {
-      return ProfileButtonPersonal(
+      return UserButtomPersonalWidget(
         profileImageUrl: _selectedProfile?.image?.imageUrl ?? '',
       );
     } else {

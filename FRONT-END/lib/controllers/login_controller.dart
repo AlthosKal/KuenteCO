@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../dto/auth/request/login_user_dto.dart';
 import '../core/exceptions/global_exception_handler.dart';
 import '../core/services/app/auth_service.dart';
+import '../dto/app/auth/request/login_user_dto.dart';
 import '../provider/toast_helper.dart';
 import '../../screens/home/logged_home_personal_view.dart';
 import '../../screens/home/logged_home_business_view.dart';

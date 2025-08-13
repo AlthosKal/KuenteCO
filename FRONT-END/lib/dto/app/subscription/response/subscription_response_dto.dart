@@ -1,6 +1,6 @@
-import '../../../utils/enum/subscription_type_enum.dart';
-import '../../../utils/enum/state_enum.dart';
-import '../../../utils/enum/preapproval_status_enum.dart';
+import '../../../../utils/enum/preapproval_status_enum.dart';
+import '../../../../utils/enum/state_enum.dart';
+import '../../../../utils/enum/subscription_type_enum.dart';
 
 class SubscriptionResponseDTO {
   final int subscriptionId;

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../controllers/validate_verification_code_controller.dart';
 import '../../core/services/app/auth_service.dart';
-import '../../dto/auth/request/send_verification_code_dto.dart';
+import '../../dto/app/auth/request/send_verification_code_dto.dart';
 import '../../widgets/common/background/animated_background_scaffold_widget.dart';
 import '../../widgets/common/blurred_card_widget.dart';
 import '../../widgets/common/form/form_title_text_widget.dart';

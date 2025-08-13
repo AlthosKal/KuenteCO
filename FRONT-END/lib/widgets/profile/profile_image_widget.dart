@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 import '../../controllers/profile_controller.dart';
-import '../../dto/image/image_dto.dart';
-import '../../dto/profile/profile_detail_dto.dart';
+import '../../dto/app/image/image_dto.dart';
+import '../../dto/app/profile/profile_detail_dto.dart';
 
 class ProfileImageWidget extends StatefulWidget {
   final ProfileController profileController;

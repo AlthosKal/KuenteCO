@@ -1,8 +1,8 @@
-import '../../../dto/subscription/request/create_subscription_request_dto.dart';
-import '../../../dto/subscription/response/create_subscription_response_dto.dart';
-import '../../../dto/subscription/response/payment_history_response_dto.dart';
-import '../../../dto/subscription/response/subscription_response_dto.dart';
-import '../../../dto/subscription/subscription_price_config_dto.dart';
+import '../../../dto/app/subscription/request/create_subscription_request_dto.dart';
+import '../../../dto/app/subscription/response/create_subscription_response_dto.dart';
+import '../../../dto/app/subscription/response/payment_history_response_dto.dart';
+import '../../../dto/app/subscription/response/subscription_response_dto.dart';
+import '../../../dto/app/subscription/subscription_price_config_dto.dart';
 import '../../exceptions/global_exception_handler.dart';
 import '../api_client.dart';
 

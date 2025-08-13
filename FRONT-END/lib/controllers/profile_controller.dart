@@ -1,16 +1,14 @@
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../core/services/app/profile_service.dart';
-import '../dto/image/image_dto.dart';
-import '../dto/profile/new_profile_dto.dart';
-import '../dto/profile/profile_detail_dto.dart';
-import '../dto/profile/update_profile_dto.dart';
+import '../dto/app/image/image_dto.dart';
+import '../dto/app/profile/new_profile_dto.dart';
+import '../dto/app/profile/profile_detail_dto.dart';
+import '../dto/app/profile/update_profile_dto.dart';
 
 class ProfileController {
   final ProfileService _profileService;
-  final _storage = const FlutterSecureStorage();
 
   final ValueNotifier<bool> isLoading = ValueNotifier(false);
   final ValueNotifier<List<ProfileDetailDTO>> profiles = ValueNotifier([]);

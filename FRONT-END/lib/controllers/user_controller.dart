@@ -2,8 +2,8 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../core/services/app/user_service.dart';
-import '../dto/auth/response/user_detail_dto.dart';
-import '../dto/image/image_dto.dart';
+import '../dto/app/auth/response/user_detail_dto.dart';
+import '../dto/app/image/image_dto.dart';
 
 class UserController extends ChangeNotifier {
   final UserService _userService;

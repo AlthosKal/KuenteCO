@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-
 import '../core/services/app/subscription_service.dart';
-import '../dto/subscription/request/create_subscription_request_dto.dart';
-import '../dto/subscription/response/create_subscription_response_dto.dart';
-import '../dto/subscription/response/payment_history_response_dto.dart';
-import '../dto/subscription/response/subscription_response_dto.dart';
-import '../dto/subscription/subscription_price_config_dto.dart';
+import '../dto/app/subscription/request/create_subscription_request_dto.dart';
+import '../dto/app/subscription/response/create_subscription_response_dto.dart';
+import '../dto/app/subscription/response/payment_history_response_dto.dart';
+import '../dto/app/subscription/response/subscription_response_dto.dart';
+import '../dto/app/subscription/subscription_price_config_dto.dart';
 
 
 class SubscriptionController extends ChangeNotifier {
