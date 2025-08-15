@@ -10,6 +10,8 @@ import 'package:KuenteCO/core/services/app/user_service.dart';
 import 'package:KuenteCO/core/services/api_client.dart';
 import 'package:KuenteCO/controllers/subscription_controller.dart';
 import 'package:KuenteCO/core/services/app/subscription_service.dart';
+import 'package:KuenteCO/controllers/category_controller.dart';
+import 'package:KuenteCO/core/services/app/category_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +23,7 @@ void main() async {
   final apiClient = ApiClient();
   final userService = UserService(apiClient);
   final subscriptionService = SubscriptionService(apiClient);
+  final categoryService = CategoryService(apiClient);
 
   runApp(
     MultiProvider(
@@ -30,6 +33,9 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => SubscriptionController(subscriptionService),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CategoryController(categoryService),
         ),
       ],
       child: MyApp(

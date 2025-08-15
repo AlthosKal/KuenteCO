@@ -4,8 +4,9 @@ import '../../widgets/common/background/background_widget.dart';
 import '../../widgets/common/blurred_card_widget.dart';
 import '../../widgets/common/footer/footer_logged_widget.dart';
 import '../../widgets/common/navbar/navbar_logged_widget.dart';
+import '../../widgets/common/category/category_card_widget.dart';
 
-class LoggedHomeBusinessView extends StatelessWidget {
+class LoggedHomeBusinessView extends StatefulWidget {
   final String userName;
   final String profileImageUrl;
 
@@ -24,6 +25,11 @@ class LoggedHomeBusinessView extends StatelessWidget {
     );
   }
 
+  @override
+  State<LoggedHomeBusinessView> createState() => _LoggedHomeBusinessViewState();
+}
+
+class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
   @override
   Widget build(BuildContext context) {
     return Background(
@@ -55,7 +61,7 @@ class LoggedHomeBusinessView extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "¡Hola, $userName!",
+                                "¡Hola, ${widget.userName}!",
                                 style: Theme.of(context)
                                     .textTheme
                                     .headlineSmall
@@ -79,7 +85,7 @@ class LoggedHomeBusinessView extends StatelessWidget {
 
                       const SizedBox(height: 24),
 
-                      /// 🔲 GRID DE 4 CARDS
+                      /// 🔲 GRID DE 4 CARDS (con categoría en el primero)
                       Expanded(
                         child: GridView.count(
                           crossAxisCount: 2,
@@ -87,15 +93,12 @@ class LoggedHomeBusinessView extends StatelessWidget {
                           mainAxisSpacing: 16,
                           childAspectRatio: 1.1,
                           children: [
-                            BlurredCard(
-                              child: _buildCardItem(
-                                icon: Icons.shopping_bag_outlined,
-                                title: "Mis pedidos",
-                                onTap: () {
-                                  // Navegar a pedidos
-                                },
-                              ),
+                            /// 🔹 PRIMER CARD → CategoryCardWidget
+                            const BlurredCard(
+                              child: CategoryCardWidget(),
                             ),
+
+                            /// 🔹 RESTO DE CARDS
                             BlurredCard(
                               child: _buildCardItem(
                                 icon: Icons.wallet_outlined,
@@ -126,6 +129,7 @@ class LoggedHomeBusinessView extends StatelessWidget {
                           ],
                         ),
                       ),
+
                       /// ✅ FOOTER
                       const FooterLoggedWidget(),
                     ],

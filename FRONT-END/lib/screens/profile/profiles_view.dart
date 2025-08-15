@@ -233,7 +233,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                   ),
                 );
-              }).toList(),
+              }),
 
               _buildAddProfileButton(),
             ],

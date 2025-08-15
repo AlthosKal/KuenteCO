@@ -21,5 +21,6 @@ class AppRoutes {
   static const termsLogged = '/termsLogged';
   static const privacyLogged = '/privacyLogged';
   static const accountScreen = '/accountScreen';
+  static const categoryView = '/categoryView';
 
 }
