@@ -21,10 +21,4 @@ public class NewCategoryDTO {
     @Valid
     @NotNull(message = "La descripción de la categoría es requerida")
     private DescriptionCategory description;
-
-    @NotNull(message = "La fecha de inicio es requerida")
-    private LocalDateTime startDate;
-
-    @NotNull(message = "La fecha de finalización es requerida")
-    private LocalDateTime finishDate;
 }

@@ -46,9 +46,6 @@ public class Category {
     @Column(columnDefinition = "jsonb")
     private DescriptionCategory description;
 
-    @Column(name = "start_date")
-    private LocalDateTime startDate;
-
-    @Column(name = "finish_date")
-    private LocalDateTime finishDate;
+    @Column(name = "register_date")
+    private LocalDateTime registerDate;
 }

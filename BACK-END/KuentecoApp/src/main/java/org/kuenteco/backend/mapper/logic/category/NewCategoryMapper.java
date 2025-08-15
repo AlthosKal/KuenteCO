@@ -13,6 +13,7 @@ public interface NewCategoryMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
+    @Mapping(target = "registerDate", ignore = true)
     @Mapping(target = "budget.id", source = "budgetId")
     Category toEntity(NewCategoryDTO dto);
 }
