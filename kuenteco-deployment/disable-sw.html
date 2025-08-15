@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Disable Service Worker - KuenteCO</title>
+    <script>
+        // Script para limpiar Service Workers registrados
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                    console.log('Service Worker desregistrado:', registration);
+                }
+                
+                // Clear all caches
+                if ('caches' in window) {
+                    caches.keys().then(function(names) {
+                        for (let name of names) {
+                            caches.delete(name);
+                        }
+                        console.log('Cache limpiado');
+                    });
+                }
+                
+                alert('Service Workers y cache limpiados. Redirigiendo a la aplicación...');
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Limpiando Service Workers...</h1>
+    <p>Esta página limpiará los Service Workers y cache para mejorar el funcionamiento de la aplicación.</p>
+    <p>Serás redirigido automáticamente.</p>
+</body>
+</html>

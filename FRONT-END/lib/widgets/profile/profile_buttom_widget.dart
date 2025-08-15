@@ -11,12 +11,12 @@ class ProfileButtonWidget extends StatelessWidget {
   final double radius;
 
   const ProfileButtonWidget({
-    Key? key,
+    super.key,
     this.profileImageUrl,
     this.profileController,
     this.profile,
     this.radius = 20,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -6,7 +6,6 @@ import '../../../core/services/app/auth_service.dart';
 import '../../../core/services/app/profile_service.dart';
 import '../../../dto/app/auth/response/user_detail_dto.dart';
 import '../../../dto/app/profile/profile_detail_dto.dart';
-import '../../../routes/app_routes.dart';
 import '../../../screens/home/logged_home_business_view.dart';
 import '../../../screens/home/logged_home_personal_view.dart';
 import '../../../screens/home/logged_home_profile_view.dart';
@@ -138,6 +137,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
   );
 
   /// ✅ Logo con navegación dinámica según tipo de autenticación
+  
   Widget _buildLogo(BuildContext context, bool isSmallScreen) {
     final double defaultWidth = isSmallScreen ? 220.0 : 250.0;
     final double defaultHeight = isSmallScreen ? 55.0 : 62.5;
