@@ -144,9 +144,8 @@ public class CategoryServiceImpl implements CategoryService {
 
         log.info("Registrando la categoria para: {}", email);
         category.setUser(user);
-        if (dto.getStartDate() == null) {
-            category.setStartDate(LocalDateTime.now());
-        }
+        category.setRegisterDate(LocalDateTime.now());
+
         masterCategoryRepository.save(category);
     }
 
@@ -171,6 +170,7 @@ public class CategoryServiceImpl implements CategoryService {
                         .orElseThrow(() -> new CategoryException("Categoría no encontrada: "));
         updateCategoryMapper.toEntity(dto);
         resolveCategory(dto.getBudgetId(), category);
+        category.setRegisterDate(LocalDateTime.now());
         log.info("Actualizando la categoria para: {}", email);
         masterCategoryRepository.save(category);
     }

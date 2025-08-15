@@ -207,8 +207,7 @@ public class ExcelServiceImpl implements ExcelService {
         header.createCell(0).setCellValue("Nombre");
         header.createCell(1).setCellValue("Presupuesto Asignado");
         header.createCell(2).setCellValue("Estado");
-        header.createCell(3).setCellValue("Fecha de Inicio");
-        header.createCell(4).setCellValue("Fecha de Finalización");
+        header.createCell(3).setCellValue("Fecha de Registro");
 
         List<Category> categories = slaveCategoryRepository.findByUser(user);
         if (categories.isEmpty()) {
@@ -225,8 +224,7 @@ public class ExcelServiceImpl implements ExcelService {
                             .setCellValue(
                                     category.getDescription().getAssignedBudget().doubleValue());
                     row.createCell(2).setCellValue(category.getDescription().getState().name());
-                    row.createCell(3).setCellValue(dtf.format(category.getStartDate()));
-                    row.createCell(4).setCellValue(dtf.format(category.getFinishDate()));
+                    row.createCell(3).setCellValue(dtf.format(category.getRegisterDate()));
                 });
     }
 
@@ -445,9 +443,7 @@ public class ExcelServiceImpl implements ExcelService {
                                                         row, 1, "Presupuesto Asignado"));
                                 String stateStr = validateRequiredTextCell(row, 2, "Estado");
                                 String startStr =
-                                        validateDateCellAsString(row, 3, "Fecha de Inicio");
-                                String endStr =
-                                        validateDateCellAsString(row, 4, "Fecha de Finalización");
+                                        validateDateCellAsString(row, 3, "Fecha de Registro");
 
                                 DescriptionCategory description =
                                         new DescriptionCategory(
@@ -458,11 +454,8 @@ public class ExcelServiceImpl implements ExcelService {
                                                 .user(user)
                                                 .name(name)
                                                 .description(description)
-                                                .startDate(
+                                                .registerDate(
                                                         LocalDate.parse(startStr, formatter)
-                                                                .atStartOfDay())
-                                                .finishDate(
-                                                        LocalDate.parse(endStr, formatter)
                                                                 .atStartOfDay())
                                                 .build();
 

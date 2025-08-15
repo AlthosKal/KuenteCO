@@ -15,6 +15,5 @@ public class CategoryDTO {
     @Positive private Integer budgetId;
     private String name;
     private DescriptionCategory description;
-    private LocalDateTime startDate;
-    private LocalDateTime finishDate;
+    private LocalDateTime registerDate;
 }
