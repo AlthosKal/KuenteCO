@@ -44,7 +44,9 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
 
   @override
   void dispose() {
-    _focusNodes.forEach((node) => node.dispose());
+    for (var node in _focusNodes) {
+      node.dispose();
+    }
     _controller.dispose();
     super.dispose();
   }

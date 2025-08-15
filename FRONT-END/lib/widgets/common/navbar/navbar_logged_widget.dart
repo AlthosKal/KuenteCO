@@ -6,7 +6,6 @@ import '../../../core/services/app/auth_service.dart';
 import '../../../core/services/app/profile_service.dart';
 import '../../../dto/app/auth/response/user_detail_dto.dart';
 import '../../../dto/app/profile/profile_detail_dto.dart';
-import '../../../routes/app_routes.dart';
 import '../../../screens/home/logged_home_business_view.dart';
 import '../../../screens/home/logged_home_personal_view.dart';
 import '../../../screens/home/logged_home_profile_view.dart';
