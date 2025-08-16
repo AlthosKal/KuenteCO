@@ -29,14 +29,21 @@ public class BackEndApplication {
         // API de MercadoPago
         System.setProperty("MERCADOPAGO_ACCESS_TOKEN", dotenv.get("MERCADOPAGO_ACCESS_TOKEN"));
         System.setProperty("MERCADOPAGO_PUBLIC_KEY", dotenv.get("MERCADOPAGO_PUBLIC_KEY"));
-        
+
         // URLs de Webhooks de MercadoPago
-        System.setProperty("MERCADOPAGO_WEBHOOK_BASE_URL", dotenv.get("MERCADOPAGO_WEBHOOK_BASE_URL"));
-        System.setProperty("MERCADOPAGO_WEBHOOK_PREAPPROVAL_URL", dotenv.get("MERCADOPAGO_WEBHOOK_PREAPPROVAL_URL"));
-        System.setProperty("MERCADOPAGO_WEBHOOK_PAYMENT_URL", dotenv.get("MERCADOPAGO_WEBHOOK_PAYMENT_URL"));
-        System.setProperty("MERCADOPAGO_WEBHOOK_GENERIC_URL", dotenv.get("MERCADOPAGO_WEBHOOK_GENERIC_URL"));
+        System.setProperty(
+                "MERCADOPAGO_WEBHOOK_BASE_URL", dotenv.get("MERCADOPAGO_WEBHOOK_BASE_URL"));
+        System.setProperty(
+                "MERCADOPAGO_WEBHOOK_PREAPPROVAL_URL",
+                dotenv.get("MERCADOPAGO_WEBHOOK_PREAPPROVAL_URL"));
+        System.setProperty(
+                "MERCADOPAGO_WEBHOOK_PAYMENT_URL", dotenv.get("MERCADOPAGO_WEBHOOK_PAYMENT_URL"));
+        System.setProperty(
+                "MERCADOPAGO_WEBHOOK_GENERIC_URL", dotenv.get("MERCADOPAGO_WEBHOOK_GENERIC_URL"));
         System.setProperty("MERCADOPAGO_WEBHOOK_SECRET", dotenv.get("MERCADOPAGO_WEBHOOK_SECRET"));
-        System.setProperty("MERCADOPAGO_WEBHOOK_SKIP_VALIDATION", dotenv.get("MERCADOPAGO_WEBHOOK_SKIP_VALIDATION"));
+        System.setProperty(
+                "MERCADOPAGO_WEBHOOK_SKIP_VALIDATION",
+                dotenv.get("MERCADOPAGO_WEBHOOK_SKIP_VALIDATION"));
 
         // API de Bancolombia
         System.setProperty("BANCOLOMBIA_BASE_URL", dotenv.get("BANCOLOMBIA_BASE_URL"));

@@ -327,7 +327,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ApiResponse<Void>> handleMaxUploadSizeExceededException(
             MaxUploadSizeExceededException ex, HttpServletRequest request) {
-        log.error("Error general del servicio de imagenes al momento de subir : {}", ex.getMessage());
+        log.error(
+                "Error general del servicio de imagenes al momento de subir : {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }

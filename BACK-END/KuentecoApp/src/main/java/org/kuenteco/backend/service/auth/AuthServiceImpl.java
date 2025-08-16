@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.config.jwt.JwtUtil;
@@ -18,15 +19,12 @@ import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.enums.SubscriptionType;
 import org.kuenteco.backend.exception.exceptions.AuthException;
 import org.kuenteco.backend.mapper.auth.NewUserMapper;
-import org.kuenteco.backend.repository.master.MasterRoleRepository;
 import org.kuenteco.backend.repository.master.MasterSubscriptionRepository;
 import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveRoleRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.kuenteco.backend.service.user.SendgridService;
 import org.kuenteco.backend.service.user.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -34,19 +32,17 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final CookieService cookieService;
     private final UserService userService;
-    private final MasterRoleRepository masterRoleRepository;
     private final SlaveRoleRepository slaveRoleRepository;
     private final MasterUserRepository masterUserRepository;
     private final SlaveUserRepository slaveUserRepository;
@@ -55,44 +51,6 @@ public class AuthServiceImpl implements AuthService {
     private final NewUserMapper newUserMapper;
     private final SendgridService sendgridService;
     private final MasterSubscriptionRepository masterSubscriptionRepository;
-
-    @Autowired
-    public AuthServiceImpl(
-            UserService userService,
-            PasswordEncoder passwordEncoder,
-            JwtUtil jwtUtil,
-            AuthenticationManagerBuilder authenticationManagerBuilder,
-            CookieService cookieService,
-            TokenBlacklistService tokenBlacklistService,
-            SlaveUserRepository slaveUserRepository,
-            MasterUserRepository masterUserRepository,
-            MasterRoleRepository masterRoleRepository,
-            SlaveRoleRepository slaveRoleRepository,
-            @Qualifier("masterTransactionManager")
-                    PlatformTransactionManager masterTransactionManager,
-            NewUserMapper newUserMapper,
-            SendgridService sendgridService,
-            MasterSubscriptionRepository masterSubscriptionRepository) {
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
-        this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.cookieService = cookieService;
-        this.tokenBlacklistService = tokenBlacklistService;
-        this.masterRoleRepository = masterRoleRepository;
-        this.slaveRoleRepository = slaveRoleRepository;
-        this.slaveUserRepository = slaveUserRepository;
-        this.masterUserRepository = masterUserRepository;
-        this.newUserMapper = newUserMapper;
-        this.sendgridService = sendgridService;
-
-        // Configuración de transacción con timeout apropiado
-        this.transactionTemplate = new TransactionTemplate(masterTransactionManager);
-        this.transactionTemplate.setTimeout(30); // 30 segundos
-        this.transactionTemplate.setPropagationBehavior(
-                TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-        this.masterSubscriptionRepository = masterSubscriptionRepository;
-    }
 
     @Override
     public TokenResponseDTO authenticate(LoginDTO dto, HttpServletResponse response) {
@@ -136,10 +94,7 @@ public class AuthServiceImpl implements AuthService {
                         .orElseThrow(() -> new AuthException("Role no encontrado"));
 
         // Asegurar que el rol existe en la base de datos maestra
-        Role masterRole =
-                slaveRoleRepository
-                        .findByName(RoleList.ROLE_USER)
-                        .orElseGet(() -> masterRoleRepository.save(role));
+        Role masterRole = role; // Usar el rol ya obtenido
 
         // Utilizar transacción explícita para guardar el usuario
         transactionTemplate.execute(

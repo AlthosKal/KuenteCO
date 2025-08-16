@@ -42,11 +42,13 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     }
 
     private File convert(MultipartFile multipartFile) throws IOException {
-        File file = File.createTempFile("upload-", "-" + Objects.requireNonNull(multipartFile.getOriginalFilename()));
+        File file =
+                File.createTempFile(
+                        "upload-",
+                        "-" + Objects.requireNonNull(multipartFile.getOriginalFilename()));
         try (FileOutputStream fo = new FileOutputStream(file)) {
             fo.write(multipartFile.getBytes());
         }
         return file;
     }
 }
-

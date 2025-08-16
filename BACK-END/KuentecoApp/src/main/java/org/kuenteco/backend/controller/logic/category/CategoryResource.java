@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.kuenteco.backend.dto.logic.category.CategoryDTO;
 import org.kuenteco.backend.dto.logic.category.NewCategoryDTO;
+import org.kuenteco.backend.dto.logic.category.UpdateCategoryDTO;
 import org.kuenteco.backend.exception.ApiResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -95,7 +96,7 @@ public interface CategoryResource {
                                             schema = @Schema(implementation = CategoryDTO.class))))
     @PatchMapping("/update")
     ResponseEntity<?> updateCategory(
-            @Valid @RequestBody CategoryDTO dto, HttpServletRequest request);
+            @Valid @RequestBody UpdateCategoryDTO dto, HttpServletRequest request);
 
     @Operation(
             summary = "Eliminar categoría",
