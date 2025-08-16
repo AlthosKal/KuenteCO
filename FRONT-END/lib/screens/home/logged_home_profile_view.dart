@@ -5,6 +5,7 @@ import '../../dto/app/profile/profile_detail_dto.dart';
 import '../../widgets/common/background/background_widget.dart';
 import '../../widgets/common/blurred_card_widget.dart';
 import '../../widgets/common/footer/footer_logged_widget.dart';
+import '../../widgets/common/category/category_card_widget.dart';
 import '../../core/services/app/profile_service.dart';
 
 class LoggedHomeProfileView extends StatefulWidget {
@@ -110,13 +111,8 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
                               mainAxisSpacing: 10,
                               childAspectRatio: 1.1,
                               children: [
-                                BlurredCard(
-                                  child: _buildCardItem(
-                                    icon: Icons.shopping_bag_outlined,
-                                    title: "Mis pedidos",
-                                    onTap: () {},
-                                  ),
-                                ),
+                                // 📋 Card de Categorías (reemplaza Mis pedidos)
+                                const CategoryCardWidget(),
                                 BlurredCard(
                                   child: _buildCardItem(
                                     icon: Icons.wallet_outlined,

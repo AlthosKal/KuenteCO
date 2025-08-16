@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../controllers/category_controller.dart';
 import '../../widgets/common/category/category_list_widget.dart';
 import '../../widgets/common/category/create_category_widget.dart';
 import '../../widgets/common/category/delete_category_widget.dart';
 import '../../widgets/common/category/edit_category_widget.dart';
+import '../../widgets/common/category/assign_category_widget.dart';
+import '../../core/services/app/auth_service.dart';
 
 class CategoryView extends StatefulWidget {
   const CategoryView({super.key});
@@ -14,11 +17,40 @@ class CategoryView extends StatefulWidget {
 }
 
 class _CategoryViewState extends State<CategoryView> {
+  final _storage = const FlutterSecureStorage();
+  bool _isBusinessUser = false;
+
   @override
   void initState() {
     super.initState();
+    _checkUserType();
     Future.microtask(() =>
         Provider.of<CategoryController>(context, listen: false).loadCategories());
+  }
+
+  Future<void> _checkUserType() async {
+    try {
+      final role = await _storage.read(key: 'role');
+      if (role == 'ROLE_PROFILE') {
+        // Los perfiles no son usuarios Business
+        setState(() {
+          _isBusinessUser = false;
+        });
+        return;
+      }
+      
+      // Para usuarios normales, verificar el userType
+      final authService = AuthService();
+      final user = await authService.getAuthenticatedUser();
+      setState(() {
+        _isBusinessUser = user.userType.toLowerCase() != 'personal';
+      });
+    } catch (e) {
+      print('Error checking user type: $e');
+      setState(() {
+        _isBusinessUser = false;
+      });
+    }
   }
 
   Future<void> _handleDeleteCategory(category) async {
@@ -34,6 +66,14 @@ class _CategoryViewState extends State<CategoryView> {
     if (result == true) {
       // La edición fue exitosa, la lista se actualizará automáticamente
       // gracias al Provider y el controlador
+    }
+  }
+
+  Future<void> _handleAssignCategory(category) async {
+    final result = await AssignCategoryWidget.showAssignDialog(context, category);
+    if (result == true) {
+      // La asignación fue exitosa
+      // No necesitamos recargar la lista ya que no cambia las categorías
     }
   }
 
@@ -322,6 +362,7 @@ class _CategoryViewState extends State<CategoryView> {
                       onTap: () => _showCategoryDetail(context, category),
                       onEdit: () => _handleEditCategory(category),
                       onDelete: () => _handleDeleteCategory(category),
+                      onAssign: _isBusinessUser ? () => _handleAssignCategory(category) : null,
                     );
                   },
                 ),
