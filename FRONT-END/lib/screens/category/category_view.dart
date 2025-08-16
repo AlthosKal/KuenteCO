@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../controllers/category_controller.dart';
 import '../../widgets/common/category/category_list_widget.dart';
 import '../../widgets/common/category/create_category_widget.dart';
 import '../../widgets/common/category/delete_category_widget.dart';
 import '../../widgets/common/category/edit_category_widget.dart';
+import '../../widgets/common/category/assign_category_widget.dart';
+import '../../core/services/app/auth_service.dart';
 
 class CategoryView extends StatefulWidget {
   const CategoryView({super.key});
@@ -14,11 +17,40 @@ class CategoryView extends StatefulWidget {
 }
 
 class _CategoryViewState extends State<CategoryView> {
+  final _storage = const FlutterSecureStorage();
+  bool _isBusinessUser = false;
+
   @override
   void initState() {
     super.initState();
+    _checkUserType();
     Future.microtask(() =>
         Provider.of<CategoryController>(context, listen: false).loadCategories());
+  }
+
+  Future<void> _checkUserType() async {
+    try {
+      final role = await _storage.read(key: 'role');
+      if (role == 'ROLE_PROFILE') {
+        // Los perfiles no son usuarios Business
+        setState(() {
+          _isBusinessUser = false;
+        });
+        return;
+      }
+      
+      // Para usuarios normales, verificar el userType
+      final authService = AuthService();
+      final user = await authService.getAuthenticatedUser();
+      setState(() {
+        _isBusinessUser = user.userType.toLowerCase() != 'personal';
+      });
+    } catch (e) {
+      print('Error checking user type: $e');
+      setState(() {
+        _isBusinessUser = false;
+      });
+    }
   }
 
   Future<void> _handleDeleteCategory(category) async {
@@ -34,6 +66,14 @@ class _CategoryViewState extends State<CategoryView> {
     if (result == true) {
       // La edición fue exitosa, la lista se actualizará automáticamente
       // gracias al Provider y el controlador
+    }
+  }
+
+  Future<void> _handleAssignCategory(category) async {
+    final result = await AssignCategoryWidget.showAssignDialog(context, category);
+    if (result == true) {
+      // La asignación fue exitosa
+      // No necesitamos recargar la lista ya que no cambia las categorías
     }
   }
 
@@ -99,14 +139,6 @@ class _CategoryViewState extends State<CategoryView> {
       appBar: AppBar(
         title: const Text("Categorías"),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showDialog(
-          context: context,
-          builder: (context) => const CreateCategoryWidget(),
-        ),
-        tooltip: 'Crear nueva categoría',
-        child: const Icon(Icons.add),
-      ),
       body: controller.isLoading
           ? const Center(child: CircularProgressIndicator())
           : controller.errorMessage != null
@@ -127,45 +159,210 @@ class _CategoryViewState extends State<CategoryView> {
               ),
             )
           : controller.categories.isEmpty
-              ? Center(
+              ? Padding(
+                  padding: const EdgeInsets.all(8),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.category_outlined,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No tienes categorías aún',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
+                      // Mensaje de no hay categorías
+                      Expanded(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.category_outlined,
+                                size: 64,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'No tienes categorías aún',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Crea tu primera categoría usando el botón de abajo',
+                                style: TextStyle(
+                                  color: Colors.grey[500],
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Presiona el botón + para crear tu primera categoría',
-                        style: TextStyle(
-                          color: Colors.grey[500],
+                      // Botón de crear categoría
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: InkWell(
+                          onTap: () => showDialog(
+                            context: context,
+                            builder: (context) => const CreateCategoryWidget(),
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.purpleAccent.withValues(alpha: 0.3),
+                                  width: 1.5,
+                                  style: BorderStyle.solid,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.purpleAccent.withValues(alpha: 0.15),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.add_rounded,
+                                        size: 24,
+                                        color: Colors.purpleAccent,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    const Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Crear primera categoría',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.purpleAccent,
+                                            ),
+                                          ),
+                                          SizedBox(height: 4),
+                                          Text(
+                                            'Toca para comenzar a organizar tus gastos',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const Icon(
+                                      Icons.arrow_forward_ios_rounded,
+                                      size: 16,
+                                      color: Colors.purpleAccent,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
                 )
               : ListView.builder(
                   padding: const EdgeInsets.all(8),
-                  itemCount: controller.categories.length,
+                  itemCount: controller.categories.length + 1, // +1 para el botón de agregar
                   itemBuilder: (context, index) {
+                    // Si es el último item, mostrar el botón de agregar
+                    if (index == controller.categories.length) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: InkWell(
+                          onTap: () => showDialog(
+                            context: context,
+                            builder: (context) => const CreateCategoryWidget(),
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.purpleAccent.withValues(alpha: 0.3),
+                                  width: 1.5,
+                                  style: BorderStyle.solid,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.purpleAccent.withValues(alpha: 0.15),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.add_rounded,
+                                        size: 24,
+                                        color: Colors.purpleAccent,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    const Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Crear nueva categoría',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.purpleAccent,
+                                            ),
+                                          ),
+                                          SizedBox(height: 4),
+                                          Text(
+                                            'Toca para agregar una nueva categoría',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const Icon(
+                                      Icons.arrow_forward_ios_rounded,
+                                      size: 16,
+                                      color: Colors.purpleAccent,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                    
+                    // Items normales de categorías
                     final category = controller.categories[index];
                     return CategoryListWidget(
                       category: category,
                       onTap: () => _showCategoryDetail(context, category),
                       onEdit: () => _handleEditCategory(category),
                       onDelete: () => _handleDeleteCategory(category),
+                      onAssign: _isBusinessUser ? () => _handleAssignCategory(category) : null,
                     );
                   },
                 ),

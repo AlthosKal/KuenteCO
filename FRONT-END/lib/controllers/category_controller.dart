@@ -168,4 +168,22 @@ class CategoryController extends ChangeNotifier {
       _setLoading(false);
     }
   }
+
+  // 📌 Asignar categoría a perfil (solo para usuarios Business)
+  Future<void> assignCategoryToProfile(int categoryId, int profileId) async {
+    print('👥 CategoryController: Assigning category $categoryId to profile $profileId');
+    
+    _setError(null); // Limpiar cualquier error previo
+    
+    try {
+      // Asignar la categoría al perfil en el servidor
+      print('👥 CategoryController: Calling service.enrollProfileToCategory...');
+      await _service.enrollProfileToCategory(profileId, categoryId);
+      print('✅ CategoryController: Category assigned successfully');
+      
+    } catch (e) {
+      print('❌ CategoryController: Error assigning category: $e');
+      _setError(e.toString());
+    }
+  }
 }
