@@ -22,6 +22,7 @@ import org.kuenteco.backend.entity.Category;
 import org.kuenteco.backend.entity.Transaction;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.entity.extra.DescriptionCategory;
+import org.kuenteco.backend.entity.extra.DescriptionTransaction;
 import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.State;
 import org.kuenteco.backend.enums.TransactionType;
@@ -120,8 +121,8 @@ class CategoryServiceImplTest {
         List<Category> categories = Arrays.asList(testCategory);
         List<CategoryDTO> categoryDTOs = Arrays.asList(new CategoryDTO());
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
-                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
+                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
@@ -146,8 +147,8 @@ class CategoryServiceImplTest {
         // Given
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
-                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
+                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
@@ -168,8 +169,8 @@ class CategoryServiceImplTest {
         // Given
         AuthCredentials credentials = new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
-                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
+                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
@@ -188,8 +189,8 @@ class CategoryServiceImplTest {
         // Given
         AuthCredentials credentials = new AuthCredentials("nonexistent@kuenteco.com", RoleList.ROLE_USER);
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
-                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
+                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
@@ -211,11 +212,20 @@ class CategoryServiceImplTest {
         Integer categoryId = 1;
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
         List<Transaction> transactions = Arrays.asList(createMockTransaction());
+
+        // Create a properly configured CategoryReportDTO
+        CategoryDTO categoryDTO = new CategoryDTO();
+        categoryDTO.setId(1);
+        categoryDTO.setName("Test Category");
+        categoryDTO.setDescription(testDescription);
+
         CategoryReportDTO reportDTO = new CategoryReportDTO();
+        reportDTO.setCategory(categoryDTO);
+
         List<TransactionDetailDTO> transactionDTOs = Arrays.asList(new TransactionDetailDTO());
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
-                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
+                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
@@ -242,8 +252,8 @@ class CategoryServiceImplTest {
         Integer categoryId = 999;
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
-                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
+                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
@@ -266,8 +276,8 @@ class CategoryServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
         Category newCategory = new Category();
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
-                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
+                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
@@ -290,8 +300,8 @@ class CategoryServiceImplTest {
         // Given
         AuthCredentials credentials = new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
-                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
+                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
@@ -311,8 +321,8 @@ class CategoryServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
         Category updatedCategory = new Category();
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
-                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
+                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
@@ -336,8 +346,8 @@ class CategoryServiceImplTest {
         Integer categoryId = 1;
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
-                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
+                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
@@ -358,8 +368,8 @@ class CategoryServiceImplTest {
         Integer categoryId = 999;
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
-                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
+                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
@@ -380,8 +390,8 @@ class CategoryServiceImplTest {
         // Given
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
-                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
+                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
@@ -401,8 +411,8 @@ class CategoryServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
         List<TransactionsByCategoryDTO> transactionsDTOs = Arrays.asList(new TransactionsByCategoryDTO());
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
-                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
+                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
@@ -423,8 +433,8 @@ class CategoryServiceImplTest {
         // Given
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
-                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
+                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
@@ -443,18 +453,18 @@ class CategoryServiceImplTest {
     @DisplayName("Should validate category description state transitions")
     void shouldValidateCategoryDescriptionStateTransitions() {
         // This test validates that the State enum in DescriptionCategory works correctly
-        
+
         // Given
         DescriptionCategory description = new DescriptionCategory();
-        
+
         // Test initial state
         description.setState(State.PENDING);
         assertEquals(State.PENDING, description.getState());
-        
+
         // Test state transition
         description.setState(State.ACTIVE);
         assertEquals(State.ACTIVE, description.getState());
-        
+
         // Test final state
         description.setState(State.CANCELLED);
         assertEquals(State.CANCELLED, description.getState());
@@ -469,11 +479,11 @@ class CategoryServiceImplTest {
         dtoWithBudget.setBudgetId(1);
         dtoWithBudget.setName("Category with Budget");
         dtoWithBudget.setDescription(testDescription);
-        
+
         Category categoryWithBudget = new Category();
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
-                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
+                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
@@ -499,15 +509,14 @@ class CategoryServiceImplTest {
         dtoWithInvalidBudget.setBudgetId(999);
         dtoWithInvalidBudget.setName("Category with Invalid Budget");
         dtoWithInvalidBudget.setDescription(testDescription);
-        
+
         Category category = new Category();
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
-                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
+                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
             when(newCategoryMapper.toEntity(dtoWithInvalidBudget)).thenReturn(category);
             when(slaveBudgetRepository.findById(999)).thenReturn(Optional.empty());
 
@@ -526,6 +535,12 @@ class CategoryServiceImplTest {
         transaction.setId(1);
         transaction.setAmount(new BigDecimal("100.00"));
         transaction.setCategory(testCategory);
+
+        // Add description to avoid NullPointerException
+        DescriptionTransaction description = new DescriptionTransaction();
+        description.setType(TransactionType.EXPENSE);
+        transaction.setDescription(description);
+
         return transaction;
     }
 }
