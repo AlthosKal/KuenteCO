@@ -156,9 +156,11 @@ public class CategoryServiceImpl implements CategoryService {
             throw new CategoryException("Endpoint solo disponible para usuarios");
         }
         Category category = prepareUpdateCategory(dto);
-        User user = slaveUserRepository
-                .findByEmail(email)
-                .orElseThrow(() -> new CategoryException("Usuario no encontrado: " + email));
+        User user =
+                slaveUserRepository
+                        .findByEmail(email)
+                        .orElseThrow(
+                                () -> new CategoryException("Usuario no encontrado: " + email));
         log.info("Actualizando la categoria para: {}", email);
         category.setUser(user);
         category.setRegisterDate(LocalDateTime.now());

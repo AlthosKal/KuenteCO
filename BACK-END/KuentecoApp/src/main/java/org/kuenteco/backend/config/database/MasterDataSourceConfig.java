@@ -18,7 +18,9 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Primary
 @Configuration
@@ -70,5 +72,16 @@ public class MasterDataSourceConfig {
     public PlatformTransactionManager transactionManager(
             @Qualifier("masterEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
+    }
+
+    @Primary
+    @Bean
+    public TransactionTemplate transactionTemplate(
+            @Qualifier("masterTransactionManager") PlatformTransactionManager transactionManager) {
+        log.info("Configurando TransactionTemplate para la base de datos maestra");
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+        transactionTemplate.setTimeout(30); // 30 segundos
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        return transactionTemplate;
     }
 }
