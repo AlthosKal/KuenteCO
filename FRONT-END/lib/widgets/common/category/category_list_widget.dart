@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../dto/app/category/category_dto.dart';
 
-class CategoryListItem extends StatelessWidget {
+class CategoryListWidget extends StatelessWidget {
   final CategoryDTO category;
   final VoidCallback onTap;
 
-  const CategoryListItem({
+  const CategoryListWidget({
     super.key,
     required this.category,
     required this.onTap,
@@ -13,12 +13,6 @@ class CategoryListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final start = category.startDate != null
-        ? "${category.startDate!.day}/${category.startDate!.month}"
-        : "Sin fecha";
-    final finish = category.finishDate != null
-        ? "${category.finishDate!.day}/${category.finishDate!.month}"
-        : "Sin fecha";
 
     return InkWell(
       onTap: onTap,
@@ -33,9 +27,9 @@ class CategoryListItem extends StatelessWidget {
           child: Row(
             children: [
               const Icon(
-                Icons.category,
+                Icons.bookmarks,
                 size: 40,
-                color: Colors.blue,
+                color: Colors.purpleAccent,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -43,7 +37,7 @@ class CategoryListItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      category.description.name,
+                      category.name,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -51,8 +45,7 @@ class CategoryListItem extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    Text("📅 $start → $finish"),
-                    Text("💰 Presupuesto ID: ${category.budgetId}"),
+                    Text("💰 Presupuesto: \$${category.description.assignedBudget}"),
                   ],
                 ),
               ),
