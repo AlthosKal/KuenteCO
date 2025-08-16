@@ -4,6 +4,7 @@ import '../../controllers/category_controller.dart';
 import '../../widgets/common/category/category_list_widget.dart';
 import '../../widgets/common/category/create_category_widget.dart';
 import '../../widgets/common/category/delete_category_widget.dart';
+import '../../widgets/common/category/edit_category_widget.dart';
 
 class CategoryView extends StatefulWidget {
   const CategoryView({super.key});
@@ -24,6 +25,14 @@ class _CategoryViewState extends State<CategoryView> {
     final result = await DeleteCategoryWidget.showDeleteDialog(context, category);
     if (result == true) {
       // La eliminación fue exitosa, la lista se actualizará automáticamente
+      // gracias al Provider y el controlador
+    }
+  }
+
+  Future<void> _handleEditCategory(category) async {
+    final result = await EditCategoryWidget.showEditDialog(context, category);
+    if (result == true) {
+      // La edición fue exitosa, la lista se actualizará automáticamente
       // gracias al Provider y el controlador
     }
   }
@@ -155,6 +164,7 @@ class _CategoryViewState extends State<CategoryView> {
                     return CategoryListWidget(
                       category: category,
                       onTap: () => _showCategoryDetail(context, category),
+                      onEdit: () => _handleEditCategory(category),
                       onDelete: () => _handleDeleteCategory(category),
                     );
                   },

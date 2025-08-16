@@ -71,9 +71,19 @@ class CategoryService {
   }
 
   // ✅ PATCH /category/update
-  Future<CategoryDTO> updateCategory(CategoryDTO dto) async {
-    final response = await _apiClient.patchApp('/category/update', dto.toJson());
-    return CategoryDTO.fromJson(response.data);
+  Future<void> updateCategory(CategoryDTO dto) async {
+    final payload = dto.toJson();
+    print('🔄 Updating category with payload: $payload');
+    
+    final response = await _apiClient.patchApp('/category/update', payload);
+    
+    print('📡 Server response status: ${response.statusCode}');
+    print('📡 Server response data: ${response.data}');
+    
+    // Verificamos que la petición fue exitosa
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Failed to update category: ${response.statusCode}');
+    }
   }
 
   // ✅ PUT /category/batch/update

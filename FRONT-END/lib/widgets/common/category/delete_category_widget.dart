@@ -159,38 +159,6 @@ class _DeleteCategoryWidgetState extends State<DeleteCategoryWidget> {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Información de la categoría:',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade700,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _buildInfoRow('Nombre', widget.category.name),
-                  _buildInfoRow(
-                    'Presupuesto',
-                    '\$${widget.category.description.assignedBudget.toStringAsFixed(2)}',
-                  ),
-                  _buildInfoRow(
-                    'Estado',
-                    widget.category.description.state.name,
-                  ),
-                ],
-              ),
-            ),
             if (_errorMessage != null) ...[
               const SizedBox(height: 16),
               Container(
@@ -243,36 +211,6 @@ class _DeleteCategoryWidgetState extends State<DeleteCategoryWidget> {
               : const Text('Eliminar'),
         ),
       ],
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 70,
-            child: Text(
-              '$label:',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade600,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

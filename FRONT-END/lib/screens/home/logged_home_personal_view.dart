@@ -4,6 +4,7 @@ import '../../widgets/common/background/background_widget.dart';
 import '../../widgets/common/blurred_card_widget.dart';
 import '../../widgets/common/footer/footer_logged_widget.dart';
 import '../../widgets/common/navbar/navbar_logged_widget.dart';
+import '../../widgets/common/category/category_card_widget.dart';
 
 class LoggedHomePersonalView extends StatelessWidget {
   final String userName;
@@ -86,13 +87,8 @@ class LoggedHomePersonalView extends StatelessWidget {
                           mainAxisSpacing: 10,
                           childAspectRatio: 1.1,
                           children: [
-                            BlurredCard(
-                              child: _buildCardItem(
-                                icon: Icons.shopping_bag_outlined,
-                                title: "Mis pedidos",
-                                onTap: () {},
-                              ),
-                            ),
+                            // 📋 Card de Categorías (reemplaza Mis pedidos)
+                            const CategoryCardWidget(),
                             BlurredCard(
                               child: _buildCardItem(
                                 icon: Icons.wallet_outlined,

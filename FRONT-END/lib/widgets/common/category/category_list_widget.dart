@@ -5,12 +5,14 @@ class CategoryListWidget extends StatelessWidget {
   final CategoryDTO category;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
+  final VoidCallback? onEdit;
 
   const CategoryListWidget({
     super.key,
     required this.category,
     required this.onTap,
     this.onDelete,
+    this.onEdit,
   });
 
   @override
@@ -58,6 +60,18 @@ class CategoryListWidget extends StatelessWidget {
                     Icons.info_outline,
                     color: Colors.grey,
                   ),
+                  if (onEdit != null) ...[
+                    const SizedBox(width: 8),
+                    IconButton(
+                      onPressed: onEdit,
+                      icon: const Icon(
+                        Icons.edit_outlined,
+                        color: Colors.blue,
+                      ),
+                      iconSize: 20,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ],
                   if (onDelete != null) ...[
                     const SizedBox(width: 8),
                     IconButton(
