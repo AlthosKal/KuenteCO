@@ -4,11 +4,15 @@ import '../../../dto/app/category/category_dto.dart';
 class CategoryListWidget extends StatelessWidget {
   final CategoryDTO category;
   final VoidCallback onTap;
+  final VoidCallback? onDelete;
+  final VoidCallback? onEdit;
 
   const CategoryListWidget({
     super.key,
     required this.category,
     required this.onTap,
+    this.onDelete,
+    this.onEdit,
   });
 
   @override
@@ -49,9 +53,38 @@ class CategoryListWidget extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(
-                Icons.info_outline,
-                color: Colors.grey,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.info_outline,
+                    color: Colors.grey,
+                  ),
+                  if (onEdit != null) ...[
+                    const SizedBox(width: 8),
+                    IconButton(
+                      onPressed: onEdit,
+                      icon: const Icon(
+                        Icons.edit_outlined,
+                        color: Colors.blue,
+                      ),
+                      iconSize: 20,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ],
+                  if (onDelete != null) ...[
+                    const SizedBox(width: 8),
+                    IconButton(
+                      onPressed: onDelete,
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: Colors.red,
+                      ),
+                      iconSize: 20,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ],
+                ],
               ),
             ],
           ),
