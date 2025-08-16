@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/category_controller.dart';
-import '../../dto/app/category/new_category_dto.dart';
-import '../../dto/app/extra/description_category_extra.dart';
-import '../../utils/enum/state_enum.dart' as StateEnum;
 import '../../widgets/common/category/category_list_widget.dart';
+import '../../widgets/common/category/create_category_widget.dart';
+import '../../widgets/common/category/delete_category_widget.dart';
+import '../../widgets/common/category/edit_category_widget.dart';
 
 class CategoryView extends StatefulWidget {
   const CategoryView({super.key});
@@ -19,6 +19,22 @@ class _CategoryViewState extends State<CategoryView> {
     super.initState();
     Future.microtask(() =>
         Provider.of<CategoryController>(context, listen: false).loadCategories());
+  }
+
+  Future<void> _handleDeleteCategory(category) async {
+    final result = await DeleteCategoryWidget.showDeleteDialog(context, category);
+    if (result == true) {
+      // La eliminación fue exitosa, la lista se actualizará automáticamente
+      // gracias al Provider y el controlador
+    }
+  }
+
+  Future<void> _handleEditCategory(category) async {
+    final result = await EditCategoryWidget.showEditDialog(context, category);
+    if (result == true) {
+      // La edición fue exitosa, la lista se actualizará automáticamente
+      // gracias al Provider y el controlador
+    }
   }
 
   void _showCategoryDetail(BuildContext context, category) {
@@ -74,115 +90,6 @@ class _CategoryViewState extends State<CategoryView> {
     );
   }
 
-  void _showCreateCategoryDialog(BuildContext context) {
-    final controller = Provider.of<CategoryController>(context, listen: false);
-    final nameController = TextEditingController();
-    final budgetController = TextEditingController();
-    final budgetIdController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Text('Crear Nueva Categoría'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nombre de la categoría',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: budgetController,
-                      decoration: const InputDecoration(
-                        labelText: 'Presupuesto asignado',
-                        border: OutlineInputBorder(),
-                        prefixText: '\$ ',
-                      ),
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: budgetIdController,
-                      decoration: const InputDecoration(
-                        labelText: 'ID del presupuesto (opcional)',
-                        border: OutlineInputBorder(),
-                        helperText: 'Dejar vacío si no hay presupuesto asociado',
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancelar'),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (nameController.text.isEmpty ||
-                        budgetController.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Por favor, completa el nombre y el presupuesto'),
-                        ),
-                      );
-                      return;
-                    }
-
-                    try {
-                      final descriptionCategory = DescriptionCategory(
-                        assignedBudget: double.parse(budgetController.text),
-                        state: StateEnum.State.ACTIVE,
-                      );
-                      
-                      final newCategory = NewCategoryDTO(
-                        budgetId: budgetIdController.text.isNotEmpty 
-                            ? int.parse(budgetIdController.text) 
-                            : null,
-                        name: nameController.text,
-                        description: descriptionCategory,
-                      );
-
-                      await controller.addCategory(newCategory);
-                      
-                      if (mounted) {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Categoría creada exitosamente'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Error al crear la categoría: $e'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    }
-                  },
-                  child: const Text('Crear'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -193,9 +100,12 @@ class _CategoryViewState extends State<CategoryView> {
         title: const Text("Categorías"),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showCreateCategoryDialog(context),
-        child: const Icon(Icons.add),
+        onPressed: () => showDialog(
+          context: context,
+          builder: (context) => const CreateCategoryWidget(),
+        ),
         tooltip: 'Crear nueva categoría',
+        child: const Icon(Icons.add),
       ),
       body: controller.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -254,6 +164,8 @@ class _CategoryViewState extends State<CategoryView> {
                     return CategoryListWidget(
                       category: category,
                       onTap: () => _showCategoryDetail(context, category),
+                      onEdit: () => _handleEditCategory(category),
+                      onDelete: () => _handleDeleteCategory(category),
                     );
                   },
                 ),

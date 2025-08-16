@@ -16,13 +16,26 @@ class CategoryDTO {
   });
 
   factory CategoryDTO.fromJson(Map<String, dynamic> json) {
-    return CategoryDTO(
-      id: json['id'],
-      budgetId: json['budgetId'],
-      name: json['name'],
-      description: DescriptionCategory.fromJson(json['description']),
-      registerDate: DateTime.parse(json['registerDate']),
-    );
+    try {
+      final id = json['id'];
+      if (id == null) {
+        throw Exception('CategoryDTO: id field is null in JSON: $json');
+      }
+      
+      return CategoryDTO(
+        id: id is int ? id : int.parse(id.toString()),
+        budgetId: json['budgetId'] != null 
+            ? (json['budgetId'] is int 
+                ? json['budgetId'] as int 
+                : int.parse(json['budgetId'].toString()))
+            : null,
+        name: json['name']?.toString() ?? '',
+        description: DescriptionCategory.fromJson(json['description'] ?? {}),
+        registerDate: DateTime.parse(json['registerDate']?.toString() ?? DateTime.now().toIso8601String()),
+      );
+    } catch (e) {
+      throw Exception('Error parsing CategoryDTO from JSON: $json. Error: $e');
+    }
   }
 
   Map<String, dynamic> toJson() {
