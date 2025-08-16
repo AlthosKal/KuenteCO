@@ -83,16 +83,16 @@ class CategoryController extends ChangeNotifier {
 
   // 📌 Agregar categoría
   Future<void> addCategory(NewCategoryDTO dto) async {
-    _setLoading(true);
+    _setError(null); // Limpiar cualquier error previo
+    
     try {
-      final newCategory = await _service.addCategory(dto);
-      categories.add(newCategory);
-      notifyListeners();
-      _setError(null);
+      // Crear la categoría en el servidor
+      await _service.addCategory(dto);
+      
+      // Recargar la lista completa desde el servidor
+      await loadCategories();
     } catch (e) {
       _setError(e.toString());
-    } finally {
-      _setLoading(false);
     }
   }
 
@@ -100,12 +100,12 @@ class CategoryController extends ChangeNotifier {
   Future<void> updateCategory(CategoryDTO dto) async {
     _setLoading(true);
     try {
-      final updated = await _service.updateCategory(dto);
-      final index = categories.indexWhere((c) => c.id == updated.id);
-      if (index != -1) {
-        categories[index] = updated;
-      }
-      notifyListeners();
+      // Actualizar la categoría en el servidor
+      await _service.updateCategory(dto);
+      
+      // Recargar toda la lista desde el servidor para asegurar consistencia
+      categories = await _service.getAllCategories();
+      
       _setError(null);
     } catch (e) {
       _setError(e.toString());
@@ -118,9 +118,12 @@ class CategoryController extends ChangeNotifier {
   Future<void> deleteCategory(int id) async {
     _setLoading(true);
     try {
+      // Eliminar la categoría en el servidor
       await _service.deleteCategory(id);
-      categories.removeWhere((c) => c.id == id);
-      notifyListeners();
+      
+      // Recargar toda la lista desde el servidor para asegurar consistencia
+      categories = await _service.getAllCategories();
+      
       _setError(null);
     } catch (e) {
       _setError(e.toString());

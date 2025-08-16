@@ -1,8 +1,8 @@
-import '../../../utils/enum/state_enum.dart';
+import '../../../utils/enum/state_enum.dart' as state_enum;
 
 class DescriptionCategory {
   final double assignedBudget;
-  final State state;
+  final state_enum.State state;
 
   DescriptionCategory({
     required this.assignedBudget,
@@ -10,13 +10,26 @@ class DescriptionCategory {
   });
 
   factory DescriptionCategory.fromJson(Map<String, dynamic> json) {
-    return DescriptionCategory(
-      assignedBudget: (json['assignedBudget'] as num).toDouble(),
-      state: State.values.firstWhere(
-            (e) => e.name == json['state'],
-        orElse: () => State.PENDING,
-      ),
-    );
+    try {
+      final assignedBudget = json['assignedBudget'];
+      final state = json['state'];
+      
+      return DescriptionCategory(
+        assignedBudget: assignedBudget != null 
+            ? (assignedBudget is num 
+                ? assignedBudget.toDouble() 
+                : double.parse(assignedBudget.toString()))
+            : 0.0,
+        state: state != null 
+            ? state_enum.State.values.firstWhere(
+                (e) => e.name.toString() == state.toString(),
+                orElse: () => state_enum.State.PENDING,
+              )
+            : state_enum.State.PENDING,
+      );
+    } catch (e) {
+      throw Exception('Error parsing DescriptionCategory from JSON: $json. Error: $e');
+    }
   }
 
   Map<String, dynamic> toJson() {

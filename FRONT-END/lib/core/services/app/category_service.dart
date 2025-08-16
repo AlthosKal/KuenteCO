@@ -50,9 +50,13 @@ class CategoryService {
   }
 
   // ✅ POST /category/add
-  Future<CategoryDTO> addCategory(NewCategoryDTO dto) async {
+  Future<void> addCategory(NewCategoryDTO dto) async {
     final response = await _apiClient.postApp('/category/add', dto.toJson());
-    return CategoryDTO.fromJson(response.data['data']);
+    
+    // Verificamos que la petición fue exitosa
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Failed to create category: ${response.statusCode}');
+    }
   }
 
   // ✅ POST /category/batch/add
