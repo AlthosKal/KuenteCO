@@ -9,9 +9,11 @@ import lombok.NoArgsConstructor;
 import org.kuenteco.backend.entity.extra.DescriptionCategory;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class NewCategoryDTO {
+@NoArgsConstructor
+public class UpdateCategoryDTO {
+    private Integer id;
+
     @Positive(message = "El ID del presupuesto debe ser un número positivo")
     private Integer budgetId;
 

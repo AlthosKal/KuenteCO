@@ -9,10 +9,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.config.jwt.AuthCredentials;
-import org.kuenteco.backend.dto.logic.category.CategoryDTO;
-import org.kuenteco.backend.dto.logic.category.CategoryReportDTO;
-import org.kuenteco.backend.dto.logic.category.NewCategoryDTO;
-import org.kuenteco.backend.dto.logic.category.TransactionsByCategoryDTO;
+import org.kuenteco.backend.dto.logic.category.*;
 import org.kuenteco.backend.dto.logic.transaction.kuenteco.TransactionDetailDTO;
 import org.kuenteco.backend.entity.Category;
 import org.kuenteco.backend.entity.Transaction;
@@ -150,7 +147,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void updateCategory(CategoryDTO dto) {
+    public void updateCategory(UpdateCategoryDTO dto) {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
         RoleList role = credentials.role();
@@ -158,20 +155,13 @@ public class CategoryServiceImpl implements CategoryService {
         if (role == RoleList.ROLE_PROFILE) {
             throw new CategoryException("Endpoint solo disponible para usuarios");
         }
-        User user =
-                slaveUserRepository
-                        .findByEmail(email)
-                        .orElseThrow(
-                                () -> new CategoryException("Usuario no encontrado: " + email));
-
-        Category category =
-                slaveCategoryRepository
-                        .getCategoryByUserAndId(user, dto.getId())
-                        .orElseThrow(() -> new CategoryException("Categoría no encontrada: "));
-        updateCategoryMapper.toEntity(dto);
-        resolveCategory(dto.getBudgetId(), category);
-        category.setRegisterDate(LocalDateTime.now());
+        Category category = prepareUpdateCategory(dto);
+        User user = slaveUserRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new CategoryException("Usuario no encontrado: " + email));
         log.info("Actualizando la categoria para: {}", email);
+        category.setUser(user);
+        category.setRegisterDate(LocalDateTime.now());
         masterCategoryRepository.save(category);
     }
 
@@ -182,12 +172,9 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (role == RoleList.ROLE_PROFILE) {
             throw new CategoryException("Endpoint solo disponible para usuarios");
-        }
-        if (id == null) {
+        } else if (id == null) {
             throw new CategoryException("Id del rubro no puede ser nulo");
-        }
-
-        if (!slaveCategoryRepository.existsById(id)) {
+        } else if (!slaveCategoryRepository.existsById(id)) {
             throw new CategoryException("Rubro no encontrado con el ID: " + id);
         }
 
@@ -240,16 +227,22 @@ public class CategoryServiceImpl implements CategoryService {
         return category;
     }
 
-    private void resolveCategory(Integer categoryId, Category category) {
-        if (categoryId != null) {
+    private Category prepareUpdateCategory(UpdateCategoryDTO dto) {
+        Category category = updateCategoryMapper.toEntity(dto);
+        resolveCategory(dto.getBudgetId(), category);
+        return category;
+    }
+
+    private void resolveCategory(Integer budgetId, Category category) {
+        if (budgetId != null) {
             category.setBudget(
                     slaveBudgetRepository
-                            .findById(categoryId)
+                            .findById(budgetId)
                             .orElseThrow(
                                     () ->
                                             new CategoryException(
                                                     "Budget no encontrado por el Id: "
-                                                            + categoryId)));
+                                                            + budgetId)));
         }
         category.setBudget(null);
     }

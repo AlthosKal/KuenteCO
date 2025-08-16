@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface SlaveSubscriptionRepository extends JpaRepository<Subscription, Integer> {
     // Obtiene todas las suscripciones de un usuario
     List<Subscription> findByUser(User user);
-    
+
     // Obtiene la suscripción más reciente del usuario (ordenada por ID descendente)
     Optional<Subscription> findFirstByUserOrderByIdDesc(User user);
 

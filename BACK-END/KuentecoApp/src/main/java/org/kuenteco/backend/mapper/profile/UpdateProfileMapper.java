@@ -19,7 +19,7 @@ public interface UpdateProfileMapper {
         @Mapping(target = "user", ignore = true),
         @Mapping(target = "role", ignore = true),
         @Mapping(target = "password", ignore = true),
-            @Mapping(target = "image", ignore = true)
+        @Mapping(target = "image", ignore = true)
     })
     void toEntity(UpdateProfileDTO dto, @MappingTarget Profile entity);
 }
