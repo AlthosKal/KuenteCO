@@ -13,7 +13,8 @@ class CategoryService {
   // ✅ GET /category
   Future<List<CategoryDTO>> getAllCategories() async {
     final response = await _apiClient.getApp('/category');
-    return (response.data as List)
+    final data = response.data['data'] as List;
+    return data
         .map((e) => CategoryDTO.fromJson(e))
         .toList();
   }
@@ -51,7 +52,7 @@ class CategoryService {
   // ✅ POST /category/add
   Future<CategoryDTO> addCategory(NewCategoryDTO dto) async {
     final response = await _apiClient.postApp('/category/add', dto.toJson());
-    return CategoryDTO.fromJson(response.data);
+    return CategoryDTO.fromJson(response.data['data']);
   }
 
   // ✅ POST /category/batch/add

@@ -183,29 +183,31 @@ ORDER BY
 CREATE OR REPLACE VIEW vw_category_enrollments AS
 SELECT
     c.id AS category_id,
-    COALESCE(c.description->>'name', 'Sin nombre') AS category_name,
+    COALESCE(c.name, c.description->>'name', 'Sin nombre') AS category_name,
     c.id_user AS category_owner_id,
-    c.id_user AS owner_user_id, -- Agregar para consistencia con otras vistas
+    c.id_user AS owner_user_id, -- Consistencia con otras vistas
     COUNT(DISTINCT ce.id_user) AS enrolled_users_count,
     COUNT(DISTINCT ce.id_profile) AS enrolled_profiles_count,
     COUNT(DISTINCT ce.id) AS total_enrollments,
     MIN(ce.enrollment_date) AS first_enrollment_date,
     MAX(ce.enrollment_date) AS last_enrollment_date,
-    c.start_date AS category_start_date,
-    c.finish_date AS category_finish_date,
+    c.register_date AS category_register_date,
+    (c.description->>'assignedBudget')::numeric AS assigned_budget,
+    c.description->>'state' AS category_state,
     CASE
-        WHEN c.finish_date IS NULL THEN 'ACTIVA'
-        WHEN c.finish_date > NOW() THEN 'ACTIVA'
-        ELSE 'FINALIZADA'
+        WHEN c.description->>'state' = 'ACTIVE' THEN 'ACTIVA'
+        WHEN c.description->>'state' IN ('INACTIVE', 'CANCELLED') THEN 'FINALIZADA'
+        ELSE c.description->>'state'
         END AS category_status
 FROM
     category c
-        LEFT JOIN category_enrollment ce ON c.id = ce.id_category
+        LEFT JOIN category_enrollment ce
+                  ON c.id = ce.id_category
 GROUP BY
     c.id,
     c.name,
+    c.description,
     c.id_user,
-    c.start_date,
-    c.finish_date
+    c.register_date
 ORDER BY
     total_enrollments DESC;

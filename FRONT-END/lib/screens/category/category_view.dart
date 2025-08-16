@@ -4,7 +4,7 @@ import '../../controllers/category_controller.dart';
 import '../../dto/app/category/new_category_dto.dart';
 import '../../dto/app/extra/description_category_extra.dart';
 import '../../utils/enum/state_enum.dart' as StateEnum;
-import '../../widgets/common/category/category_list_item.dart';
+import '../../widgets/common/category/category_list_widget.dart';
 
 class CategoryView extends StatefulWidget {
   const CategoryView({super.key});
@@ -22,12 +22,7 @@ class _CategoryViewState extends State<CategoryView> {
   }
 
   void _showCategoryDetail(BuildContext context, category) {
-    final start = category.startDate != null
-        ? "${category.startDate!.day}/${category.startDate!.month}/${category.startDate!.year}"
-        : "Sin fecha";
-    final finish = category.finishDate != null
-        ? "${category.finishDate!.day}/${category.finishDate!.month}/${category.finishDate!.year}"
-        : "Sin fecha";
+    final registerDateStr = "${category.registerDate.day}/${category.registerDate.month}/${category.registerDate.year}";
 
     showModalBottomSheet(
       context: context,
@@ -52,16 +47,17 @@ class _CategoryViewState extends State<CategoryView> {
               ),
               const SizedBox(height: 10),
               Text(
-                category.description.name,
+                category.name,
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const Divider(),
-              Text("📅 Inicio: $start"),
-              Text("📅 Fin: $finish"),
-              Text("💰 Presupuesto ID: ${category.budgetId}"),
+              Text("📅 Fecha de registro: $registerDateStr"),
+              Text("💰 Presupuesto asignado: \$${category.description.assignedBudget}"),
+              Text("💰 Presupuesto ID: ${category.budgetId ?? 'Sin asignar'}"),
+              Text("🔄 Estado: ${category.description.state}"),
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 onPressed: () {
@@ -83,8 +79,6 @@ class _CategoryViewState extends State<CategoryView> {
     final nameController = TextEditingController();
     final budgetController = TextEditingController();
     final budgetIdController = TextEditingController();
-    DateTime? startDate;
-    DateTime? finishDate;
 
     showDialog(
       context: context,
@@ -118,63 +112,11 @@ class _CategoryViewState extends State<CategoryView> {
                     TextField(
                       controller: budgetIdController,
                       decoration: const InputDecoration(
-                        labelText: 'ID del presupuesto',
+                        labelText: 'ID del presupuesto (opcional)',
                         border: OutlineInputBorder(),
+                        helperText: 'Dejar vacío si no hay presupuesto asociado',
                       ),
                       keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextButton(
-                            onPressed: () async {
-                              final picked = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(2020),
-                                lastDate: DateTime(2030),
-                              );
-                              if (picked != null) {
-                                setState(() {
-                                  startDate = picked;
-                                });
-                              }
-                            },
-                            child: Text(
-                              startDate != null
-                                  ? 'Inicio: ${startDate!.day}/${startDate!.month}/${startDate!.year}'
-                                  : 'Seleccionar fecha inicio',
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextButton(
-                            onPressed: () async {
-                              final picked = await showDatePicker(
-                                context: context,
-                                initialDate: startDate ?? DateTime.now(),
-                                firstDate: startDate ?? DateTime(2020),
-                                lastDate: DateTime(2030),
-                              );
-                              if (picked != null) {
-                                setState(() {
-                                  finishDate = picked;
-                                });
-                              }
-                            },
-                            child: Text(
-                              finishDate != null
-                                  ? 'Fin: ${finishDate!.day}/${finishDate!.month}/${finishDate!.year}'
-                                  : 'Seleccionar fecha fin',
-                            ),
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),
@@ -187,11 +129,10 @@ class _CategoryViewState extends State<CategoryView> {
                 ElevatedButton(
                   onPressed: () async {
                     if (nameController.text.isEmpty ||
-                        budgetController.text.isEmpty ||
-                        budgetIdController.text.isEmpty) {
+                        budgetController.text.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Por favor, completa todos los campos obligatorios'),
+                          content: Text('Por favor, completa el nombre y el presupuesto'),
                         ),
                       );
                       return;
@@ -199,16 +140,16 @@ class _CategoryViewState extends State<CategoryView> {
 
                     try {
                       final descriptionCategory = DescriptionCategory(
-                        name: nameController.text,
                         assignedBudget: double.parse(budgetController.text),
                         state: StateEnum.State.ACTIVE,
                       );
                       
                       final newCategory = NewCategoryDTO(
-                        budgetId: int.parse(budgetIdController.text),
+                        budgetId: budgetIdController.text.isNotEmpty 
+                            ? int.parse(budgetIdController.text) 
+                            : null,
+                        name: nameController.text,
                         description: descriptionCategory,
-                        startDate: startDate ?? DateTime.now(),
-                        finishDate: finishDate ?? DateTime.now().add(const Duration(days: 30)),
                       );
 
                       await controller.addCategory(newCategory);
@@ -310,7 +251,7 @@ class _CategoryViewState extends State<CategoryView> {
                   itemCount: controller.categories.length,
                   itemBuilder: (context, index) {
                     final category = controller.categories[index];
-                    return CategoryListItem(
+                    return CategoryListWidget(
                       category: category,
                       onTap: () => _showCategoryDetail(context, category),
                     );

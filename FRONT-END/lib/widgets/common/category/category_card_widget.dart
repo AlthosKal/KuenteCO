@@ -42,81 +42,153 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
       );
     }
 
-    // // 🔹 Si no hay categorías → card para crear
-    // if (categoryController.categories.isEmpty) {
-    //   return InkWell(
-    //     onTap: () => Navigator.pushNamed(context, AppRoutes.categoryView),
-    //     borderRadius: BorderRadius.circular(16),
-    //     child: Container(
-    //       decoration: BoxDecoration(
-    //         border: Border.all(color: Colors.grey.withOpacity(0.3), width: 2),
-    //         borderRadius: BorderRadius.circular(16),
-    //       ),
-    //       child: const Padding(
-    //         padding: EdgeInsets.all(12),
-    //         child: Column(
-    //           mainAxisAlignment: MainAxisAlignment.center,
-    //           children: [
-    //             Icon(Icons.add_circle_outline, size: 32, color: Colors.green),
-    //             SizedBox(height: 8),
-    //             Text(
-    //               'Crear nueva\ncategoría',
-    //               style: TextStyle(
-    //                 fontSize: 14,
-    //                 fontWeight: FontWeight.w600,
-    //                 color: Colors.black87,
-    //               ),
-    //               textAlign: TextAlign.center,
-    //             ),
-    //             SizedBox(height: 4),
-    //             Text(
-    //               'Aún no tienes categorías',
-    //               style: TextStyle(
-    //                 fontSize: 10,
-    //                 color: Colors.black54,
-    //               ),
-    //               textAlign: TextAlign.center,
-    //             ),
-    //           ],
-    //         ),
-    //       ),
-    //     ),
-    //   );
-    // }
-
-    // 🔹 Si hay categorías → mostrar la primera
-    final category = categoryController.categories.first;
-    return InkWell(
-      onTap: () => Navigator.pushNamed(context, AppRoutes.categoryView),
-      borderRadius: BorderRadius.circular(16),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.category, size: 32, color: Colors.blue),
-            const SizedBox(height: 8),
-            Text(
-              category.description.name,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '💰 ID: ${category.budgetId}',
-              style: const TextStyle(
-                fontSize: 10,
-                color: Colors.black54,
-              ),
-              textAlign: TextAlign.center,
+    // 🔹 Si no hay categorías → mostrar botón para crear
+    if (categoryController.categories.isEmpty) {
+      return Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF6C63FF), Color(0xFF4CAF50)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.blue.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => Navigator.pushNamed(context, AppRoutes.categoryView),
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.category_outlined,
+                      size: 28,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Categorías',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Gestionar categorías',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white70,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // 🔹 Si hay categorías → mostrar información de la primera
+    final category = categoryController.categories.first;
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.purple.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => Navigator.pushNamed(context, AppRoutes.categoryView),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.folder_special,
+                    size: 28,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  category.name,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '\$${category.description.assignedBudget}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 2),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${categoryController.categories.length} categoría${categoryController.categories.length > 1 ? 's' : ''}',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.white70,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -127,52 +199,67 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
     required String errorMessage,
     required VoidCallback onRetry,
   }) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error_outline, color: Colors.red, size: 24),
-          const SizedBox(height: 8),
-          const Text(
-            'Error al cargar categorías',
-            style: TextStyle(fontSize: 12, color: Colors.red, fontWeight: FontWeight.w600),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                child: TextButton(
-                  onPressed: onRetry,
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.blue.withOpacity(0.1),
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                  ),
-                  child: const Text(
-                    'Reintentar',
-                    style: TextStyle(fontSize: 10, color: Colors.blue),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 4),
-              Expanded(
-                child: TextButton(
-                  onPressed: () => Navigator.pushNamed(context, AppRoutes.categoryView),
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.green.withOpacity(0.1),
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                  ),
-                  child: const Text(
-                    'Ir a Categorías',
-                    style: TextStyle(fontSize: 10, color: Colors.green),
-                  ),
-                ),
-              ),
-            ],
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.red.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => Navigator.pushNamed(context, AppRoutes.categoryView),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.warning_rounded,
+                    size: 28,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Error',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Toca para reintentar',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white70,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
