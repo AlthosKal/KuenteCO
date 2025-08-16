@@ -6,6 +6,7 @@ class CategoryListWidget extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback? onDelete;
   final VoidCallback? onEdit;
+  final VoidCallback? onAssign;
 
   const CategoryListWidget({
     super.key,
@@ -13,6 +14,7 @@ class CategoryListWidget extends StatelessWidget {
     required this.onTap,
     this.onDelete,
     this.onEdit,
+    this.onAssign,
   });
 
   @override
@@ -60,6 +62,19 @@ class CategoryListWidget extends StatelessWidget {
                     Icons.info_outline,
                     color: Colors.grey,
                   ),
+                  if (onAssign != null) ...[
+                    const SizedBox(width: 8),
+                    IconButton(
+                      onPressed: onAssign,
+                      icon: const Icon(
+                        Icons.person_add_outlined,
+                        color: Colors.green,
+                      ),
+                      iconSize: 20,
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Asignar a perfil',
+                    ),
+                  ],
                   if (onEdit != null) ...[
                     const SizedBox(width: 8),
                     IconButton(
