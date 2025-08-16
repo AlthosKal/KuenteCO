@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../controllers/category_controller.dart';
 import '../../widgets/common/category/category_list_widget.dart';
 import '../../widgets/common/category/create_category_widget.dart';
+import '../../widgets/common/category/delete_category_widget.dart';
 
 class CategoryView extends StatefulWidget {
   const CategoryView({super.key});
@@ -17,6 +18,14 @@ class _CategoryViewState extends State<CategoryView> {
     super.initState();
     Future.microtask(() =>
         Provider.of<CategoryController>(context, listen: false).loadCategories());
+  }
+
+  Future<void> _handleDeleteCategory(category) async {
+    final result = await DeleteCategoryWidget.showDeleteDialog(context, category);
+    if (result == true) {
+      // La eliminación fue exitosa, la lista se actualizará automáticamente
+      // gracias al Provider y el controlador
+    }
   }
 
   void _showCategoryDetail(BuildContext context, category) {
@@ -146,6 +155,7 @@ class _CategoryViewState extends State<CategoryView> {
                     return CategoryListWidget(
                       category: category,
                       onTap: () => _showCategoryDetail(context, category),
+                      onDelete: () => _handleDeleteCategory(category),
                     );
                   },
                 ),
