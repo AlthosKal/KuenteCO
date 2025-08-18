@@ -1,0 +1,33 @@
+﻿2025-08-18T14:35:30.6315724Z ##[group]Run actions/setup-java@v4
+2025-08-18T14:35:30.6316218Z with:
+2025-08-18T14:35:30.6316663Z   java-version: 17
+2025-08-18T14:35:30.6317026Z   distribution: zulu
+2025-08-18T14:35:30.6317426Z   java-package: jdk
+2025-08-18T14:35:30.6318119Z   check-latest: false
+2025-08-18T14:35:30.6318473Z   server-id: github
+2025-08-18T14:35:30.6318862Z   server-username: GITHUB_ACTOR
+2025-08-18T14:35:30.6319293Z   server-password: GITHUB_TOKEN
+2025-08-18T14:35:30.6319742Z   overwrite-settings: true
+2025-08-18T14:35:30.6320113Z   job-status: success
+2025-08-18T14:35:30.6320698Z   token: ***
+2025-08-18T14:35:30.6321087Z ##[endgroup]
+2025-08-18T14:35:30.8358382Z ##[group]Installed distributions
+2025-08-18T14:35:30.8383684Z Trying to resolve the latest version from remote
+2025-08-18T14:35:30.9254427Z Resolved latest version as 17.0.16+8
+2025-08-18T14:35:30.9255578Z Trying to download...
+2025-08-18T14:35:30.9256594Z Downloading Java 17.0.16+8 (Zulu) from https://cdn.azul.com/zulu/bin/zulu17.60.17-ca-crac-jdk17.0.16-linux_x64.tar.gz ...
+2025-08-18T14:35:34.5441155Z Extracting Java archive...
+2025-08-18T14:35:34.5546984Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/b8bdc04b-d908-46af-9717-b67c545712fd -f /home/runner/work/_temp/f044e1f1-872a-4d07-b886-4df90dfb0df4
+2025-08-18T14:35:37.2713707Z Java 17.0.16+8 was downloaded
+2025-08-18T14:35:37.2714289Z Setting Java 17.0.16+8 as the default
+2025-08-18T14:35:37.2726724Z Creating toolchains.xml for JDK version 17 from zulu
+2025-08-18T14:35:37.2814321Z Writing to /home/runner/.m2/toolchains.xml
+2025-08-18T14:35:37.2815018Z 
+2025-08-18T14:35:37.2815211Z Java configuration:
+2025-08-18T14:35:37.2815765Z   Distribution: zulu
+2025-08-18T14:35:37.2816317Z   Version: 17.0.16+8
+2025-08-18T14:35:37.2816933Z   Path: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.16-8/x64
+2025-08-18T14:35:37.2819618Z 
+2025-08-18T14:35:37.2820539Z ##[endgroup]
+2025-08-18T14:35:37.2840405Z Creating settings.xml with server-id: github
+2025-08-18T14:35:37.2840989Z Writing to /home/runner/.m2/settings.xml

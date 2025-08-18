@@ -1,0 +1,14 @@
+﻿2025-08-18T14:35:37.6665987Z ##[group]Run actions/cache@v4
+2025-08-18T14:35:37.6666345Z with:
+2025-08-18T14:35:37.6666553Z   path: ~/.m2
+2025-08-18T14:35:37.6666994Z   key: Linux-m2-d9ca40d1f2838b70b4e1d2e766f6b07142685887e144cbea303d45783f236a9b
+2025-08-18T14:35:37.6667467Z   restore-keys: Linux-m2
+2025-08-18T14:35:37.6667731Z   enableCrossOsArchive: false
+2025-08-18T14:35:37.6668033Z   fail-on-cache-miss: false
+2025-08-18T14:35:37.6668280Z   lookup-only: false
+2025-08-18T14:35:37.6668508Z   save-always: false
+2025-08-18T14:35:37.6668720Z env:
+2025-08-18T14:35:37.6668997Z   JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.16-8/x64
+2025-08-18T14:35:37.6669454Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.16-8/x64
+2025-08-18T14:35:37.6669822Z ##[endgroup]
+2025-08-18T14:35:37.8650970Z Cache not found for input keys: Linux-m2-d9ca40d1f2838b70b4e1d2e766f6b07142685887e144cbea303d45783f236a9b, Linux-m2
