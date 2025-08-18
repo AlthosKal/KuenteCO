@@ -1,0 +1,14 @@
+﻿2025-08-18T14:35:37.3043325Z ##[group]Run actions/cache@v4
+2025-08-18T14:35:37.3043715Z with:
+2025-08-18T14:35:37.3043924Z   path: ~/.sonar/cache
+2025-08-18T14:35:37.3044128Z   key: Linux-sonar
+2025-08-18T14:35:37.3044373Z   restore-keys: Linux-sonar
+2025-08-18T14:35:37.3044800Z   enableCrossOsArchive: false
+2025-08-18T14:35:37.3045047Z   fail-on-cache-miss: false
+2025-08-18T14:35:37.3045269Z   lookup-only: false
+2025-08-18T14:35:37.3045459Z   save-always: false
+2025-08-18T14:35:37.3045643Z env:
+2025-08-18T14:35:37.3045879Z   JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.16-8/x64
+2025-08-18T14:35:37.3046273Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.16-8/x64
+2025-08-18T14:35:37.3046582Z ##[endgroup]
+2025-08-18T14:35:37.4996024Z Cache not found for input keys: Linux-sonar, Linux-sonar
