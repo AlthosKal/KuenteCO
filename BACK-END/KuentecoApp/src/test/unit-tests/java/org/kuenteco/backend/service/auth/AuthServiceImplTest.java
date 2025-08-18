@@ -6,8 +6,6 @@ import static org.mockito.Mockito.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,55 +36,34 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AuthServiceImpl Unit Tests")
 class AuthServiceImplTest {
 
-    @InjectMocks
-    private AuthServiceImpl authService;
+    @InjectMocks private AuthServiceImpl authService;
 
-    @Mock
-    private PasswordEncoder passwordEncoder;
-    @Mock
-    private JwtUtil jwtUtil;
-    @Mock
-    private AuthenticationManagerBuilder authenticationManagerBuilder;
-    @Mock
-    private CookieService cookieService;
-    @Mock
-    private UserService userService;
-    @Mock
-    private MasterRoleRepository masterRoleRepository;
-    @Mock
-    private SlaveRoleRepository slaveRoleRepository;
-    @Mock
-    private MasterUserRepository masterUserRepository;
-    @Mock
-    private SlaveUserRepository slaveUserRepository;
-    @Mock
-    private TokenBlacklistService tokenBlacklistService;
-    @Mock
-    private TransactionTemplate transactionTemplate;
-    @Mock
-    private NewUserMapper newUserMapper;
-    @Mock
-    private SendgridService sendgridService;
-    @Mock
-    private MasterSubscriptionRepository masterSubscriptionRepository;
-    @Mock
-    private AuthenticationManager authenticationManager;
-    @Mock
-    private Authentication authentication;
-    @Mock
-    private HttpServletRequest httpServletRequest;
-    @Mock
-    private HttpServletResponse httpServletResponse;
+    @Mock private PasswordEncoder passwordEncoder;
+    @Mock private JwtUtil jwtUtil;
+    @Mock private AuthenticationManagerBuilder authenticationManagerBuilder;
+    @Mock private CookieService cookieService;
+    @Mock private UserService userService;
+    @Mock private MasterRoleRepository masterRoleRepository;
+    @Mock private SlaveRoleRepository slaveRoleRepository;
+    @Mock private MasterUserRepository masterUserRepository;
+    @Mock private SlaveUserRepository slaveUserRepository;
+    @Mock private TokenBlacklistService tokenBlacklistService;
+    @Mock private TransactionTemplate transactionTemplate;
+    @Mock private NewUserMapper newUserMapper;
+    @Mock private SendgridService sendgridService;
+    @Mock private MasterSubscriptionRepository masterSubscriptionRepository;
+    @Mock private AuthenticationManager authenticationManager;
+    @Mock private Authentication authentication;
+    @Mock private HttpServletRequest httpServletRequest;
+    @Mock private HttpServletResponse httpServletResponse;
 
     private User testUser;
     private Role testRole;
@@ -126,7 +103,7 @@ class AuthServiceImplTest {
     void shouldAuthenticateUserSuccessfully() {
         // Given
         String expectedToken = "jwt-token-123";
-        
+
         when(userService.findByNameOrEmail("test@kuenteco.com")).thenReturn(testUser);
         when(authenticationManagerBuilder.getObject()).thenReturn(authenticationManager);
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
@@ -140,8 +117,13 @@ class AuthServiceImplTest {
         assertNotNull(result);
         assertEquals(expectedToken, result.getToken());
         assertEquals(UserType.PERSONAL, result.getType());
-        
-        verify(cookieService).addHttpOnlyCookie(eq("jwt"), eq(expectedToken), eq(7 * 24 * 60 * 60), eq(httpServletResponse));
+
+        verify(cookieService)
+                .addHttpOnlyCookie(
+                        eq("jwt"),
+                        eq(expectedToken),
+                        eq(7 * 24 * 60 * 60),
+                        eq(httpServletResponse));
         verify(userService).findByNameOrEmail("test@kuenteco.com");
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
     }
@@ -154,9 +136,12 @@ class AuthServiceImplTest {
         when(userService.findByNameOrEmail("test@kuenteco.com")).thenReturn(testUser);
 
         // When & Then
-        AuthException exception = assertThrows(AuthException.class, () -> {
-            authService.authenticate(loginDTO, httpServletResponse);
-        });
+        AuthException exception =
+                assertThrows(
+                        AuthException.class,
+                        () -> {
+                            authService.authenticate(loginDTO, httpServletResponse);
+                        });
 
         assertEquals("Cuenta no activada, Por favor verifica tu correo", exception.getMessage());
         verify(authenticationManager, never()).authenticate(any());
@@ -170,9 +155,12 @@ class AuthServiceImplTest {
         loginDTO.setNameOrEmail("nonexistent@kuenteco.com");
 
         // When & Then
-        AuthException exception = assertThrows(AuthException.class, () -> {
-            authService.authenticate(loginDTO, httpServletResponse);
-        });
+        AuthException exception =
+                assertThrows(
+                        AuthException.class,
+                        () -> {
+                            authService.authenticate(loginDTO, httpServletResponse);
+                        });
 
         assertEquals("Cuenta no activada, Por favor verifica tu correo", exception.getMessage());
     }
@@ -187,13 +175,16 @@ class AuthServiceImplTest {
         when(newUserMapper.toEntity(newUserDTO)).thenReturn(testUser);
         when(passwordEncoder.encode("password123")).thenReturn("encoded-password");
         when(masterUserRepository.save(any(User.class))).thenReturn(testUser);
-        when(masterSubscriptionRepository.save(any(Subscription.class))).thenReturn(new Subscription());
+        when(masterSubscriptionRepository.save(any(Subscription.class)))
+                .thenReturn(new Subscription());
 
         // Configure transaction template to execute the lambda
-        when(transactionTemplate.execute(any())).thenAnswer(invocation -> {
-            TransactionCallback<?> callback = invocation.getArgument(0);
-            return callback.doInTransaction(null);
-        });
+        when(transactionTemplate.execute(any()))
+                .thenAnswer(
+                        invocation -> {
+                            TransactionCallback<?> callback = invocation.getArgument(0);
+                            return callback.doInTransaction(null);
+                        });
 
         // When
         authService.addUser(newUserDTO);
@@ -214,11 +205,15 @@ class AuthServiceImplTest {
         when(userService.existsByUserName("newuser")).thenReturn(true);
 
         // When & Then
-        AuthException exception = assertThrows(AuthException.class, () -> {
-            authService.addUser(newUserDTO);
-        });
+        AuthException exception =
+                assertThrows(
+                        AuthException.class,
+                        () -> {
+                            authService.addUser(newUserDTO);
+                        });
 
-        assertEquals("Datos Inválidos, nombre con caracteres no permitidos o ya existente", 
+        assertEquals(
+                "Datos Inválidos, nombre con caracteres no permitidos o ya existente",
                 exception.getMessage());
         verify(masterUserRepository, never()).save(any());
     }
@@ -231,11 +226,15 @@ class AuthServiceImplTest {
         when(userService.existsByUserEmail("newuser@kuenteco.com")).thenReturn(true);
 
         // When & Then
-        AuthException exception = assertThrows(AuthException.class, () -> {
-            authService.addUser(newUserDTO);
-        });
+        AuthException exception =
+                assertThrows(
+                        AuthException.class,
+                        () -> {
+                            authService.addUser(newUserDTO);
+                        });
 
-        assertEquals("Datos Inválidos, correo con caracteres no permitidos o ya existente", 
+        assertEquals(
+                "Datos Inválidos, correo con caracteres no permitidos o ya existente",
                 exception.getMessage());
         verify(masterUserRepository, never()).save(any());
     }
@@ -245,14 +244,17 @@ class AuthServiceImplTest {
     void shouldActivateUserSuccessfully() {
         // Given
         testUser.setState(State.PENDING);
-        when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+        when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                .thenReturn(Optional.of(testUser));
         when(masterUserRepository.save(testUser)).thenReturn(testUser);
 
         // Configure transaction template to execute the lambda
-        when(transactionTemplate.execute(any())).thenAnswer(invocation -> {
-            TransactionCallback<?> callback = invocation.getArgument(0);
-            return callback.doInTransaction(null);
-        });
+        when(transactionTemplate.execute(any()))
+                .thenAnswer(
+                        invocation -> {
+                            TransactionCallback<?> callback = invocation.getArgument(0);
+                            return callback.doInTransaction(null);
+                        });
 
         // When
         authService.activateUser("test@kuenteco.com");
@@ -267,18 +269,22 @@ class AuthServiceImplTest {
     void shouldHandleAlreadyActivatedUserGracefully() {
         // Given - User is already active
         testUser.setState(State.ACTIVE);
-        when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+        when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                .thenReturn(Optional.of(testUser));
 
         // Configure transaction template to return true
-        when(transactionTemplate.execute(any())).thenAnswer(invocation -> {
-            TransactionCallback<?> callback = invocation.getArgument(0);
-            return callback.doInTransaction(null);
-        });
+        when(transactionTemplate.execute(any()))
+                .thenAnswer(
+                        invocation -> {
+                            TransactionCallback<?> callback = invocation.getArgument(0);
+                            return callback.doInTransaction(null);
+                        });
 
         // When & Then - Should not throw exception
-        assertDoesNotThrow(() -> {
-            authService.activateUser("test@kuenteco.com");
-        });
+        assertDoesNotThrow(
+                () -> {
+                    authService.activateUser("test@kuenteco.com");
+                });
 
         // User state should remain active
         assertEquals(State.ACTIVE, testUser.getState());
@@ -288,20 +294,25 @@ class AuthServiceImplTest {
     @DisplayName("Should throw exception when activating non-existent user")
     void shouldThrowExceptionWhenActivatingNonExistentUser() {
         // Given
-        when(slaveUserRepository.findByEmail("nonexistent@kuenteco.com")).thenReturn(Optional.empty());
-        when(transactionTemplate.execute(any())).thenAnswer(invocation -> {
-            TransactionCallback<?> callback = invocation.getArgument(0);
-            try {
-                return callback.doInTransaction(null);
-            } catch (AuthException e) {
-                throw e;
-            }
-        });
+        when(slaveUserRepository.findByEmail("nonexistent@kuenteco.com"))
+                .thenReturn(Optional.empty());
+        when(transactionTemplate.execute(any()))
+                .thenAnswer(
+                        invocation -> {
+                            TransactionCallback<?> callback = invocation.getArgument(0);
+                            try {
+                                return callback.doInTransaction(null);
+                            } catch (AuthException e) {
+                                throw e;
+                            }
+                        });
 
         // When & Then
-        assertThrows(AuthException.class, () -> {
-            authService.activateUser("nonexistent@kuenteco.com");
-        });
+        assertThrows(
+                AuthException.class,
+                () -> {
+                    authService.activateUser("nonexistent@kuenteco.com");
+                });
     }
 
     @Test
@@ -313,15 +324,18 @@ class AuthServiceImplTest {
         changePasswordDTO.setCode("verification-code-123");
         changePasswordDTO.setNewPassword("newPassword123");
 
-        when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+        when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                .thenReturn(Optional.of(testUser));
         when(passwordEncoder.encode("newPassword123")).thenReturn("new-encoded-password");
         when(masterUserRepository.save(testUser)).thenReturn(testUser);
 
         // Configure transaction template
-        when(transactionTemplate.execute(any())).thenAnswer(invocation -> {
-            TransactionCallback<?> callback = invocation.getArgument(0);
-            return callback.doInTransaction(null);
-        });
+        when(transactionTemplate.execute(any()))
+                .thenAnswer(
+                        invocation -> {
+                            TransactionCallback<?> callback = invocation.getArgument(0);
+                            return callback.doInTransaction(null);
+                        });
 
         // When
         String result = authService.changePasswordWithVerification(changePasswordDTO);
@@ -342,20 +356,25 @@ class AuthServiceImplTest {
         changePasswordDTO.setEmail("test@kuenteco.com");
         changePasswordDTO.setNewPassword("newPassword123");
 
-        when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
-        when(transactionTemplate.execute(any())).thenAnswer(invocation -> {
-            TransactionCallback<?> callback = invocation.getArgument(0);
-            try {
-                return callback.doInTransaction(null);
-            } catch (RuntimeException e) {
-                throw e;
-            }
-        });
+        when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                .thenReturn(Optional.of(testUser));
+        when(transactionTemplate.execute(any()))
+                .thenAnswer(
+                        invocation -> {
+                            TransactionCallback<?> callback = invocation.getArgument(0);
+                            try {
+                                return callback.doInTransaction(null);
+                            } catch (RuntimeException e) {
+                                throw e;
+                            }
+                        });
 
         // When & Then
-        assertThrows(RuntimeException.class, () -> {
-            authService.changePasswordWithVerification(changePasswordDTO);
-        });
+        assertThrows(
+                RuntimeException.class,
+                () -> {
+                    authService.changePasswordWithVerification(changePasswordDTO);
+                });
 
         verify(passwordEncoder, never()).encode(anyString());
         verify(masterUserRepository, never()).save(any());
@@ -383,9 +402,12 @@ class AuthServiceImplTest {
         when(jwtUtil.resolveToken(httpServletRequest)).thenReturn(null);
 
         // When & Then
-        AuthException exception = assertThrows(AuthException.class, () -> {
-            authService.logout(httpServletRequest, httpServletResponse);
-        });
+        AuthException exception =
+                assertThrows(
+                        AuthException.class,
+                        () -> {
+                            authService.logout(httpServletRequest, httpServletResponse);
+                        });
 
         assertEquals("Token no proporcionado", exception.getMessage());
         verify(tokenBlacklistService, never()).addToBlacklist(anyString());
@@ -396,7 +418,7 @@ class AuthServiceImplTest {
     @DisplayName("Should validate role assignment during user registration")
     void shouldValidateRoleAssignmentDuringUserRegistration() {
         // Test that role assignment works correctly during user creation
-        
+
         // Given
         when(userService.existsByUserName("roletest")).thenReturn(false);
         when(userService.existsByUserEmail("roletest@kuenteco.com")).thenReturn(false);
@@ -404,13 +426,16 @@ class AuthServiceImplTest {
         when(newUserMapper.toEntity(any())).thenReturn(testUser);
         when(passwordEncoder.encode("password")).thenReturn("encoded");
         when(masterUserRepository.save(any())).thenReturn(testUser);
-        when(masterSubscriptionRepository.save(any(Subscription.class))).thenReturn(new Subscription());
+        when(masterSubscriptionRepository.save(any(Subscription.class)))
+                .thenReturn(new Subscription());
 
         // Configure transaction template
-        when(transactionTemplate.execute(any())).thenAnswer(invocation -> {
-            TransactionCallback<?> callback = invocation.getArgument(0);
-            return callback.doInTransaction(null);
-        });
+        when(transactionTemplate.execute(any()))
+                .thenAnswer(
+                        invocation -> {
+                            TransactionCallback<?> callback = invocation.getArgument(0);
+                            return callback.doInTransaction(null);
+                        });
 
         NewUserDTO roleTestDTO = new NewUserDTO();
         roleTestDTO.setUsername("roletest");
@@ -437,13 +462,16 @@ class AuthServiceImplTest {
         when(newUserMapper.toEntity(any())).thenReturn(testUser);
         when(passwordEncoder.encode(any())).thenReturn("encoded");
         when(masterUserRepository.save(any())).thenReturn(testUser);
-        when(masterSubscriptionRepository.save(any(Subscription.class))).thenReturn(new Subscription());
+        when(masterSubscriptionRepository.save(any(Subscription.class)))
+                .thenReturn(new Subscription());
 
         // Configure transaction template
-        when(transactionTemplate.execute(any())).thenAnswer(invocation -> {
-            TransactionCallback<?> callback = invocation.getArgument(0);
-            return callback.doInTransaction(null);
-        });
+        when(transactionTemplate.execute(any()))
+                .thenAnswer(
+                        invocation -> {
+                            TransactionCallback<?> callback = invocation.getArgument(0);
+                            return callback.doInTransaction(null);
+                        });
 
         NewUserDTO subTestDTO = new NewUserDTO();
         subTestDTO.setUsername("subtest");
@@ -455,18 +483,20 @@ class AuthServiceImplTest {
         authService.addUser(subTestDTO);
 
         // Then
-        verify(masterSubscriptionRepository).save(argThat(subscription ->
-            subscription.getState() == State.INACTIVE &&
-            subscription.getType() == SubscriptionType.BASIC &&
-            subscription.getUser() != null
-        ));
+        verify(masterSubscriptionRepository)
+                .save(
+                        argThat(
+                                subscription ->
+                                        subscription.getState() == State.INACTIVE
+                                                && subscription.getType() == SubscriptionType.BASIC
+                                                && subscription.getUser() != null));
     }
 
     @Test
     @DisplayName("Should validate authentication manager interaction")
     void shouldValidateAuthenticationManagerInteraction() {
         // Test that the authentication manager is called correctly
-        
+
         // Given
         String expectedToken = "generated-jwt-token";
         when(userService.findByNameOrEmail("test@kuenteco.com")).thenReturn(testUser);
@@ -481,9 +511,14 @@ class AuthServiceImplTest {
         assertNotNull(result);
         assertEquals(expectedToken, result.getToken());
         assertEquals(UserType.PERSONAL, result.getType());
-        
+
         // Verify authentication manager was called
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(cookieService).addHttpOnlyCookie(eq("jwt"), eq(expectedToken), eq(7 * 24 * 60 * 60), eq(httpServletResponse));
+        verify(cookieService)
+                .addHttpOnlyCookie(
+                        eq("jwt"),
+                        eq(expectedToken),
+                        eq(7 * 24 * 60 * 60),
+                        eq(httpServletResponse));
     }
 }

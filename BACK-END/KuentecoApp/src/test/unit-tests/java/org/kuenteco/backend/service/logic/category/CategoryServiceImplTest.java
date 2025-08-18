@@ -46,29 +46,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @DisplayName("CategoryServiceImpl Unit Tests")
 class CategoryServiceImplTest {
 
-    @InjectMocks
-    private CategoryServiceImpl categoryService;
+    @InjectMocks private CategoryServiceImpl categoryService;
 
-    @Mock
-    private MasterCategoryRepository masterCategoryRepository;
-    @Mock
-    private SlaveCategoryRepository slaveCategoryRepository;
-    @Mock
-    private SlaveUserRepository slaveUserRepository;
-    @Mock
-    private CategoryDetailMapper categoryDetailMapper;
-    @Mock
-    private UpdateCategoryMapper updateCategoryMapper;
-    @Mock
-    private NewCategoryMapper newCategoryMapper;
-    @Mock
-    private SlaveBudgetRepository slaveBudgetRepository;
-    @Mock
-    private SlaveTransactionRepository slaveTransactionRepository;
-    @Mock
-    private CategoryReportMapper categoryReportMapper;
-    @Mock
-    private TransactionDetailMapper transactionDetailMapper;
+    @Mock private MasterCategoryRepository masterCategoryRepository;
+    @Mock private SlaveCategoryRepository slaveCategoryRepository;
+    @Mock private SlaveUserRepository slaveUserRepository;
+    @Mock private CategoryDetailMapper categoryDetailMapper;
+    @Mock private UpdateCategoryMapper updateCategoryMapper;
+    @Mock private NewCategoryMapper newCategoryMapper;
+    @Mock private SlaveBudgetRepository slaveBudgetRepository;
+    @Mock private SlaveTransactionRepository slaveTransactionRepository;
+    @Mock private CategoryReportMapper categoryReportMapper;
+    @Mock private TransactionDetailMapper transactionDetailMapper;
 
     private User testUser;
     private Category testCategory;
@@ -122,11 +111,13 @@ class CategoryServiceImplTest {
         List<CategoryDTO> categoryDTOs = Arrays.asList(new CategoryDTO());
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(slaveCategoryRepository.findByUser(testUser)).thenReturn(categories);
             when(categoryDetailMapper.toDtoList(categories)).thenReturn(categoryDTOs);
 
@@ -148,11 +139,13 @@ class CategoryServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(slaveCategoryRepository.findByUser(testUser)).thenReturn(Collections.emptyList());
 
             // When
@@ -167,17 +160,22 @@ class CategoryServiceImplTest {
     @DisplayName("Should throw exception when profile tries to get categories")
     void shouldThrowExceptionWhenProfileTriesToGetCategories() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
+        AuthCredentials credentials =
+                new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             // When & Then
-            CategoryException exception = assertThrows(CategoryException.class, () -> {
-                categoryService.getCategories();
-            });
+            CategoryException exception =
+                    assertThrows(
+                            CategoryException.class,
+                            () -> {
+                                categoryService.getCategories();
+                            });
 
             assertEquals("Endpoint solo disponible para usuarios", exception.getMessage());
         }
@@ -187,19 +185,25 @@ class CategoryServiceImplTest {
     @DisplayName("Should throw exception when user not found")
     void shouldThrowExceptionWhenUserNotFound() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("nonexistent@kuenteco.com", RoleList.ROLE_USER);
+        AuthCredentials credentials =
+                new AuthCredentials("nonexistent@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("nonexistent@kuenteco.com")).thenReturn(Optional.empty());
+            when(slaveUserRepository.findByEmail("nonexistent@kuenteco.com"))
+                    .thenReturn(Optional.empty());
 
             // When & Then
-            CategoryException exception = assertThrows(CategoryException.class, () -> {
-                categoryService.getCategories();
-            });
+            CategoryException exception =
+                    assertThrows(
+                            CategoryException.class,
+                            () -> {
+                                categoryService.getCategories();
+                            });
 
             assertTrue(exception.getMessage().contains("Usuario no encontrado"));
         }
@@ -225,13 +229,17 @@ class CategoryServiceImplTest {
         List<TransactionDetailDTO> transactionDTOs = Arrays.asList(new TransactionDetailDTO());
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
-            when(slaveCategoryRepository.findByIdAndUser(categoryId, testUser)).thenReturn(Optional.of(testCategory));
-            when(slaveTransactionRepository.findByCategoryOrderByTransactionDateDesc(testCategory)).thenReturn(transactions);
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
+            when(slaveCategoryRepository.findByIdAndUser(categoryId, testUser))
+                    .thenReturn(Optional.of(testCategory));
+            when(slaveTransactionRepository.findByCategoryOrderByTransactionDateDesc(testCategory))
+                    .thenReturn(transactions);
             when(categoryReportMapper.toDTO(testCategory)).thenReturn(reportDTO);
             when(transactionDetailMapper.toDtoList(transactions)).thenReturn(transactionDTOs);
 
@@ -253,19 +261,28 @@ class CategoryServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
-            when(slaveCategoryRepository.findByIdAndUser(categoryId, testUser)).thenReturn(Optional.empty());
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
+            when(slaveCategoryRepository.findByIdAndUser(categoryId, testUser))
+                    .thenReturn(Optional.empty());
 
             // When & Then
-            CategoryException exception = assertThrows(CategoryException.class, () -> {
-                categoryService.getCategoryReport(categoryId);
-            });
+            CategoryException exception =
+                    assertThrows(
+                            CategoryException.class,
+                            () -> {
+                                categoryService.getCategoryReport(categoryId);
+                            });
 
-            assertTrue(exception.getMessage().contains("Categoría no encontrada con el Id: " + categoryId));
+            assertTrue(
+                    exception
+                            .getMessage()
+                            .contains("Categoría no encontrada con el Id: " + categoryId));
         }
     }
 
@@ -277,11 +294,13 @@ class CategoryServiceImplTest {
         Category newCategory = new Category();
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(newCategoryMapper.toEntity(newCategoryDTO)).thenReturn(newCategory);
             when(slaveBudgetRepository.findById(1)).thenReturn(Optional.of(testBudget));
 
@@ -298,17 +317,22 @@ class CategoryServiceImplTest {
     @DisplayName("Should throw exception when profile tries to add category")
     void shouldThrowExceptionWhenProfileTriesToAddCategory() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
+        AuthCredentials credentials =
+                new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             // When & Then
-            CategoryException exception = assertThrows(CategoryException.class, () -> {
-                categoryService.addCategory(newCategoryDTO);
-            });
+            CategoryException exception =
+                    assertThrows(
+                            CategoryException.class,
+                            () -> {
+                                categoryService.addCategory(newCategoryDTO);
+                            });
 
             assertEquals("Endpoint solo disponible para usuarios", exception.getMessage());
         }
@@ -322,11 +346,13 @@ class CategoryServiceImplTest {
         Category updatedCategory = new Category();
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(updateCategoryMapper.toEntity(updateCategoryDTO)).thenReturn(updatedCategory);
             when(slaveBudgetRepository.findById(1)).thenReturn(Optional.of(testBudget));
 
@@ -347,8 +373,9 @@ class CategoryServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             when(slaveCategoryRepository.existsById(categoryId)).thenReturn(true);
@@ -369,18 +396,25 @@ class CategoryServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             when(slaveCategoryRepository.existsById(categoryId)).thenReturn(false);
 
             // When & Then
-            CategoryException exception = assertThrows(CategoryException.class, () -> {
-                categoryService.deleteCategory(categoryId);
-            });
+            CategoryException exception =
+                    assertThrows(
+                            CategoryException.class,
+                            () -> {
+                                categoryService.deleteCategory(categoryId);
+                            });
 
-            assertTrue(exception.getMessage().contains("Rubro no encontrado con el ID: " + categoryId));
+            assertTrue(
+                    exception
+                            .getMessage()
+                            .contains("Rubro no encontrado con el ID: " + categoryId));
         }
     }
 
@@ -391,14 +425,18 @@ class CategoryServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             // When & Then
-            CategoryException exception = assertThrows(CategoryException.class, () -> {
-                categoryService.deleteCategory(null);
-            });
+            CategoryException exception =
+                    assertThrows(
+                            CategoryException.class,
+                            () -> {
+                                categoryService.deleteCategory(null);
+                            });
 
             assertEquals("Id del rubro no puede ser nulo", exception.getMessage());
         }
@@ -409,11 +447,13 @@ class CategoryServiceImplTest {
     void shouldGetTransactionsByCategorySuccessfully() {
         // Given
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
-        List<TransactionsByCategoryDTO> transactionsDTOs = Arrays.asList(new TransactionsByCategoryDTO());
+        List<TransactionsByCategoryDTO> transactionsDTOs =
+                Arrays.asList(new TransactionsByCategoryDTO());
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             when(slaveCategoryRepository.getTransactionsByCategoryAndUserEmail("test@kuenteco.com"))
@@ -434,8 +474,9 @@ class CategoryServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             when(slaveCategoryRepository.getTransactionsByCategoryAndUserEmail("test@kuenteco.com"))
@@ -483,11 +524,13 @@ class CategoryServiceImplTest {
         Category categoryWithBudget = new Category();
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(newCategoryMapper.toEntity(dtoWithBudget)).thenReturn(categoryWithBudget);
             when(slaveBudgetRepository.findById(1)).thenReturn(Optional.of(testBudget));
 
@@ -513,17 +556,21 @@ class CategoryServiceImplTest {
         Category category = new Category();
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             when(newCategoryMapper.toEntity(dtoWithInvalidBudget)).thenReturn(category);
             when(slaveBudgetRepository.findById(999)).thenReturn(Optional.empty());
 
             // When & Then
-            CategoryException exception = assertThrows(CategoryException.class, () -> {
-                categoryService.addCategory(dtoWithInvalidBudget);
-            });
+            CategoryException exception =
+                    assertThrows(
+                            CategoryException.class,
+                            () -> {
+                                categoryService.addCategory(dtoWithInvalidBudget);
+                            });
 
             assertTrue(exception.getMessage().contains("Budget no encontrado por el Id: 999"));
         }

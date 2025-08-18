@@ -26,12 +26,12 @@ class NewCategoryMapperTest {
     void setUp() {
         // Initialize the mapper
         mapper = Mappers.getMapper(NewCategoryMapper.class);
-        
+
         // Setup test data
         testDescription = new DescriptionCategory();
         testDescription.setAssignedBudget(new BigDecimal("1500.00"));
         testDescription.setState(State.ACTIVE);
-        
+
         sourceDTO = new NewCategoryDTO();
         sourceDTO.setBudgetId(1);
         sourceDTO.setName("Test Category");
@@ -77,7 +77,8 @@ class NewCategoryMapperTest {
         Category result = mapper.toEntity(sourceDTO);
 
         // Then
-        assertNull(result.getRegisterDate()); // RegisterDate should be null as it's ignored in mapping
+        assertNull(
+                result.getRegisterDate()); // RegisterDate should be null as it's ignored in mapping
     }
 
     @Test
@@ -113,7 +114,8 @@ class NewCategoryMapperTest {
 
         // Then
         assertNotNull(result.getDescription());
-        assertEquals(testDescription.getAssignedBudget(), result.getDescription().getAssignedBudget());
+        assertEquals(
+                testDescription.getAssignedBudget(), result.getDescription().getAssignedBudget());
         assertEquals(testDescription.getState(), result.getDescription().getState());
     }
 
@@ -180,21 +182,21 @@ class NewCategoryMapperTest {
         // Test with PENDING state
         testDescription.setState(State.PENDING);
         sourceDTO.setDescription(testDescription);
-        
+
         Category result1 = mapper.toEntity(sourceDTO);
         assertEquals(State.PENDING, result1.getDescription().getState());
-        
+
         // Test with INACTIVE state
         testDescription.setState(State.INACTIVE);
         sourceDTO.setDescription(testDescription);
-        
+
         Category result2 = mapper.toEntity(sourceDTO);
         assertEquals(State.INACTIVE, result2.getDescription().getState());
-        
+
         // Test with CANCELLED state
         testDescription.setState(State.CANCELLED);
         sourceDTO.setDescription(testDescription);
-        
+
         Category result3 = mapper.toEntity(sourceDTO);
         assertEquals(State.CANCELLED, result3.getDescription().getState());
     }
@@ -205,22 +207,22 @@ class NewCategoryMapperTest {
         // Test with zero budget
         testDescription.setAssignedBudget(BigDecimal.ZERO);
         sourceDTO.setDescription(testDescription);
-        
+
         Category result1 = mapper.toEntity(sourceDTO);
         assertEquals(BigDecimal.ZERO, result1.getDescription().getAssignedBudget());
-        
+
         // Test with large budget
         BigDecimal largeBudget = new BigDecimal("999999.99");
         testDescription.setAssignedBudget(largeBudget);
         sourceDTO.setDescription(testDescription);
-        
+
         Category result2 = mapper.toEntity(sourceDTO);
         assertEquals(largeBudget, result2.getDescription().getAssignedBudget());
-        
+
         // Test with null budget
         testDescription.setAssignedBudget(null);
         sourceDTO.setDescription(testDescription);
-        
+
         Category result3 = mapper.toEntity(sourceDTO);
         assertNull(result3.getDescription().getAssignedBudget());
     }
@@ -232,7 +234,7 @@ class NewCategoryMapperTest {
         DescriptionCategory complexDescription = new DescriptionCategory();
         complexDescription.setAssignedBudget(new BigDecimal("2500.50"));
         complexDescription.setState(State.SUSPENDED);
-        
+
         sourceDTO.setDescription(complexDescription);
 
         // When
@@ -240,7 +242,9 @@ class NewCategoryMapperTest {
 
         // Then
         assertNotNull(result.getDescription());
-        assertEquals(complexDescription.getAssignedBudget(), result.getDescription().getAssignedBudget());
+        assertEquals(
+                complexDescription.getAssignedBudget(),
+                result.getDescription().getAssignedBudget());
         assertEquals(complexDescription.getState(), result.getDescription().getState());
     }
 
@@ -266,7 +270,9 @@ class NewCategoryMapperTest {
         assertNotEquals(result1.getName(), result2.getName());
         assertNotEquals(result1.getBudget().getId(), result2.getBudget().getId());
         assertEquals(result1.getDescription().getState(), result2.getDescription().getState());
-        assertEquals(result1.getDescription().getAssignedBudget(), result2.getDescription().getAssignedBudget());
+        assertEquals(
+                result1.getDescription().getAssignedBudget(),
+                result2.getDescription().getAssignedBudget());
     }
 
     @Test

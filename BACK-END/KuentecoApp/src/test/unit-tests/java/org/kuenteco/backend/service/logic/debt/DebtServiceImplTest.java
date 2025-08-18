@@ -38,23 +38,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @DisplayName("DebtServiceImpl Unit Tests")
 class DebtServiceImplTest {
 
-    @InjectMocks
-    private DebtServiceImpl debtService;
+    @InjectMocks private DebtServiceImpl debtService;
 
-    @Mock
-    private MasterDebtRepository masterDebtRepository;
-    @Mock
-    private SlaveDebtRepository slaveDebtRepository;
-    @Mock
-    private SlaveUserRepository slaveUserRepository;
-    @Mock
-    private DebtDetailMapper debtDetailMapper;
-    @Mock
-    private debtsByStateMapper debtsByStateMapper;
-    @Mock
-    private NewDebtMapper newDebtMapper;
-    @Mock
-    private UpdateDebtMapper updateDebtMapper;
+    @Mock private MasterDebtRepository masterDebtRepository;
+    @Mock private SlaveDebtRepository slaveDebtRepository;
+    @Mock private SlaveUserRepository slaveUserRepository;
+    @Mock private DebtDetailMapper debtDetailMapper;
+    @Mock private debtsByStateMapper debtsByStateMapper;
+    @Mock private NewDebtMapper newDebtMapper;
+    @Mock private UpdateDebtMapper updateDebtMapper;
 
     private User testUser;
     private Debt testDebt;
@@ -101,11 +93,13 @@ class DebtServiceImplTest {
         List<DebtDTO> debtDTOs = Arrays.asList(new DebtDTO());
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(slaveDebtRepository.findByUser(testUser)).thenReturn(debts);
             when(debtDetailMapper.toDtoList(debts)).thenReturn(debtDTOs);
 
@@ -127,11 +121,13 @@ class DebtServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(slaveDebtRepository.findByUser(testUser)).thenReturn(Collections.emptyList());
 
             // When
@@ -146,17 +142,22 @@ class DebtServiceImplTest {
     @DisplayName("Should throw exception when profile tries to get debts")
     void shouldThrowExceptionWhenProfileTriesToGetDebts() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
+        AuthCredentials credentials =
+                new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             // When & Then
-            DebtException exception = assertThrows(DebtException.class, () -> {
-                debtService.getDebts();
-            });
+            DebtException exception =
+                    assertThrows(
+                            DebtException.class,
+                            () -> {
+                                debtService.getDebts();
+                            });
 
             assertEquals("Endpoint solo disponible para usuarios", exception.getMessage());
         }
@@ -171,12 +172,15 @@ class DebtServiceImplTest {
         List<DebtDTO> debtDTOs = Arrays.asList(new DebtDTO());
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
-            when(slaveDebtRepository.findByStateAndUser(StateDebt.ACTIVE, testUser)).thenReturn(debts);
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
+            when(slaveDebtRepository.findByStateAndUser(StateDebt.ACTIVE, testUser))
+                    .thenReturn(debts);
             when(debtsByStateMapper.toDtoList(debts)).thenReturn(debtDTOs);
 
             // When
@@ -197,11 +201,13 @@ class DebtServiceImplTest {
         List<DebtSummaryDTO> summaryDTOs = Arrays.asList(new DebtSummaryDTO());
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveDebtRepository.findByUserEmailDebtSummaries("test@kuenteco.com")).thenReturn(summaryDTOs);
+            when(slaveDebtRepository.findByUserEmailDebtSummaries("test@kuenteco.com"))
+                    .thenReturn(summaryDTOs);
 
             // When
             Object result = debtService.getDebtSummaryReport();
@@ -219,11 +225,13 @@ class DebtServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveDebtRepository.findByUserEmailDebtSummaries("test@kuenteco.com")).thenReturn(Collections.emptyList());
+            when(slaveDebtRepository.findByUserEmailDebtSummaries("test@kuenteco.com"))
+                    .thenReturn(Collections.emptyList());
 
             // When
             Object result = debtService.getDebtSummaryReport();
@@ -241,12 +249,15 @@ class DebtServiceImplTest {
         BigDecimal expectedTotal = new BigDecimal("3000.00");
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
-            when(slaveDebtRepository.sumPendingAmountByStateAndUser(StateDebt.ACTIVE, testUser)).thenReturn(expectedTotal);
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
+            when(slaveDebtRepository.sumPendingAmountByStateAndUser(StateDebt.ACTIVE, testUser))
+                    .thenReturn(expectedTotal);
 
             // When
             BigDecimal result = debtService.getTotalPendingAmount();
@@ -264,12 +275,15 @@ class DebtServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
-            when(slaveDebtRepository.sumPendingAmountByStateAndUser(StateDebt.ACTIVE, testUser)).thenReturn(null);
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
+            when(slaveDebtRepository.sumPendingAmountByStateAndUser(StateDebt.ACTIVE, testUser))
+                    .thenReturn(null);
 
             // When
             BigDecimal result = debtService.getTotalPendingAmount();
@@ -287,11 +301,13 @@ class DebtServiceImplTest {
         Debt newDebt = new Debt();
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(newDebtMapper.toEntity(newDebtDTO)).thenReturn(newDebt);
 
             // When
@@ -299,9 +315,7 @@ class DebtServiceImplTest {
 
             // Then
             verify(newDebtMapper).toEntity(newDebtDTO);
-            verify(masterDebtRepository).save(argThat(debt ->
-                    debt.getUser().equals(testUser)
-            ));
+            verify(masterDebtRepository).save(argThat(debt -> debt.getUser().equals(testUser)));
         }
     }
 
@@ -319,18 +333,27 @@ class DebtServiceImplTest {
         invalidDateDTO.setExpirationDate(LocalDateTime.now().minusDays(1)); // Before start date
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
 
             // When & Then
-            DebtException exception = assertThrows(DebtException.class, () -> {
-                debtService.addDebt(invalidDateDTO);
-            });
+            DebtException exception =
+                    assertThrows(
+                            DebtException.class,
+                            () -> {
+                                debtService.addDebt(invalidDateDTO);
+                            });
 
-            assertTrue(exception.getMessage().contains("La fecha de vencimiento no puede ser anterior a la fecha de inicio"));
+            assertTrue(
+                    exception
+                            .getMessage()
+                            .contains(
+                                    "La fecha de vencimiento no puede ser anterior a la fecha de inicio"));
         }
     }
 
@@ -348,18 +371,26 @@ class DebtServiceImplTest {
         invalidAmountDTO.setExpirationDate(LocalDateTime.now().plusDays(30));
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
 
             // When & Then
-            DebtException exception = assertThrows(DebtException.class, () -> {
-                debtService.addDebt(invalidAmountDTO);
-            });
+            DebtException exception =
+                    assertThrows(
+                            DebtException.class,
+                            () -> {
+                                debtService.addDebt(invalidAmountDTO);
+                            });
 
-            assertTrue(exception.getMessage().contains("El monto pendiente no puede ser mayor al monto total"));
+            assertTrue(
+                    exception
+                            .getMessage()
+                            .contains("El monto pendiente no puede ser mayor al monto total"));
         }
     }
 
@@ -368,7 +399,7 @@ class DebtServiceImplTest {
     void shouldMakePaymentSuccessfullyWithPartialPayment() {
         // Given
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
 
             when(slaveDebtRepository.findById(1)).thenReturn(Optional.of(testDebt));
 
@@ -376,9 +407,14 @@ class DebtServiceImplTest {
             debtService.makePayment(debtPaymentDTO);
 
             // Then
-            verify(masterDebtRepository).save(argThat(debt ->
-                    debt.getPendingAmount().compareTo(new BigDecimal("2500.00")) == 0 // 3000 - 500
-            ));
+            verify(masterDebtRepository)
+                    .save(
+                            argThat(
+                                    debt ->
+                                            debt.getPendingAmount()
+                                                            .compareTo(new BigDecimal("2500.00"))
+                                                    == 0 // 3000 - 500
+                                    ));
         }
     }
 
@@ -391,7 +427,7 @@ class DebtServiceImplTest {
         fullPaymentDTO.setPaymentAmount(new BigDecimal("3000.00")); // Full pending amount
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
 
             when(slaveDebtRepository.findById(1)).thenReturn(Optional.of(testDebt));
 
@@ -399,10 +435,12 @@ class DebtServiceImplTest {
             debtService.makePayment(fullPaymentDTO);
 
             // Then
-            verify(masterDebtRepository).save(argThat(debt ->
-                    debt.getPendingAmount().compareTo(BigDecimal.ZERO) == 0 &&
-                            debt.getState() == StateDebt.PAID
-            ));
+            verify(masterDebtRepository)
+                    .save(
+                            argThat(
+                                    debt ->
+                                            debt.getPendingAmount().compareTo(BigDecimal.ZERO) == 0
+                                                    && debt.getState() == StateDebt.PAID));
         }
     }
 
@@ -415,16 +453,22 @@ class DebtServiceImplTest {
         overpaymentDTO.setPaymentAmount(new BigDecimal("5000.00")); // More than pending
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
 
             when(slaveDebtRepository.findById(1)).thenReturn(Optional.of(testDebt));
 
             // When & Then
-            DebtException exception = assertThrows(DebtException.class, () -> {
-                debtService.makePayment(overpaymentDTO);
-            });
+            DebtException exception =
+                    assertThrows(
+                            DebtException.class,
+                            () -> {
+                                debtService.makePayment(overpaymentDTO);
+                            });
 
-            assertTrue(exception.getMessage().contains("El monto del pago no puede ser mayor al monto pendiente"));
+            assertTrue(
+                    exception
+                            .getMessage()
+                            .contains("El monto del pago no puede ser mayor al monto pendiente"));
         }
     }
 
@@ -435,16 +479,23 @@ class DebtServiceImplTest {
         testDebt.setState(StateDebt.PAID);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
 
             when(slaveDebtRepository.findById(1)).thenReturn(Optional.of(testDebt));
 
             // When & Then
-            DebtException exception = assertThrows(DebtException.class, () -> {
-                debtService.makePayment(debtPaymentDTO);
-            });
+            DebtException exception =
+                    assertThrows(
+                            DebtException.class,
+                            () -> {
+                                debtService.makePayment(debtPaymentDTO);
+                            });
 
-            assertTrue(exception.getMessage().contains("No se puede realizar un pago a una deuda que no está activa"));
+            assertTrue(
+                    exception
+                            .getMessage()
+                            .contains(
+                                    "No se puede realizar un pago a una deuda que no está activa"));
         }
     }
 
@@ -456,8 +507,9 @@ class DebtServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             when(slaveDebtRepository.existsById(debtId)).thenReturn(true);
@@ -478,16 +530,20 @@ class DebtServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             when(slaveDebtRepository.existsById(debtId)).thenReturn(false);
 
             // When & Then
-            DebtException exception = assertThrows(DebtException.class, () -> {
-                debtService.deleteDebt(debtId);
-            });
+            DebtException exception =
+                    assertThrows(
+                            DebtException.class,
+                            () -> {
+                                debtService.deleteDebt(debtId);
+                            });
 
             assertTrue(exception.getMessage().contains("Deuda no encontrada con ID: 999"));
         }
@@ -502,8 +558,9 @@ class DebtServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             when(slaveDebtRepository.findById(debtId)).thenReturn(Optional.of(testDebt));
@@ -512,9 +569,7 @@ class DebtServiceImplTest {
             debtService.updateDebtState(debtId, newState);
 
             // Then
-            verify(masterDebtRepository).save(argThat(debt ->
-                    debt.getState() == newState
-            ));
+            verify(masterDebtRepository).save(argThat(debt -> debt.getState() == newState));
         }
     }
 
@@ -522,11 +577,13 @@ class DebtServiceImplTest {
     @DisplayName("Should throw exception when profile tries to access debt operations")
     void shouldThrowExceptionWhenProfileTriesToAccessDebtOperations() {
         // Given
-        AuthCredentials profileCredentials = new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
+        AuthCredentials profileCredentials =
+                new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(profileCredentials);
 
             // Test multiple operations
