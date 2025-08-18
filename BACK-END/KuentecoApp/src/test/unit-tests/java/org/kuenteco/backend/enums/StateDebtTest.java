@@ -16,14 +16,14 @@ class StateDebtTest {
     @DisplayName("Should have all expected debt state values")
     void shouldHaveAllExpectedDebtStateValues() {
         // Given
-        List<StateDebt> expectedStates = Arrays.asList(
-            StateDebt.ACTIVE,
-            StateDebt.PAID,
-            StateDebt.DEFEATED,
-            StateDebt.REFINANCED,
-            StateDebt.IN_MORATIUM,
-            StateDebt.CANCELLED
-        );
+        List<StateDebt> expectedStates =
+                Arrays.asList(
+                        StateDebt.ACTIVE,
+                        StateDebt.PAID,
+                        StateDebt.DEFEATED,
+                        StateDebt.REFINANCED,
+                        StateDebt.IN_MORATIUM,
+                        StateDebt.CANCELLED);
 
         // When
         StateDebt[] actualStates = StateDebt.values();
@@ -52,9 +52,11 @@ class StateDebtTest {
         String invalidState = "INVALID_DEBT_STATE";
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> {
-            StateDebt.valueOf(invalidState);
-        });
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    StateDebt.valueOf(invalidState);
+                });
     }
 
     @ParameterizedTest
@@ -94,23 +96,23 @@ class StateDebtTest {
         assertTrue(isValidDebtTransition(StateDebt.ACTIVE, StateDebt.REFINANCED));
         assertTrue(isValidDebtTransition(StateDebt.ACTIVE, StateDebt.IN_MORATIUM));
         assertTrue(isValidDebtTransition(StateDebt.ACTIVE, StateDebt.CANCELLED));
-        
+
         // Valid transitions from DEFEATED (overdue)
         assertTrue(isValidDebtTransition(StateDebt.DEFEATED, StateDebt.PAID));
         assertTrue(isValidDebtTransition(StateDebt.DEFEATED, StateDebt.REFINANCED));
         assertTrue(isValidDebtTransition(StateDebt.DEFEATED, StateDebt.IN_MORATIUM));
         assertTrue(isValidDebtTransition(StateDebt.DEFEATED, StateDebt.CANCELLED));
-        
+
         // Valid transitions from IN_MORATIUM
         assertTrue(isValidDebtTransition(StateDebt.IN_MORATIUM, StateDebt.PAID));
         assertTrue(isValidDebtTransition(StateDebt.IN_MORATIUM, StateDebt.ACTIVE));
         assertTrue(isValidDebtTransition(StateDebt.IN_MORATIUM, StateDebt.REFINANCED));
         assertTrue(isValidDebtTransition(StateDebt.IN_MORATIUM, StateDebt.CANCELLED));
-        
+
         // Valid transitions from REFINANCED
         assertTrue(isValidDebtTransition(StateDebt.REFINANCED, StateDebt.ACTIVE));
         assertTrue(isValidDebtTransition(StateDebt.REFINANCED, StateDebt.CANCELLED));
-        
+
         // Invalid transitions (final states)
         assertFalse(isValidDebtTransition(StateDebt.PAID, StateDebt.ACTIVE));
         assertFalse(isValidDebtTransition(StateDebt.PAID, StateDebt.DEFEATED));
@@ -125,7 +127,7 @@ class StateDebtTest {
         assertTrue(isActiveDebtState(StateDebt.ACTIVE));
         assertTrue(isActiveDebtState(StateDebt.DEFEATED));
         assertTrue(isActiveDebtState(StateDebt.IN_MORATIUM));
-        
+
         // Non-active debt states
         assertFalse(isActiveDebtState(StateDebt.PAID));
         assertFalse(isActiveDebtState(StateDebt.CANCELLED));
@@ -138,7 +140,7 @@ class StateDebtTest {
         // Final states (no further transitions expected)
         assertTrue(isFinalDebtState(StateDebt.PAID));
         assertTrue(isFinalDebtState(StateDebt.CANCELLED));
-        
+
         // Non-final states (transitions allowed)
         assertFalse(isFinalDebtState(StateDebt.ACTIVE));
         assertFalse(isFinalDebtState(StateDebt.DEFEATED));
@@ -152,7 +154,7 @@ class StateDebtTest {
         // Problematic states (require attention)
         assertTrue(isProblematicDebtState(StateDebt.DEFEATED));
         assertTrue(isProblematicDebtState(StateDebt.IN_MORATIUM));
-        
+
         // Non-problematic states
         assertFalse(isProblematicDebtState(StateDebt.ACTIVE));
         assertFalse(isProblematicDebtState(StateDebt.PAID));
@@ -168,14 +170,14 @@ class StateDebtTest {
         assertTrue(isPositiveResolutionState(StateDebt.REFINANCED));
         assertFalse(isPositiveResolutionState(StateDebt.CANCELLED));
         assertFalse(isPositiveResolutionState(StateDebt.DEFEATED));
-        
+
         // Negative states (bad for credit)
         assertTrue(isNegativeState(StateDebt.DEFEATED));
         assertTrue(isNegativeState(StateDebt.IN_MORATIUM));
         assertTrue(isNegativeState(StateDebt.CANCELLED));
         assertFalse(isNegativeState(StateDebt.ACTIVE));
         assertFalse(isNegativeState(StateDebt.PAID));
-        
+
         // Neutral states
         assertTrue(isNeutralState(StateDebt.ACTIVE));
         assertFalse(isNeutralState(StateDebt.PAID));
@@ -189,7 +191,7 @@ class StateDebtTest {
         assertTrue(requiresPayment(StateDebt.ACTIVE));
         assertTrue(requiresPayment(StateDebt.DEFEATED));
         assertTrue(requiresPayment(StateDebt.IN_MORATIUM));
-        
+
         // States that don't require payment
         assertFalse(requiresPayment(StateDebt.PAID));
         assertFalse(requiresPayment(StateDebt.CANCELLED));
@@ -202,10 +204,10 @@ class StateDebtTest {
         // States that should trigger notifications
         assertTrue(shouldNotify(StateDebt.DEFEATED));
         assertTrue(shouldNotify(StateDebt.IN_MORATIUM));
-        
+
         // States that might trigger notifications
         assertFalse(shouldNotify(StateDebt.ACTIVE)); // Depends on due date
-        
+
         // States that shouldn't trigger notifications
         assertFalse(shouldNotify(StateDebt.PAID));
         assertFalse(shouldNotify(StateDebt.CANCELLED));
@@ -218,11 +220,15 @@ class StateDebtTest {
             case ACTIVE:
                 return to != StateDebt.ACTIVE; // Can transition to any other state
             case DEFEATED:
-                return to == StateDebt.PAID || to == StateDebt.REFINANCED || 
-                       to == StateDebt.IN_MORATIUM || to == StateDebt.CANCELLED;
+                return to == StateDebt.PAID
+                        || to == StateDebt.REFINANCED
+                        || to == StateDebt.IN_MORATIUM
+                        || to == StateDebt.CANCELLED;
             case IN_MORATIUM:
-                return to == StateDebt.PAID || to == StateDebt.ACTIVE || 
-                       to == StateDebt.REFINANCED || to == StateDebt.CANCELLED;
+                return to == StateDebt.PAID
+                        || to == StateDebt.ACTIVE
+                        || to == StateDebt.REFINANCED
+                        || to == StateDebt.CANCELLED;
             case REFINANCED:
                 return to == StateDebt.ACTIVE || to == StateDebt.CANCELLED;
             case PAID:
@@ -234,7 +240,9 @@ class StateDebtTest {
     }
 
     private boolean isActiveDebtState(StateDebt state) {
-        return state == StateDebt.ACTIVE || state == StateDebt.DEFEATED || state == StateDebt.IN_MORATIUM;
+        return state == StateDebt.ACTIVE
+                || state == StateDebt.DEFEATED
+                || state == StateDebt.IN_MORATIUM;
     }
 
     private boolean isFinalDebtState(StateDebt state) {
@@ -250,7 +258,9 @@ class StateDebtTest {
     }
 
     private boolean isNegativeState(StateDebt state) {
-        return state == StateDebt.DEFEATED || state == StateDebt.IN_MORATIUM || state == StateDebt.CANCELLED;
+        return state == StateDebt.DEFEATED
+                || state == StateDebt.IN_MORATIUM
+                || state == StateDebt.CANCELLED;
     }
 
     private boolean isNeutralState(StateDebt state) {

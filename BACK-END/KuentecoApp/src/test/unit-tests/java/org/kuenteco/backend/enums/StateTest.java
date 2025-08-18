@@ -16,13 +16,13 @@ class StateTest {
     @DisplayName("Should have all expected state values")
     void shouldHaveAllExpectedStateValues() {
         // Given
-        List<State> expectedStates = Arrays.asList(
-            State.PENDING,
-            State.ACTIVE,
-            State.INACTIVE,
-            State.SUSPENDED,
-            State.CANCELLED
-        );
+        List<State> expectedStates =
+                Arrays.asList(
+                        State.PENDING,
+                        State.ACTIVE,
+                        State.INACTIVE,
+                        State.SUSPENDED,
+                        State.CANCELLED);
 
         // When
         State[] actualStates = State.values();
@@ -50,9 +50,11 @@ class StateTest {
         String invalidState = "INVALID_STATE";
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> {
-            State.valueOf(invalidState);
-        });
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    State.valueOf(invalidState);
+                });
     }
 
     @ParameterizedTest
@@ -86,24 +88,24 @@ class StateTest {
     @DisplayName("Should support state transition validation logic")
     void shouldSupportStateTransitionValidationLogic() {
         // This test demonstrates how State enum can be used in business logic
-        
+
         // Valid transitions from PENDING
         assertTrue(isValidTransition(State.PENDING, State.ACTIVE));
         assertTrue(isValidTransition(State.PENDING, State.CANCELLED));
-        
+
         // Valid transitions from ACTIVE
         assertTrue(isValidTransition(State.ACTIVE, State.INACTIVE));
         assertTrue(isValidTransition(State.ACTIVE, State.SUSPENDED));
         assertTrue(isValidTransition(State.ACTIVE, State.CANCELLED));
-        
+
         // Valid transitions from INACTIVE
         assertTrue(isValidTransition(State.INACTIVE, State.ACTIVE));
         assertTrue(isValidTransition(State.INACTIVE, State.CANCELLED));
-        
+
         // Valid transitions from SUSPENDED
         assertTrue(isValidTransition(State.SUSPENDED, State.ACTIVE));
         assertTrue(isValidTransition(State.SUSPENDED, State.CANCELLED));
-        
+
         // Invalid transitions (once cancelled, cannot change)
         assertFalse(isValidTransition(State.CANCELLED, State.ACTIVE));
         assertFalse(isValidTransition(State.CANCELLED, State.INACTIVE));
@@ -116,7 +118,7 @@ class StateTest {
     void shouldIdentifyActiveStatesCorrectly() {
         // Active operational states
         assertTrue(isOperationalState(State.ACTIVE));
-        
+
         // Non-operational states
         assertFalse(isOperationalState(State.PENDING));
         assertFalse(isOperationalState(State.INACTIVE));
@@ -129,7 +131,7 @@ class StateTest {
     void shouldIdentifyFinalStatesCorrectly() {
         // Final states (no further transitions allowed)
         assertTrue(isFinalState(State.CANCELLED));
-        
+
         // Non-final states (transitions allowed)
         assertFalse(isFinalState(State.PENDING));
         assertFalse(isFinalState(State.ACTIVE));
@@ -143,13 +145,13 @@ class StateTest {
         // Initial states
         assertTrue(isInitialState(State.PENDING));
         assertFalse(isInitialState(State.ACTIVE));
-        
+
         // Temporary states (can be resumed)
         assertTrue(isTemporaryState(State.INACTIVE));
         assertTrue(isTemporaryState(State.SUSPENDED));
         assertFalse(isTemporaryState(State.CANCELLED));
         assertFalse(isTemporaryState(State.ACTIVE));
-        
+
         // Permanent states
         assertTrue(isPermanentState(State.CANCELLED));
         assertFalse(isPermanentState(State.SUSPENDED));

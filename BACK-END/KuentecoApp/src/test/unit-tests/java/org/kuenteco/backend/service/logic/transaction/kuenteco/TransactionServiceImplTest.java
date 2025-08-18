@@ -36,33 +36,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @DisplayName("TransactionServiceImpl Unit Tests")
 class TransactionServiceImplTest {
 
-    @InjectMocks
-    private TransactionServiceImpl transactionService;
+    @InjectMocks private TransactionServiceImpl transactionService;
 
-    @Mock
-    private MasterTransactionRepository masterTransactionRepository;
-    @Mock
-    private SlaveTransactionRepository slaveTransactionRepository;
-    @Mock
-    private SlaveUserRepository slaveUserRepository;
-    @Mock
-    private SlaveProfileRepository slaveProfileRepository;
-    @Mock
-    private SlaveCategoryRepository slaveCategoryRepository;
-    @Mock
-    private SlaveBudgetRepository slaveBudgetRepository;
-    @Mock
-    private SlaveDebtRepository slaveDebtRepository;
-    @Mock
-    private TransactionDetailMapper transactionDetailMapper;
-    @Mock
-    private NewTransactionMapper newTransactionMapper;
-    @Mock
-    private UpdateTransactionMapper updateTransactionMapper;
-    @Mock
-    private ProfileWithTransactionsMapper profileWithTransactionsMapper;
-    @Mock
-    private TransactionSummaryMapper transactionSummaryMapper;
+    @Mock private MasterTransactionRepository masterTransactionRepository;
+    @Mock private SlaveTransactionRepository slaveTransactionRepository;
+    @Mock private SlaveUserRepository slaveUserRepository;
+    @Mock private SlaveProfileRepository slaveProfileRepository;
+    @Mock private SlaveCategoryRepository slaveCategoryRepository;
+    @Mock private SlaveBudgetRepository slaveBudgetRepository;
+    @Mock private SlaveDebtRepository slaveDebtRepository;
+    @Mock private TransactionDetailMapper transactionDetailMapper;
+    @Mock private NewTransactionMapper newTransactionMapper;
+    @Mock private UpdateTransactionMapper updateTransactionMapper;
+    @Mock private ProfileWithTransactionsMapper profileWithTransactionsMapper;
+    @Mock private TransactionSummaryMapper transactionSummaryMapper;
 
     private User testUser;
     private User businessUser;
@@ -159,12 +146,14 @@ class TransactionServiceImplTest {
         List<Transaction> transactions = Arrays.asList(testTransaction);
         List<TransactionDetailDTO> transactionDTOs = Arrays.asList(new TransactionDetailDTO());
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(slaveTransactionRepository.findByUser(testUser)).thenReturn(transactions);
             when(transactionDetailMapper.toDtoList(transactions)).thenReturn(transactionDTOs);
 
@@ -183,29 +172,34 @@ class TransactionServiceImplTest {
     @DisplayName("Should get transactions for business user successfully")
     void shouldGetTransactionsForBusinessUserSuccessfully() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("business@kuenteco.com", RoleList.ROLE_USER);
+        AuthCredentials credentials =
+                new AuthCredentials("business@kuenteco.com", RoleList.ROLE_USER);
         List<Profile> profiles = Arrays.asList(testProfile);
         List<Transaction> profileTransactions = Arrays.asList(testTransaction);
-        
+
         ProfileWithTransactionsDTO profileWithTransactionsDTO = new ProfileWithTransactionsDTO();
         profileWithTransactionsDTO.setTransactionCount(1);
 
-        UserProfilesWithTransactionsDTO expectedResult = UserProfilesWithTransactionsDTO.builder()
-                .username("businessuser")
-                .email("business@kuenteco.com")
-                .profiles(Arrays.asList(profileWithTransactionsDTO))
-                .totalProfiles(1)
-                .totalTransactions(1)
-                .build();
+        UserProfilesWithTransactionsDTO expectedResult =
+                UserProfilesWithTransactionsDTO.builder()
+                        .username("businessuser")
+                        .email("business@kuenteco.com")
+                        .profiles(Arrays.asList(profileWithTransactionsDTO))
+                        .totalProfiles(1)
+                        .totalTransactions(1)
+                        .build();
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("business@kuenteco.com")).thenReturn(Optional.of(businessUser));
+            when(slaveUserRepository.findByEmail("business@kuenteco.com"))
+                    .thenReturn(Optional.of(businessUser));
             when(slaveProfileRepository.findByUser(businessUser)).thenReturn(profiles);
-            when(slaveTransactionRepository.findByProfile(testProfile)).thenReturn(profileTransactions);
+            when(slaveTransactionRepository.findByProfile(testProfile))
+                    .thenReturn(profileTransactions);
             when(profileWithTransactionsMapper.toDto(testProfile, profileTransactions))
                     .thenReturn(profileWithTransactionsDTO);
 
@@ -227,16 +221,19 @@ class TransactionServiceImplTest {
     @DisplayName("Should get transactions for profile successfully")
     void shouldGetTransactionsForProfileSuccessfully() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
+        AuthCredentials credentials =
+                new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
         List<Transaction> transactions = Arrays.asList(testTransaction);
         List<TransactionDetailDTO> transactionDTOs = Arrays.asList(new TransactionDetailDTO());
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveProfileRepository.findByEmail("profile@kuenteco.com")).thenReturn(Optional.of(testProfile));
+            when(slaveProfileRepository.findByEmail("profile@kuenteco.com"))
+                    .thenReturn(Optional.of(testProfile));
             when(slaveTransactionRepository.findByProfile(testProfile)).thenReturn(transactions);
             when(transactionDetailMapper.toDtoList(transactions)).thenReturn(transactionDTOs);
 
@@ -256,13 +253,16 @@ class TransactionServiceImplTest {
         // Given
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
-            when(slaveTransactionRepository.findByUser(testUser)).thenReturn(Collections.emptyList());
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
+            when(slaveTransactionRepository.findByUser(testUser))
+                    .thenReturn(Collections.emptyList());
 
             // When
             Object result = transactionService.getTransactions();
@@ -276,19 +276,25 @@ class TransactionServiceImplTest {
     @DisplayName("Should throw exception when user not found for transactions")
     void shouldThrowExceptionWhenUserNotFoundForTransactions() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("nonexistent@kuenteco.com", RoleList.ROLE_USER);
+        AuthCredentials credentials =
+                new AuthCredentials("nonexistent@kuenteco.com", RoleList.ROLE_USER);
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("nonexistent@kuenteco.com")).thenReturn(Optional.empty());
+            when(slaveUserRepository.findByEmail("nonexistent@kuenteco.com"))
+                    .thenReturn(Optional.empty());
 
             // When & Then
-            TransactionException exception = assertThrows(TransactionException.class, () -> {
-                transactionService.getTransactions();
-            });
+            TransactionException exception =
+                    assertThrows(
+                            TransactionException.class,
+                            () -> {
+                                transactionService.getTransactions();
+                            });
 
             assertEquals("Usuario no encontrado", exception.getMessage());
         }
@@ -299,39 +305,55 @@ class TransactionServiceImplTest {
     void shouldGetTransactionSummarySuccessfully() {
         // Given
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
-        
-        // Mock raw data from database - this represents actual query results
-        Object[] rawDataRow = new Object[]{"user-123", "PERSONAL", null, "Groceries", "Food", "Monthly Budget", null, 
-                        5L, 3L, 2L, new BigDecimal("1500.00"), new BigDecimal("800.00"), 
-                        new BigDecimal("700.00"), LocalDateTime.now().minusDays(30), LocalDateTime.now()};
-        List<Object[]> mockRawData = Collections.singletonList(rawDataRow);
-        
-        // Mock the expected result after mapping
-        List<TransactionSummaryDTO> expectedSummary = Arrays.asList(
-            TransactionSummaryDTO.builder()
-                .ownerUserId("user-123")
-                .transactionOwnerType("PERSONAL")
-                .transactionName("Groceries")
-                .categoryName("Food")
-                .budgetName("Monthly Budget")
-                .transactionCount(5L)
-                .incomeCount(3L)
-                .expenseCount(2L)
-                .totalIncome(new BigDecimal("1500.00"))
-                .totalExpenses(new BigDecimal("800.00"))
-                .netAmount(new BigDecimal("700.00"))
-                .build()
-        );
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        // Mock raw data from database - this represents actual query results
+        Object[] rawDataRow =
+                new Object[] {
+                    "user-123",
+                    "PERSONAL",
+                    null,
+                    "Groceries",
+                    "Food",
+                    "Monthly Budget",
+                    null,
+                    5L,
+                    3L,
+                    2L,
+                    new BigDecimal("1500.00"),
+                    new BigDecimal("800.00"),
+                    new BigDecimal("700.00"),
+                    LocalDateTime.now().minusDays(30),
+                    LocalDateTime.now()
+                };
+        List<Object[]> mockRawData = Collections.singletonList(rawDataRow);
+
+        // Mock the expected result after mapping
+        List<TransactionSummaryDTO> expectedSummary =
+                Arrays.asList(
+                        TransactionSummaryDTO.builder()
+                                .ownerUserId("user-123")
+                                .transactionOwnerType("PERSONAL")
+                                .transactionName("Groceries")
+                                .categoryName("Food")
+                                .budgetName("Monthly Budget")
+                                .transactionCount(5L)
+                                .incomeCount(3L)
+                                .expenseCount(2L)
+                                .totalIncome(new BigDecimal("1500.00"))
+                                .totalExpenses(new BigDecimal("800.00"))
+                                .netAmount(new BigDecimal("700.00"))
+                                .build());
+
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             // Mock repository call
             when(slaveTransactionRepository.findAllTransactionsSummariesRaw("test@kuenteco.com"))
                     .thenReturn(mockRawData);
-            
+
             // Mock mapper conversion
             when(transactionSummaryMapper.fromObjectArrayList(mockRawData))
                     .thenReturn(expectedSummary);
@@ -343,7 +365,7 @@ class TransactionServiceImplTest {
             assertNotNull(result);
             assertEquals(expectedSummary, result);
             assertTrue(result instanceof List);
-            
+
             // Verify interactions
             verify(slaveTransactionRepository).findAllTransactionsSummariesRaw("test@kuenteco.com");
             verify(transactionSummaryMapper).fromObjectArrayList(mockRawData);
@@ -356,9 +378,10 @@ class TransactionServiceImplTest {
         // Given
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             // Mock empty raw data from repository
@@ -371,7 +394,8 @@ class TransactionServiceImplTest {
             // Then
             assertEquals("No tiene transacciones registradas", result);
             verify(slaveTransactionRepository).findAllTransactionsSummariesRaw("test@kuenteco.com");
-            verifyNoInteractions(transactionSummaryMapper); // Mapper should not be called when no data
+            verifyNoInteractions(
+                    transactionSummaryMapper); // Mapper should not be called when no data
         }
     }
 
@@ -379,17 +403,22 @@ class TransactionServiceImplTest {
     @DisplayName("Should throw exception when profile tries to get transaction summary")
     void shouldThrowExceptionWhenProfileTriesToGetTransactionSummary() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
+        AuthCredentials credentials =
+                new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             // When & Then
-            TransactionException exception = assertThrows(TransactionException.class, () -> {
-                transactionService.getTransactionSummary();
-            });
+            TransactionException exception =
+                    assertThrows(
+                            TransactionException.class,
+                            () -> {
+                                transactionService.getTransactionSummary();
+                            });
 
             assertEquals("Endpoint solo disponible para usuarios", exception.getMessage());
         }
@@ -402,12 +431,14 @@ class TransactionServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
         Transaction preparedTransaction = new Transaction();
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(newTransactionMapper.toEntity(newTransactionDTO)).thenReturn(preparedTransaction);
             when(slaveCategoryRepository.findById(1)).thenReturn(Optional.of(testCategory));
             when(slaveBudgetRepository.findById(1)).thenReturn(Optional.of(testBudget));
@@ -419,11 +450,15 @@ class TransactionServiceImplTest {
             verify(newTransactionMapper).toEntity(newTransactionDTO);
             verify(slaveCategoryRepository).findById(1);
             verify(slaveBudgetRepository).findById(1);
-            verify(masterTransactionRepository).save(argThat(transaction -> 
-                transaction.getUser().equals(testUser) &&
-                transaction.getCategory().equals(testCategory) &&
-                transaction.getBudget().equals(testBudget)
-            ));
+            verify(masterTransactionRepository)
+                    .save(
+                            argThat(
+                                    transaction ->
+                                            transaction.getUser().equals(testUser)
+                                                    && transaction
+                                                            .getCategory()
+                                                            .equals(testCategory)
+                                                    && transaction.getBudget().equals(testBudget)));
         }
     }
 
@@ -431,15 +466,18 @@ class TransactionServiceImplTest {
     @DisplayName("Should add transaction for profile successfully")
     void shouldAddTransactionForProfileSuccessfully() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
+        AuthCredentials credentials =
+                new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
         Transaction preparedTransaction = new Transaction();
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveProfileRepository.findByEmail("profile@kuenteco.com")).thenReturn(Optional.of(testProfile));
+            when(slaveProfileRepository.findByEmail("profile@kuenteco.com"))
+                    .thenReturn(Optional.of(testProfile));
             when(newTransactionMapper.toEntity(newTransactionDTO)).thenReturn(preparedTransaction);
             when(slaveCategoryRepository.findById(1)).thenReturn(Optional.of(testCategory));
             when(slaveBudgetRepository.findById(1)).thenReturn(Optional.of(testBudget));
@@ -448,9 +486,8 @@ class TransactionServiceImplTest {
             transactionService.addTransaction(newTransactionDTO);
 
             // Then
-            verify(masterTransactionRepository).save(argThat(transaction -> 
-                transaction.getProfile().equals(testProfile)
-            ));
+            verify(masterTransactionRepository)
+                    .save(argThat(transaction -> transaction.getProfile().equals(testProfile)));
         }
     }
 
@@ -458,23 +495,29 @@ class TransactionServiceImplTest {
     @DisplayName("Should throw exception when business user tries to add transaction directly")
     void shouldThrowExceptionWhenBusinessUserTriesToAddTransactionDirectly() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("business@kuenteco.com", RoleList.ROLE_USER);
+        AuthCredentials credentials =
+                new AuthCredentials("business@kuenteco.com", RoleList.ROLE_USER);
         Transaction preparedTransaction = new Transaction();
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("business@kuenteco.com")).thenReturn(Optional.of(businessUser));
+            when(slaveUserRepository.findByEmail("business@kuenteco.com"))
+                    .thenReturn(Optional.of(businessUser));
             when(newTransactionMapper.toEntity(newTransactionDTO)).thenReturn(preparedTransaction);
             when(slaveCategoryRepository.findById(1)).thenReturn(Optional.of(testCategory));
             when(slaveBudgetRepository.findById(1)).thenReturn(Optional.of(testBudget));
 
             // When & Then
-            TransactionException exception = assertThrows(TransactionException.class, () -> {
-                transactionService.addTransaction(newTransactionDTO);
-            });
+            TransactionException exception =
+                    assertThrows(
+                            TransactionException.class,
+                            () -> {
+                                transactionService.addTransaction(newTransactionDTO);
+                            });
 
             assertEquals("Solo los perfiles pueden ingresar transacciones", exception.getMessage());
         }
@@ -487,18 +530,22 @@ class TransactionServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
         Transaction preparedTransaction = new Transaction();
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             when(newTransactionMapper.toEntity(newTransactionDTO)).thenReturn(preparedTransaction);
             when(slaveCategoryRepository.findById(1)).thenReturn(Optional.empty());
 
             // When & Then
-            TransactionException exception = assertThrows(TransactionException.class, () -> {
-                transactionService.addTransaction(newTransactionDTO);
-            });
+            TransactionException exception =
+                    assertThrows(
+                            TransactionException.class,
+                            () -> {
+                                transactionService.addTransaction(newTransactionDTO);
+                            });
 
             assertTrue(exception.getMessage().contains("Categoría no encontrada con ID: 1"));
         }
@@ -511,13 +558,16 @@ class TransactionServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
         Transaction updatedTransaction = new Transaction();
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
-            when(updateTransactionMapper.toEntity(updateTransactionDTO)).thenReturn(updatedTransaction);
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
+            when(updateTransactionMapper.toEntity(updateTransactionDTO))
+                    .thenReturn(updatedTransaction);
             when(slaveCategoryRepository.findById(1)).thenReturn(Optional.of(testCategory));
 
             // When
@@ -525,9 +575,8 @@ class TransactionServiceImplTest {
 
             // Then
             verify(updateTransactionMapper).toEntity(updateTransactionDTO);
-            verify(masterTransactionRepository).save(argThat(transaction -> 
-                transaction.getUser().equals(testUser)
-            ));
+            verify(masterTransactionRepository)
+                    .save(argThat(transaction -> transaction.getUser().equals(testUser)));
         }
     }
 
@@ -553,9 +602,12 @@ class TransactionServiceImplTest {
         when(masterTransactionRepository.existsById(transactionId)).thenReturn(false);
 
         // When & Then
-        TransactionException exception = assertThrows(TransactionException.class, () -> {
-            transactionService.deleteTransaction(transactionId);
-        });
+        TransactionException exception =
+                assertThrows(
+                        TransactionException.class,
+                        () -> {
+                            transactionService.deleteTransaction(transactionId);
+                        });
 
         assertTrue(exception.getMessage().contains("Transacción no encontrada con ID: 999"));
     }
@@ -564,9 +616,12 @@ class TransactionServiceImplTest {
     @DisplayName("Should throw exception when deleting transaction with null ID")
     void shouldThrowExceptionWhenDeletingTransactionWithNullId() {
         // When & Then
-        TransactionException exception = assertThrows(TransactionException.class, () -> {
-            transactionService.deleteTransaction(null);
-        });
+        TransactionException exception =
+                assertThrows(
+                        TransactionException.class,
+                        () -> {
+                            transactionService.deleteTransaction(null);
+                        });
 
         assertEquals("ID de transacción no puede ser nulo", exception.getMessage());
     }
@@ -579,12 +634,14 @@ class TransactionServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
         Transaction preparedTransaction = new Transaction();
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(newTransactionMapper.toEntity(newTransactionDTO)).thenReturn(preparedTransaction);
             when(slaveCategoryRepository.findById(1)).thenReturn(Optional.of(testCategory));
             when(slaveBudgetRepository.findById(1)).thenReturn(Optional.of(testBudget));
@@ -595,9 +652,8 @@ class TransactionServiceImplTest {
 
             // Then
             verify(slaveDebtRepository).findById(1);
-            verify(masterTransactionRepository).save(argThat(transaction -> 
-                transaction.getDebt().equals(testDebt)
-            ));
+            verify(masterTransactionRepository)
+                    .save(argThat(transaction -> transaction.getDebt().equals(testDebt)));
         }
     }
 
@@ -610,12 +666,14 @@ class TransactionServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
         Transaction preparedTransaction = new Transaction();
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(newTransactionMapper.toEntity(newTransactionDTO)).thenReturn(preparedTransaction);
             when(slaveCategoryRepository.findById(1)).thenReturn(Optional.of(testCategory));
 
@@ -623,10 +681,12 @@ class TransactionServiceImplTest {
             transactionService.addTransaction(newTransactionDTO);
 
             // Then
-            verify(masterTransactionRepository).save(argThat(transaction -> 
-                transaction.getBudget() == null &&
-                transaction.getDebt() == null
-            ));
+            verify(masterTransactionRepository)
+                    .save(
+                            argThat(
+                                    transaction ->
+                                            transaction.getBudget() == null
+                                                    && transaction.getDebt() == null));
         }
     }
 
@@ -634,33 +694,39 @@ class TransactionServiceImplTest {
     @DisplayName("Should validate user type transition logic")
     void shouldValidateUserTypeTransitionLogic() {
         // This test validates that user type affects transaction handling
-        
+
         // Given - Personal user should be able to create transactions directly
-        AuthCredentials personalCredentials = new AuthCredentials("personal@kuenteco.com", RoleList.ROLE_USER);
+        AuthCredentials personalCredentials =
+                new AuthCredentials("personal@kuenteco.com", RoleList.ROLE_USER);
         User personalUser = new User();
         personalUser.setType(UserType.PERSONAL);
         personalUser.setEmail("personal@kuenteco.com");
 
         Transaction preparedTransaction = new Transaction();
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(personalCredentials);
 
-            when(slaveUserRepository.findByEmail("personal@kuenteco.com")).thenReturn(Optional.of(personalUser));
+            when(slaveUserRepository.findByEmail("personal@kuenteco.com"))
+                    .thenReturn(Optional.of(personalUser));
             when(newTransactionMapper.toEntity(any())).thenReturn(preparedTransaction);
             when(slaveCategoryRepository.findById(any())).thenReturn(Optional.of(testCategory));
-            when(slaveBudgetRepository.findById(1)).thenReturn(Optional.of(testBudget)); // Add missing budget mock
+            when(slaveBudgetRepository.findById(1))
+                    .thenReturn(Optional.of(testBudget)); // Add missing budget mock
 
             // When
             transactionService.addTransaction(newTransactionDTO);
 
             // Then
-            verify(masterTransactionRepository).save(argThat(transaction -> 
-                transaction.getUser().equals(personalUser) &&
-                transaction.getProfile() == null
-            ));
+            verify(masterTransactionRepository)
+                    .save(
+                            argThat(
+                                    transaction ->
+                                            transaction.getUser().equals(personalUser)
+                                                    && transaction.getProfile() == null));
         }
     }
 
@@ -668,15 +734,19 @@ class TransactionServiceImplTest {
     @DisplayName("Should return empty profiles result for business user without profiles")
     void shouldReturnEmptyProfilesResultForBusinessUserWithoutProfiles() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("business@kuenteco.com", RoleList.ROLE_USER);
+        AuthCredentials credentials =
+                new AuthCredentials("business@kuenteco.com", RoleList.ROLE_USER);
 
-        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService = 
+        try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("business@kuenteco.com")).thenReturn(Optional.of(businessUser));
-            when(slaveProfileRepository.findByUser(businessUser)).thenReturn(Collections.emptyList());
+            when(slaveUserRepository.findByEmail("business@kuenteco.com"))
+                    .thenReturn(Optional.of(businessUser));
+            when(slaveProfileRepository.findByUser(businessUser))
+                    .thenReturn(Collections.emptyList());
 
             // When
             Object result = transactionService.getTransactions();

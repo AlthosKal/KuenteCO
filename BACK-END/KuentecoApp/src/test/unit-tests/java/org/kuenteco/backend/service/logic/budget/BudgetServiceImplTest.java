@@ -36,21 +36,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @DisplayName("BudgetServiceImpl Unit Tests")
 class BudgetServiceImplTest {
 
-    @InjectMocks
-    private BudgetServiceImpl budgetService;
+    @InjectMocks private BudgetServiceImpl budgetService;
 
-    @Mock
-    private MasterBudgetRepository masterBudgetRepository;
-    @Mock
-    private SlaveBudgetRepository slaveBudgetRepository;
-    @Mock
-    private SlaveUserRepository slaveUserRepository;
-    @Mock
-    private BudgetDetailMapper budgetDetailMapper;
-    @Mock
-    private UpdateBudgetMapper updateBudgetMapper;
-    @Mock
-    private NewBudgetMapper newBudgetMapper;
+    @Mock private MasterBudgetRepository masterBudgetRepository;
+    @Mock private SlaveBudgetRepository slaveBudgetRepository;
+    @Mock private SlaveUserRepository slaveUserRepository;
+    @Mock private BudgetDetailMapper budgetDetailMapper;
+    @Mock private UpdateBudgetMapper updateBudgetMapper;
+    @Mock private NewBudgetMapper newBudgetMapper;
 
     private User testUser;
     private Budget testBudget;
@@ -94,11 +87,13 @@ class BudgetServiceImplTest {
         List<BudgetDTO> budgetDTOs = Arrays.asList(new BudgetDTO());
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(slaveBudgetRepository.findByUser(testUser)).thenReturn(budgets);
             when(budgetDetailMapper.toDtoList(budgets)).thenReturn(budgetDTOs);
 
@@ -120,11 +115,13 @@ class BudgetServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(slaveBudgetRepository.findByUser(testUser)).thenReturn(Collections.emptyList());
 
             // When
@@ -139,17 +136,22 @@ class BudgetServiceImplTest {
     @DisplayName("Should throw exception when profile tries to get budgets")
     void shouldThrowExceptionWhenProfileTriesToGetBudgets() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
+        AuthCredentials credentials =
+                new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             // When & Then
-            BudgetException exception = assertThrows(BudgetException.class, () -> {
-                budgetService.getBudgets();
-            });
+            BudgetException exception =
+                    assertThrows(
+                            BudgetException.class,
+                            () -> {
+                                budgetService.getBudgets();
+                            });
 
             assertEquals("Endpoint solo disponible para usuarios", exception.getMessage());
         }
@@ -159,19 +161,25 @@ class BudgetServiceImplTest {
     @DisplayName("Should throw exception when user not found for budgets")
     void shouldThrowExceptionWhenUserNotFoundForBudgets() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("nonexistent@kuenteco.com", RoleList.ROLE_USER);
+        AuthCredentials credentials =
+                new AuthCredentials("nonexistent@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("nonexistent@kuenteco.com")).thenReturn(Optional.empty());
+            when(slaveUserRepository.findByEmail("nonexistent@kuenteco.com"))
+                    .thenReturn(Optional.empty());
 
             // When & Then
-            CategoryException exception = assertThrows(CategoryException.class, () -> {
-                budgetService.getBudgets();
-            });
+            CategoryException exception =
+                    assertThrows(
+                            CategoryException.class,
+                            () -> {
+                                budgetService.getBudgets();
+                            });
 
             assertTrue(exception.getMessage().contains("Usuario no encontrado"));
         }
@@ -185,11 +193,13 @@ class BudgetServiceImplTest {
         List<BudgetVsActualDTO> reportDTOs = Arrays.asList(new BudgetVsActualDTO());
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveBudgetRepository.findAllBudgetVsActual("test@kuenteco.com")).thenReturn(reportDTOs);
+            when(slaveBudgetRepository.findAllBudgetVsActual("test@kuenteco.com"))
+                    .thenReturn(reportDTOs);
 
             // When
             Object result = budgetService.getBudgetVsActualReport();
@@ -207,11 +217,13 @@ class BudgetServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveBudgetRepository.findAllBudgetVsActual("test@kuenteco.com")).thenReturn(Collections.emptyList());
+            when(slaveBudgetRepository.findAllBudgetVsActual("test@kuenteco.com"))
+                    .thenReturn(Collections.emptyList());
 
             // When
             Object result = budgetService.getBudgetVsActualReport();
@@ -229,11 +241,13 @@ class BudgetServiceImplTest {
         List<BudgetSummaryDTO> summaryDTOs = Arrays.asList(new BudgetSummaryDTO());
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveBudgetRepository.getBudgetSummaries("test@kuenteco.com")).thenReturn(summaryDTOs);
+            when(slaveBudgetRepository.getBudgetSummaries("test@kuenteco.com"))
+                    .thenReturn(summaryDTOs);
 
             // When
             Object result = budgetService.getBudgetSummary();
@@ -251,11 +265,13 @@ class BudgetServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveBudgetRepository.getBudgetSummaries("test@kuenteco.com")).thenReturn(Collections.emptyList());
+            when(slaveBudgetRepository.getBudgetSummaries("test@kuenteco.com"))
+                    .thenReturn(Collections.emptyList());
 
             // When
             Object result = budgetService.getBudgetSummary();
@@ -273,11 +289,13 @@ class BudgetServiceImplTest {
         Budget newBudget = new Budget();
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(newBudgetMapper.toEntity(newBudgetDTO)).thenReturn(newBudget);
 
             // When
@@ -285,9 +303,8 @@ class BudgetServiceImplTest {
 
             // Then
             verify(newBudgetMapper).toEntity(newBudgetDTO);
-            verify(masterBudgetRepository).save(argThat(budget ->
-                    budget.getUser().equals(testUser)
-            ));
+            verify(masterBudgetRepository)
+                    .save(argThat(budget -> budget.getUser().equals(testUser)));
         }
     }
 
@@ -295,17 +312,22 @@ class BudgetServiceImplTest {
     @DisplayName("Should throw exception when profile tries to add budget")
     void shouldThrowExceptionWhenProfileTriesToAddBudget() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
+        AuthCredentials credentials =
+                new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             // When & Then
-            BudgetException exception = assertThrows(BudgetException.class, () -> {
-                budgetService.addBudget(newBudgetDTO);
-            });
+            BudgetException exception =
+                    assertThrows(
+                            BudgetException.class,
+                            () -> {
+                                budgetService.addBudget(newBudgetDTO);
+                            });
 
             assertEquals("Endpoint solo disponible para usuarios", exception.getMessage());
         }
@@ -315,19 +337,25 @@ class BudgetServiceImplTest {
     @DisplayName("Should throw exception when user not found for add budget")
     void shouldThrowExceptionWhenUserNotFoundForAddBudget() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("nonexistent@kuenteco.com", RoleList.ROLE_USER);
+        AuthCredentials credentials =
+                new AuthCredentials("nonexistent@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("nonexistent@kuenteco.com")).thenReturn(Optional.empty());
+            when(slaveUserRepository.findByEmail("nonexistent@kuenteco.com"))
+                    .thenReturn(Optional.empty());
 
             // When & Then
-            BudgetException exception = assertThrows(BudgetException.class, () -> {
-                budgetService.addBudget(newBudgetDTO);
-            });
+            BudgetException exception =
+                    assertThrows(
+                            BudgetException.class,
+                            () -> {
+                                budgetService.addBudget(newBudgetDTO);
+                            });
 
             assertTrue(exception.getMessage().contains("Usuario no encontrado"));
         }
@@ -341,12 +369,15 @@ class BudgetServiceImplTest {
         Budget updatedBudget = new Budget();
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
-            when(slaveBudgetRepository.getBudgetByUserAndId(testUser, 1)).thenReturn(Optional.of(testBudget));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
+            when(slaveBudgetRepository.getBudgetByUserAndId(testUser, 1))
+                    .thenReturn(Optional.of(testBudget));
             when(updateBudgetMapper.toEntity(budgetDTO)).thenReturn(updatedBudget);
 
             // When
@@ -366,17 +397,23 @@ class BudgetServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
-            when(slaveBudgetRepository.getBudgetByUserAndId(testUser, 1)).thenReturn(Optional.empty());
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
+            when(slaveBudgetRepository.getBudgetByUserAndId(testUser, 1))
+                    .thenReturn(Optional.empty());
 
             // When & Then
-            BudgetException exception = assertThrows(BudgetException.class, () -> {
-                budgetService.updateBudget(budgetDTO);
-            });
+            BudgetException exception =
+                    assertThrows(
+                            BudgetException.class,
+                            () -> {
+                                budgetService.updateBudget(budgetDTO);
+                            });
 
             assertEquals("Presupuesto no encontrado", exception.getMessage());
         }
@@ -390,8 +427,9 @@ class BudgetServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             when(slaveBudgetRepository.existsById(budgetId)).thenReturn(true);
@@ -412,18 +450,25 @@ class BudgetServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             when(slaveBudgetRepository.existsById(budgetId)).thenReturn(false);
 
             // When & Then
-            BudgetException exception = assertThrows(BudgetException.class, () -> {
-                budgetService.deleteBudget(budgetId);
-            });
+            BudgetException exception =
+                    assertThrows(
+                            BudgetException.class,
+                            () -> {
+                                budgetService.deleteBudget(budgetId);
+                            });
 
-            assertTrue(exception.getMessage().contains("ID del presupuesto no encontrado con el ID: 999"));
+            assertTrue(
+                    exception
+                            .getMessage()
+                            .contains("ID del presupuesto no encontrado con el ID: 999"));
         }
     }
 
@@ -434,14 +479,18 @@ class BudgetServiceImplTest {
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             // When & Then
-            BudgetException exception = assertThrows(BudgetException.class, () -> {
-                budgetService.deleteBudget(null);
-            });
+            BudgetException exception =
+                    assertThrows(
+                            BudgetException.class,
+                            () -> {
+                                budgetService.deleteBudget(null);
+                            });
 
             assertEquals("ID del presupuesto no puede ser nulo", exception.getMessage());
         }
@@ -451,17 +500,22 @@ class BudgetServiceImplTest {
     @DisplayName("Should throw exception when profile tries to get budget vs actual report")
     void shouldThrowExceptionWhenProfileTriesToGetBudgetVsActualReport() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
+        AuthCredentials credentials =
+                new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             // When & Then
-            BudgetException exception = assertThrows(BudgetException.class, () -> {
-                budgetService.getBudgetVsActualReport();
-            });
+            BudgetException exception =
+                    assertThrows(
+                            BudgetException.class,
+                            () -> {
+                                budgetService.getBudgetVsActualReport();
+                            });
 
             assertEquals("Endpoint solo disponible para usuarios", exception.getMessage());
         }
@@ -471,17 +525,22 @@ class BudgetServiceImplTest {
     @DisplayName("Should throw exception when profile tries to get budget summary")
     void shouldThrowExceptionWhenProfileTriesToGetBudgetSummary() {
         // Given
-        AuthCredentials credentials = new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
+        AuthCredentials credentials =
+                new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
             // When & Then
-            BudgetException exception = assertThrows(BudgetException.class, () -> {
-                budgetService.getBudgetSummary();
-            });
+            BudgetException exception =
+                    assertThrows(
+                            BudgetException.class,
+                            () -> {
+                                budgetService.getBudgetSummary();
+                            });
 
             assertEquals("Endpoint solo disponible para usuarios", exception.getMessage());
         }
@@ -499,23 +558,28 @@ class BudgetServiceImplTest {
         Budget newBudget = new Budget();
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(newBudgetMapper.toEntity(largeBudgetDTO)).thenReturn(newBudget);
 
             // When
             budgetService.addBudget(largeBudgetDTO);
 
             // Then
-            verify(masterBudgetRepository).save(argThat(budget ->
-                    budget.getUser().equals(testUser)
-            ));
-            verify(newBudgetMapper).toEntity(argThat(dto ->
-                    dto.getTotalBudget().compareTo(new BigDecimal("10000.50")) == 0
-            ));
+            verify(masterBudgetRepository)
+                    .save(argThat(budget -> budget.getUser().equals(testUser)));
+            verify(newBudgetMapper)
+                    .toEntity(
+                            argThat(
+                                    dto ->
+                                            dto.getTotalBudget()
+                                                            .compareTo(new BigDecimal("10000.50"))
+                                                    == 0));
         }
     }
 
@@ -531,11 +595,13 @@ class BudgetServiceImplTest {
         Budget newBudget = new Budget();
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(newBudgetMapper.toEntity(zeroBudgetDTO)).thenReturn(newBudget);
 
             // When
@@ -543,9 +609,8 @@ class BudgetServiceImplTest {
 
             // Then
             verify(masterBudgetRepository).save(any(Budget.class));
-            verify(newBudgetMapper).toEntity(argThat(dto ->
-                    dto.getTotalBudget().compareTo(BigDecimal.ZERO) == 0
-            ));
+            verify(newBudgetMapper)
+                    .toEntity(argThat(dto -> dto.getTotalBudget().compareTo(BigDecimal.ZERO) == 0));
         }
     }
 
@@ -562,21 +627,28 @@ class BudgetServiceImplTest {
         Budget updatedBudget = new Budget();
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
-            when(slaveBudgetRepository.getBudgetByUserAndId(testUser, 1)).thenReturn(Optional.of(testBudget));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
+            when(slaveBudgetRepository.getBudgetByUserAndId(testUser, 1))
+                    .thenReturn(Optional.of(testBudget));
             when(updateBudgetMapper.toEntity(increaseBudgetDTO)).thenReturn(updatedBudget);
 
             // When
             budgetService.updateBudget(increaseBudgetDTO);
 
             // Then
-            verify(updateBudgetMapper).toEntity(argThat(dto ->
-                    dto.getTotalBudget().compareTo(new BigDecimal("7500.00")) == 0
-            ));
+            verify(updateBudgetMapper)
+                    .toEntity(
+                            argThat(
+                                    dto ->
+                                            dto.getTotalBudget()
+                                                            .compareTo(new BigDecimal("7500.00"))
+                                                    == 0));
             verify(masterBudgetRepository).save(testBudget);
         }
     }
@@ -593,11 +665,13 @@ class BudgetServiceImplTest {
         Budget newBudget = new Budget();
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(credentials);
 
-            when(slaveUserRepository.findByEmail("test@kuenteco.com")).thenReturn(Optional.of(testUser));
+            when(slaveUserRepository.findByEmail("test@kuenteco.com"))
+                    .thenReturn(Optional.of(testUser));
             when(newBudgetMapper.toEntity(specialBudgetDTO)).thenReturn(newBudget);
 
             // When
@@ -605,9 +679,12 @@ class BudgetServiceImplTest {
 
             // Then
             verify(masterBudgetRepository).save(any(Budget.class));
-            verify(newBudgetMapper).toEntity(argThat(dto ->
-                    dto.getName().equals("Budget-2024 (Q1) & [Emergency] 50%")
-            ));
+            verify(newBudgetMapper)
+                    .toEntity(
+                            argThat(
+                                    dto ->
+                                            dto.getName()
+                                                    .equals("Budget-2024 (Q1) & [Emergency] 50%")));
         }
     }
 
@@ -615,11 +692,13 @@ class BudgetServiceImplTest {
     @DisplayName("Should validate role-based access control across all operations")
     void shouldValidateRoleBasedAccessControlAcrossAllOperations() {
         // Test that all operations properly reject ROLE_PROFILE
-        AuthCredentials profileCredentials = new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
+        AuthCredentials profileCredentials =
+                new AuthCredentials("profile@kuenteco.com", RoleList.ROLE_PROFILE);
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
-                     mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
-            authService.when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+            authService
+                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
                     .thenReturn(profileCredentials);
 
             // Test getBudgets
