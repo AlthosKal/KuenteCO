@@ -2,11 +2,13 @@ package org.kuenteco.backend.dto.auth;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.kuenteco.backend.enums.UserType;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class NewUserDTO {
