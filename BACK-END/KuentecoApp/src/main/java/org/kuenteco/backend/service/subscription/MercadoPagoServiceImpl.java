@@ -122,7 +122,13 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
                     userEmail,
                     preapproval.getId());
 
-            return preapprovalMapper.toCreateSubscriptionResponse(savedPreapproval);
+            // Necesitamos buscar la subscription asociada para el mapper
+            Optional<Subscription> createdSubscriptionOpt =
+                    slaveSubscriptionRepository.findByMercadoPagoPreapproval(savedPreapproval);
+            Subscription createdSubscription = createdSubscriptionOpt.orElse(null);
+
+            return preapprovalMapper.toCreateSubscriptionResponse(
+                    savedPreapproval, createdSubscription);
 
         } catch (MPApiException e) {
             log.error("Error al crear preapproval en MercadoPago: {}", e.getMessage(), e);
@@ -189,7 +195,12 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
                     "No tiene permisos para acceder a esta suscripción");
         }
 
-        return preapprovalMapper.toSubscriptionResponse(preapproval);
+        // Buscar la subscription asociada para el mapper
+        Optional<Subscription> subscriptionOpt =
+                slaveSubscriptionRepository.findByMercadoPagoPreapproval(preapproval);
+        Subscription subscription = subscriptionOpt.orElse(null);
+
+        return preapprovalMapper.toSubscriptionResponse(preapproval, subscription);
     }
 
     @Override
@@ -421,10 +432,6 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
         }
 
         masterSubscriptionRepository.save(subscription);
-
-        // Relación bidireccional
-        preapproval.setSubscription(subscription);
-        masterMercadoPagoPreapprovalRepository.save(preapproval);
 
         log.info(
                 "Suscripción actualizada o creada para usuario: {}, tipo: {}, ID: {}",

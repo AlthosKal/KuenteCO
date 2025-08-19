@@ -116,7 +116,7 @@ class AuthServiceImplTest {
         // Then
         assertNotNull(result);
         assertEquals(expectedToken, result.getToken());
-        assertEquals(UserType.PERSONAL, result.getType());
+        assertEquals(UserType.PERSONAL.name(), result.getType());
 
         verify(cookieService)
                 .addHttpOnlyCookie(
@@ -510,7 +510,7 @@ class AuthServiceImplTest {
         // Then
         assertNotNull(result);
         assertEquals(expectedToken, result.getToken());
-        assertEquals(UserType.PERSONAL, result.getType());
+        assertEquals(UserType.PERSONAL.name(), result.getType());
 
         // Verify authentication manager was called
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));

@@ -51,12 +51,12 @@ public class JwtUtil {
         return cookie != null ? cookie.getValue() : null;
     }
 
-    public Boolean validateToken(String token, UserDetails details) {
+    public boolean validateToken(String token, UserDetails details) {
         final String email = extractEmail(token);
         return (email.equals(details.getUsername()) && !isTokenExpired(token));
     }
 
-    public Boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 

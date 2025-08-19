@@ -23,9 +23,9 @@ import org.kuenteco.backend.enums.StateDebt;
 import org.kuenteco.backend.enums.UserType;
 import org.kuenteco.backend.exception.exceptions.DebtException;
 import org.kuenteco.backend.mapper.logic.debt.DebtDetailMapper;
+import org.kuenteco.backend.mapper.logic.debt.DebtsByStateMapper;
 import org.kuenteco.backend.mapper.logic.debt.NewDebtMapper;
 import org.kuenteco.backend.mapper.logic.debt.UpdateDebtMapper;
-import org.kuenteco.backend.mapper.logic.debt.debtsByStateMapper;
 import org.kuenteco.backend.repository.master.MasterDebtRepository;
 import org.kuenteco.backend.repository.slave.SlaveDebtRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
@@ -44,7 +44,7 @@ class DebtServiceImplTest {
     @Mock private SlaveDebtRepository slaveDebtRepository;
     @Mock private SlaveUserRepository slaveUserRepository;
     @Mock private DebtDetailMapper debtDetailMapper;
-    @Mock private debtsByStateMapper debtsByStateMapper;
+    @Mock private DebtsByStateMapper debtsByStateMapper;
     @Mock private NewDebtMapper newDebtMapper;
     @Mock private UpdateDebtMapper updateDebtMapper;
 

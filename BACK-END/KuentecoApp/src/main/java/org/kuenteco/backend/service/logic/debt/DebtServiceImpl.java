@@ -20,9 +20,9 @@ import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.enums.StateDebt;
 import org.kuenteco.backend.exception.exceptions.DebtException;
 import org.kuenteco.backend.mapper.logic.debt.DebtDetailMapper;
+import org.kuenteco.backend.mapper.logic.debt.DebtsByStateMapper;
 import org.kuenteco.backend.mapper.logic.debt.NewDebtMapper;
 import org.kuenteco.backend.mapper.logic.debt.UpdateDebtMapper;
-import org.kuenteco.backend.mapper.logic.debt.debtsByStateMapper;
 import org.kuenteco.backend.repository.master.MasterDebtRepository;
 import org.kuenteco.backend.repository.slave.SlaveDebtRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
@@ -37,7 +37,7 @@ public class DebtServiceImpl implements DebtService {
     private final SlaveDebtRepository slaveDebtRepository;
     private final SlaveUserRepository slaveUserRepository;
     private final DebtDetailMapper debtDetailMapper;
-    private final debtsByStateMapper debtsByStateMapper;
+    private final DebtsByStateMapper debtsByStateMapper;
     private final NewDebtMapper newDebtMapper;
     private final UpdateDebtMapper updateDebtMapper;
 

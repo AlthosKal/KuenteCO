@@ -4,8 +4,7 @@ import jakarta.persistence.EntityManagerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
@@ -22,6 +21,7 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.support.TransactionTemplate;
 
+@Slf4j
 @Primary
 @Configuration
 @EnableTransactionManagement
@@ -30,9 +30,13 @@ import org.springframework.transaction.support.TransactionTemplate;
         entityManagerFactoryRef = "masterEntityManagerFactory",
         transactionManagerRef = "masterTransactionManager")
 public class MasterDataSourceConfig {
-    private static final Logger log = LoggerFactory.getLogger(MasterDataSourceConfig.class);
 
-    @Autowired private Environment environment;
+    private final Environment environment;
+
+    @Autowired
+    public MasterDataSourceConfig(Environment environment) {
+        this.environment = environment;
+    }
 
     @Primary
     @Bean(name = "masterDataSource")

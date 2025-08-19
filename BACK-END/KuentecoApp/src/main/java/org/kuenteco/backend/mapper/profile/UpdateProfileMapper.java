@@ -9,17 +9,14 @@ import org.mapstruct.Mappings;
 
 @Mapper(componentModel = "spring")
 public interface UpdateProfileMapper {
-
-    @Mappings({
-        @Mapping(target = "username", source = "username"),
-        @Mapping(target = "email", source = "email"),
+        @Mapping(target = "username", source = "username")
+        @Mapping(target = "email", source = "email")
         @Mapping(
                 target = "startDate",
-                expression = "java(new java.sql.Timestamp(System.currentTimeMillis()))"),
-        @Mapping(target = "user", ignore = true),
-        @Mapping(target = "role", ignore = true),
-        @Mapping(target = "password", ignore = true),
+                expression = "java(new java.sql.Timestamp(System.currentTimeMillis()))")
+        @Mapping(target = "user", ignore = true)
+        @Mapping(target = "role", ignore = true)
+        @Mapping(target = "password", ignore = true)
         @Mapping(target = "image", ignore = true)
-    })
     void toEntity(UpdateProfileDTO dto, @MappingTarget Profile entity);
 }

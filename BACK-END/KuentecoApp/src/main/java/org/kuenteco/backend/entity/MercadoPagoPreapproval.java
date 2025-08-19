@@ -80,7 +80,4 @@ public class MercadoPagoPreapproval {
 
     @Column(name = "reason")
     private String reason; // Descripción del plan de suscripción
-
-    @OneToOne(mappedBy = "mercadoPagoPreapproval", cascade = CascadeType.ALL)
-    private Subscription subscription;
 }

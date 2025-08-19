@@ -6,6 +6,6 @@ import org.kuenteco.backend.entity.Debt;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface debtsByStateMapper {
+public interface DebtsByStateMapper {
     List<DebtDTO> toDtoList(List<Debt> debts);
 }
