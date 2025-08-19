@@ -20,6 +20,20 @@ springdoc:
     operationsSorter: method
     tagsSorter: alpha
     version: 5.2.0
+  info:
+    title: "KuenteCO Financial Management API"
+    version: "1.0.0"
+    description: "Comprehensive financial management API for personal and business expense tracking, budgeting, debt management, and financial analytics"
+    contact:
+      name: "KuenteCO Development Team"
+      url: "https://github.com/althoskal/KuenteCO"
+      email: "dev@kuenteco.com"
+    license:
+      name: "MIT License"
+      url: "https://opensource.org/licenses/MIT"
+    # Zalando required extensions
+    x-api-id: "kuenteco-financial-api"
+    x-audience: "external-partner"
 
 cloudinary:
   cloud_name: ${CLOUDINARY_NAME}
