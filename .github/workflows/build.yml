@@ -34,10 +34,6 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Create test structure
-        run: |
-          mkdir -p src/test/java
-          cp -r src/test/unit-tests/java/* src/test/java/ 2>/dev/null || true
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
