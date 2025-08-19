@@ -22,6 +22,7 @@ import org.kuenteco.backend.repository.master.MasterMercadoPagoPreapprovalReposi
 import org.kuenteco.backend.repository.master.MasterSubscriptionRepository;
 import org.kuenteco.backend.repository.slave.SlaveMercadoPagoPaymentRepository;
 import org.kuenteco.backend.repository.slave.SlaveMercadoPagoPreapprovalRepository;
+import org.kuenteco.backend.repository.slave.SlaveSubscriptionRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,7 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
     private final MasterMercadoPagoPreapprovalRepository masterMercadoPagoPreapprovalRepository;
     private final SlaveMercadoPagoPreapprovalRepository slaveMercadoPagoPreapprovalRepository;
     private final MasterSubscriptionRepository masterSubscriptionRepository;
+    private final SlaveSubscriptionRepository slaveSubscriptionRepository;
     private final MasterMercadoPagoPaymentRepository masterMercadoPagoPaymentRepository;
     private final SlaveMercadoPagoPaymentRepository slaveMercadoPagoPaymentRepository;
     private final MercadoPagoWebhookValidationService validationService;
@@ -212,8 +214,10 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
         masterMercadoPagoPreapprovalRepository.save(localPreapproval);
 
         // Activar la suscripción
-        if (localPreapproval.getSubscription() != null) {
-            Subscription subscription = localPreapproval.getSubscription();
+        Optional<Subscription> subscriptionOpt =
+                slaveSubscriptionRepository.findByMercadoPagoPreapproval(localPreapproval);
+        if (subscriptionOpt.isPresent()) {
+            Subscription subscription = subscriptionOpt.get();
             subscription.setState(State.ACTIVE);
             subscription.setUpdatedAt(LocalDateTime.now());
             masterSubscriptionRepository.save(subscription);
@@ -231,8 +235,10 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
         masterMercadoPagoPreapprovalRepository.save(localPreapproval);
 
         // La suscripción permanece en estado PENDING
-        if (localPreapproval.getSubscription() != null) {
-            Subscription subscription = localPreapproval.getSubscription();
+        Optional<Subscription> subscriptionOpt =
+                slaveSubscriptionRepository.findByMercadoPagoPreapproval(localPreapproval);
+        if (subscriptionOpt.isPresent()) {
+            Subscription subscription = subscriptionOpt.get();
             subscription.setState(State.PENDING);
             subscription.setUpdatedAt(LocalDateTime.now());
             masterSubscriptionRepository.save(subscription);
@@ -248,8 +254,10 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
         masterMercadoPagoPreapprovalRepository.save(localPreapproval);
 
         // Cancelar la suscripción
-        if (localPreapproval.getSubscription() != null) {
-            Subscription subscription = localPreapproval.getSubscription();
+        Optional<Subscription> subscriptionOpt =
+                slaveSubscriptionRepository.findByMercadoPagoPreapproval(localPreapproval);
+        if (subscriptionOpt.isPresent()) {
+            Subscription subscription = subscriptionOpt.get();
             subscription.setState(State.CANCELLED);
             subscription.setUpdatedAt(LocalDateTime.now());
             masterSubscriptionRepository.save(subscription);
@@ -267,8 +275,10 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
         masterMercadoPagoPreapprovalRepository.save(localPreapproval);
 
         // Rechazar la suscripción
-        if (localPreapproval.getSubscription() != null) {
-            Subscription subscription = localPreapproval.getSubscription();
+        Optional<Subscription> subscriptionOpt =
+                slaveSubscriptionRepository.findByMercadoPagoPreapproval(localPreapproval);
+        if (subscriptionOpt.isPresent()) {
+            Subscription subscription = subscriptionOpt.get();
             subscription.setState(State.CANCELLED); // No hay estado REJECTED en Subscription
             subscription.setUpdatedAt(LocalDateTime.now());
             masterSubscriptionRepository.save(subscription);
@@ -284,8 +294,10 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
         masterMercadoPagoPreapprovalRepository.save(localPreapproval);
 
         // Pausar la suscripción (usar estado CANCELLED como pausa)
-        if (localPreapproval.getSubscription() != null) {
-            Subscription subscription = localPreapproval.getSubscription();
+        Optional<Subscription> subscriptionOpt =
+                slaveSubscriptionRepository.findByMercadoPagoPreapproval(localPreapproval);
+        if (subscriptionOpt.isPresent()) {
+            Subscription subscription = subscriptionOpt.get();
             subscription.setState(State.CANCELLED);
             subscription.setUpdatedAt(LocalDateTime.now());
             masterSubscriptionRepository.save(subscription);
@@ -483,35 +495,39 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
         try {
             // Obtener la suscripción asociada
             MercadoPagoPreapproval preapproval = payment.getPreapproval();
-            if (preapproval != null && preapproval.getSubscription() != null) {
-                Subscription subscription = preapproval.getSubscription();
+            if (preapproval != null) {
+                Optional<Subscription> subscriptionOpt =
+                        slaveSubscriptionRepository.findByMercadoPagoPreapproval(preapproval);
+                if (subscriptionOpt.isPresent()) {
+                    Subscription subscription = subscriptionOpt.get();
 
-                // Extender la fecha de expiración de la suscripción
-                LocalDateTime currentExpiration = subscription.getExpirationDate();
-                LocalDateTime newExpiration;
+                    // Extender la fecha de expiración de la suscripción
+                    LocalDateTime currentExpiration = subscription.getExpirationDate();
+                    LocalDateTime newExpiration;
 
-                // Si la suscripción ya expiró, extender desde hoy
-                if (currentExpiration.isBefore(LocalDateTime.now())) {
-                    newExpiration = LocalDateTime.now().plusDays(30);
-                } else {
-                    // Si aún está activa, extender desde la fecha actual de expiración
-                    newExpiration = currentExpiration.plusDays(30);
+                    // Si la suscripción ya expiró, extender desde hoy
+                    if (currentExpiration.isBefore(LocalDateTime.now())) {
+                        newExpiration = LocalDateTime.now().plusDays(30);
+                    } else {
+                        // Si aún está activa, extender desde la fecha actual de expiración
+                        newExpiration = currentExpiration.plusDays(30);
+                    }
+
+                    subscription.setExpirationDate(newExpiration);
+                    subscription.setState(State.ACTIVE);
+                    subscription.setUpdatedAt(LocalDateTime.now());
+                    masterSubscriptionRepository.save(subscription);
+
+                    // Actualizar la fecha del próximo pago en el preapproval
+                    preapproval.setNextPaymentDate(newExpiration);
+                    preapproval.setLastModified(LocalDateTime.now());
+                    masterMercadoPagoPreapprovalRepository.save(preapproval);
+
+                    log.info(
+                            "Suscripción extendida hasta: {}, subscription ID: {}",
+                            newExpiration,
+                            subscription.getId());
                 }
-
-                subscription.setExpirationDate(newExpiration);
-                subscription.setState(State.ACTIVE);
-                subscription.setUpdatedAt(LocalDateTime.now());
-                masterSubscriptionRepository.save(subscription);
-
-                // Actualizar la fecha del próximo pago en el preapproval
-                preapproval.setNextPaymentDate(newExpiration);
-                preapproval.setLastModified(LocalDateTime.now());
-                masterMercadoPagoPreapprovalRepository.save(preapproval);
-
-                log.info(
-                        "Suscripción extendida hasta: {}, subscription ID: {}",
-                        newExpiration,
-                        subscription.getId());
             }
 
         } catch (Exception e) {
@@ -525,18 +541,22 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
         try {
             // Obtener la suscripción asociada
             MercadoPagoPreapproval preapproval = payment.getPreapproval();
-            if (preapproval != null && preapproval.getSubscription() != null) {
-                Subscription subscription = preapproval.getSubscription();
+            if (preapproval != null) {
+                Optional<Subscription> subscriptionOpt =
+                        slaveSubscriptionRepository.findByMercadoPagoPreapproval(preapproval);
+                if (subscriptionOpt.isPresent()) {
+                    Subscription subscription = subscriptionOpt.get();
 
-                // Si la suscripción ya expiró, marcarla como vencida
-                if (subscription.getExpirationDate().isBefore(LocalDateTime.now())) {
-                    subscription.setState(State.CANCELLED); // No hay estado EXPIRED
-                    subscription.setUpdatedAt(LocalDateTime.now());
-                    masterSubscriptionRepository.save(subscription);
+                    // Si la suscripción ya expiró, marcarla como vencida
+                    if (subscription.getExpirationDate().isBefore(LocalDateTime.now())) {
+                        subscription.setState(State.CANCELLED); // No hay estado EXPIRED
+                        subscription.setUpdatedAt(LocalDateTime.now());
+                        masterSubscriptionRepository.save(subscription);
 
-                    log.info(
-                            "Suscripción marcada como vencida por pago fallido: {}",
-                            subscription.getId());
+                        log.info(
+                                "Suscripción marcada como vencida por pago fallido: {}",
+                                subscription.getId());
+                    }
                 }
 
                 // TODO: Implementar lógica adicional:

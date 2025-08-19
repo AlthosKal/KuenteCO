@@ -252,7 +252,7 @@ public class SubscriptionController implements SubscriptionResource {
 
         try {
             log.info("Webhook de payment recibido: {}", notification);
-            log.debug("Headers del webhook: {}", headers);
+            log.debug("Headers del webhook al momento de realizar el pago: {}", headers);
 
             String action = (String) notification.get("action");
             String type = (String) notification.get("type");
@@ -310,7 +310,7 @@ public class SubscriptionController implements SubscriptionResource {
 
         try {
             log.info("Webhook genérico recibido: {}", notification);
-            log.debug("Headers del webhook: {}", headers);
+            log.debug("Headers del webhook al hacer una petición generica: {}", headers);
 
             String action = (String) notification.get("action");
             String type = (String) notification.get("type");

@@ -10,31 +10,33 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface MercadoPagoPreapprovalMapper {
 
-    @Mapping(source = "id", target = "subscriptionId")
-    @Mapping(source = "preapprovalId", target = "preapprovalId")
-    @Mapping(source = "initPoint", target = "initPoint")
-    @Mapping(source = "externalReference", target = "externalReference")
-    @Mapping(source = "autoRecurringTransactionAmount", target = "monthlyAmount")
-    @Mapping(source = "status", target = "status")
-    @Mapping(source = "dateCreated", target = "createdAt")
-    @Mapping(source = "nextPaymentDate", target = "nextPaymentDate")
+    @Mapping(source = "preapproval.id", target = "subscriptionId")
+    @Mapping(source = "preapproval.preapprovalId", target = "preapprovalId")
+    @Mapping(source = "preapproval.initPoint", target = "initPoint")
+    @Mapping(source = "preapproval.externalReference", target = "externalReference")
+    @Mapping(source = "preapproval.autoRecurringTransactionAmount", target = "monthlyAmount")
+    @Mapping(source = "preapproval.status", target = "status")
+    @Mapping(source = "preapproval.dateCreated", target = "createdAt")
+    @Mapping(source = "preapproval.nextPaymentDate", target = "nextPaymentDate")
     @Mapping(source = "subscription.type", target = "subscriptionType")
-    CreateSubscriptionResponseDTO toCreateSubscriptionResponse(MercadoPagoPreapproval preapproval);
+    CreateSubscriptionResponseDTO toCreateSubscriptionResponse(
+            MercadoPagoPreapproval preapproval, Subscription subscription);
 
     @Mapping(source = "subscription.id", target = "subscriptionId")
-    @Mapping(source = "preapprovalId", target = "preapprovalId")
+    @Mapping(source = "preapproval.preapprovalId", target = "preapprovalId")
     @Mapping(source = "subscription.type", target = "subscriptionType")
-    @Mapping(source = "autoRecurringTransactionAmount", target = "monthlyAmount")
+    @Mapping(source = "preapproval.autoRecurringTransactionAmount", target = "monthlyAmount")
     @Mapping(source = "subscription.state", target = "subscriptionState")
-    @Mapping(source = "status", target = "preapprovalStatus")
+    @Mapping(source = "preapproval.status", target = "preapprovalStatus")
     @Mapping(source = "subscription.startDate", target = "startDate")
     @Mapping(source = "subscription.expirationDate", target = "expirationDate")
-    @Mapping(source = "nextPaymentDate", target = "nextPaymentDate")
+    @Mapping(source = "preapproval.nextPaymentDate", target = "nextPaymentDate")
     @Mapping(source = "subscription.isAutoRenewable", target = "isAutoRenewable")
-    @Mapping(source = "paymentMethodId", target = "paymentMethodId")
-    @Mapping(source = "cardLastFourDigits", target = "cardLastFourDigits")
-    @Mapping(source = "cardBrand", target = "cardBrand")
-    SubscriptionResponseDTO toSubscriptionResponse(MercadoPagoPreapproval preapproval);
+    @Mapping(source = "preapproval.paymentMethodId", target = "paymentMethodId")
+    @Mapping(source = "preapproval.cardLastFourDigits", target = "cardLastFourDigits")
+    @Mapping(source = "preapproval.cardBrand", target = "cardBrand")
+    SubscriptionResponseDTO toSubscriptionResponse(
+            MercadoPagoPreapproval preapproval, Subscription subscription);
 
     @Mapping(source = "subscription.id", target = "subscriptionId")
     @Mapping(source = "mercadoPagoPreapproval.preapprovalId", target = "preapprovalId")

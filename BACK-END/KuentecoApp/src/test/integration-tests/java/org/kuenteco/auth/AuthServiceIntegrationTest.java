@@ -231,7 +231,7 @@ public class AuthServiceIntegrationTest extends BaseIntegrationTestWithoutWireMo
         // Then
         assertThat(tokenResponse).isNotNull();
         assertThat(tokenResponse.getToken()).isNotBlank();
-        assertThat(tokenResponse.getType()).isEqualTo(UserType.PERSONAL);
+        assertThat(tokenResponse.getType()).isEqualTo(UserType.PERSONAL.name());
     }
 
     @Test

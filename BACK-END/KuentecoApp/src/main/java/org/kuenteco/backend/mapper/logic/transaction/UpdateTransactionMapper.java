@@ -8,15 +8,13 @@ import org.mapstruct.Mappings;
 
 @Mapper(componentModel = "spring")
 public interface UpdateTransactionMapper {
-    @Mappings({
         // Ignorar propiedades que se agregan por la lógica de negocio
-        @Mapping(target = "profile", ignore = true),
-        @Mapping(target = "user", ignore = true),
-        @Mapping(target = "transactionDate", ignore = true),
+        @Mapping(target = "profile", ignore = true)
+        @Mapping(target = "user", ignore = true)
+        @Mapping(target = "transactionDate", ignore = true)
         // Mapear solo los IDs, las entidades completas se resuelven en el servicio
-        @Mapping(target = "category.id", source = "categoryId"),
-        @Mapping(target = "budget.id", source = "budgetId"),
-        @Mapping(target = "debt.id", source = "debtId"),
-    })
+        @Mapping(target = "category.id", source = "categoryId")
+        @Mapping(target = "budget.id", source = "budgetId")
+        @Mapping(target = "debt.id", source = "debtId")
     Transaction toEntity(UpdateTransactionDTO dto);
 }

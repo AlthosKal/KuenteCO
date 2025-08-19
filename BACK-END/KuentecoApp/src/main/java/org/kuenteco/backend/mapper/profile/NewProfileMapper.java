@@ -12,13 +12,12 @@ import org.mapstruct.Named;
 @Mapper(componentModel = "spring")
 public interface NewProfileMapper {
 
-    @Mappings({
-        @Mapping(target = "id", ignore = true),
-        @Mapping(target = "user", ignore = true), // Se establecerá manualmente en el servicio
-        @Mapping(target = "image", ignore = true),
-        @Mapping(target = "role", ignore = true),
+
+        @Mapping(target = "id", ignore = true)
+        @Mapping(target = "user", ignore = true) // Se establecerá manualmente en el servicio
+        @Mapping(target = "image", ignore = true)
+        @Mapping(target = "role", ignore = true)
         @Mapping(target = "startDate", source = ".", qualifiedByName = "currentTimestamp")
-    })
     Profile toEntity(NewProfileDTO dto);
 
     @Named("currentTimestamp")
