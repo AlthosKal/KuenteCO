@@ -611,6 +611,20 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.3</version>
+                <configuration>
+                    <!-- Timeout para tests individuales (2 minutos) -->
+                    <forkedProcessTimeoutInSeconds>120</forkedProcessTimeoutInSeconds>
+                    <!-- Timeout para todo el conjunto de tests (10 minutos) -->
+                    <forkedProcessExitTimeoutInSeconds>600</forkedProcessExitTimeoutInSeconds>
+                    <!-- Configuración de memoria para tests -->
+                    <argLine>-Xmx2g -XX:+UseG1GC @{argLine}</argLine>
+                    <!-- Configuración para tests de integración -->
+                    <systemPropertyVariables>
+                        <spring.profiles.active>integration-test</spring.profiles.active>
+                    </systemPropertyVariables>
+                    <!-- Habilitar reportes XML para SonarCloud -->
+                    <reportFormat>xml</reportFormat>
+                </configuration>
             </plugin>
 
             <plugin>
