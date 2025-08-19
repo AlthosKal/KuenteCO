@@ -12,6 +12,15 @@ spring:
         format_sql: true
         use_sql_comments: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        # Configuraciones de timeout para entornos CI
+        connection.provider_disables_autocommit: false
+        jdbc.time_zone: UTC
+        jdbc.lob.non_contextual_creation: true
+        # Timeouts más largos para CI
+        connection.acquisition_timeout: 60000
+        connection.release_mode: after_transaction
+      # Timeout adicional para transacciones largas
+      javax.persistence.query.timeout: 60000
   
   # Configuración de Flyway para tests
   flyway:
@@ -27,13 +36,15 @@ spring:
     username: test_user
     password: test_password
     driver-class-name: org.postgresql.Driver
-    # Pool de conexiones para tests
+    # Pool de conexiones para tests con timeouts más largos para CI
     hikari:
       maximum-pool-size: 10
       minimum-idle: 5
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
+      connection-timeout: 60000      # 60 segundos
+      idle-timeout: 600000          # 10 minutos  
+      max-lifetime: 1800000         # 30 minutos
+      leak-detection-threshold: 120000  # 2 minutos
+      validation-timeout: 10000     # 10 segundos
 
   # Configuraciones de seguridad para tests
   security:
