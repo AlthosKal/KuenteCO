@@ -1,8 +1,0 @@
-﻿2025-08-18T14:35:37.8740606Z ##[group]Run mkdir -p src/test/java
-2025-08-18T14:35:37.8740994Z [36;1mmkdir -p src/test/java[0m
-2025-08-18T14:35:37.8741378Z [36;1mcp -r src/test/unit-tests/java/* src/test/java/ 2>/dev/null || true[0m
-2025-08-18T14:35:37.8805371Z shell: /usr/bin/bash -e {0}
-2025-08-18T14:35:37.8805691Z env:
-2025-08-18T14:35:37.8805992Z   JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.16-8/x64
-2025-08-18T14:35:37.8806492Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.16-8/x64
-2025-08-18T14:35:37.8807169Z ##[endgroup]
