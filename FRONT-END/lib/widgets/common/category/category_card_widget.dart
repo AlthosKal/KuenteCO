@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../controllers/category_controller.dart';
 import '../../../routes/app_routes.dart';
 
@@ -11,13 +12,46 @@ class CategoryCardWidget extends StatefulWidget {
 }
 
 class _CategoryCardWidgetState extends State<CategoryCardWidget> {
+  final _storage = const FlutterSecureStorage();
+  
   @override
   void initState() {
     super.initState();
     // Cargar categorías cuando se monta el widget
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<CategoryController>(context, listen: false).loadCategories();
+      _loadDataBasedOnRole();
     });
+  }
+  
+  /// Cargar datos según el rol del usuario
+  Future<void> _loadDataBasedOnRole() async {
+    final categoryController = Provider.of<CategoryController>(context, listen: false);
+    
+    try {
+      final role = await _storage.read(key: 'role');
+      print('🔄 CategoryCardWidget: User role detected: $role');
+      
+      if (role == 'ROLE_PROFILE') {
+        // Si es un perfil, cargar sus inscripciones de categorías
+        print('📌 CategoryCardWidget: Loading profile enrollments...');
+        await categoryController.loadProfileEnrollments();
+      } else {
+        // Si es un usuario regular, cargar sus categorías
+        print('📌 CategoryCardWidget: Loading user categories...');
+        await categoryController.loadCategories();
+      }
+    } catch (e) {
+      print('❌ CategoryCardWidget: Error loading data: $e');
+      // No hacer fallback para perfiles, solo para usuarios
+      final role = await _storage.read(key: 'role');
+      if (role != 'ROLE_PROFILE') {
+        try {
+          await categoryController.loadCategories();
+        } catch (fallbackError) {
+          print('❌ CategoryCardWidget: Fallback also failed: $fallbackError');
+        }
+      }
+    }
   }
 
   @override
@@ -38,10 +72,28 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
     if (categoryController.errorMessage != null) {
       return _buildErrorCard(
         errorMessage: categoryController.errorMessage!,
-        onRetry: () => categoryController.loadCategories(),
+        onRetry: () => _loadDataBasedOnRole(),
       );
     }
 
+    return FutureBuilder<String?>(
+      future: _storage.read(key: 'role'),
+      builder: (context, snapshot) {
+        final role = snapshot.data;
+        
+        if (role == 'ROLE_PROFILE') {
+          // Mostrar enrollments para perfiles
+          return _buildEnrollmentCard(categoryController);
+        } else {
+          // Mostrar categorías para usuarios
+          return _buildCategoryCard(categoryController);
+        }
+      },
+    );
+  }
+  
+  /// Widget para mostrar categorías de usuarios
+  Widget _buildCategoryCard(CategoryController categoryController) {
     // 🔹 Si no hay categorías → mostrar botón para crear
     if (categoryController.categories.isEmpty) {
       return Container(
@@ -180,6 +232,160 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
                   ),
                   child: Text(
                     '${categoryController.categories.length} categoría${categoryController.categories.length > 1 ? 's' : ''}',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.white70,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+  
+  /// Widget para mostrar enrollments de perfiles
+  Widget _buildEnrollmentCard(CategoryController categoryController) {
+    // 🔹 Si no hay enrollments → mostrar mensaje
+    if (categoryController.enrollments.isEmpty) {
+      return Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFF9A56), Color(0xFFFF6B95)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.orange.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => Navigator.pushNamed(context, AppRoutes.categoryView),
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.assignment_ind_outlined,
+                      size: 28,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Mis Categorías',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'No tienes categorías asignadas',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white70,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // 🔹 Si hay enrollments → mostrar información del primero
+    final enrollment = categoryController.enrollments.first;
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF56AB2F), Color(0xFFA8E6CF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => Navigator.pushNamed(context, AppRoutes.categoryView),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.assignment_turned_in,
+                    size: 28,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  enrollment.categoryName,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Categoría asignada',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 2),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${categoryController.enrollments.length} asignada${categoryController.enrollments.length > 1 ? 's' : ''}',
                     style: const TextStyle(
                       fontSize: 10,
                       color: Colors.white70,

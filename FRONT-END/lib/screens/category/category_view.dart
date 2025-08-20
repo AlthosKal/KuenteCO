@@ -1,3 +1,6 @@
+import 'package:KuenteCO/widgets/common/category/create_multiple_categories_widget.dart';
+import 'package:KuenteCO/widgets/common/category/delete_multiple_categories_widget.dart';
+import 'package:KuenteCO/widgets/common/category/edit_multiple_categories_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -7,6 +10,7 @@ import '../../widgets/common/category/create_category_widget.dart';
 import '../../widgets/common/category/delete_category_widget.dart';
 import '../../widgets/common/category/edit_category_widget.dart';
 import '../../widgets/common/category/assign_category_widget.dart';
+import '../../widgets/common/category/delete_enrollment_widget.dart';
 import '../../core/services/app/auth_service.dart';
 
 class CategoryView extends StatefulWidget {
@@ -19,13 +23,45 @@ class CategoryView extends StatefulWidget {
 class _CategoryViewState extends State<CategoryView> {
   final _storage = const FlutterSecureStorage();
   bool _isBusinessUser = false;
+  
+  // Multi-select functionality
+  bool _isSelectionMode = false;
+  Set<int> _selectedCategoryIds = {};
+  Set<String> _selectedEnrollmentKeys = {}; // For enrollments: "categoryName-profileEmail-userEmail"
 
   @override
   void initState() {
     super.initState();
     _checkUserType();
-    Future.microtask(() =>
-        Provider.of<CategoryController>(context, listen: false).loadCategories());
+    Future.microtask(() => _loadDataBasedOnRole());
+  }
+  
+  /// Cargar datos según el rol del usuario
+  Future<void> _loadDataBasedOnRole() async {
+    final categoryController = Provider.of<CategoryController>(context, listen: false);
+    
+    try {
+      final role = await _storage.read(key: 'role');
+      
+      if (role == 'ROLE_PROFILE') {
+        // Si es un perfil, cargar sus inscripciones de categorías
+        await categoryController.loadProfileEnrollments();
+      } else {
+        // Si es un usuario regular, cargar sus categorías
+        await categoryController.loadCategories();
+      }
+    } catch (e) {
+      print('Error loading data in CategoryView: $e');
+      // No hacer fallback para perfiles, solo para usuarios
+      final role = await _storage.read(key: 'role');
+      if (role != 'ROLE_PROFILE') {
+        try {
+          await categoryController.loadCategories();
+        } catch (fallbackError) {
+          print('CategoryView: Fallback also failed: $fallbackError');
+        }
+      }
+    }
   }
 
   Future<void> _checkUserType() async {
@@ -129,36 +165,333 @@ class _CategoryViewState extends State<CategoryView> {
       },
     );
   }
+  
+  /// Obtener elementos a mostrar según el rol
+  List<dynamic> _getItemsToDisplay(CategoryController controller) {
+    // Para perfiles, usar enrollments pero mostrar como si fueran categorías
+    // Para usuarios, usar categories normal
+    return controller.categories;
+  }
+  
+  /// Verificar si el usuario actual es un perfil
+  Future<bool> _isProfile() async {
+    final role = await _storage.read(key: 'role');
+    return role == 'ROLE_PROFILE';
+  }
+  
+  // ============= MULTI-SELECT AND BATCH OPERATIONS =============
+  
+  void _toggleSelectionMode() {
+    setState(() {
+      _isSelectionMode = !_isSelectionMode;
+      if (!_isSelectionMode) {
+        _selectedCategoryIds.clear();
+        _selectedEnrollmentKeys.clear();
+      }
+    });
+  }
+  
+  void _toggleCategorySelection(int categoryId) {
+    setState(() {
+      if (_selectedCategoryIds.contains(categoryId)) {
+        _selectedCategoryIds.remove(categoryId);
+      } else {
+        _selectedCategoryIds.add(categoryId);
+      }
+      
+      // Exit selection mode if no items selected
+      if (_selectedCategoryIds.isEmpty && _selectedEnrollmentKeys.isEmpty) {
+        _isSelectionMode = false;
+      }
+    });
+  }
+  
+  void _toggleEnrollmentSelection(String enrollmentKey) {
+    setState(() {
+      if (_selectedEnrollmentKeys.contains(enrollmentKey)) {
+        _selectedEnrollmentKeys.remove(enrollmentKey);
+      } else {
+        _selectedEnrollmentKeys.add(enrollmentKey);
+      }
+      
+      // Exit selection mode if no items selected
+      if (_selectedCategoryIds.isEmpty && _selectedEnrollmentKeys.isEmpty) {
+        _isSelectionMode = false;
+      }
+    });
+  }
+  
+  void _selectAllCategories(CategoryController controller) {
+    setState(() {
+      _selectedCategoryIds.clear();
+      for (final category in controller.categories) {
+        _selectedCategoryIds.add(category.id);
+      }
+    });
+  }
+  
+  void _selectAllEnrollments(CategoryController controller) {
+    setState(() {
+      _selectedEnrollmentKeys.clear();
+      for (final enrollment in controller.enrollments) {
+        final key = '${enrollment.categoryName}-${enrollment.profileEmail}-${enrollment.userEmail}';
+        _selectedEnrollmentKeys.add(key);
+      }
+    });
+  }
+  
+  void _clearSelection() {
+    setState(() {
+      _selectedCategoryIds.clear();
+      _selectedEnrollmentKeys.clear();
+      _isSelectionMode = false;
+    });
+  }
+  
+  // Batch operations for categories
+  void _showBatchCreateDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => const CreateMultipleCategoriesWidget(),
+    );
+  }
+  
+  void _showBatchEditDialog(CategoryController controller) {
+    final selectedCategories = controller.categories
+        .where((category) => _selectedCategoryIds.contains(category.id))
+        .toList();
+        
+    if (selectedCategories.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No hay categorías seleccionadas para editar'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+    
+    showDialog(
+      context: context,
+      builder: (context) => EditMultipleCategoriesWidget(
+        controller: controller,
+        categoriesToEdit: selectedCategories,
+      ),
+    ).then((_) => _clearSelection());
+  }
+  
+  void _showBatchDeleteDialog(CategoryController controller) {
+    final selectedCategories = controller.categories
+        .where((category) => _selectedCategoryIds.contains(category.id))
+        .toList();
+        
+    if (selectedCategories.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No hay categorías seleccionadas para eliminar'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+    
+    showDialog(
+      context: context,
+      builder: (context) => DeleteMultipleCategoriesWidget(
+        controller: controller,
+        categoriesToDelete: selectedCategories,
+      ),
+    ).then((_) => _clearSelection());
+  }
+  
+  void _showEnrollmentDeleteDialog(CategoryController controller) {
+    final selectedEnrollments = controller.enrollments
+        .where((enrollment) {
+          final key = '${enrollment.categoryName}-${enrollment.profileEmail}-${enrollment.userEmail}';
+          return _selectedEnrollmentKeys.contains(key);
+        })
+        .toList();
+        
+    if (selectedEnrollments.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No hay asignaciones seleccionadas para eliminar'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+    
+    showDialog(
+      context: context,
+      builder: (context) => EnrollmentDeleteWidget(
+        controller: controller,
+        enrollmentsToDelete: selectedEnrollments,
+      ),
+    ).then((_) => _clearSelection());
+  }
+  
+  // ============= APP BAR BUILDER =============
+  
+  PreferredSizeWidget _buildAppBar(CategoryController controller, bool isProfile) {
+    if (_isSelectionMode) {
+      // Selection mode AppBar with batch operations
+      return AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: _clearSelection,
+        ),
+        title: Text(
+          isProfile 
+              ? '${_selectedEnrollmentKeys.length} seleccionadas'
+              : '${_selectedCategoryIds.length} seleccionadas',
+        ),
+        actions: [
+          // Select All button
+          IconButton(
+            icon: const Icon(Icons.select_all),
+            onPressed: () {
+              if (isProfile) {
+                _selectAllEnrollments(controller);
+              } else {
+                _selectAllCategories(controller);
+              }
+            },
+            tooltip: 'Seleccionar todo',
+          ),
+          
+          // Batch operations menu
+          PopupMenuButton<String>(
+            onSelected: (String value) {
+              switch (value) {
+                case 'batch_create':
+                  _showBatchCreateDialog();
+                  break;
+                case 'batch_edit':
+                  _showBatchEditDialog(controller);
+                  break;
+                case 'batch_delete':
+                  if (isProfile) {
+                    _showEnrollmentDeleteDialog(controller);
+                  } else {
+                    _showBatchDeleteDialog(controller);
+                  }
+                  break;
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              if (isProfile) {
+                return [
+                  const PopupMenuItem<String>(
+                    value: 'batch_delete',
+                    child: ListTile(
+                      leading: Icon(Icons.link_off, color: Colors.orange),
+                      title: Text('Eliminar asignaciones'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                ];
+              } else {
+                return [
+                  const PopupMenuItem<String>(
+                    value: 'batch_create',
+                    child: ListTile(
+                      leading: Icon(Icons.add_box, color: Colors.green),
+                      title: Text('Crear múltiples'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'batch_edit',
+                    child: ListTile(
+                      leading: Icon(Icons.edit, color: Colors.blue),
+                      title: Text('Editar seleccionadas'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'batch_delete',
+                    child: ListTile(
+                      leading: Icon(Icons.delete, color: Colors.red),
+                      title: Text('Eliminar seleccionadas'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                ];
+              }
+            },
+            icon: const Icon(Icons.more_vert),
+          ),
+        ],
+      );
+    } else {
+      // Normal AppBar
+      return AppBar(
+        title: const Text("Categorías"),
+        actions: [
+          // Multi-select toggle button (only for users with categories or profiles with enrollments)
+          if ((!isProfile && controller.categories.isNotEmpty) || 
+              (isProfile && controller.enrollments.isNotEmpty))
+            IconButton(
+              icon: const Icon(Icons.checklist),
+              onPressed: _toggleSelectionMode,
+              tooltip: 'Selección múltiple',
+            ),
+          
+          // Batch create button (only for regular users)
+          if (!isProfile)
+            IconButton(
+              icon: const Icon(Icons.add_box),
+              onPressed: _showBatchCreateDialog,
+              tooltip: 'Crear múltiples categorías',
+            ),
+        ],
+      );
+    }
+  }
 
 
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<CategoryController>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Categorías"),
-      ),
-      body: controller.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : controller.errorMessage != null
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    controller.errorMessage!,
-                    style: const TextStyle(color: Colors.red),
+    return FutureBuilder<bool>(
+      future: _isProfile(),
+      builder: (context, snapshot) {
+        final isProfile = snapshot.data ?? false;
+        
+        return Scaffold(
+          appBar: _buildAppBar(controller, isProfile),
+          body: controller.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : controller.errorMessage != null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        controller.errorMessage!,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () => _loadDataBasedOnRole(),
+                        child: const Text('Reintentar'),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => controller.loadCategories(),
-                    child: const Text('Reintentar'),
-                  ),
-                ],
-              ),
-            )
-          : controller.categories.isEmpty
+                )
+              : isProfile
+                  ? _buildProfileView(controller)
+                  : _buildUserView(controller),
+        );
+      },
+    );
+  }
+  
+  /// Vista para usuarios regulares (pueden crear/editar categorías)
+  Widget _buildUserView(CategoryController controller) {
+    return controller.categories.isEmpty
               ? Padding(
                   padding: const EdgeInsets.all(8),
                   child: Column(
@@ -363,9 +696,169 @@ class _CategoryViewState extends State<CategoryView> {
                       onEdit: () => _handleEditCategory(category),
                       onDelete: () => _handleDeleteCategory(category),
                       onAssign: _isBusinessUser ? () => _handleAssignCategory(category) : null,
+                      isSelectionMode: _isSelectionMode,
+                      isSelected: _selectedCategoryIds.contains(category.id),
+                      onSelectionToggle: () {
+                        _toggleCategorySelection(category.id);
+                        // Enter selection mode if not already in it
+                        if (!_isSelectionMode) {
+                          setState(() {
+                            _isSelectionMode = true;
+                          });
+                        }
+                      },
                     );
                   },
+                );
+  }
+  
+  /// Vista para perfiles (solo pueden ver categorías asignadas)
+  Widget _buildProfileView(CategoryController controller) {
+    return controller.enrollments.isEmpty
+        ? Padding(
+            padding: const EdgeInsets.all(8),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.assignment_ind_outlined,
+                    size: 64,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No tienes categorías asignadas',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Contacta al administrador para que te asigne categorías',
+                    style: TextStyle(
+                      color: Colors.grey[500],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          )
+        : ListView.builder(
+            padding: const EdgeInsets.all(8),
+            itemCount: controller.enrollments.length,
+            itemBuilder: (context, index) {
+              final enrollment = controller.enrollments[index];
+              final enrollmentKey = '${enrollment.categoryName}-${enrollment.profileEmail}-${enrollment.userEmail}';
+              final isSelected = _selectedEnrollmentKeys.contains(enrollmentKey);
+              
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: InkWell(
+                  onTap: _isSelectionMode
+                      ? () {
+                          _toggleEnrollmentSelection(enrollmentKey);
+                          // Enter selection mode if not already in it
+                          if (!_isSelectionMode) {
+                            setState(() {
+                              _isSelectionMode = true;
+                            });
+                          }
+                        }
+                      : null,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Card(
+                    elevation: isSelected ? 4 : 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: isSelected 
+                          ? BorderSide(color: Colors.orange, width: 2) 
+                          : BorderSide.none,
+                    ),
+                    color: isSelected ? Colors.orange.withOpacity(0.1) : null,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected 
+                              ? Colors.orange.withValues(alpha: 0.5)
+                              : Colors.green.withValues(alpha: 0.3),
+                          width: 1.5,
+                          style: BorderStyle.solid,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          children: [
+                            // Selection checkbox in selection mode
+                            if (_isSelectionMode) ...[
+                              Checkbox(
+                                value: isSelected,
+                                onChanged: (_) {
+                                  _toggleEnrollmentSelection(enrollmentKey);
+                                },
+                                activeColor: Colors.orange,
+                              ),
+                              const SizedBox(width: 8),
+                            ],
+                            
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: isSelected 
+                                    ? Colors.orange.withValues(alpha: 0.15)
+                                    : Colors.green.withValues(alpha: 0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.assignment_turned_in,
+                                size: 24,
+                                color: isSelected ? Colors.orange : Colors.green,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    enrollment.categoryName,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: isSelected ? Colors.orange[800] : Colors.green,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Categoría asignada por ${enrollment.userEmail}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: isSelected ? Colors.orange[600] : Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            
+                            if (!_isSelectionMode)
+                              Icon(
+                                Icons.visibility,
+                                size: 16,
+                                color: Colors.green,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-    );
+              );
+            },
+          );
   }
 }
