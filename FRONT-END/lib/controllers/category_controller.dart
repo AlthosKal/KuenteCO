@@ -92,6 +92,28 @@ class CategoryController extends ChangeNotifier {
     }
   }
 
+  // 📌 Cargar inscripciones del perfil autenticado
+  Future<void> loadProfileEnrollments() async {
+    _setLoading(true);
+    try {
+      print('🔄 CategoryController: Loading profile enrollments from server...');
+      enrollments = await _service.getAllEnrollments();
+      print('✅ CategoryController: Loaded ${enrollments.length} profile enrollments from server');
+      
+      // Log de todas las inscripciones para debug
+      for (int i = 0; i < enrollments.length; i++) {
+        print('   Profile Enrollment $i: Category="${enrollments[i].categoryName}", ProfileEmail="${enrollments[i].profileEmail}"');
+      }
+      
+      _setError(null);
+    } catch (e) {
+      print('❌ CategoryController: Error loading profile enrollments: $e');
+      _setError(e.toString());
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   // 📌 Agregar categoría
   Future<void> addCategory(NewCategoryDTO dto) async {
     _setError(null); // Limpiar cualquier error previo
@@ -103,6 +125,23 @@ class CategoryController extends ChangeNotifier {
       // Recargar la lista completa desde el servidor
       await loadCategories();
     } catch (e) {
+      _setError(e.toString());
+    }
+  }
+  
+  // 📌 Agregar múltiples categorías (batch)
+  Future<void> addCategoriesBatch(List<NewCategoryDTO> dtos) async {
+    _setError(null);
+    
+    try {
+      print('📌 CategoryController: Creating ${dtos.length} categories in batch...');
+      await _service.addCategoriesBatch(dtos);
+      print('✅ CategoryController: Batch creation completed successfully');
+      
+      // Recargar la lista completa desde el servidor
+      await loadCategories();
+    } catch (e) {
+      print('❌ CategoryController: Error in batch creation: $e');
       _setError(e.toString());
     }
   }
@@ -150,6 +189,23 @@ class CategoryController extends ChangeNotifier {
       _setError(e.toString());
     }
   }
+  
+  // 📌 Actualizar múltiples categorías (batch)
+  Future<void> updateCategoriesBatch(List<CategoryDTO> dtos) async {
+    _setError(null);
+    
+    try {
+      print('📌 CategoryController: Updating ${dtos.length} categories in batch...');
+      await _service.updateCategoriesBatch(dtos);
+      print('✅ CategoryController: Batch update completed successfully');
+      
+      // Recargar la lista completa desde el servidor
+      await loadCategories();
+    } catch (e) {
+      print('❌ CategoryController: Error in batch update: $e');
+      _setError(e.toString());
+    }
+  }
 
   // 📌 Eliminar categoría
   Future<void> deleteCategory(int id) async {
@@ -168,6 +224,23 @@ class CategoryController extends ChangeNotifier {
       _setLoading(false);
     }
   }
+  
+  // 📌 Eliminar múltiples categorías (batch)
+  Future<void> deleteCategoriesBatch(List<int> ids) async {
+    _setError(null);
+    
+    try {
+      print('📌 CategoryController: Deleting ${ids.length} categories in batch...');
+      await _service.deleteCategoriesBatch(ids);
+      print('✅ CategoryController: Batch deletion completed successfully');
+      
+      // Recargar la lista completa desde el servidor
+      await loadCategories();
+    } catch (e) {
+      print('❌ CategoryController: Error in batch deletion: $e');
+      _setError(e.toString());
+    }
+  }
 
   // 📌 Asignar categoría a perfil (solo para usuarios Business)
   Future<void> assignCategoryToProfile(int categoryId, int profileId) async {
@@ -183,6 +256,23 @@ class CategoryController extends ChangeNotifier {
       
     } catch (e) {
       print('❌ CategoryController: Error assigning category: $e');
+      _setError(e.toString());
+    }
+  }
+  
+  // 📌 Eliminar asignación de categoría (enrollment)
+  Future<void> deleteEnrollment(int enrollmentId) async {
+    _setError(null);
+    
+    try {
+      print('📌 CategoryController: Deleting enrollment with ID: $enrollmentId');
+      await _service.deleteEnrollment(enrollmentId);
+      print('✅ CategoryController: Enrollment deleted successfully');
+      
+      // Recargar las inscripciones desde el servidor
+      await loadProfileEnrollments();
+    } catch (e) {
+      print('❌ CategoryController: Error deleting enrollment: $e');
       _setError(e.toString());
     }
   }
