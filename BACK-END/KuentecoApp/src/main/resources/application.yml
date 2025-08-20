@@ -62,7 +62,7 @@ bancolombia:
       scope: "Device:write:app"  # Scope corregido según documentación
     api:
       # Base path corregido - removido el path específico del endpoint
-      base-path: /public-partner/sb/v1/operations/cross-product/account-management/transaction-engine/transactional-information/information/retrieve/transactional/info
+      base-path: /public-partner/sb/v1/operations/cross-product/account-management/transaction-engine/transactional-information
       endpoints:
         # Endpoint corregido para obtener información transaccional
         transactions: /information/retrieve/transactional/info
