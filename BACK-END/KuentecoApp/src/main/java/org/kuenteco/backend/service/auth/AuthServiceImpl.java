@@ -1,11 +1,12 @@
 package org.kuenteco.backend.service.auth;
 
-import static org.kuenteco.backend.service.user.SendgridServiceImpl.verificationCodes;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.config.jwt.AuthCredentials;
@@ -23,7 +24,7 @@ import org.kuenteco.backend.repository.master.MasterSubscriptionRepository;
 import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveRoleRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
-import org.kuenteco.backend.service.user.SendgridService;
+import org.kuenteco.backend.service.email.SendgridService;
 import org.kuenteco.backend.service.user.UserService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -51,6 +52,7 @@ public class AuthServiceImpl implements AuthService {
     private final NewUserMapper newUserMapper;
     private final SendgridService sendgridService;
     private final MasterSubscriptionRepository masterSubscriptionRepository;
+    protected final Map<String, String> verificationCodes = new ConcurrentHashMap<>();
 
     @Override
     public TokenResponseDTO authenticate(LoginDTO dto, HttpServletResponse response) {
@@ -157,7 +159,7 @@ public class AuthServiceImpl implements AuthService {
                             return true;
                         });
         if (result == null || !result) {
-            throw new RuntimeException(
+            throw new AuthException(
                     "No se pudo activar la cuenta. Por favor, intente nuevamente.");
         }
     }
@@ -175,7 +177,7 @@ public class AuthServiceImpl implements AuthService {
 
                     // Verificar que la cuenta esté activa
                     if (user.getState() != State.ACTIVE) {
-                        throw new RuntimeException("La cuenta no está activa");
+                        throw new AuthException("La cuenta no está activa");
                     }
 
                     user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));

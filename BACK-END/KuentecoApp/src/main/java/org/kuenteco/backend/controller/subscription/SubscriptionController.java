@@ -28,6 +28,9 @@ public class SubscriptionController implements SubscriptionResource {
     private final MercadoPagoService mercadoPagoService;
     private final MercadoPagoPaymentService mercadoPagoPaymentService;
     private final MercadoPagoWebhookService mercadoPagoWebhookService;
+    private static final String ACTION = "action";
+    private static final String TYPE = "type";
+    private static final String DATA = "data";
 
     /**
      * Crea una nueva suscripción en Mercado Pago
@@ -187,8 +190,8 @@ public class SubscriptionController implements SubscriptionResource {
             log.debug("Headers del webhook: {}", headers);
 
             // Validar que es una notificación legítima de MercadoPago
-            String action = (String) notification.get("action");
-            String type = (String) notification.get("type");
+            String action = (String) notification.get(ACTION);
+            String type = (String) notification.get(TYPE);
 
             if ("payment.updated".equals(action)
                     || "subscription".equals(type)
@@ -196,7 +199,7 @@ public class SubscriptionController implements SubscriptionResource {
                     || action != null && action.contains("preapproval")) {
 
                 // Extraer el ID del preapproval
-                Map<String, Object> data = (Map<String, Object>) notification.get("data");
+                Map<String, Object> data = (Map<String, Object>) notification.get(DATA);
                 if (data != null) {
                     String preapprovalId = (String) data.get("id");
 
@@ -231,7 +234,7 @@ public class SubscriptionController implements SubscriptionResource {
             log.error("Error procesando webhook de preapproval: {}", e.getMessage(), e);
             // MercadoPago requiere que respondamos con status 200 incluso si hay error
             // para evitar reenvíos innecesarios
-            return ResponseEntity.ok("ERROR");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -254,14 +257,14 @@ public class SubscriptionController implements SubscriptionResource {
             log.info("Webhook de payment recibido: {}", notification);
             log.debug("Headers del webhook al momento de realizar el pago: {}", headers);
 
-            String action = (String) notification.get("action");
-            String type = (String) notification.get("type");
+            String action = (String) notification.get(ACTION);
+            String type = (String) notification.get(TYPE);
 
             if ("payment.created".equals(action)
                     || "payment.updated".equals(action)
                     || "payment".equals(type)) {
 
-                Map<String, Object> data = (Map<String, Object>) notification.get("data");
+                Map<String, Object> data = (Map<String, Object>) notification.get(DATA);
                 if (data != null) {
                     String paymentId = (String) data.get("id");
 
@@ -290,7 +293,7 @@ public class SubscriptionController implements SubscriptionResource {
 
         } catch (Exception e) {
             log.error("Error procesando webhook de payment: {}", e.getMessage(), e);
-            return ResponseEntity.ok("ERROR");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -329,7 +332,7 @@ public class SubscriptionController implements SubscriptionResource {
 
         } catch (Exception e) {
             log.error("Error procesando webhook genérico: {}", e.getMessage(), e);
-            return ResponseEntity.ok("ERROR");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

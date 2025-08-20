@@ -16,9 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional(transactionManager = "slaveTransactionManager", readOnly = true)
 public interface SlaveDebtRepository extends JpaRepository<Debt, Integer> {
-    @Query(
-            """
-    SELECT COALESCE(SUM(d.pendingAmount), 0) FROM Debt d WHERE d.user = :user AND d.state = :state""")
+    @Query(" SELECT COALESCE(SUM(d.pendingAmount), 0) FROM Debt d WHERE d.user = :user AND d.state = :state")
     BigDecimal sumPendingAmountByStateAndUser(
             @Param("state") StateDebt state, @Param("user") User user);
 

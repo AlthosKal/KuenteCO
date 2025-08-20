@@ -22,7 +22,7 @@ import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveRoleRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
 import org.kuenteco.backend.service.auth.AuthService;
-import org.kuenteco.backend.service.user.SendgridService;
+import org.kuenteco.backend.service.email.SendgridService;
 import org.kuenteco.config.BaseIntegrationTestWithoutWireMock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

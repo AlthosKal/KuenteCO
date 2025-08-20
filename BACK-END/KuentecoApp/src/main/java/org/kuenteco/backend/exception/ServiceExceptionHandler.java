@@ -20,14 +20,6 @@ public class ServiceExceptionHandler {
                 .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }
 
-    @ExceptionHandler(SendgridException.class)
-    public ResponseEntity<ApiResponse<Void>> handleSendgridException(
-            SendgridException ex, HttpServletRequest request) {
-        log.warn("Error de al enviar correo: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
-    }
-
     @ExceptionHandler(CategoryException.class)
     public ResponseEntity<ApiResponse<Void>> handleCategoryException(
             CategoryException ex, HttpServletRequest request) {
@@ -56,14 +48,6 @@ public class ServiceExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleNotificationException(
             NotificationException ex, HttpServletRequest request) {
         log.warn("Error con el servicio de Notificaciones: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
-    }
-
-    @ExceptionHandler(ExchangeRateException.class)
-    public ResponseEntity<ApiResponse<Void>> handleExchangeRateException(
-            ExchangeRateException ex, HttpServletRequest request) {
-        log.warn("Error con el servicio de Tazas de Cambio: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }
