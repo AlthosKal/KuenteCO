@@ -7,6 +7,15 @@ import org.kuenteco.backend.exception.exceptions.ExcelException;
 
 public class ExcelValidator {
 
+    /**
+     * Constructor privado para prevenir la instanciación de esta utility class.
+     *
+     * @throws IllegalStateException siempre, ya que esta clase no debe ser instanciada
+     */
+    private ExcelValidator() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static String validateRequiredTextCell(Row row, int index, String fieldName) {
         Cell cell = row.getCell(index);
         if (cell == null || cell.getCellType() == CellType.BLANK) {

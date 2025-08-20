@@ -27,7 +27,7 @@ import org.kuenteco.backend.repository.master.MasterSubscriptionRepository;
 import org.kuenteco.backend.repository.master.MasterUserRepository;
 import org.kuenteco.backend.repository.slave.SlaveRoleRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
-import org.kuenteco.backend.service.user.SendgridService;
+import org.kuenteco.backend.service.email.SendgridService;
 import org.kuenteco.backend.service.user.UserService;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

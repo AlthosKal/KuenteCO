@@ -20,11 +20,12 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     }
 
     @Override
-    public Map upload(MultipartFile multipartFile) throws IOException {
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> upload(MultipartFile multipartFile) throws IOException {
         File file = convert(multipartFile);
         try {
-            Map params = ObjectUtils.asMap("secure", true);
-            Map result = cloudinary.uploader().upload(file, params);
+            Map<String, Object> params = ObjectUtils.asMap("secure", true);
+            Map<String, Object> result = (Map<String, Object>) cloudinary.uploader().upload(file, params);
 
             // Siempre leer secure_url para HTTPS
             String secureUrl = (String) result.get("secure_url");
@@ -37,18 +38,37 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     }
 
     @Override
-    public Map delete(String id) throws IOException {
-        return cloudinary.uploader().destroy(id, ObjectUtils.emptyMap());
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> delete(String id) throws IOException {
+        return (Map<String, Object>) cloudinary.uploader().destroy(id, ObjectUtils.emptyMap());
     }
 
     private File convert(MultipartFile multipartFile) throws IOException {
-        File file =
-                File.createTempFile(
-                        "upload-",
-                        "-" + Objects.requireNonNull(multipartFile.getOriginalFilename()));
+        String originalFilename = Objects.requireNonNull(multipartFile.getOriginalFilename());
+
+        // Sanitizar: quitar caracteres peligrosos
+        String safeName = originalFilename.replaceAll("[^a-zA-Z0-9.-]", "_");
+
+        // Limitar longitud para evitar abusos
+        if (safeName.length() > 50) {
+            safeName = safeName.substring(safeName.length() - 50);
+        }
+
+        // Crear archivo siempre en el directorio temporal del sistema
+        File file = File.createTempFile("upload-", "-" + safeName);
+
+        // Validar que está dentro del directorio temporal
+        String tmpDir = new File(System.getProperty("java.io.tmpdir")).getCanonicalPath();
+        String filePath = file.getCanonicalPath();
+        if (!filePath.startsWith(tmpDir)) {
+            throw new SecurityException("Ruta de archivo no válida: se detectó un intento de escritura fuera del directorio temporal permitido");
+        }
+
+        // Escribir el contenido
         try (FileOutputStream fo = new FileOutputStream(file)) {
             fo.write(multipartFile.getBytes());
         }
+
         return file;
     }
 }

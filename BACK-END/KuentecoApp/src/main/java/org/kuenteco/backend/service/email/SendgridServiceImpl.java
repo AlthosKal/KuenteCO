@@ -1,4 +1,4 @@
-package org.kuenteco.backend.service.user;
+package org.kuenteco.backend.service.email;
 
 import com.sendgrid.Method;
 import com.sendgrid.Request;
@@ -17,11 +17,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.kuenteco.backend.dto.auth.SendVerificationCodeDTO;
 import org.kuenteco.backend.dto.auth.ValidateVerificationCodeDTO;
 import org.kuenteco.backend.exception.exceptions.SendgridException;
 import org.kuenteco.backend.repository.slave.SlaveProfileRepository;
 import org.kuenteco.backend.repository.slave.SlaveUserRepository;
+import org.kuenteco.backend.service.user.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -29,11 +31,12 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SendgridServiceImpl implements SendgridService {
-    public static final Map<String, String> verificationCodes = new ConcurrentHashMap<>();
+    protected final Map<String, String> verificationCodes = new ConcurrentHashMap<>();
     private final SlaveUserRepository slaveUserRepository;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final UserService userService;
     private final SlaveProfileRepository slaveProfileRepository;
+    private final Random random = new Random();
 
     // SendGrid
     @Value("${spring.sendgrid.api-key}")
@@ -67,7 +70,7 @@ public class SendgridServiceImpl implements SendgridService {
 
         String code = generateVerificationCode();
         verificationCodes.put(email, code);
-        log.info("Código de verificacion: " + code);
+        log.info("Código de verificacion: {}", code);
 
         // Programar la eliminación del código después de 15 minutos
         scheduleRemoval(email);
@@ -76,7 +79,7 @@ public class SendgridServiceImpl implements SendgridService {
             sendEmail(email, code, isRegistration);
         } catch (IOException e) {
             verificationCodes.remove(email);
-            throw new RuntimeException("Error al enviar email: " + e.getMessage());
+            throw new SendgridException("Error al enviar email: " + e.getMessage());
         }
     }
 
@@ -94,27 +97,13 @@ public class SendgridServiceImpl implements SendgridService {
     }
 
     private String generateVerificationCode() {
-        return String.format("%06d", new Random().nextInt(999999));
+        int value = random.nextInt(999999);
+        return String.format("%06d", value);
     }
 
     private void sendEmail(String recipientEmail, String code, boolean isRegistration)
             throws IOException {
-        Email from = new Email(emailSendGrid);
-        Email to = new Email(recipientEmail);
-
-        Mail mail = new Mail();
-        mail.setFrom(from);
-        mail.setSubject(isRegistration ? "Verifica tu registro" : "Recuperación de contraseña");
-
-        Personalization personalization = new Personalization();
-        personalization.addTo(to);
-
-        String templateId = isRegistration ? verifyEmail : resetPassword;
-        String dynamicField = isRegistration ? "codeVerificationEmail" : "codeResetPassword";
-
-        personalization.addDynamicTemplateData(dynamicField, code);
-        mail.addPersonalization(personalization);
-        mail.setTemplateId(templateId);
+        Mail mail = getMail(recipientEmail, code, isRegistration);
 
         SendGrid sg = new SendGrid(sendgridApiKey);
         Request request = new Request();
@@ -131,5 +120,25 @@ public class SendgridServiceImpl implements SendgridService {
                     response.getBody());
             throw new IOException("Error en el servicio de email: " + response.getBody());
         }
+    }
+
+    private @NotNull Mail getMail(String recipientEmail, String code, boolean isRegistration) {
+        Email from = new Email(emailSendGrid);
+        Email to = new Email(recipientEmail);
+
+        Mail mail = new Mail();
+        mail.setFrom(from);
+        mail.setSubject(isRegistration ? "Verifica tu registro" : "Recuperación de contraseña");
+
+        Personalization personalization = new Personalization();
+        personalization.addTo(to);
+
+        String templateId = isRegistration ? verifyEmail : resetPassword;
+        String dynamicField = isRegistration ? "codeVerificationEmail" : "codeResetPassword";
+
+        personalization.addDynamicTemplateData(dynamicField, code);
+        mail.addPersonalization(personalization);
+        mail.setTemplateId(templateId);
+        return mail;
     }
 }

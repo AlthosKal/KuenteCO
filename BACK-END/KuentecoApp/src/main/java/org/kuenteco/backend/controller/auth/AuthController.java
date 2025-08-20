@@ -11,7 +11,7 @@ import org.kuenteco.backend.dto.image.ImageDTO;
 import org.kuenteco.backend.exception.ApiResponse;
 import org.kuenteco.backend.service.auth.AuthService;
 import org.kuenteco.backend.service.image.ImageService;
-import org.kuenteco.backend.service.user.SendgridService;
+import org.kuenteco.backend.service.email.SendgridService;
 import org.kuenteco.backend.service.user.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

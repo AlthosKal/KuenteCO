@@ -68,28 +68,12 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
 
             // Procesar según el tipo de acción
             switch (action) {
-                case "authorized":
-                case "preapproval.authorized":
-                    handlePreapprovalAuthorized(localPreapproval, mpPreapproval);
-                    break;
-                case "pending":
-                case "preapproval.pending":
-                    handlePreapprovalPending(localPreapproval, mpPreapproval);
-                    break;
-                case "cancelled":
-                case "preapproval.cancelled":
-                    handlePreapprovalCancelled(localPreapproval, mpPreapproval);
-                    break;
-                case "rejected":
-                case "preapproval.rejected":
-                    handlePreapprovalRejected(localPreapproval, mpPreapproval);
-                    break;
-                case "paused":
-                case "preapproval.paused":
-                    handlePreapprovalPaused(localPreapproval, mpPreapproval);
-                    break;
-                default:
-                    log.warn("Acción de preapproval no reconocida: {}", action);
+                case "authorized","preapproval.authorized" -> handlePreapprovalAuthorized(localPreapproval, mpPreapproval);
+                case "pending","preapproval.pending" ->handlePreapprovalPending(localPreapproval, mpPreapproval);
+                case "cancelled","preapproval.cancelled" -> handlePreapprovalCancelled(localPreapproval, mpPreapproval);
+                case "rejected","preapproval.rejected" -> handlePreapprovalRejected(localPreapproval, mpPreapproval);
+                case "paused","preapproval.paused" -> handlePreapprovalPaused(localPreapproval, mpPreapproval);
+                default ->log.warn("Acción de preapproval no reconocida: {}", action);
             }
 
             log.info("Webhook de preapproval procesado exitosamente: {}", preapprovalId);
@@ -117,14 +101,9 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
 
             // Procesar según el tipo de acción
             switch (action) {
-                case "payment.created":
-                    handlePaymentCreated(payment);
-                    break;
-                case "payment.updated":
-                    handlePaymentUpdated(payment);
-                    break;
-                default:
-                    log.warn("Acción de payment no reconocida: {}", action);
+                case "payment.created" ->handlePaymentCreated(payment);
+                case "payment.updated"->handlePaymentUpdated(payment);
+                default -> log.warn("Acción de payment no reconocida: {}", action);
             }
 
             log.info("Webhook de payment procesado exitosamente: {}", paymentId);
@@ -471,22 +450,13 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
     private PaymentStatus mapMPPaymentStatus(String mpStatus) {
         if (mpStatus == null) return PaymentStatus.PENDING;
 
-        switch (mpStatus.toLowerCase()) {
-            case "approved":
-                return PaymentStatus.APPROVED;
-            case "pending":
-            case "in_process":
-            case "in_mediation":
-                return PaymentStatus.PENDING;
-            case "rejected":
-            case "cancelled":
-                return PaymentStatus.DECLINED;
-            case "refunded":
-            case "charged_back":
-                return PaymentStatus.VOIDED;
-            default:
-                return PaymentStatus.ERROR;
-        }
+        return switch (mpStatus.toLowerCase()) {
+            case "approved" -> PaymentStatus.APPROVED;
+            case "pending", "in_process", "in_mediation" -> PaymentStatus.PENDING;
+            case "rejected", "cancelled" -> PaymentStatus.DECLINED;
+            case "refunded", "charged_back" -> PaymentStatus.VOIDED;
+            default -> PaymentStatus.ERROR;
+        };
     }
 
     private void handlePaymentApproved(MercadoPagoPayment payment) {

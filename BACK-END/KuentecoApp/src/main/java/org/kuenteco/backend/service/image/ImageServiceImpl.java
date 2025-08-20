@@ -99,7 +99,7 @@ public class ImageServiceImpl implements ImageService {
                 }
 
                 Image oldImage = user.getImage();
-                Image newImage = null;
+                Image newImage;
 
                 // Subimos la nueva imagen
                 newImage = uploadImage(image);
@@ -124,7 +124,7 @@ public class ImageServiceImpl implements ImageService {
                 }
 
                 Image oldImage = profile.getImage();
-                Image newImage = null;
+                Image newImage;
 
                 // Subimos la nueva imagen
                 newImage = uploadImage(image);
@@ -195,7 +195,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public Image uploadImage(MultipartFile file) throws IOException {
-        Map uploadResult = cloudinaryService.upload(file);
+        Map<String, Object> uploadResult = cloudinaryService.upload(file);
         String imageUrl = (String) uploadResult.get("url");
         String imageId = (String) uploadResult.get("public_id");
         Image image =
