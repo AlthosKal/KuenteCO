@@ -25,7 +25,8 @@ public class CloudinaryServiceImpl implements CloudinaryService {
         File file = convert(multipartFile);
         try {
             Map<String, Object> params = ObjectUtils.asMap("secure", true);
-            Map<String, Object> result = (Map<String, Object>) cloudinary.uploader().upload(file, params);
+            Map<String, Object> result =
+                    (Map<String, Object>) cloudinary.uploader().upload(file, params);
 
             // Siempre leer secure_url para HTTPS
             String secureUrl = (String) result.get("secure_url");
@@ -61,7 +62,8 @@ public class CloudinaryServiceImpl implements CloudinaryService {
         String tmpDir = new File(System.getProperty("java.io.tmpdir")).getCanonicalPath();
         String filePath = file.getCanonicalPath();
         if (!filePath.startsWith(tmpDir)) {
-            throw new SecurityException("Ruta de archivo no válida: se detectó un intento de escritura fuera del directorio temporal permitido");
+            throw new SecurityException(
+                    "Ruta de archivo no válida: se detectó un intento de escritura fuera del directorio temporal permitido");
         }
 
         // Escribir el contenido

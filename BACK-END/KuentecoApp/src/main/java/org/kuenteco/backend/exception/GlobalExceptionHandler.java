@@ -122,7 +122,6 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }
 
-
     @ExceptionHandler(SendgridException.class)
     public ResponseEntity<ApiResponse<Void>> handleSendgridException(
             SendgridException ex, HttpServletRequest request) {
@@ -130,7 +129,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ex.getMessage(), request.getRequestURI()));
     }
-
 
     @ExceptionHandler(ExchangeRateException.class)
     public ResponseEntity<ApiResponse<Void>> handleExchangeRateException(

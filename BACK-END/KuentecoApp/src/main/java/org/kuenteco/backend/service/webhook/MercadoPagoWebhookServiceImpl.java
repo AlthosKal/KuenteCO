@@ -68,12 +68,17 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
 
             // Procesar según el tipo de acción
             switch (action) {
-                case "authorized","preapproval.authorized" -> handlePreapprovalAuthorized(localPreapproval, mpPreapproval);
-                case "pending","preapproval.pending" ->handlePreapprovalPending(localPreapproval, mpPreapproval);
-                case "cancelled","preapproval.cancelled" -> handlePreapprovalCancelled(localPreapproval, mpPreapproval);
-                case "rejected","preapproval.rejected" -> handlePreapprovalRejected(localPreapproval, mpPreapproval);
-                case "paused","preapproval.paused" -> handlePreapprovalPaused(localPreapproval, mpPreapproval);
-                default ->log.warn("Acción de preapproval no reconocida: {}", action);
+                case "authorized", "preapproval.authorized" ->
+                        handlePreapprovalAuthorized(localPreapproval, mpPreapproval);
+                case "pending", "preapproval.pending" ->
+                        handlePreapprovalPending(localPreapproval, mpPreapproval);
+                case "cancelled", "preapproval.cancelled" ->
+                        handlePreapprovalCancelled(localPreapproval, mpPreapproval);
+                case "rejected", "preapproval.rejected" ->
+                        handlePreapprovalRejected(localPreapproval, mpPreapproval);
+                case "paused", "preapproval.paused" ->
+                        handlePreapprovalPaused(localPreapproval, mpPreapproval);
+                default -> log.warn("Acción de preapproval no reconocida: {}", action);
             }
 
             log.info("Webhook de preapproval procesado exitosamente: {}", preapprovalId);
@@ -101,8 +106,8 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
 
             // Procesar según el tipo de acción
             switch (action) {
-                case "payment.created" ->handlePaymentCreated(payment);
-                case "payment.updated"->handlePaymentUpdated(payment);
+                case "payment.created" -> handlePaymentCreated(payment);
+                case "payment.updated" -> handlePaymentUpdated(payment);
                 default -> log.warn("Acción de payment no reconocida: {}", action);
             }
 
