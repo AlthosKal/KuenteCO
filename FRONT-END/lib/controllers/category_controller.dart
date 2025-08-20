@@ -16,7 +16,9 @@ class CategoryController extends ChangeNotifier {
 
   List<CategoryDTO> categories = [];
   List<CategoryEnrollmentSummaryDTO> summaryReports = [];
-  List<CategoryEnrollmentDTO> enrollments = [];
+  List<CategoryEnrollmentDTO> enrollments = []; // Para perfiles
+  List<CategoryEnrollmentSummaryDTO> enrollmentSummaries = []; // Para usuarios de negocios
+  List<CategoryEnrollmentDTO> detailedEnrollments = []; // Para gestión detallada de usuarios de negocios
   CategoryReportDTO? currentReport;
 
   CategoryController(this._service);
@@ -79,20 +81,29 @@ class CategoryController extends ChangeNotifier {
     }
   }
 
-  // 📌 Cargar inscripciones
+  // 📌 Cargar inscripciones (para usuarios de negocios - gestionar asignaciones)
   Future<void> loadEnrollments() async {
     _setLoading(true);
     try {
-      enrollments = await _service.getAllEnrollments();
+      print('🔄 CategoryController: Loading enrollment summaries for business user management...');
+      enrollmentSummaries = await _service.getEnrollmentSummariesByUser();
+      print('✅ CategoryController: Loaded ${enrollmentSummaries.length} enrollment summaries for business user');
+      
+      // Log de las inscripciones para debug
+      for (int i = 0; i < enrollmentSummaries.length; i++) {
+        print('   Enrollment Summary $i: Category="${enrollmentSummaries[i].categoryName}", ID=${enrollmentSummaries[i].categoryId}');
+      }
+      
       _setError(null);
     } catch (e) {
+      print('❌ CategoryController: Error loading enrollment summaries for business user: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // 📌 Cargar inscripciones del perfil autenticado
+  // 📌 Cargar inscripciones del perfil autenticado (solo sus asignaciones)
   Future<void> loadProfileEnrollments() async {
     _setLoading(true);
     try {
@@ -111,6 +122,21 @@ class CategoryController extends ChangeNotifier {
       _setError(e.toString());
     } finally {
       _setLoading(false);
+    }
+  }
+
+  // 📌 Cargar enrollments detallados para gestión (usuarios de negocios)
+  // NOTA: Esta funcionalidad está temporalmente deshabilitada debido a restricciones del backend
+  // El endpoint /category/enroll está restringido solo para perfiles
+  Future<void> loadDetailedEnrollments() async {
+    try {
+      print('⚠️ CategoryController: loadDetailedEnrollments() disabled due to backend restrictions');
+      print('⚠️ The /category/enroll endpoint is restricted to profiles only');
+      detailedEnrollments = [];
+      _setError('La eliminación masiva de asignaciones requiere permisos especiales del backend');
+    } catch (e) {
+      print('❌ CategoryController: Error in loadDetailedEnrollments: $e');
+      _setError(e.toString());
     }
   }
 
@@ -269,11 +295,13 @@ class CategoryController extends ChangeNotifier {
       await _service.deleteEnrollment(enrollmentId);
       print('✅ CategoryController: Enrollment deleted successfully');
       
-      // Recargar las inscripciones desde el servidor
-      await loadProfileEnrollments();
+      // Recargar tanto los enrollments detallados como los resúmenes
+      await loadDetailedEnrollments();
+      await loadEnrollments();
     } catch (e) {
       print('❌ CategoryController: Error deleting enrollment: $e');
       _setError(e.toString());
+      rethrow; // Re-lanzar el error para que la UI pueda manejarlo
     }
   }
 }
