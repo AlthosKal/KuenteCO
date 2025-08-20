@@ -1,8 +1,8 @@
 class CategoryEnrollmentSummaryDTO {
   final int? categoryId;
   final String? categoryName;
-  final int? categoryOwnerId;
-  final int? ownerUserId;
+  final String? categoryOwnerId; // Changed from int? to String? for UUID
+  final String? ownerUserId; // Changed from int? to String? for UUID
   final int? enrolledUsersCount;
   final int? enrolledProfilesCount;
   final int? totalEnrollments;
