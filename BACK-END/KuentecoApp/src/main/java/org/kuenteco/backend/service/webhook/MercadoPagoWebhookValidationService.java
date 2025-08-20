@@ -54,7 +54,8 @@ public class MercadoPagoWebhookValidationService {
             }
 
             // Extraer timestamp y firma
-            SignatureComponents signatureComponents = parseSignatureHeader(webhookHeaders.xSignature());
+            SignatureComponents signatureComponents =
+                    parseSignatureHeader(webhookHeaders.xSignature());
             if (signatureComponents == null) {
                 return false;
             }
@@ -65,8 +66,11 @@ public class MercadoPagoWebhookValidationService {
             }
 
             // Generar y validar firma
-            return validateSignature(webhookHeaders.xRequestId(), dataId,
-                    signatureComponents.timestamp(), signatureComponents.signature());
+            return validateSignature(
+                    webhookHeaders.xRequestId(),
+                    dataId,
+                    signatureComponents.timestamp(),
+                    signatureComponents.signature());
 
         } catch (Exception e) {
             log.error("Error validando webhook: {}", e.getMessage(), e);
@@ -74,25 +78,23 @@ public class MercadoPagoWebhookValidationService {
         }
     }
 
-    /**
-     * Extrae y valida los headers necesarios del webhook
-     */
+    /** Extrae y valida los headers necesarios del webhook */
     private WebhookHeaders extractAndValidateHeaders(Map<String, String> headers) {
         String xSignature = headers.get("x-signature");
         String xRequestId = headers.get("x-request-id");
 
         if (xSignature == null || xRequestId == null) {
-            log.warn("Headers requeridos faltantes: x-signature={}, x-request-id={}",
-                    xSignature, xRequestId);
+            log.warn(
+                    "Headers requeridos faltantes: x-signature={}, x-request-id={}",
+                    xSignature,
+                    xRequestId);
             return null;
         }
 
         return new WebhookHeaders(xSignature, xRequestId);
     }
 
-    /**
-     * Parsea el header x-signature para extraer timestamp y firma
-     */
+    /** Parsea el header x-signature para extraer timestamp y firma */
     private SignatureComponents parseSignatureHeader(String xSignature) {
         String[] parts = xSignature.split(",");
         String ts = null;
@@ -117,9 +119,7 @@ public class MercadoPagoWebhookValidationService {
         return new SignatureComponents(ts, v1);
     }
 
-    /**
-     * Parsea una parte individual del header de firma
-     */
+    /** Parsea una parte individual del header de firma */
     private SignatureKeyValue parseSignaturePart(String part) {
         String[] keyValue = part.split("=", 2);
         if (keyValue.length != 2) {
@@ -132,9 +132,7 @@ public class MercadoPagoWebhookValidationService {
         return new SignatureKeyValue(key, value);
     }
 
-    /**
-     * Valida que el timestamp no sea muy antiguo o futuro
-     */
+    /** Valida que el timestamp no sea muy antiguo o futuro */
     private boolean isValidTimestamp(String timestampStr) {
         try {
             long timestampMs = Long.parseLong(timestampStr) * 1000; // ts está en segundos
@@ -144,7 +142,9 @@ public class MercadoPagoWebhookValidationService {
             boolean isValid = timeDifferenceMs <= 15 * 60 * 1000; // 15 minutos
 
             if (!isValid) {
-                log.warn("Webhook timestamp muy antiguo o futuro. Diferencia: {} ms", timeDifferenceMs);
+                log.warn(
+                        "Webhook timestamp muy antiguo o futuro. Diferencia: {} ms",
+                        timeDifferenceMs);
             }
 
             return isValid;
@@ -155,10 +155,9 @@ public class MercadoPagoWebhookValidationService {
         }
     }
 
-    /**
-     * Valida la firma generando el manifest y comparando con la firma esperada
-     */
-    private boolean validateSignature(String xRequestId, String dataId, String timestamp, String receivedSignature) {
+    /** Valida la firma generando el manifest y comparando con la firma esperada */
+    private boolean validateSignature(
+            String xRequestId, String dataId, String timestamp, String receivedSignature) {
         try {
             // Crear el template de manifest según documentación de MercadoPago
             String manifest = buildManifest(dataId, xRequestId, timestamp);
@@ -171,8 +170,10 @@ public class MercadoPagoWebhookValidationService {
             boolean isValid = expectedSignature.equals(receivedSignature);
 
             if (!isValid) {
-                log.warn("Firma de webhook inválida. Esperada: {}, Recibida: {}",
-                        expectedSignature, receivedSignature);
+                log.warn(
+                        "Firma de webhook inválida. Esperada: {}, Recibida: {}",
+                        expectedSignature,
+                        receivedSignature);
                 log.debug("Manifest usado: {}", manifest);
             } else {
                 log.info("Webhook validado exitosamente");
@@ -186,11 +187,10 @@ public class MercadoPagoWebhookValidationService {
         }
     }
 
-    /**
-     * Construye el manifest según la especificación de MercadoPago
-     */
+    /** Construye el manifest según la especificación de MercadoPago */
     private String buildManifest(String dataId, String xRequestId, String timestamp) {
-        return String.format("id:%s;request-id:%s;ts:%s;",
+        return String.format(
+                "id:%s;request-id:%s;ts:%s;",
                 dataId != null ? dataId.toLowerCase() : "",
                 xRequestId != null ? xRequestId : "",
                 timestamp);

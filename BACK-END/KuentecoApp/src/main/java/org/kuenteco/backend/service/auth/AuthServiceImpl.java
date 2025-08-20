@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.config.jwt.AuthCredentials;
@@ -159,8 +158,7 @@ public class AuthServiceImpl implements AuthService {
                             return true;
                         });
         if (result == null || !result) {
-            throw new AuthException(
-                    "No se pudo activar la cuenta. Por favor, intente nuevamente.");
+            throw new AuthException("No se pudo activar la cuenta. Por favor, intente nuevamente.");
         }
     }
 

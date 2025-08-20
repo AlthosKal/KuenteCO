@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CategoryEnrollmentDTO {
-    //Listar Ides
+    // Listar Ides
     @NotBlank private String userEmail;
     @NotBlank private String profileEmail;
     @NotBlank private String categoryName;
