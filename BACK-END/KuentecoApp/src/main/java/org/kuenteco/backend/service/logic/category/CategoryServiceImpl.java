@@ -236,16 +236,16 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private void resolveCategory(Integer budgetId, Category category) {
-        if (budgetId != null) {
-            category.setBudget(
-                    slaveBudgetRepository
-                            .findById(budgetId)
-                            .orElseThrow(
-                                    () ->
-                                            new CategoryException(
-                                                    "Budget no encontrado por el Id: "
-                                                            + budgetId)));
+        if (budgetId == null) {
+            category.setBudget(null);
         }
-        category.setBudget(null);
+        assert budgetId != null;
+        category.setBudget(
+                slaveBudgetRepository
+                        .findById(budgetId)
+                        .orElseThrow(
+                                () ->
+                                        new CategoryException(
+                                                "Budget no encontrado por el Id: " + budgetId)));
     }
 }
