@@ -2,6 +2,8 @@ package org.kuenteco.backend.controller.logic.category;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.kuenteco.backend.dto.logic.category.*;
@@ -144,6 +146,17 @@ public class CategoryController implements CategoryResource {
                 HttpStatus.CREATED);
     }
 
+    @PostMapping("/enroll/add/batch")
+    public ResponseEntity<?> enrollProfilesToCategories(
+            @RequestBody List<BatchEnrollmentRequestDTO> dto,
+            HttpServletRequest request) {
+        List<CategoryEnrollmentDTO> results = dto.stream().map(
+                e -> categoryEnrollmentService.enrollProfileToCategory(e.profileId(), e.categoryId())).toList();
+        return new ResponseEntity<>(
+                ApiResponse.ok("Categoría asignada correctamente", results, request.getRequestURI()),
+                HttpStatus.CREATED);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCategory(@PathVariable Integer id, HttpServletRequest request) {
         categoryService.deleteCategory(id);
@@ -168,6 +181,15 @@ public class CategoryController implements CategoryResource {
     public ResponseEntity<?> removeCategoryEnrollment(
             @PathVariable Integer id, HttpServletRequest request) {
         categoryEnrollmentService.removeCategoryEnrollment(id);
+        return new ResponseEntity<>(
+                ApiResponse.ok("Asignación eliminada correctamente", null, request.getRequestURI()),
+                HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/enroll/batch")
+    public ResponseEntity<?> removeCategoryEnrollments(
+            @RequestParam List<Integer> id, HttpServletRequest request) {
+        id.forEach(categoryEnrollmentService::removeCategoryEnrollment);
         return new ResponseEntity<>(
                 ApiResponse.ok("Asignación eliminada correctamente", null, request.getRequestURI()),
                 HttpStatus.NO_CONTENT);

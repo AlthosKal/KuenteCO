@@ -1,19 +1,13 @@
 package org.kuenteco.backend.dto.logic.category;
 
+import java.lang.reflect.Array;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+
 public interface CategoryEnrollmentProjection {
-    Integer getCategoryId();
-
+    int[] getCategoryEnrollmentIds();
     String getCategoryName();
-
-    String getCategoryOwnerId();
-
-    String getOwnerUserId(); // <-- es String (UUID como texto)
-
-    Long getEnrolledUsersCount();
-
-    Long getEnrolledProfilesCount();
 
     Long getTotalEnrollments();
 
@@ -21,9 +15,9 @@ public interface CategoryEnrollmentProjection {
 
     LocalDateTime getLastEnrollmentDate();
 
-    LocalDateTime getCategoryStartDate();
+    LocalDateTime getCategoryRegisterDate();
 
-    LocalDateTime getCategoryFinishDate();
+    BigDecimal getAssignedBudget();
 
-    String getCategoryStatus();
+    String getCategoryState();
 }
