@@ -2,8 +2,6 @@ package org.kuenteco.backend.controller.logic.category;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.kuenteco.backend.dto.logic.category.*;
@@ -148,12 +146,17 @@ public class CategoryController implements CategoryResource {
 
     @PostMapping("/enroll/add/batch")
     public ResponseEntity<?> enrollProfilesToCategories(
-            @RequestBody List<BatchEnrollmentRequestDTO> dto,
-            HttpServletRequest request) {
-        List<CategoryEnrollmentDTO> results = dto.stream().map(
-                e -> categoryEnrollmentService.enrollProfileToCategory(e.profileId(), e.categoryId())).toList();
+            @RequestBody List<BatchEnrollmentRequestDTO> dto, HttpServletRequest request) {
+        List<CategoryEnrollmentDTO> results =
+                dto.stream()
+                        .map(
+                                e ->
+                                        categoryEnrollmentService.enrollProfileToCategory(
+                                                e.profileId(), e.categoryId()))
+                        .toList();
         return new ResponseEntity<>(
-                ApiResponse.ok("Categoría asignada correctamente", results, request.getRequestURI()),
+                ApiResponse.ok(
+                        "Categoría asignada correctamente", results, request.getRequestURI()),
                 HttpStatus.CREATED);
     }
 

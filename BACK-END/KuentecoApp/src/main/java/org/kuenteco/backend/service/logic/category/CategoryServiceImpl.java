@@ -246,7 +246,6 @@ public class CategoryServiceImpl implements CategoryService {
                         .orElseThrow(
                                 () ->
                                         new CategoryException(
-                                                "Budget no encontrado por el Id: "
-                                                        + budgetId)));
+                                                "Budget no encontrado por el Id: " + budgetId)));
     }
 }
