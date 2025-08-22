@@ -58,6 +58,7 @@
         <spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
         <sonar.organization>althoskal</sonar.organization>
         <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
+        <sonar.projectKey>AlthosKal_KuenteCO</sonar.projectKey>
 
         <!-- Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
