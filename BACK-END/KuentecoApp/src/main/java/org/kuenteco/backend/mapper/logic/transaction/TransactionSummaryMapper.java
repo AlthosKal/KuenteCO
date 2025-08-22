@@ -32,7 +32,6 @@ public class TransactionSummaryMapper {
                 .build();
     }
 
-
     public List<TransactionSummaryDTO> fromObjectArrayList(List<Object[]> rows) {
         return rows.stream().map(this::fromObjectArray).collect(Collectors.toList());
     }
