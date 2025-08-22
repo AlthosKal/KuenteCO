@@ -22,19 +22,25 @@ public class ChatHistoryController implements ChatHistoryResource {
     private final ChatService chatService;
 
     @GetMapping("/user")
-    public ResponseEntity<?> getAllUserConversations(
-            HttpServletRequest request) {
+    public ResponseEntity<?> getAllUserConversations(HttpServletRequest request) {
         List<ChatHistoryDTO> summaries =
                 chatService.getAllConversationsOfAuthenticatedUser(request);
-        return new ResponseEntity<>(ApiResponse.ok("Historial obtenido correctamente", summaries, request.getRequestURI()), HttpStatus.OK);
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Historial obtenido correctamente", summaries, request.getRequestURI()),
+                HttpStatus.OK);
     }
 
     @GetMapping("/{conversationId}")
     @Override
-    public ResponseEntity<?> getHistory(@PathVariable String conversationId, HttpServletRequest request) {
+    public ResponseEntity<?> getHistory(
+            @PathVariable String conversationId, HttpServletRequest request) {
         LOGGER.info("Fetching history for conversationId: {}", conversationId);
         List<ChatHistoryDTO> history = chatService.getHistoryByConversationId(conversationId);
-        return new ResponseEntity<>(ApiResponse.ok("Historial obtenido correctamente", history, request.getRequestURI()), HttpStatus.OK);
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Historial obtenido correctamente", history, request.getRequestURI()),
+                HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{conversationId}")

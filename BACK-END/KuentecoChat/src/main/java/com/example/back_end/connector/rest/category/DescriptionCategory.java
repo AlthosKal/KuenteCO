@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DescriptionCategory {
-    private String name;
-
     private BigDecimal assignedBudget;
 
     private State state;

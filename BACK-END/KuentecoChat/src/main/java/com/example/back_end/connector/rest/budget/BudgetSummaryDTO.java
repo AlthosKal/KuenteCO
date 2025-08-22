@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BudgetSummaryDTO {
-    private String userId;
-    private String ownerUserId; // Para consistencia con las vistas
+    private String ownerUserId;
     private String username;
     private Long totalBudgets;
     private BigDecimal totalBudgetAmount;
