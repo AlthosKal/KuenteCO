@@ -10,8 +10,9 @@ import '../../widgets/common/category/create_category_widget.dart';
 import '../../widgets/common/category/delete_category_widget.dart';
 import '../../widgets/common/category/edit_category_widget.dart';
 import '../../widgets/common/category/assign_category_widget.dart';
-import '../../widgets/common/category/delete_enrollment_widget.dart';
+import '../../widgets/components/app/category/enrollment_delete_widget.dart' as ComponentEnrollmentDelete;
 import '../../core/services/app/auth_service.dart';
+import '../../dto/app/category/category_enrollment_dto.dart';
 
 class CategoryView extends StatefulWidget {
   const CategoryView({super.key});
@@ -110,6 +111,22 @@ class _CategoryViewState extends State<CategoryView> {
     if (result == true) {
       // La asignación fue exitosa
       // No necesitamos recargar la lista ya que no cambia las categorías
+    }
+  }
+  
+  // Método para manejar eliminación individual de asignaciones
+  Future<void> _handleDeleteSingleEnrollment(enrollment) async {
+    final categoryController = Provider.of<CategoryController>(context, listen: false);
+    
+    final result = await ComponentEnrollmentDelete.EnrollmentDeleteWidget.showDeleteSingleDialog(
+      context,
+      categoryController,
+      enrollment,
+    );
+    
+    if (result == true) {
+      // La eliminación fue exitosa, recargar los datos
+      await _loadDataBasedOnRole();
     }
   }
 
@@ -343,7 +360,7 @@ class _CategoryViewState extends State<CategoryView> {
     
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => EnrollmentDeleteWidget(
+      builder: (context) => ComponentEnrollmentDelete.EnrollmentDeleteWidget(
         controller: controller,
         enrollmentsToDelete: selectedEnrollments,
       ),
@@ -450,17 +467,36 @@ class _CategoryViewState extends State<CategoryView> {
                               children: [
                                 Text('Perfiles inscritos: ${enrollmentSummary.enrolledProfilesCount ?? 0}'),
                                 Text('Estado: ${enrollmentSummary.categoryStatus ?? 'Desconocido'}'),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Toca para gestionar asignaciones individuales',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.blue[600],
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
                               ],
                             ),
-                            trailing: enrollmentSummary.totalEnrollments! > 0 
-                                ? IconButton(
-                                    onPressed: () async {
-                                      await _deleteAllCategoryAssignments(controller, enrollmentSummary);
-                                    },
-                                    icon: const Icon(Icons.delete, color: Colors.red),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Botón para ver asignaciones individuales
+                                if (enrollmentSummary.totalEnrollments! > 0)
+                                  IconButton(
+                                    onPressed: () => _showDetailedEnrollmentsDialog(controller, enrollmentSummary),
+                                    icon: const Icon(Icons.people, color: Colors.blue),
+                                    tooltip: 'Ver asignaciones individuales',
+                                  ),
+                                // Botón para eliminar TODAS las asignaciones de esta categoría
+                                if (enrollmentSummary.totalEnrollments! > 0)
+                                  IconButton(
+                                    onPressed: () => _deleteAllCategoryAssignments(controller, enrollmentSummary),
+                                    icon: const Icon(Icons.delete_sweep, color: Colors.red),
                                     tooltip: 'Eliminar todas las asignaciones',
-                                  )
-                                : const Icon(Icons.info_outline, color: Colors.grey),
+                                  ),
+                              ],
+                            ),
                             isThreeLine: true,
                           ),
                         );
@@ -934,10 +970,15 @@ class _CategoryViewState extends State<CategoryView> {
                               ],
                             ),
                           ),
-                          const Icon(
-                            Icons.visibility,
-                            size: 16,
-                            color: Colors.green,
+                          // Botón para eliminar la asignación individual
+                          IconButton(
+                            onPressed: () => _handleDeleteSingleEnrollment(enrollment),
+                            icon: const Icon(
+                              Icons.link_off,
+                              size: 20,
+                              color: Colors.orange,
+                            ),
+                            tooltip: 'Eliminar asignación',
                           ),
                         ],
                       ),
@@ -989,15 +1030,6 @@ class _CategoryViewState extends State<CategoryView> {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
-            Text(
-              'Nota: Esta funcionalidad requiere acceso especial. Por favor, contacta al administrador del sistema para eliminar asignaciones masivas.',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-                fontStyle: FontStyle.italic,
-              ),
-            ),
           ],
         ),
         actions: [
@@ -1008,10 +1040,10 @@ class _CategoryViewState extends State<CategoryView> {
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
+              backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Entendido'),
+            child: const Text('Eliminar Todas'),
           ),
         ],
       ),
@@ -1019,32 +1051,56 @@ class _CategoryViewState extends State<CategoryView> {
     
     if (confirmed != true) return;
     
-    // Show information message instead of attempting deletion
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Funcionalidad no disponible',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'La eliminación masiva de asignaciones requiere permisos especiales del backend.',
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Contacta al administrador del sistema para esta funcionalidad.',
-              style: TextStyle(fontSize: 12),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.orange,
-        duration: const Duration(seconds: 6),
+    // Mostrar loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
       ),
     );
+    
+    try {
+      // Intentar eliminar todas las asignaciones de la categoría
+      await controller.deleteAllEnrollmentsByCategory(enrollmentSummary.categoryId!);
+      
+      // Cerrar loading
+      Navigator.pop(context);
+      
+      // Cerrar el diálogo de gestión de asignaciones
+      Navigator.pop(context);
+      
+      // Mostrar éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Eliminadas todas las asignaciones de "${enrollmentSummary.categoryName}"'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      // Cerrar loading
+      Navigator.pop(context);
+      
+      // Mostrar error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Error al eliminar asignaciones',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              Text('$e'),
+            ],
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
   }
   
   // Detailed enrollment management dialog
@@ -1158,6 +1214,12 @@ class _CategoryViewState extends State<CategoryView> {
                           ],
                         ),
                       ),
+                      // Botón para eliminación masiva
+                      IconButton(
+                        onPressed: () => _showMassDeleteForCategory(context, controller, categoryEnrollments),
+                        icon: const Icon(Icons.checklist, color: Colors.orange),
+                        tooltip: 'Eliminación masiva',
+                      ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
                         icon: const Icon(Icons.close),
@@ -1252,5 +1314,32 @@ class _CategoryViewState extends State<CategoryView> {
         );
       },
     );
+  }
+  
+  // Método para mostrar eliminación masiva de una categoría específica
+  Future<void> _showMassDeleteForCategory(BuildContext context, CategoryController controller, List<dynamic> categoryEnrollments) async {
+    // Cerrar el modal de asignaciones detalladas
+    Navigator.pop(context);
+    
+    final result = await ComponentEnrollmentDelete.EnrollmentDeleteWidget.showDeleteMultipleDialog(
+      context,
+      controller,
+      categoryEnrollments.cast<CategoryEnrollmentDTO>(),
+    );
+    
+    if (result == true) {
+      // Cerrar también el modal de gestión de asignaciones
+      Navigator.pop(context);
+      
+      // Recargar la lista de resúmenes
+      await controller.loadEnrollments();
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Asignaciones eliminadas exitosamente'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
   }
 }

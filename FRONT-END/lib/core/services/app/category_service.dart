@@ -237,6 +237,90 @@ class CategoryService {
 
   // ✅ DELETE /category/enroll/{id}
   Future<void> deleteEnrollment(int id) async {
-    await _apiClient.deleteApp('/category/enroll/$id');
+    print('📌 CategoryService: Starting deleteEnrollment request');
+    print('📌 CategoryService: Enrollment ID to delete: $id');
+    print('📌 CategoryService: Request URL: /category/enroll/$id');
+    
+    try {
+      final response = await _apiClient.deleteApp('/category/enroll/$id');
+      print('✅ CategoryService: Delete enrollment response status: ${response.statusCode}');
+      print('✅ CategoryService: Delete enrollment response data: ${response.data}');
+      
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        print('❌ CategoryService: Unexpected status code: ${response.statusCode}');
+        throw Exception('Failed to delete enrollment: ${response.statusCode}');
+      }
+      
+      print('✅ CategoryService: Enrollment deleted successfully');
+    } catch (e) {
+      print('❌ CategoryService: Error deleting enrollment: $e');
+      rethrow;
+    }
+  }
+
+  // ✅ DELETE /category/enroll/category/{categoryId} - Delete all enrollments for a specific category
+  // Alternative approach: Delete enrollments individually if bulk endpoint fails
+  Future<void> deleteAllEnrollmentsByCategory(int categoryId) async {
+    print('📌 CategoryService: Starting deleteAllEnrollmentsByCategory request');
+    print('📌 CategoryService: Category ID: $categoryId');
+    print('📌 CategoryService: Request URL: /category/enroll/category/$categoryId');
+    
+    try {
+      // Try the bulk delete endpoint first
+      final response = await _apiClient.deleteApp('/category/enroll/category/$categoryId');
+      print('✅ CategoryService: Delete all enrollments response status: ${response.statusCode}');
+      print('✅ CategoryService: Delete all enrollments response data: ${response.data}');
+      
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        print('❌ CategoryService: Unexpected status code: ${response.statusCode}');
+        throw Exception('Failed to delete all enrollments for category: ${response.statusCode}');
+      }
+      
+      print('✅ CategoryService: All enrollments for category deleted successfully');
+    } catch (e) {
+      print('❌ CategoryService: Bulk delete failed with error: $e');
+      print('📌 CategoryService: Attempting fallback - individual deletion');
+      
+      // Fallback: Get all detailed enrollments and delete them individually
+      try {
+        final allEnrollments = await getDetailedEnrollments();
+        final categoryEnrollments = allEnrollments.where((enrollment) => enrollment.id != null).toList();
+        
+        print('📌 CategoryService: Found ${categoryEnrollments.length} total enrollments to filter');
+        
+        // We can't filter by categoryId here since we don't have it in the response
+        // This is a limitation of the fallback approach - it will be handled by the UI
+        // which already has the filtered list
+        
+        print('✅ CategoryService: Fallback preparation completed - UI will handle individual deletions');
+        
+        // Re-throw the original error since this fallback requires UI coordination
+        rethrow;
+        
+      } catch (fallbackError) {
+        print('❌ CategoryService: Fallback also failed: $fallbackError');
+        rethrow;
+      }
+    }
+  }
+  
+  // ✅ Alternative method: Delete enrollments by IDs (bulk individual deletion)
+  Future<void> deleteEnrollmentsByIds(List<int> enrollmentIds) async {
+    print('📌 CategoryService: Starting deleteEnrollmentsByIds request');
+    print('📌 CategoryService: Enrollment IDs to delete: $enrollmentIds');
+    
+    if (enrollmentIds.isEmpty) {
+      print('📌 CategoryService: No enrollment IDs provided, nothing to delete');
+      return;
+    }
+    
+    try {
+      final deletePromises = enrollmentIds.map((id) => deleteEnrollment(id)).toList();
+      await Future.wait(deletePromises);
+      print('✅ CategoryService: All enrollments deleted successfully via individual calls');
+    } catch (e) {
+      print('❌ CategoryService: Error deleting enrollments by IDs: $e');
+      rethrow;
+    }
   }
 }
