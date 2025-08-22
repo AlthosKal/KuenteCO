@@ -4,8 +4,7 @@ import jakarta.persistence.EntityManagerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
@@ -18,8 +17,11 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.support.TransactionTemplate;
 
+@Slf4j
 @Primary
 @Configuration
 @EnableTransactionManagement
@@ -28,9 +30,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         entityManagerFactoryRef = "masterEntityManagerFactory",
         transactionManagerRef = "masterTransactionManager")
 public class MasterDataSourceConfig {
-    private static final Logger log = LoggerFactory.getLogger(MasterDataSourceConfig.class);
 
-    @Autowired private Environment environment;
+    private final Environment environment;
+
+    @Autowired
+    public MasterDataSourceConfig(Environment environment) {
+        this.environment = environment;
+    }
 
     @Primary
     @Bean(name = "masterDataSource")
@@ -70,5 +76,16 @@ public class MasterDataSourceConfig {
     public PlatformTransactionManager transactionManager(
             @Qualifier("masterEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
+    }
+
+    @Primary
+    @Bean
+    public TransactionTemplate transactionTemplate(
+            @Qualifier("masterTransactionManager") PlatformTransactionManager transactionManager) {
+        log.info("Configurando TransactionTemplate para la base de datos maestra");
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+        transactionTemplate.setTimeout(30); // 30 segundos
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        return transactionTemplate;
     }
 }

@@ -84,9 +84,7 @@ public class TransactionServiceImpl implements TransactionService {
         if (rawData.isEmpty()) {
             return "No tiene transacciones registradas";
         }
-
-        List<TransactionSummaryDTO> dto = transactionSummaryMapper.fromObjectArrayList(rawData);
-        return dto;
+        return transactionSummaryMapper.fromObjectArrayList(rawData);
     }
 
     @Override

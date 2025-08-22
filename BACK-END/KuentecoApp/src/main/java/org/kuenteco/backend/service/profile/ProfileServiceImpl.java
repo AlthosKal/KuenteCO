@@ -2,6 +2,7 @@ package org.kuenteco.backend.service.profile;
 
 import static org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -210,10 +211,12 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     @Transactional
-    public void updateProfile(UpdateProfileDTO dto, MultipartFile file) throws IOException {
+    public void updateProfile(String json, MultipartFile file) throws IOException {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
 
+        ObjectMapper mapper = new ObjectMapper();
+        UpdateProfileDTO dto = mapper.readValue(json, UpdateProfileDTO.class);
         User user =
                 slaveUserRepository
                         .findByEmail(email)

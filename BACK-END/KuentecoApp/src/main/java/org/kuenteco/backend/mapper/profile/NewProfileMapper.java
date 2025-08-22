@@ -6,19 +6,16 @@ import org.kuenteco.backend.dto.profile.NewProfileDTO;
 import org.kuenteco.backend.entity.Profile;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
 public interface NewProfileMapper {
 
-    @Mappings({
-        @Mapping(target = "id", ignore = true),
-        @Mapping(target = "user", ignore = true), // Se establecerá manualmente en el servicio
-        @Mapping(target = "image", ignore = true),
-        @Mapping(target = "role", ignore = true),
-        @Mapping(target = "startDate", source = ".", qualifiedByName = "currentTimestamp")
-    })
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "user", ignore = true) // Se establecerá manualmente en el servicio
+    @Mapping(target = "image", ignore = true)
+    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "startDate", source = ".", qualifiedByName = "currentTimestamp")
     Profile toEntity(NewProfileDTO dto);
 
     @Named("currentTimestamp")

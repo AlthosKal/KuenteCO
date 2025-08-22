@@ -22,7 +22,7 @@ public class MercadoPagoConfiguration {
             log.info("MercadoPago configurado correctamente");
         } catch (Exception e) {
             log.error("Error al configurar MercadoPago", e);
-            throw new RuntimeException("Error al configurar MercadoPago", e);
+            throw new IllegalArgumentException("Error al configurar MercadoPago", e);
         }
     }
 }

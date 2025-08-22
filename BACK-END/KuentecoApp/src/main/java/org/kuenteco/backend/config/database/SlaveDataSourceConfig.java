@@ -4,8 +4,7 @@ import jakarta.persistence.EntityManagerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
@@ -19,6 +18,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+@Slf4j
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
@@ -26,9 +26,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         entityManagerFactoryRef = "slaveEntityManagerFactory",
         transactionManagerRef = "slaveTransactionManager")
 public class SlaveDataSourceConfig {
-    private static final Logger log = LoggerFactory.getLogger(SlaveDataSourceConfig.class);
 
-    @Autowired private Environment environment;
+    private final Environment environment;
+
+    @Autowired
+    public SlaveDataSourceConfig(Environment environment) {
+        this.environment = environment;
+    }
 
     @Bean(name = "slaveDataSource")
     public DataSource dataSource() {

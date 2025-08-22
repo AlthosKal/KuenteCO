@@ -1,4 +1,4 @@
-package org.kuenteco.backend.service.user;
+package org.kuenteco.backend.service.email;
 
 import org.kuenteco.backend.dto.auth.SendVerificationCodeDTO;
 import org.kuenteco.backend.dto.auth.ValidateVerificationCodeDTO;

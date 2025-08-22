@@ -113,7 +113,7 @@ class CategoryController extends ChangeNotifier {
       
       // Log de todas las inscripciones para debug
       for (int i = 0; i < enrollments.length; i++) {
-        print('   Profile Enrollment $i: Category="${enrollments[i].categoryName}", ProfileEmail="${enrollments[i].profileEmail}"');
+        print('   Profile Enrollment $i: ID=${enrollments[i].id}, Category="${enrollments[i].categoryName}", ProfileEmail="${enrollments[i].profileEmail}", UserEmail="${enrollments[i].userEmail}"');
       }
       
       _setError(null);
@@ -126,17 +126,24 @@ class CategoryController extends ChangeNotifier {
   }
 
   // 📌 Cargar enrollments detallados para gestión (usuarios de negocios)
-  // NOTA: Esta funcionalidad está temporalmente deshabilitada debido a restricciones del backend
-  // El endpoint /category/enroll está restringido solo para perfiles
   Future<void> loadDetailedEnrollments() async {
+    _setLoading(true);
     try {
-      print('⚠️ CategoryController: loadDetailedEnrollments() disabled due to backend restrictions');
-      print('⚠️ The /category/enroll endpoint is restricted to profiles only');
-      detailedEnrollments = [];
-      _setError('La eliminación masiva de asignaciones requiere permisos especiales del backend');
+      print('🔄 CategoryController: Loading detailed enrollments for business user management...');
+      detailedEnrollments = await _service.getDetailedEnrollments();
+      print('✅ CategoryController: Loaded ${detailedEnrollments.length} detailed enrollments for business user');
+      
+      // Log de las inscripciones detalladas para debug
+      for (int i = 0; i < detailedEnrollments.length; i++) {
+        print('   Detailed Enrollment $i: ID=${detailedEnrollments[i].id}, Category="${detailedEnrollments[i].categoryName}", ProfileEmail="${detailedEnrollments[i].profileEmail}", UserEmail="${detailedEnrollments[i].userEmail}"');
+      }
+      
+      _setError(null);
     } catch (e) {
-      print('❌ CategoryController: Error in loadDetailedEnrollments: $e');
+      print('❌ CategoryController: Error loading detailed enrollments: $e');
       _setError(e.toString());
+    } finally {
+      _setLoading(false);
     }
   }
 
@@ -302,6 +309,90 @@ class CategoryController extends ChangeNotifier {
       print('❌ CategoryController: Error deleting enrollment: $e');
       _setError(e.toString());
       rethrow; // Re-lanzar el error para que la UI pueda manejarlo
+    }
+  }
+  
+  // 📌 Eliminar TODAS las asignaciones de una categoría (solo para usuarios Business)
+  Future<void> deleteAllEnrollmentsByCategory(int categoryId) async {
+    _setError(null);
+    
+    try {
+      print('📌 CategoryController: Deleting ALL enrollments for category ID: $categoryId');
+      await _service.deleteAllEnrollmentsByCategory(categoryId);
+      print('✅ CategoryController: All enrollments for category deleted successfully');
+      
+      // Recargar los resúmenes de enrollments para actualizar la UI
+      await loadEnrollments();
+    } catch (e) {
+      print('❌ CategoryController: Bulk delete failed: $e');
+      print('📌 CategoryController: Attempting alternative approach...');
+      
+      // Alternative approach: Delete enrollments individually
+      // This requires getting the detailed enrollments for this category first
+      try {
+        await loadDetailedEnrollments();
+        
+        // Find the category name from enrollmentSummaries
+        String? categoryName;
+        for (final summary in enrollmentSummaries) {
+          if (summary.categoryId == categoryId) {
+            categoryName = summary.categoryName;
+            break;
+          }
+        }
+        
+        if (categoryName == null) {
+          throw Exception('Category not found in summaries');
+        }
+        
+        // Filter detailed enrollments for this category
+        final categoryEnrollments = detailedEnrollments
+            .where((enrollment) => 
+                enrollment.categoryName == categoryName && 
+                enrollment.id != null)
+            .toList();
+        
+        if (categoryEnrollments.isEmpty) {
+          print('📌 CategoryController: No detailed enrollments found for category');
+          await loadEnrollments(); // Still reload to refresh UI
+          return;
+        }
+        
+        final enrollmentIds = categoryEnrollments
+            .map((e) => e.id!)
+            .toList();
+        
+        print('📌 CategoryController: Attempting to delete ${enrollmentIds.length} enrollments individually');
+        await _service.deleteEnrollmentsByIds(enrollmentIds);
+        print('✅ CategoryController: All enrollments deleted successfully via alternative method');
+        
+        // Reload data
+        await loadEnrollments();
+        
+      } catch (alternativeError) {
+        print('❌ CategoryController: Alternative approach also failed: $alternativeError');
+        _setError('Error al eliminar asignaciones: $alternativeError');
+        rethrow;
+      }
+    }
+  }
+  
+  // 📌 Eliminar asignaciones por IDs (método auxiliar)
+  Future<void> deleteEnrollmentsByIds(List<int> enrollmentIds) async {
+    _setError(null);
+    
+    try {
+      print('📌 CategoryController: Deleting ${enrollmentIds.length} enrollments by IDs');
+      await _service.deleteEnrollmentsByIds(enrollmentIds);
+      print('✅ CategoryController: All enrollments deleted successfully by IDs');
+      
+      // Recargar tanto los enrollments detallados como los resúmenes
+      await loadDetailedEnrollments();
+      await loadEnrollments();
+    } catch (e) {
+      print('❌ CategoryController: Error deleting enrollments by IDs: $e');
+      _setError(e.toString());
+      rethrow;
     }
   }
 }

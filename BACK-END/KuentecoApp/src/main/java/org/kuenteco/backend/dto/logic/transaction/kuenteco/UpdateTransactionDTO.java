@@ -7,12 +7,14 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.kuenteco.backend.entity.extra.DescriptionTransaction;
 import org.kuenteco.backend.validation.ValidCurrency;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateTransactionDTO {

@@ -14,6 +14,6 @@ public interface SlaveMercadoPagoPaymentRepository
         extends JpaRepository<MercadoPagoPayment, Integer> {
     List<MercadoPagoPayment> findByPreapprovalOrderByDateCreatedDesc(
             MercadoPagoPreapproval preapproval);
-            
+
     Optional<MercadoPagoPayment> findByPaymentId(String paymentId);
 }

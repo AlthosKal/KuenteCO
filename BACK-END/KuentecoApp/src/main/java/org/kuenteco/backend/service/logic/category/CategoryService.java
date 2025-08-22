@@ -1,8 +1,8 @@
 package org.kuenteco.backend.service.logic.category;
 
-import org.kuenteco.backend.dto.logic.category.CategoryDTO;
 import org.kuenteco.backend.dto.logic.category.CategoryReportDTO;
 import org.kuenteco.backend.dto.logic.category.NewCategoryDTO;
+import org.kuenteco.backend.dto.logic.category.UpdateCategoryDTO;
 
 public interface CategoryService {
     Object getCategories();
@@ -13,7 +13,7 @@ public interface CategoryService {
 
     void addCategory(NewCategoryDTO dto);
 
-    void updateCategory(CategoryDTO dto);
+    void updateCategory(UpdateCategoryDTO dto);
 
     void deleteCategory(Integer id);
 }

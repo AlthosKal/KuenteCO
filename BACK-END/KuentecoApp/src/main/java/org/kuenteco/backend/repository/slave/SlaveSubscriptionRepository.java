@@ -2,6 +2,7 @@ package org.kuenteco.backend.repository.slave;
 
 import java.util.List;
 import java.util.Optional;
+import org.kuenteco.backend.entity.MercadoPagoPreapproval;
 import org.kuenteco.backend.entity.Subscription;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.State;
@@ -14,12 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 public interface SlaveSubscriptionRepository extends JpaRepository<Subscription, Integer> {
     // Obtiene todas las suscripciones de un usuario
     List<Subscription> findByUser(User user);
-    
+
     // Obtiene la suscripción más reciente del usuario (ordenada por ID descendente)
     Optional<Subscription> findFirstByUserOrderByIdDesc(User user);
 
     // Obtiene todas las suscripciones de un usuario por estado específico
     List<Subscription> findByUserAndState(User user, State state);
+
+    // Obtiene la suscripción asociada a un MercadoPago preapproval específico
+    Optional<Subscription> findByMercadoPagoPreapproval(
+            MercadoPagoPreapproval mercadoPagoPreapproval);
 
     // Método para obtener la suscripción "actual" del usuario (la más reciente)
     default Optional<Subscription> getSubscriptionByUser(User user) {

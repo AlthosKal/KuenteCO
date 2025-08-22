@@ -20,6 +20,20 @@ springdoc:
     operationsSorter: method
     tagsSorter: alpha
     version: 5.2.0
+  info:
+    title: "KuenteCO Financial Management API"
+    version: "1.0.0"
+    description: "Comprehensive financial management API for personal and business expense tracking, budgeting, debt management, and financial analytics"
+    contact:
+      name: "KuenteCO Development Team"
+      url: "https://github.com/althoskal/KuenteCO"
+      email: "dev@kuenteco.com"
+    license:
+      name: "MIT License"
+      url: "https://opensource.org/licenses/MIT"
+    # Zalando required extensions
+    x-api-id: "kuenteco-financial-api"
+    x-audience: "external-partner"
 
 cloudinary:
   cloud_name: ${CLOUDINARY_NAME}
@@ -42,20 +56,20 @@ bancolombia:
     base-url: ${BANCOLOMBIA_BASE_URL}
     auth:
       token-expiration-buffer-seconds: 300
-      token-url-base-path: /public-bancolombia/sb/security/oauth-provider/oauth2/token
+      token-url-base-path: /public-partner/sb/security/oauth-provider/oauth2/token
       client-id: ${BANCOLOMBIA_CLIENT_ID}
       client-secret: ${BANCOLOMBIA_CLIENT_SECRET}
       scope: "Device:write:app"  # Scope corregido según documentación
     api:
       # Base path corregido - removido el path específico del endpoint
-      base-path: /public-bancolombia/sb/v1/operations/cross-product/account-management/transaction-engine/transactional-information
+      base-path: /public-partner/sb/v1/operations/cross-product/account-management/transaction-engine/transactional-information
       endpoints:
         # Endpoint corregido para obtener información transaccional
         transactions: /information/retrieve/transactional/info
         # Endpoint para health check
         health: /information/retrieve/transactional/info/health
       timeout-seconds: 45
-      max-retries: 5
+      max-retries: 3
     ssl:
       enabled: false
       keystore-path: ""

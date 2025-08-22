@@ -1,13 +1,15 @@
 package org.kuenteco.backend.dto.auth;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TokenResponseDTO<T> {
+@Builder
+public class TokenResponseDTO {
     private String token;
-    private T type;
+    private String type;
 }

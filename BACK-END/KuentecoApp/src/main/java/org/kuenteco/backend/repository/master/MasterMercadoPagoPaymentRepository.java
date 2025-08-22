@@ -8,9 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional(transactionManager = "masterTransactionManager")
-public interface MasterMercadoPagoPaymentRepository extends JpaRepository<MercadoPagoPayment, Integer> {
-    
+public interface MasterMercadoPagoPaymentRepository
+        extends JpaRepository<MercadoPagoPayment, Integer> {
+
     Optional<MercadoPagoPayment> findByPaymentId(String paymentId);
-    
+
     boolean existsByPaymentId(String paymentId);
 }

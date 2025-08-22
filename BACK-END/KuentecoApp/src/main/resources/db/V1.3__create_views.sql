@@ -182,12 +182,9 @@ ORDER BY
 -- Vista de categorías con información de enrollments (ya tenía category_owner_id correctamente)
 CREATE OR REPLACE VIEW vw_category_enrollments AS
 SELECT
-    c.id AS category_id,
-    COALESCE(c.name, c.description->>'name', 'Sin nombre') AS category_name,
-    c.id_user AS category_owner_id,
-    c.id_user AS owner_user_id, -- Consistencia con otras vistas
-    COUNT(DISTINCT ce.id_user) AS enrolled_users_count,
-    COUNT(DISTINCT ce.id_profile) AS enrolled_profiles_count,
+    ARRAY_AGG(ce.id) AS category_enrollment_ids,
+    c.id_user AS owner_user_id,
+    c.name AS category_name,
     COUNT(DISTINCT ce.id) AS total_enrollments,
     MIN(ce.enrollment_date) AS first_enrollment_date,
     MAX(ce.enrollment_date) AS last_enrollment_date,
@@ -203,6 +200,7 @@ FROM
     category c
         LEFT JOIN category_enrollment ce
                   ON c.id = ce.id_category
+WHERE ce.id IS NOT NULL
 GROUP BY
     c.id,
     c.name,

@@ -4,10 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import org.kuenteco.backend.dto.logic.category.CategoryDTO;
-import org.kuenteco.backend.dto.logic.category.CategoryEnrollmentDTO;
-import org.kuenteco.backend.dto.logic.category.CategoryReportDTO;
-import org.kuenteco.backend.dto.logic.category.NewCategoryDTO;
+import org.kuenteco.backend.dto.logic.category.*;
 import org.kuenteco.backend.exception.ApiResponse;
 import org.kuenteco.backend.service.logic.category.CategoryEnrollmentService;
 import org.kuenteco.backend.service.logic.category.CategoryService;
@@ -118,7 +115,7 @@ public class CategoryController implements CategoryResource {
 
     @PatchMapping("/update")
     public ResponseEntity<?> updateCategory(
-            @Valid @RequestBody CategoryDTO dto, HttpServletRequest request) {
+            @Valid @RequestBody UpdateCategoryDTO dto, HttpServletRequest request) {
         categoryService.updateCategory(dto);
         return new ResponseEntity<>(
                 ApiResponse.ok("Categoría actualizada correctamente", dto, request.getRequestURI()),
@@ -127,7 +124,7 @@ public class CategoryController implements CategoryResource {
 
     @PutMapping("/batch/update")
     public ResponseEntity<?> updateCategories(
-            @Valid @RequestBody List<CategoryDTO> dto, HttpServletRequest request) {
+            @Valid @RequestBody List<UpdateCategoryDTO> dto, HttpServletRequest request) {
         dto.forEach(categoryService::updateCategory);
         return new ResponseEntity<>(
                 ApiResponse.ok(
@@ -144,6 +141,22 @@ public class CategoryController implements CategoryResource {
                 categoryEnrollmentService.enrollProfileToCategory(profileId, categoryId);
         return new ResponseEntity<>(
                 ApiResponse.ok("Categoría asignada correctamente", dto, request.getRequestURI()),
+                HttpStatus.CREATED);
+    }
+
+    @PostMapping("/enroll/add/batch")
+    public ResponseEntity<?> enrollProfilesToCategories(
+            @RequestBody List<BatchEnrollmentRequestDTO> dto, HttpServletRequest request) {
+        List<CategoryEnrollmentDTO> results =
+                dto.stream()
+                        .map(
+                                e ->
+                                        categoryEnrollmentService.enrollProfileToCategory(
+                                                e.profileId(), e.categoryId()))
+                        .toList();
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Categoría asignada correctamente", results, request.getRequestURI()),
                 HttpStatus.CREATED);
     }
 
@@ -171,6 +184,15 @@ public class CategoryController implements CategoryResource {
     public ResponseEntity<?> removeCategoryEnrollment(
             @PathVariable Integer id, HttpServletRequest request) {
         categoryEnrollmentService.removeCategoryEnrollment(id);
+        return new ResponseEntity<>(
+                ApiResponse.ok("Asignación eliminada correctamente", null, request.getRequestURI()),
+                HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/enroll/batch")
+    public ResponseEntity<?> removeCategoryEnrollments(
+            @RequestParam List<Integer> id, HttpServletRequest request) {
+        id.forEach(categoryEnrollmentService::removeCategoryEnrollment);
         return new ResponseEntity<>(
                 ApiResponse.ok("Asignación eliminada correctamente", null, request.getRequestURI()),
                 HttpStatus.NO_CONTENT);

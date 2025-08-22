@@ -28,9 +28,13 @@ public class SubscriptionController implements SubscriptionResource {
     private final MercadoPagoService mercadoPagoService;
     private final MercadoPagoPaymentService mercadoPagoPaymentService;
     private final MercadoPagoWebhookService mercadoPagoWebhookService;
+    private static final String ACTION = "action";
+    private static final String TYPE = "type";
+    private static final String DATA = "data";
 
     /**
      * Crea una nueva suscripción en Mercado Pago
+     *
      * @param dto DTO con los datos de la suscripción a crear
      * @param principal Información del usuario autenticado
      * @param request Información de la petición HTTP
@@ -167,10 +171,10 @@ public class SubscriptionController implements SubscriptionResource {
     // ================================
 
     /**
-     * Webhook para notificaciones de preapproval de MercadoPago
-     * Maneja eventos como: authorized, pending, cancelled, rejected
-     * 
-     * URL del webhook: POST /v1/subscription/webhook/preapproval
+     * Webhook para notificaciones de preapproval de MercadoPago Maneja eventos como: authorized,
+     * pending, cancelled, rejected
+     *
+     * <p>URL del webhook: POST /v1/subscription/webhook/preapproval
      *
      * @param notification Datos de la notificación enviada por MercadoPago
      * @param headers Headers de la petición HTTP
@@ -180,57 +184,65 @@ public class SubscriptionController implements SubscriptionResource {
     public ResponseEntity<String> handlePreapprovalWebhook(
             @RequestBody Map<String, Object> notification,
             @RequestHeader Map<String, String> headers) {
-        
+
         try {
             log.info("Webhook de preapproval recibido: {}", notification);
             log.debug("Headers del webhook: {}", headers);
-            
+
             // Validar que es una notificación legítima de MercadoPago
-            String action = (String) notification.get("action");
-            String type = (String) notification.get("type");
-            
-            if ("payment.updated".equals(action) || "subscription".equals(type) || 
-                "preapproval".equals(type) || action != null && action.contains("preapproval")) {
-                
+            String action = (String) notification.get(ACTION);
+            String type = (String) notification.get(TYPE);
+
+            if ("payment.updated".equals(action)
+                    || "subscription".equals(type)
+                    || "preapproval".equals(type)
+                    || action != null && action.contains("preapproval")) {
+
                 // Extraer el ID del preapproval
-                Map<String, Object> data = (Map<String, Object>) notification.get("data");
+                Map<String, Object> data = (Map<String, Object>) notification.get(DATA);
                 if (data != null) {
                     String preapprovalId = (String) data.get("id");
-                    
+
                     if (preapprovalId != null) {
-                        log.info("Procesando webhook para preapproval ID: {}, action: {}", preapprovalId, action);
-                        
+                        log.info(
+                                "Procesando webhook para preapproval ID: {}, action: {}",
+                                preapprovalId,
+                                action);
+
                         // Validar webhook con respuesta apropiada
                         if (mercadoPagoWebhookService.isValidWebhook(notification, headers)) {
-                            // Procesar el webhook de manera asíncrona para responder rápido a MercadoPago
-                            mercadoPagoWebhookService.processPreapprovalWebhook(preapprovalId, action, notification);
+                            // Procesar el webhook de manera asíncrona para responder rápido a
+                            // MercadoPago
+                            mercadoPagoWebhookService.processPreapprovalWebhook(
+                                    preapprovalId, action, notification);
                         } else {
                             log.warn("Webhook inválido rechazado: preapprovalId={}", preapprovalId);
-                            // Retornar 401 para webhooks inválidos para que MercadoPago no los reenvíe
+                            // Retornar 401 para webhooks inválidos para que MercadoPago no los
+                            // reenvíe
                             return ResponseEntity.status(401).body("UNAUTHORIZED");
                         }
-                        
+
                         return ResponseEntity.ok("OK");
                     }
                 }
             }
-            
+
             log.warn("Webhook no reconocido: action={}, type={}", action, type);
             return ResponseEntity.ok("IGNORED");
-            
+
         } catch (Exception e) {
             log.error("Error procesando webhook de preapproval: {}", e.getMessage(), e);
             // MercadoPago requiere que respondamos con status 200 incluso si hay error
             // para evitar reenvíos innecesarios
-            return ResponseEntity.ok("ERROR");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     /**
-     * Webhook para notificaciones de pagos individuales de MercadoPago
-     * Maneja eventos como: payment.created, payment.updated
-     * 
-     * URL del webhook: POST /v1/subscription/webhook/payment
+     * Webhook para notificaciones de pagos individuales de MercadoPago Maneja eventos como:
+     * payment.created, payment.updated
+     *
+     * <p>URL del webhook: POST /v1/subscription/webhook/payment
      *
      * @param notification Datos de la notificación enviada por MercadoPago
      * @param headers Headers de la petición HTTP
@@ -240,50 +252,55 @@ public class SubscriptionController implements SubscriptionResource {
     public ResponseEntity<String> handlePaymentWebhook(
             @RequestBody Map<String, Object> notification,
             @RequestHeader Map<String, String> headers) {
-        
+
         try {
             log.info("Webhook de payment recibido: {}", notification);
-            log.debug("Headers del webhook: {}", headers);
-            
-            String action = (String) notification.get("action");
-            String type = (String) notification.get("type");
-            
-            if ("payment.created".equals(action) || "payment.updated".equals(action) || 
-                "payment".equals(type)) {
-                
-                Map<String, Object> data = (Map<String, Object>) notification.get("data");
+            log.debug("Headers del webhook al momento de realizar el pago: {}", headers);
+
+            String action = (String) notification.get(ACTION);
+            String type = (String) notification.get(TYPE);
+
+            if ("payment.created".equals(action)
+                    || "payment.updated".equals(action)
+                    || "payment".equals(type)) {
+
+                Map<String, Object> data = (Map<String, Object>) notification.get(DATA);
                 if (data != null) {
                     String paymentId = (String) data.get("id");
-                    
+
                     if (paymentId != null) {
-                        log.info("Procesando webhook para payment ID: {}, action: {}", paymentId, action);
-                        
+                        log.info(
+                                "Procesando webhook para payment ID: {}, action: {}",
+                                paymentId,
+                                action);
+
                         // Validar y procesar webhook de pago
                         if (mercadoPagoWebhookService.isValidWebhook(notification, headers)) {
-                            mercadoPagoWebhookService.processPaymentWebhook(paymentId, action, notification);
+                            mercadoPagoWebhookService.processPaymentWebhook(
+                                    paymentId, action, notification);
                         } else {
                             log.warn("Webhook de pago inválido rechazado: paymentId={}", paymentId);
                             return ResponseEntity.ok("INVALID");
                         }
-                        
+
                         return ResponseEntity.ok("OK");
                     }
                 }
             }
-            
+
             log.warn("Webhook de payment no reconocido: action={}, type={}", action, type);
             return ResponseEntity.ok("IGNORED");
-            
+
         } catch (Exception e) {
             log.error("Error procesando webhook de payment: {}", e.getMessage(), e);
-            return ResponseEntity.ok("ERROR");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     /**
      * Webhook genérico para otras notificaciones de MercadoPago
-     * 
-     * URL del webhook: POST /v1/subscription/webhook/generic
+     *
+     * <p>URL del webhook: POST /v1/subscription/webhook/generic
      *
      * @param notification Datos de la notificación enviada por MercadoPago
      * @param headers Headers de la petición HTTP
@@ -293,16 +310,16 @@ public class SubscriptionController implements SubscriptionResource {
     public ResponseEntity<String> handleGenericWebhook(
             @RequestBody Map<String, Object> notification,
             @RequestHeader Map<String, String> headers) {
-        
+
         try {
             log.info("Webhook genérico recibido: {}", notification);
-            log.debug("Headers del webhook: {}", headers);
-            
+            log.debug("Headers del webhook al hacer una petición generica: {}", headers);
+
             String action = (String) notification.get("action");
             String type = (String) notification.get("type");
-            
+
             log.info("Procesando webhook genérico: action={}, type={}", action, type);
-            
+
             // Procesar webhook genérico
             if (mercadoPagoWebhookService.isValidWebhook(notification, headers)) {
                 mercadoPagoWebhookService.processGenericWebhook(notification);
@@ -310,12 +327,12 @@ public class SubscriptionController implements SubscriptionResource {
                 log.warn("Webhook genérico inválido rechazado");
                 return ResponseEntity.ok("INVALID");
             }
-            
+
             return ResponseEntity.ok("OK");
-            
+
         } catch (Exception e) {
             log.error("Error procesando webhook genérico: {}", e.getMessage(), e);
-            return ResponseEntity.ok("ERROR");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

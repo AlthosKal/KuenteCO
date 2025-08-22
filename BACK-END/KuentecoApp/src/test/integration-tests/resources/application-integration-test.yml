@@ -1,0 +1,150 @@
+# Configuración específica para pruebas de integración
+# Las propiedades de base de datos serán establecidas dinámicamente por TestContainers
+
+spring:
+  # Configuraciones de JPA/Hibernate para tests
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        # Configuraciones de timeout para entornos CI
+        connection.provider_disables_autocommit: false
+        jdbc.time_zone: UTC
+        jdbc.lob.non_contextual_creation: true
+        # Timeouts más largos para CI
+        connection.acquisition_timeout: 60000
+        connection.release_mode: after_transaction
+      # Timeout adicional para transacciones largas
+      javax.persistence.query.timeout: 60000
+  
+  # Configuración de Flyway para tests
+  flyway:
+    enabled: false
+  
+  # Cache deshabilitado para tests
+  cache:
+    type: none
+  
+  # Configuraciones de base de datos - serán sobrescritas por TestContainers
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test_db
+    username: test_user
+    password: test_password
+    driver-class-name: org.postgresql.Driver
+    # Pool de conexiones para tests con timeouts más largos para CI
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 60000      # 60 segundos
+      idle-timeout: 600000          # 10 minutos  
+      max-lifetime: 1800000         # 30 minutos
+      leak-detection-threshold: 120000  # 2 minutos
+      validation-timeout: 10000     # 10 segundos
+
+  # Configuraciones de seguridad para tests
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test-client-id
+            client-secret: test-client-secret
+  
+  # Configuraciones de SendGrid para tests (serán mockeadas)
+  sendgrid:
+    api-key: test-sendgrid-key
+    email: test@kuenteco.org
+    functions:
+      verify-email: test-verify-email
+      reset-password: test-reset-password
+
+# Configuración para la base de datos slave (usa las mismas credenciales para pruebas)
+slave:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test_db
+    username: test_user
+    password: test_password
+    driver-class-name: org.postgresql.Driver
+
+# Deshabilitar métricas y actuator para tests
+management:
+  endpoints:
+    enabled-by-default: false
+  endpoint:
+    health:
+      enabled: true
+
+# Configuraciones de logging
+logging:
+  level:
+    org.springframework.web: INFO
+    org.kuenteco: DEBUG
+    org.testcontainers: INFO
+    com.github.tomakehurst.wiremock: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.type.descriptor.sql.BasicBinder: INFO
+
+# Configuraciones JWT para tests
+jwt:
+  secret: test-secret-key-for-integration-tests-that-is-long-enough
+  expiration: 3600
+
+# Configuraciones de Cloudinary para tests (serán mockeadas)
+cloudinary:
+  cloud_name: test-cloud
+  api_key: test-api-key
+  api_secret: test-api-secret
+
+# Configuraciones de MercadoPago para tests (serán mockeadas)
+mercadopago:
+  access-token: test-mp-access-token
+  public-key: test-mp-public-key
+  webhooks:
+    base-url: http://localhost:9999
+    preapproval-url: http://localhost:9999
+    payment-url: http://localhost:9999
+    generic-url: http://localhost:9999
+    secret: test-webhook-secret
+    skip-validation: true
+
+# Configuraciones de Bancolombia para tests (serán mockeadas)
+bancolombia:
+  sandbox:
+    base-url: http://localhost:9999
+    auth:
+      token-expiration-buffer-seconds: 300
+      token-url-base-path: /test/token
+      client-id: test-client-id
+      client-secret: test-client-secret
+      scope: "Device:write:app"
+    api:
+      base-path: /test/api
+      endpoints:
+        transactions: /transaction
+        health: /health
+      timeout-seconds: 45
+      max-retries: 2
+    ssl:
+      enabled: false
+      keystore-path: ""
+      keystore-password: ""
+      keystore-type: "PKCS12"
+      trust-store-path: ""
+      trust-store-password: ""
+
+# URLs base para servicios externos (serán mockeadas por WireMock)
+external:
+  mercadopago:
+    base-url: http://localhost:9999
+  bancolombia:
+    base-url: http://localhost:9999
+  cloudinary:
+    base-url: http://localhost:9999
+  sendgrid:
+    base-url: http://localhost:9999
