@@ -15,7 +15,7 @@ public class TransactionDetailDTO {
     private Integer id;
     private Integer categoryId;
     private Integer budgetId;
-    private TransactionType type;
+    private String name;
     private BigDecimal amount;
     private LocalDateTime timestamp;
     private DescriptionTransaction description;

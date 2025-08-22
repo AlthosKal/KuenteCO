@@ -27,6 +27,7 @@ public interface SlaveTransactionRepository extends JpaRepository<Transaction, I
         v.owner_user_id,
         v.transaction_owner_type,
         v.id_profile,
+        v.id,
         v.transaction_name,
         v.category_name,
         v.budget_name,

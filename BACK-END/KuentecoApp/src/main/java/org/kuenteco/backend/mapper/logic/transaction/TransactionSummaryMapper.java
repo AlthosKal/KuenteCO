@@ -16,20 +16,22 @@ public class TransactionSummaryMapper {
                 .ownerUserId((String) row[0])
                 .transactionOwnerType((String) row[1])
                 .profileId((Integer) row[2])
-                .transactionName((String) row[3])
-                .categoryName((String) row[4])
-                .budgetName((String) row[5])
-                .debtName((String) row[6])
-                .transactionCount((Long) row[7])
-                .incomeCount((Long) row[8])
-                .expenseCount((Long) row[9])
-                .totalIncome((BigDecimal) row[10])
-                .totalExpenses((BigDecimal) row[11])
-                .netAmount((BigDecimal) row[12])
-                .firstTransactionDate(convertToLocalDateTime(row[13]))
-                .lastTransactionDate(convertToLocalDateTime(row[14]))
+                .transactionId((Integer) row[3])
+                .transactionName((String) row[4])
+                .categoryName((String) row[5])
+                .budgetName((String) row[6])
+                .debtName((String) row[7])
+                .transactionCount((Long) row[8])
+                .incomeCount((Long) row[9])
+                .expenseCount((Long) row[10])
+                .totalIncome((BigDecimal) row[11])
+                .totalExpenses((BigDecimal) row[12])
+                .netAmount((BigDecimal) row[13])
+                .firstTransactionDate(convertToLocalDateTime(row[14]))
+                .lastTransactionDate(convertToLocalDateTime(row[15]))
                 .build();
     }
+
 
     public List<TransactionSummaryDTO> fromObjectArrayList(List<Object[]> rows) {
         return rows.stream().map(this::fromObjectArray).collect(Collectors.toList());
