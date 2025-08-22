@@ -13,8 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TransactionSummaryDTO {
     private String ownerUserId;
-    private String transactionOwnerType;
     private Integer profileId;
+    private Integer transactionId;
+    private String transactionOwnerType;
     private String transactionName;
     private String categoryName;
     private String budgetName;

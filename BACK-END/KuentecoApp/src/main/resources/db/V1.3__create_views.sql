@@ -3,7 +3,7 @@
 CREATE OR REPLACE VIEW vw_transactions_by_category AS
 SELECT
     c.id AS category_id,
-    COALESCE(c.description->>'name', 'Sin nombre') AS category_name,
+    COALESCE(c.name, 'Sin nombre') AS category_name,
     -- Agregar el owner_user_id basado en quien es el propietario de la transacción
     CASE
         WHEN t.id_user IS NOT NULL THEN t.id_user
@@ -22,9 +22,10 @@ FROM
     category c
         LEFT JOIN transaction t ON c.id = t.id_category
         LEFT JOIN profile p ON t.id_profile = p.id
+WHERE t.id IS NOT NULL
 GROUP BY
     c.id,
-    c.description->>'name',
+    c.name,
     c.id_user,
     CASE
     WHEN t.id_user IS NOT NULL THEN t.id_user
@@ -38,14 +39,13 @@ ORDER BY
 -- Tablas Relacionadas: Budget - Category - Transaction - KuentecoUser - Profile
 CREATE OR REPLACE VIEW vw_budget_vs_actual AS
 SELECT
+    b.id_user AS owner_user_id,
     c.id AS category_id,
-    COALESCE(c.description->>'name', 'Sin nombre') AS category_name,
     b.id AS budget_id,
+    COALESCE(c.name, 'Sin nombre') AS category_name,
     b.name AS budget_name,
     b.total_budget AS assigned_amount,
     b.remaining_budget,
-    -- Agregar el owner_user_id
-    b.id_user AS owner_user_id,
     COALESCE(SUM(CASE WHEN t.description->>'type' = 'EXPENSE' THEN t.amount ELSE 0 END), 0) AS actual_spent,
     (COALESCE(b.total_budget, 0) - COALESCE(SUM(CASE WHEN t.description->>'type' = 'EXPENSE' THEN t.amount ELSE 0 END), 0)) AS calculated_remaining,
     CASE
@@ -65,10 +65,10 @@ FROM
         LEFT JOIN transaction t ON c.id = t.id_category
         LEFT JOIN profile p ON t.id_profile = p.id
 WHERE
-    b.total_budget IS NOT NULL AND b.total_budget > 0
+    b.total_budget IS NOT NULL AND b.total_budget > 0 AND b.id IS NOT NULL
 GROUP BY
     c.id,
-    c.description->>'name',
+    c.name,
     b.id,
     b.name,
     b.total_budget,
@@ -80,7 +80,6 @@ ORDER BY
 -- Vista de resumen de presupuestos por usuario (ya tenía user_id correctamente)
 CREATE OR REPLACE VIEW vw_budget_summary_by_user AS
 SELECT
-    u.id AS user_id,
     u.id AS owner_user_id, -- Agregar para consistencia con otras vistas
     u.username,
     COUNT(DISTINCT b.id) AS total_budgets,
@@ -103,7 +102,6 @@ ORDER BY
 -- Vista de resumen de deudas por usuario (ya tenía user_id correctamente)
 CREATE OR REPLACE VIEW vw_debt_summary AS
 SELECT
-    u.id AS user_id,
     u.id AS owner_user_id, -- Agregar para consistencia con otras vistas
     u.username,
     COUNT(*) AS total_debts,
@@ -126,7 +124,7 @@ GROUP BY
 ORDER BY
     active_pending_amount DESC;
 
--- Vista de transacciones por usuario/perfil con información completa (ya estaba correcta)
+-- Vista de transacciones por usuario/perfil con información completa
 CREATE OR REPLACE VIEW vw_transactions_summary AS
 SELECT
     CASE
@@ -134,14 +132,15 @@ SELECT
         WHEN t.id_profile IS NOT NULL THEN p.id_user
         ELSE NULL
         END AS owner_user_id,
+    t.id_profile,
+    t.id,
     CASE
         WHEN t.id_user IS NOT NULL THEN 'USER'
         WHEN t.id_profile IS NOT NULL THEN 'PROFILE'
         ELSE 'UNKNOWN'
         END AS transaction_owner_type,
-    t.id_profile,
     COALESCE(t.name, 'Sin nombre') AS transaction_name,
-    COALESCE(c.description->>'name', 'Sin categoría') AS category_name,
+    COALESCE(c.name, 'Sin categoría') AS category_name,
     COALESCE(b.name, 'Sin presupuesto') AS budget_name,
     COALESCE(d.name, 'Sin deuda') AS debt_name,
     COUNT(*) AS transaction_count,
@@ -172,8 +171,9 @@ GROUP BY
         ELSE 'UNKNOWN'
         END,
     t.id_profile,
+    t.id,
     t.name,
-    c.description->>'name',
+    c.name,
     b.name,
     d.name
 ORDER BY

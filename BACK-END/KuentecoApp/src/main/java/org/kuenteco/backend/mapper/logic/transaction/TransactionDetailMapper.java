@@ -11,7 +11,6 @@ public interface TransactionDetailMapper {
     @Mapping(target = "timestamp", source = "transactionDate")
     @Mapping(target = "categoryId", source = "category.id")
     @Mapping(target = "budgetId", source = "budget.id")
-    @Mapping(target = "type", ignore = true) // Se calcula en el servicio
     TransactionDetailDTO toDto(Transaction transaction);
 
     List<TransactionDetailDTO> toDtoList(List<Transaction> transactions);
