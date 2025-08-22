@@ -55,8 +55,9 @@
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
         <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
-	<spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
-	<sonar.organization>althoskal</sonar.organization>
+        <spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
+        <sonar.organization>althoskal</sonar.organization>
+        <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
 
         <!-- Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -717,6 +718,13 @@
                             </dependency>
                         </dependencies>
                     </plugin>
+
+                    <plugin>
+                        <groupId>org.sonarsource.scanner.maven</groupId>
+                        <artifactId>sonar-maven-plugin</artifactId>
+                        <version>${sonar-maven-plugin.version}</version>
+                    </plugin>
+
                 </plugins>
             </build>
         </profile>
