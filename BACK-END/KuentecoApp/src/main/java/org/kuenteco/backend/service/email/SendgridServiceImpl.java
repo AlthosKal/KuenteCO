@@ -8,6 +8,7 @@ import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -36,7 +37,7 @@ public class SendgridServiceImpl implements SendgridService {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final UserService userService;
     private final SlaveProfileRepository slaveProfileRepository;
-    private final Random random = new Random();
+    private final SecureRandom random = new SecureRandom();
 
     // SendGrid
     @Value("${spring.sendgrid.api-key}")
