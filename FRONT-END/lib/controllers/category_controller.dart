@@ -5,6 +5,7 @@ import '../dto/app/category/category_enrollment_dto.dart';
 import '../dto/app/category/category_enrollment_summary_dto.dart';
 import '../dto/app/category/category_report_dto.dart';
 import '../dto/app/category/new_category_dto.dart';
+import '../dto/app/category/batch_enrollment_request_dto.dart';
 import '../dto/app/extra/description_category_extra.dart';
 import '../utils/enum/state_enum.dart' as state_enum;
 
@@ -91,7 +92,7 @@ class CategoryController extends ChangeNotifier {
       
       // Log de las inscripciones para debug
       for (int i = 0; i < enrollmentSummaries.length; i++) {
-        print('   Enrollment Summary $i: Category="${enrollmentSummaries[i].categoryName}", ID=${enrollmentSummaries[i].categoryId}');
+        print('   Enrollment Summary $i: Category="${enrollmentSummaries[i].categoryName}", EnrollmentIDs=${enrollmentSummaries[i].categoryEnrollmentIds}');
       }
       
       _setError(null);
@@ -126,17 +127,23 @@ class CategoryController extends ChangeNotifier {
   }
 
   // 📌 Cargar enrollments detallados para gestión (usuarios de negocios)
+  // NOTA: El endpoint /category/enroll está restringido solo para perfiles.
+  // Para usuarios business, necesitamos usar una estrategia diferente
   Future<void> loadDetailedEnrollments() async {
     _setLoading(true);
     try {
       print('🔄 CategoryController: Loading detailed enrollments for business user management...');
-      detailedEnrollments = await _service.getDetailedEnrollments();
-      print('✅ CategoryController: Loaded ${detailedEnrollments.length} detailed enrollments for business user');
       
-      // Log de las inscripciones detalladas para debug
-      for (int i = 0; i < detailedEnrollments.length; i++) {
-        print('   Detailed Enrollment $i: ID=${detailedEnrollments[i].id}, Category="${detailedEnrollments[i].categoryName}", ProfileEmail="${detailedEnrollments[i].profileEmail}", UserEmail="${detailedEnrollments[i].userEmail}"');
-      }
+      // Estrategia alternativa: usar el endpoint de resumen de enrollments por usuario
+      // que sí funciona para usuarios business, pero no nos da los detalles individuales
+      await loadEnrollments();
+      
+      // Crear una lista vacía de detailed enrollments ya que no tenemos acceso
+      // al endpoint que nos daría los enrollments individuales
+      detailedEnrollments = [];
+      
+      print('⚠️ CategoryController: Detailed enrollments endpoint not available for business users');
+      print('📌 CategoryController: Using enrollment summaries instead. Total summaries: ${enrollmentSummaries.length}');
       
       _setError(null);
     } catch (e) {
@@ -287,6 +294,11 @@ class CategoryController extends ChangeNotifier {
       await _service.enrollProfileToCategory(profileId, categoryId);
       print('✅ CategoryController: Category assigned successfully');
       
+      // Recargar los resúmenes de enrollments para actualizar la UI
+      print('🔄 CategoryController: Reloading enrollment summaries after assignment...');
+      await loadEnrollments();
+      print('✅ CategoryController: Enrollment summaries reloaded');
+      
     } catch (e) {
       print('❌ CategoryController: Error assigning category: $e');
       _setError(e.toString());
@@ -377,20 +389,71 @@ class CategoryController extends ChangeNotifier {
     }
   }
   
-  // 📌 Eliminar asignaciones por IDs (método auxiliar)
+  // 🔧 Eliminar asignaciones por IDs usando batch endpoint (método auxiliar)
   Future<void> deleteEnrollmentsByIds(List<int> enrollmentIds) async {
     _setError(null);
     
     try {
-      print('📌 CategoryController: Deleting ${enrollmentIds.length} enrollments by IDs');
-      await _service.deleteEnrollmentsByIds(enrollmentIds);
-      print('✅ CategoryController: All enrollments deleted successfully by IDs');
+      print('📌 CategoryController: Deleting ${enrollmentIds.length} enrollments by IDs using batch endpoint');
+      await _service.deleteEnrollmentsBatch(enrollmentIds);
+      print('✅ CategoryController: All enrollments deleted successfully by batch IDs');
+      
+      // Recargar tanto los enrollments detallados como los resúmenes
+      try {
+        await loadDetailedEnrollments();
+      } catch (detailedError) {
+        print('⚠️ CategoryController: Could not reload detailed enrollments: $detailedError');
+        // No es crítico si no se pueden recargar los enrollments detallados
+      }
+      await loadEnrollments();
+    } catch (e) {
+      print('❌ CategoryController: Error deleting enrollments by batch IDs: $e');
+      _setError(e.toString());
+      rethrow;
+    }
+  }
+  
+  // 🆕 Nuevo método: Eliminar asignaciones usando categoryEnrollmentIds del resumen
+  Future<void> deleteEnrollmentsByCategorySummary(CategoryEnrollmentSummaryDTO enrollmentSummary) async {
+    _setError(null);
+    
+    try {
+      if (enrollmentSummary.categoryEnrollmentIds == null || enrollmentSummary.categoryEnrollmentIds!.isEmpty) {
+        throw Exception('No hay IDs de enrollments disponibles para eliminar');
+      }
+      
+      final enrollmentIds = enrollmentSummary.categoryEnrollmentIds!;
+      print('📌 CategoryController: Deleting ${enrollmentIds.length} enrollments for category "${enrollmentSummary.categoryName}"');
+      print('📌 CategoryController: Enrollment IDs to delete: $enrollmentIds');
+      
+      await _service.deleteEnrollmentsBatch(enrollmentIds);
+      print('✅ CategoryController: All enrollments for category deleted successfully using batch endpoint');
+      
+      // Recargar los resúmenes de enrollments para actualizar la UI
+      await loadEnrollments();
+    } catch (e) {
+      print('❌ CategoryController: Error deleting enrollments by category summary: $e');
+      _setError(e.toString());
+      rethrow;
+    }
+  }
+  
+  // 🆕 Asignar múltiples perfiles a categorías (NUEVO)
+  Future<List<CategoryEnrollmentDTO>> enrollProfilesToCategoriesBatch(List<BatchEnrollmentRequestDTO> enrollments) async {
+    _setError(null);
+    
+    try {
+      print('📌 CategoryController: Creating ${enrollments.length} enrollments in batch');
+      final results = await _service.enrollProfilesToCategoriesBatch(enrollments);
+      print('✅ CategoryController: Batch enrollments created successfully');
       
       // Recargar tanto los enrollments detallados como los resúmenes
       await loadDetailedEnrollments();
       await loadEnrollments();
+      
+      return results;
     } catch (e) {
-      print('❌ CategoryController: Error deleting enrollments by IDs: $e');
+      print('❌ CategoryController: Error creating batch enrollments: $e');
       _setError(e.toString());
       rethrow;
     }
