@@ -1267,56 +1267,16 @@ class _CategoryViewState extends State<CategoryView> {
   
   // Detailed enrollment management dialog
   Future<void> _showDetailedEnrollmentsDialog(CategoryController controller, enrollmentSummary) async {
-    // Mostrar loading
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
+    print('🔍 Debug: Showing detailed enrollments for category: "${enrollmentSummary.categoryName}"');
+    print('🔍 Debug: Total enrollments: ${enrollmentSummary.totalEnrollments}');
+    print('🔍 Debug: Enrollment IDs: ${enrollmentSummary.categoryEnrollmentIds}');
     
-    List<dynamic> categoryEnrollments = [];
-    
-    try {
-      // Cargar enrollments detallados
-      await controller.loadDetailedEnrollments();
-      
-      print('🔍 Debug: Total detailed enrollments loaded: ${controller.detailedEnrollments.length}');
-      print('🔍 Debug: Looking for category: "${enrollmentSummary.categoryName}"');
-      
-      // Filtrar enrollments por categoria
-      categoryEnrollments = controller.detailedEnrollments
-          .where((enrollment) => enrollment.categoryName == enrollmentSummary.categoryName)
-          .toList();
-      
-      print('🔍 Debug: Found ${categoryEnrollments.length} enrollments for this category');
-      
-      // Debug: Log all detailed enrollments
-      for (int i = 0; i < controller.detailedEnrollments.length; i++) {
-        final enrollment = controller.detailedEnrollments[i];
-        print('🔍 Debug Enrollment $i: ID=${enrollment.id}, Category="${enrollment.categoryName}", Profile="${enrollment.profileEmail}"');
-      }
-      
-      // Cerrar loading
-      Navigator.pop(context);
-      
-      if (categoryEnrollments.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('No se encontraron asignaciones detalladas para "${enrollmentSummary.categoryName}"'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-        return;
-      }
-    } catch (e) {
-      // Cerrar loading si hay error
-      Navigator.pop(context);
+    // Verificar que tenemos IDs de enrollments
+    if (enrollmentSummary.categoryEnrollmentIds == null || enrollmentSummary.categoryEnrollmentIds!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error cargando asignaciones detalladas: $e'),
-          backgroundColor: Colors.red,
+          content: Text('No hay asignaciones disponibles para "${enrollmentSummary.categoryName}"'),
+          backgroundColor: Colors.orange,
         ),
       );
       return;
@@ -1360,7 +1320,7 @@ class _CategoryViewState extends State<CategoryView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Asignaciones de:',
+                              'Asignaciones individuales:',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey[600],
@@ -1376,12 +1336,6 @@ class _CategoryViewState extends State<CategoryView> {
                           ],
                         ),
                       ),
-                      // Botón para eliminación masiva
-                      IconButton(
-                        onPressed: () => _showMassDeleteForCategory(context, controller, categoryEnrollments),
-                        icon: const Icon(Icons.checklist, color: Colors.orange),
-                        tooltip: 'Eliminación masiva',
-                      ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
                         icon: const Icon(Icons.close),
@@ -1389,13 +1343,13 @@ class _CategoryViewState extends State<CategoryView> {
                     ],
                   ),
                   const Divider(),
-                  // Lista de enrollments detallados
+                  // Lista de enrollments usando solo IDs
                   Expanded(
                     child: ListView.builder(
                       controller: scrollController,
-                      itemCount: categoryEnrollments.length,
+                      itemCount: enrollmentSummary.categoryEnrollmentIds!.length,
                       itemBuilder: (context, index) {
-                        final enrollment = categoryEnrollments[index];
+                        final enrollmentId = enrollmentSummary.categoryEnrollmentIds![index];
                         return Card(
                           margin: const EdgeInsets.symmetric(vertical: 4),
                           child: ListTile(
@@ -1404,83 +1358,26 @@ class _CategoryViewState extends State<CategoryView> {
                               child: Icon(Icons.person, color: Colors.white),
                             ),
                             title: Text(
-                              enrollment.profileEmail,
+                              'Perfil asignado #${index + 1}',
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            subtitle: Text('Asignado por: ${enrollment.userEmail}'),
-                            trailing: enrollment.id != null
-                                ? IconButton(
-                                    onPressed: () async {
-                                      final confirmed = await showDialog<bool>(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                          title: const Text('Eliminar Asignación'),
-                                          content: Text(
-                                            '¿Estás seguro de que quieres eliminar la asignación de "${enrollment.categoryName}" para ${enrollment.profileEmail}?',
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () => Navigator.pop(context, false),
-                                              child: const Text('Cancelar'),
-                                            ),
-                                            ElevatedButton(
-                                              onPressed: () => Navigator.pop(context, true),
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.red,
-                                                foregroundColor: Colors.white,
-                                              ),
-                                              child: const Text('Eliminar'),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                      
-                                      if (confirmed == true) {
-                                        try {
-                                          print('📌 CategoryView: Deleting individual enrollment ID: ${enrollment.id}');
-                                          print('📌 CategoryView: Profile: ${enrollment.profileEmail}');
-                                          print('📌 CategoryView: Category: ${enrollment.categoryName}');
-                                          
-                                          // Mostrar loading mientras se elimina
-                                          showDialog(
-                                            context: context,
-                                            barrierDismissible: false,
-                                            builder: (context) => const Center(
-                                              child: CircularProgressIndicator(),
-                                            ),
-                                          );
-                                          
-                                          await controller.deleteEnrollment(enrollment.id!);
-                                          
-                                          // Cerrar loading
-                                          Navigator.pop(context);
-                                          
-                                          Navigator.pop(context); // Cerrar el diálogo detallado
-                                          Navigator.pop(context); // Cerrar el diálogo de gestión
-                                          
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text('Asignación eliminada: ${enrollment.profileEmail}'),
-                                              backgroundColor: Colors.green,
-                                            ),
-                                          );
-                                          
-                                          // Recargar todos los datos para actualizar la UI
-                                          await _loadDataBasedOnRole();
-                                        } catch (e) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text('Error al eliminar asignación: $e'),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
-                                        }
-                                      }
-                                    },
-                                    icon: const Icon(Icons.delete, color: Colors.red),
-                                    tooltip: 'Eliminar asignación',
-                                  )
-                                : const Icon(Icons.info_outline, color: Colors.grey),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('ID de asignación: $enrollmentId'),
+                                Text('Categoría: ${enrollmentSummary.categoryName}'),
+                              ],
+                            ),
+                            trailing: IconButton(
+                              onPressed: () => _deleteIndividualEnrollment(
+                                controller,
+                                enrollmentId,
+                                enrollmentSummary.categoryName ?? 'Categoría'
+                              ),
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              tooltip: 'Eliminar asignación',
+                            ),
+                            isThreeLine: true,
                           ),
                         );
                       },

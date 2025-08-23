@@ -127,28 +127,28 @@ class CategoryController extends ChangeNotifier {
   }
 
   // 📌 Cargar enrollments detallados para gestión (usuarios de negocios)
-  // NOTA: El endpoint /category/enroll está restringido solo para perfiles.
-  // Para usuarios business, necesitamos usar una estrategia diferente
   Future<void> loadDetailedEnrollments() async {
     _setLoading(true);
     try {
       print('🔄 CategoryController: Loading detailed enrollments for business user management...');
       
-      // Estrategia alternativa: usar el endpoint de resumen de enrollments por usuario
-      // que sí funciona para usuarios business, pero no nos da los detalles individuales
-      await loadEnrollments();
+      // Usar el método correcto del servicio para cargar enrollments detallados
+      detailedEnrollments = await _service.getDetailedEnrollments();
       
-      // Crear una lista vacía de detailed enrollments ya que no tenemos acceso
-      // al endpoint que nos daría los enrollments individuales
-      detailedEnrollments = [];
+      print('✅ CategoryController: Loaded ${detailedEnrollments.length} detailed enrollments');
       
-      print('⚠️ CategoryController: Detailed enrollments endpoint not available for business users');
-      print('📌 CategoryController: Using enrollment summaries instead. Total summaries: ${enrollmentSummaries.length}');
+      // Log de los enrollments para debug
+      for (int i = 0; i < detailedEnrollments.length; i++) {
+        final enrollment = detailedEnrollments[i];
+        print('   Detailed Enrollment $i: ID=${enrollment.id}, Category="${enrollment.categoryName}", ProfileEmail="${enrollment.profileEmail}", UserEmail="${enrollment.userEmail}"');
+      }
       
       _setError(null);
     } catch (e) {
       print('❌ CategoryController: Error loading detailed enrollments: $e');
       _setError(e.toString());
+      // En caso de error, mantener la lista vacía para evitar crashes
+      detailedEnrollments = [];
     } finally {
       _setLoading(false);
     }
