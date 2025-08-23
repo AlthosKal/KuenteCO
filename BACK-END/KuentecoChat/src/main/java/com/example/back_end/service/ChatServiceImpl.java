@@ -11,11 +11,11 @@ import com.example.back_end.dto.request.ChatDTO;
 import com.example.back_end.dto.request.ChatFilesDTO;
 import com.example.back_end.dto.request.ChatHistoryDTO;
 import com.example.back_end.dto.request.ChatMultipartDTO;
+import com.example.back_end.dto.response.CharDataDTO;
 import com.example.back_end.dto.response.DynamicAnalysisResponseDTO;
 import com.example.back_end.dto.response.StringChatResponseDTO;
-import com.example.back_end.dto.response.CharDataDTO;
-import com.example.back_end.dto.response.ai.ChartDataResponseDTO;
 import com.example.back_end.dto.response.ai.BaseDynamicResponseDTO;
+import com.example.back_end.dto.response.ai.ChartDataResponseDTO;
 import com.example.back_end.entity.ChatHistory;
 import com.example.back_end.enums.ApiError;
 import com.example.back_end.enums.Model;
@@ -812,7 +812,10 @@ public class ChatServiceImpl implements ChatService {
                     return null;
             }
         } catch (Exception e) {
-            LOGGER.warn("Error generating chart data for function {}: {}", functionName, e.getMessage());
+            LOGGER.warn(
+                    "Error generating chart data for function {}: {}",
+                    functionName,
+                    e.getMessage());
             return null;
         }
     }
@@ -847,8 +850,7 @@ public class ChatServiceImpl implements ChatService {
                 "bar",
                 chartData,
                 "Categorías",
-                "Balance ($)"
-        );
+                "Balance ($)");
     }
 
     private ChartDataResponseDTO generateIncomeExpenseChart(Object data) {
@@ -883,8 +885,7 @@ public class ChatServiceImpl implements ChatService {
                 "pie",
                 chartData,
                 "Categorías",
-                "Gastos ($)"
-        );
+                "Gastos ($)");
     }
 
     private ChartDataResponseDTO generateTransactionChart(Object data) {
@@ -893,33 +894,40 @@ public class ChatServiceImpl implements ChatService {
         }
 
         Map<String, Double> categoryTotals = new HashMap<>();
-        
+
         for (Object userProfile : list) {
             try {
                 // Extraer transacciones del perfil de usuario
-                List<?> profiles = getFieldValue(userProfile, "profiles", List.class, Collections.emptyList());
-                
+                List<?> profiles =
+                        getFieldValue(userProfile, "profiles", List.class, Collections.emptyList());
+
                 for (Object profile : profiles) {
-                    List<?> transactions = getFieldValue(profile, "transactions", List.class, Collections.emptyList());
-                    
+                    List<?> transactions =
+                            getFieldValue(
+                                    profile, "transactions", List.class, Collections.emptyList());
+
                     for (Object transaction : transactions) {
                         Double amount = getFieldValue(transaction, "amount", Double.class, 0.0);
                         if (amount == null) {
-                            Object amountObj = getFieldValue(transaction, "amount", Object.class, null);
+                            Object amountObj =
+                                    getFieldValue(transaction, "amount", Object.class, null);
                             if (amountObj != null) {
                                 amount = Double.parseDouble(amountObj.toString());
                             } else {
                                 continue;
                             }
                         }
-                        
-                        Object description = getFieldValue(transaction, "description", Object.class, null);
+
+                        Object description =
+                                getFieldValue(transaction, "description", Object.class, null);
                         String category = "Otros";
-                        
+
                         if (description != null) {
-                            category = getFieldValue(description, "description", String.class, "Otros");
+                            category =
+                                    getFieldValue(
+                                            description, "description", String.class, "Otros");
                         }
-                        
+
                         categoryTotals.merge(category, Math.abs(amount), Double::sum);
                     }
                 }
@@ -928,11 +936,12 @@ public class ChatServiceImpl implements ChatService {
             }
         }
 
-        List<CharDataDTO> chartData = categoryTotals.entrySet().stream()
-                .map(entry -> new CharDataDTO(entry.getKey(), entry.getValue()))
-                .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
-                .limit(10) // Top 10 categorías
-                .collect(Collectors.toList());
+        List<CharDataDTO> chartData =
+                categoryTotals.entrySet().stream()
+                        .map(entry -> new CharDataDTO(entry.getKey(), entry.getValue()))
+                        .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
+                        .limit(10) // Top 10 categorías
+                        .collect(Collectors.toList());
 
         return new ChartDataResponseDTO(
                 "Transacciones por Categoría",
@@ -940,8 +949,7 @@ public class ChatServiceImpl implements ChatService {
                 "doughnut",
                 chartData,
                 "Categorías",
-                "Monto ($)"
-        );
+                "Monto ($)");
     }
 
     private ChartDataResponseDTO generateDebtChart(Object data) {
@@ -962,7 +970,7 @@ public class ChatServiceImpl implements ChatService {
                         pendingAmount = 0.0;
                     }
                 }
-                
+
                 if (pendingAmount > 0) {
                     chartData.add(new CharDataDTO("Deuda " + debtId, pendingAmount));
                 }
@@ -977,8 +985,7 @@ public class ChatServiceImpl implements ChatService {
                 "bar",
                 chartData,
                 "Deudas",
-                "Monto Pendiente ($)"
-        );
+                "Monto Pendiente ($)");
     }
 
     private ChartDataResponseDTO generateBudgetComparisonChart(Object data) {
@@ -992,16 +999,17 @@ public class ChatServiceImpl implements ChatService {
                 String category = getFieldValue(budget, "categoryName", String.class, "N/A");
                 Double assigned = getFieldValue(budget, "assignedAmount", Double.class, 0.0);
                 Double spent = getFieldValue(budget, "actualSpent", Double.class, 0.0);
-                
+
                 if (assigned == null) {
-                    Object assignedObj = getFieldValue(budget, "assignedAmount", Object.class, null);
+                    Object assignedObj =
+                            getFieldValue(budget, "assignedAmount", Object.class, null);
                     if (assignedObj != null) {
                         assigned = Double.parseDouble(assignedObj.toString());
                     } else {
                         assigned = 0.0;
                     }
                 }
-                
+
                 if (spent == null) {
                     Object spentObj = getFieldValue(budget, "actualSpent", Object.class, null);
                     if (spentObj != null) {
@@ -1010,7 +1018,7 @@ public class ChatServiceImpl implements ChatService {
                         spent = 0.0;
                     }
                 }
-                
+
                 // Calcular utilización del presupuesto como porcentaje
                 double utilization = assigned > 0 ? (spent / assigned) * 100 : 0;
                 chartData.add(new CharDataDTO(category, utilization));
@@ -1025,47 +1033,51 @@ public class ChatServiceImpl implements ChatService {
                 "horizontalBar",
                 chartData,
                 "Categorías",
-                "Utilización (%)"
-        );
+                "Utilización (%)");
     }
 
-    /**
-     * Método auxiliar para extraer valores de campos usando reflexión de forma segura
-     */
+    /** Método auxiliar para extraer valores de campos usando reflexión de forma segura */
     @SuppressWarnings("unchecked")
-    private <T> T getFieldValue(Object object, String fieldName, Class<T> expectedType, T defaultValue) {
+    private <T> T getFieldValue(
+            Object object, String fieldName, Class<T> expectedType, T defaultValue) {
         try {
             Class<?> clazz = object.getClass();
-            
+
             // Intentar primero con el campo directo
             try {
                 java.lang.reflect.Field field = clazz.getDeclaredField(fieldName);
                 field.setAccessible(true);
                 Object value = field.get(object);
-                
+
                 if (value != null && expectedType.isAssignableFrom(value.getClass())) {
                     return (T) value;
-                } else if (value != null && expectedType == Double.class && value instanceof Number) {
+                } else if (value != null
+                        && expectedType == Double.class
+                        && value instanceof Number) {
                     return (T) Double.valueOf(((Number) value).doubleValue());
                 } else if (value != null && expectedType == String.class) {
                     return (T) value.toString();
                 }
             } catch (NoSuchFieldException e) {
                 // Intentar con getter method
-                String getterName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+                String getterName =
+                        "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
                 try {
                     java.lang.reflect.Method getter = clazz.getMethod(getterName);
                     Object value = getter.invoke(object);
-                    
+
                     if (value != null && expectedType.isAssignableFrom(value.getClass())) {
                         return (T) value;
-                    } else if (value != null && expectedType == Double.class && value instanceof Number) {
+                    } else if (value != null
+                            && expectedType == Double.class
+                            && value instanceof Number) {
                         return (T) Double.valueOf(((Number) value).doubleValue());
                     } else if (value != null && expectedType == String.class) {
                         return (T) value.toString();
                     }
                 } catch (Exception me) {
-                    LOGGER.debug("No se pudo acceder al getter '{}': {}", getterName, me.getMessage());
+                    LOGGER.debug(
+                            "No se pudo acceder al getter '{}': {}", getterName, me.getMessage());
                 }
             }
         } catch (Exception e) {

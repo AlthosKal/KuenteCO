@@ -76,18 +76,20 @@ public interface TransactionMapper {
                 .budgetName(null) // Podrías mapear si tienes esta información
                 .debtName(null) // Podrías mapear si tienes esta información
                 .transactionCount(1L)
-                .incomeCount(transaction.getType() == TransactionType.INCOME ? 1L : 0L)
-                .expenseCount(transaction.getType() == TransactionType.EXPENSE ? 1L : 0L)
+                .incomeCount(
+                        transaction.getDescription().getType() == TransactionType.INCOME ? 1L : 0L)
+                .expenseCount(
+                        transaction.getDescription().getType() == TransactionType.EXPENSE ? 1L : 0L)
                 .totalIncome(
-                        transaction.getType() == TransactionType.INCOME
+                        transaction.getDescription().getType() == TransactionType.INCOME
                                 ? transaction.getAmount()
                                 : BigDecimal.ZERO)
                 .totalExpenses(
-                        transaction.getType() == TransactionType.EXPENSE
+                        transaction.getDescription().getType() == TransactionType.EXPENSE
                                 ? transaction.getAmount()
                                 : BigDecimal.ZERO)
                 .netAmount(
-                        transaction.getType() == TransactionType.INCOME
+                        transaction.getDescription().getType() == TransactionType.INCOME
                                 ? transaction.getAmount()
                                 : transaction.getAmount().negate())
                 .firstTransactionDate(transaction.getTimestamp())

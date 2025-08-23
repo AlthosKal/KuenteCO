@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class CategoryDTO {
     private Integer id;
     private Integer budgetId;
+    private String name;
     private DescriptionCategory description;
-    private LocalDateTime startDate;
-    private LocalDateTime finishDate;
+    private LocalDateTime registerDate;
 }

@@ -33,8 +33,10 @@ class _CategoryViewState extends State<CategoryView> {
   @override
   void initState() {
     super.initState();
-    _checkUserType();
-    Future.microtask(() => _loadDataBasedOnRole());
+    Future.microtask(() async {
+      await _checkUserType();
+      await _loadDataBasedOnRole();
+    });
   }
   
   /// Cargar datos según el rol del usuario
@@ -50,6 +52,19 @@ class _CategoryViewState extends State<CategoryView> {
       } else {
         // Si es un usuario regular, cargar sus categorías
         await categoryController.loadCategories();
+        
+        // Si es usuario business, también cargar enrollment summaries (opcional)
+        if (_isBusinessUser) {
+          try {
+            await categoryController.loadEnrollments();
+            print('✅ CategoryView: Enrollment summaries loaded successfully');
+          } catch (enrollmentError) {
+            print('⚠️ CategoryView: Error loading enrollment summaries: $enrollmentError');
+            print('📌 CategoryView: Continuing without enrollment summaries - categories will still be available');
+            // No es crítico si fallan los enrollment summaries
+            // Las categorías seguirán siendo visibles y funcionales
+          }
+        }
       }
     } catch (e) {
       print('Error loading data in CategoryView: $e');
@@ -109,8 +124,12 @@ class _CategoryViewState extends State<CategoryView> {
   Future<void> _handleAssignCategory(category) async {
     final result = await AssignCategoryWidget.showAssignDialog(context, category);
     if (result == true) {
-      // La asignación fue exitosa
-      // No necesitamos recargar la lista ya que no cambia las categorías
+      // La asignación fue exitosa - para usuarios business necesitamos
+      // recargar los enrollment summaries para actualizar los contadores
+      if (_isBusinessUser) {
+        final categoryController = Provider.of<CategoryController>(context, listen: false);
+        await categoryController.loadEnrollments();
+      }
     }
   }
   
@@ -469,7 +488,7 @@ class _CategoryViewState extends State<CategoryView> {
                                 Text('Estado: ${enrollmentSummary.categoryStatus ?? 'Desconocido'}'),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'Toca para gestionar asignaciones individuales',
+                                  'Toca el ícono de personas para intentar ver asignaciones individuales',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: Colors.blue[600],
@@ -481,12 +500,12 @@ class _CategoryViewState extends State<CategoryView> {
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                // Botón para ver asignaciones individuales
+                                // Botón para intentar ver asignaciones individuales
                                 if (enrollmentSummary.totalEnrollments! > 0)
                                   IconButton(
                                     onPressed: () => _showDetailedEnrollmentsDialog(controller, enrollmentSummary),
                                     icon: const Icon(Icons.people, color: Colors.blue),
-                                    tooltip: 'Ver asignaciones individuales',
+                                    tooltip: 'Intentar ver asignaciones individuales',
                                   ),
                                 // Botón para eliminar TODAS las asignaciones de esta categoría
                                 if (enrollmentSummary.totalEnrollments! > 0)
@@ -1061,8 +1080,17 @@ class _CategoryViewState extends State<CategoryView> {
     );
     
     try {
-      // Intentar eliminar todas las asignaciones de la categoría
-      await controller.deleteAllEnrollmentsByCategory(enrollmentSummary.categoryId!);
+      // Validar que tenemos categoryEnrollmentIds válidos
+      if (enrollmentSummary.categoryEnrollmentIds == null || enrollmentSummary.categoryEnrollmentIds!.isEmpty) {
+        throw Exception('No hay IDs de enrollments disponibles para eliminar');
+      }
+      
+      print('📌 CategoryView: Attempting to delete enrollments for category: "${enrollmentSummary.categoryName}"');
+      print('📌 CategoryView: Enrollment IDs to delete: ${enrollmentSummary.categoryEnrollmentIds}');
+      print('📌 CategoryView: Total Enrollments: ${enrollmentSummary.totalEnrollments}');
+      
+      // Usar el nuevo método que utiliza categoryEnrollmentIds directamente
+      await controller.deleteEnrollmentsByCategorySummary(enrollmentSummary);
       
       // Cerrar loading
       Navigator.pop(context);
@@ -1070,10 +1098,13 @@ class _CategoryViewState extends State<CategoryView> {
       // Cerrar el diálogo de gestión de asignaciones
       Navigator.pop(context);
       
+      // Recargar los datos para actualizar la UI
+      await _loadDataBasedOnRole();
+      
       // Mostrar éxito
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Eliminadas todas las asignaciones de "${enrollmentSummary.categoryName}"'),
+          content: Text('Eliminadas todas las asignaciones de "${enrollmentSummary.categoryName ?? 'Categoría sin nombre'}"'),
           backgroundColor: Colors.green,
         ),
       );

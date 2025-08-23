@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BudgetVsActualDTO {
+    private String ownerUserId;
     private Integer categoryId;
-    private String categoryName;
     private Integer budgetId;
+    private String categoryName;
     private String budgetName;
     private BigDecimal assignedAmount;
     private BigDecimal remainingBudget;
-    private Integer ownerUserId;
     private BigDecimal actualSpent;
     private BigDecimal calculatedRemaining;
     private BigDecimal percentageUsed;
