@@ -11,6 +11,7 @@ class CategoryEnrollmentSummaryDTO {
   final DateTime? categoryStartDate;
   final DateTime? categoryFinishDate;
   final String? categoryStatus;
+  final List<int>? categoryEnrollmentIds; // IDs de los enrollments individuales
 
   CategoryEnrollmentSummaryDTO({
     this.categoryId,
@@ -25,9 +26,18 @@ class CategoryEnrollmentSummaryDTO {
     this.categoryStartDate,
     this.categoryFinishDate,
     this.categoryStatus,
+    this.categoryEnrollmentIds,
   });
 
   factory CategoryEnrollmentSummaryDTO.fromJson(Map<String, dynamic> json) {
+    // Parsear categoryEnrollmentIds que viene como array del backend
+    List<int>? enrollmentIds;
+    if (json['categoryEnrollmentIds'] != null) {
+      enrollmentIds = (json['categoryEnrollmentIds'] as List<dynamic>)
+          .map((e) => e as int)
+          .toList();
+    }
+    
     return CategoryEnrollmentSummaryDTO(
       categoryId: json['categoryId'],
       categoryName: json['categoryName'],
@@ -49,6 +59,7 @@ class CategoryEnrollmentSummaryDTO {
           ? DateTime.parse(json['categoryFinishDate'])
           : null,
       categoryStatus: json['categoryStatus'],
+      categoryEnrollmentIds: enrollmentIds,
     );
   }
 
@@ -66,6 +77,7 @@ class CategoryEnrollmentSummaryDTO {
       'categoryStartDate': categoryStartDate?.toIso8601String(),
       'categoryFinishDate': categoryFinishDate?.toIso8601String(),
       'categoryStatus': categoryStatus,
+      'categoryEnrollmentIds': categoryEnrollmentIds,
     };
   }
 }
