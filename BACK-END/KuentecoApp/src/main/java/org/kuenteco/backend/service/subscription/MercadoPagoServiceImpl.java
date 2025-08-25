@@ -60,14 +60,14 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
                     SubscriptionType.STANDARD,
                     SubscriptionPriceConfigDTO.builder()
                             .type(SubscriptionType.STANDARD)
-                            .monthlyPrice(new BigDecimal("12900"))
+                            .monthlyPrice(new BigDecimal("1700"))
                             .description("Plan Estándar - KuenteCo")
                             .currencyId("COP")
                             .build(),
                     SubscriptionType.PREMIUM,
                     SubscriptionPriceConfigDTO.builder()
                             .type(SubscriptionType.PREMIUM)
-                            .monthlyPrice(new BigDecimal("24900"))
+                            .monthlyPrice(new BigDecimal("1700"))
                             .description("Plan Premium - KuenteCo")
                             .currencyId("COP")
                             .build());

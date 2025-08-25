@@ -8,6 +8,8 @@ public interface CategoryEnrollmentProjection {
 
     String getCategoryName();
 
+    String getProfileName();
+
     Long getTotalEnrollments();
 
     LocalDateTime getFirstEnrollmentDate();

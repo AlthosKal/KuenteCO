@@ -1,38 +1,35 @@
 services:
-  postgres-master:
-    image: yefff/image-master-kuenteco:1.0.0
-    container_name: MasterKuenteCO
-    environment:
-      POSTGRES_USER: master
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: KuenteCO
+#BASE DE DATOS POSTGRESQL MAESTRA
+  postgres-master-database:
+    image: yefff/image-master-kuenteco:1.1.1
+    container_name: DatabaseMasterKuenteCOSub
     volumes:
       - postgres-master-data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5431:5432"
     networks:
-      - postgres-network
+      - kuenteco-sub-network
+    restart: unless-stopped
 
-  postgres-replica:
-    image: yefff/image-slave-kuenteco:1.0.0
-    container_name: SlaveKuenteCO
-    environment:
-      POSTGRES_USER: slave
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: KuenteCO
+#BASE DE DATOS POSTGRESQL REPLICA
+  postgres-replica-database:
+    image: yefff/image-slave-kuenteco:1.1.1
+    container_name: DatabaseSlaveKuenteCOSub
     volumes:
       - postgres-replica-data:/var/lib/postgresql/data
     ports:
-      - "5433:5432"
+      - "5430:5432"
     networks:
-      - postgres-network
+      - kuenteco-sub-network
     depends_on:
-      - postgres-master
+      postgres-master-database:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   postgres-master-data:
   postgres-replica-data:
 
 networks:
-  postgres-network:
+  kuenteco-sub-network:
     driver: bridge

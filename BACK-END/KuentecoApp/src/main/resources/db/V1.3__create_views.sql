@@ -185,27 +185,25 @@ SELECT
     ARRAY_AGG(ce.id) AS category_enrollment_ids,
     c.id_user AS owner_user_id,
     c.name AS category_name,
+    p.username profile_name,
     COUNT(DISTINCT ce.id) AS total_enrollments,
     MIN(ce.enrollment_date) AS first_enrollment_date,
     MAX(ce.enrollment_date) AS last_enrollment_date,
     c.register_date AS category_register_date,
     (c.description->>'assignedBudget')::numeric AS assigned_budget,
-    c.description->>'state' AS category_state,
-    CASE
-        WHEN c.description->>'state' = 'ACTIVE' THEN 'ACTIVA'
-        WHEN c.description->>'state' IN ('INACTIVE', 'CANCELLED') THEN 'FINALIZADA'
-        ELSE c.description->>'state'
-        END AS category_status
+    c.description->>'state' AS category_state
 FROM
     category c
-        LEFT JOIN category_enrollment ce
-                  ON c.id = ce.id_category
+        INNER JOIN category_enrollment ce
+                   ON c.id = ce.id_category
+        LEFT JOIN profile p ON ce.id_profile = p.id
 WHERE ce.id IS NOT NULL
 GROUP BY
     c.id,
     c.name,
     c.description,
     c.id_user,
-    c.register_date
+    c.register_date,
+    p.username
 ORDER BY
     total_enrollments DESC;
