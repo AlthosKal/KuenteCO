@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import '../../controllers/user_controller.dart';
 import '../dto/app/auth/response/user_detail_dto.dart';
 import '../widgets/common/primary_buttom_widget.dart';
+import '../widgets/components/user/user_image_widget.dart';
 import 'auth/verification_code_email_view.dart';
-import '../widgets/user/user_image_widget.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
-import '../../utils/formatters.dart';
+import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
+import '../../../utils/formatters.dart';
 
 class TransactionCardWidget extends StatelessWidget {
   final TransactionDetailDTO transaction;
