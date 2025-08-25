@@ -63,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
                         .orElseThrow(
                                 () ->
                                         new AuthException(
-                                                "Cuenta no activada, Por favor verifica tu correo"));
+                                                "Credenciales Invalidas, verifique sus datos e intente nuevamente"));
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(user.getEmail(), dto.password);
