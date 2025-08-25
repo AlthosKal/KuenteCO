@@ -33,7 +33,7 @@ class _AssignCategoryWidgetState extends State<AssignCategoryWidget> {
   List<ProfileDetailDTO> _profiles = [];
   ProfileDetailDTO? _selectedProfile;
   bool _isLoading = false;
-  bool _isLoadingProfiles = true;
+  bool _isLoadingData = true;
   String? _errorMessage;
 
   @override
@@ -45,18 +45,18 @@ class _AssignCategoryWidgetState extends State<AssignCategoryWidget> {
   Future<void> _loadProfiles() async {
     try {
       setState(() {
-        _isLoadingProfiles = true;
+        _isLoadingData = true;
         _errorMessage = null;
       });
-
+      
       _profiles = await _profileService.getAllProfiles();
       
       setState(() {
-        _isLoadingProfiles = false;
+        _isLoadingData = false;
       });
     } catch (e) {
       setState(() {
-        _isLoadingProfiles = false;
+        _isLoadingData = false;
         _errorMessage = 'Error al cargar perfiles: $e';
       });
     }
@@ -131,7 +131,10 @@ class _AssignCategoryWidgetState extends State<AssignCategoryWidget> {
       ),
       child: Container(
         width: MediaQuery.of(context).size.width * 0.9,
-        constraints: const BoxConstraints(maxWidth: 400),
+        height: MediaQuery.of(context).size.height * 0.7,
+        constraints: const BoxConstraints(
+          maxWidth: 400,
+        ),
         child: Card(
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -140,9 +143,8 @@ class _AssignCategoryWidgetState extends State<AssignCategoryWidget> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
-                // Header con icono y título
+                // Header
                 Row(
                   children: [
                     Container(
@@ -181,183 +183,183 @@ class _AssignCategoryWidgetState extends State<AssignCategoryWidget> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                
+                const SizedBox(height: 16),
 
                 // Contenido principal
-                if (_isLoadingProfiles)
-                  const Padding(
-                    padding: EdgeInsets.all(32.0),
-                    child: CircularProgressIndicator(),
+                if (_isLoadingData)
+                  const Expanded(
+                    child: Center(child: CircularProgressIndicator()),
                   )
                 else if (_errorMessage != null && _profiles.isEmpty)
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    color: Colors.red.shade50,
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  _errorMessage!,
-                                  style: TextStyle(
-                                    color: Colors.red.shade700,
-                                    fontSize: 14,
+                  Expanded(
+                    child: Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      color: Colors.red.shade50,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    _errorMessage!,
+                                    style: TextStyle(
+                                      color: Colors.red.shade700,
+                                      fontSize: 14,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          ElevatedButton.icon(
-                            onPressed: _loadProfiles,
-                            icon: const Icon(Icons.refresh, size: 16),
-                            label: const Text('Reintentar'),
-                          ),
-                        ],
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            ElevatedButton.icon(
+                              onPressed: _loadProfiles,
+                              icon: const Icon(Icons.refresh, size: 16),
+                              label: const Text('Reintentar'),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   )
                 else if (_profiles.isEmpty)
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(32.0),
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.people_outline,
-                            size: 48,
-                            color: Colors.grey,
-                          ),
-                          SizedBox(height: 12),
-                          Text(
-                            'No hay perfiles disponibles',
-                            style: TextStyle(
-                              fontSize: 16,
+                  const Expanded(
+                    child: Card(
+                      elevation: 2,
+                      child: Padding(
+                        padding: EdgeInsets.all(32.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.people_outline,
+                              size: 48,
                               color: Colors.grey,
                             ),
-                          ),
-                        ],
+                            SizedBox(height: 12),
+                            Text(
+                              'No hay perfiles disponibles',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   )
                 else
-                  // Selector de perfiles
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Seleccionar perfil:',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                  Expanded(
+                    child: Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Seleccionar perfil:',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 12),
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(
-                              maxHeight: 300, // Limitar altura máxima
-                            ),
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: _profiles.length,
-                              itemBuilder: (context, index) {
-                                final profile = _profiles[index];
-                                final isSelected = _selectedProfile?.id == profile.id;
-                                
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 2),
-                                  child: InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedProfile = profile;
-                                        _errorMessage = null;
-                                      });
-                                    },
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        color: isSelected 
-                                            ? Colors.blue.withValues(alpha: 0.1)
-                                            : null,
-                                        border: isSelected 
-                                            ? Border.all(
-                                                color: Colors.blue.withValues(alpha: 0.5),
-                                                width: 1.5,
-                                              )
-                                            : null,
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          CircleAvatar(
-                                            radius: 16,
-                                            backgroundColor: Colors.blue.withValues(alpha: 0.1),
-                                            child: Text(
-                                              profile.username.isNotEmpty 
-                                                  ? profile.username[0].toUpperCase()
-                                                  : '?',
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.blue,
+                            const SizedBox(height: 12),
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: _profiles.length,
+                                itemBuilder: (context, index) {
+                                  final profile = _profiles[index];
+                                  final isSelected = _selectedProfile?.id == profile.id;
+                                  
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 2),
+                                    child: InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          _selectedProfile = profile;
+                                          _errorMessage = null;
+                                        });
+                                      },
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(8),
+                                          color: isSelected 
+                                              ? Colors.blue.withValues(alpha: 0.1)
+                                              : null,
+                                          border: isSelected 
+                                              ? Border.all(
+                                                  color: Colors.blue.withValues(alpha: 0.5),
+                                                  width: 1.5,
+                                                )
+                                              : null,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            CircleAvatar(
+                                              radius: 16,
+                                              backgroundColor: Colors.blue.withValues(alpha: 0.1),
+                                              child: Text(
+                                                profile.username.isNotEmpty 
+                                                    ? profile.username[0].toUpperCase()
+                                                    : '?',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.blue,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  profile.username,
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.w600,
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    profile.username,
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
                                                   ),
-                                                ),
-                                                Text(
-                                                  profile.email,
-                                                  style: const TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.grey,
+                                                  Text(
+                                                    profile.email,
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey,
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                          if (isSelected)
-                                            const Icon(
-                                              Icons.check_circle,
-                                              color: Colors.blue,
-                                              size: 20,
-                                            ),
-                                        ],
+                                            if (isSelected)
+                                              const Icon(
+                                                Icons.check_circle,
+                                                color: Colors.blue,
+                                                size: 20,
+                                              ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -376,7 +378,7 @@ class _AssignCategoryWidgetState extends State<AssignCategoryWidget> {
                       child: Row(
                         children: [
                           Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               _errorMessage!,
@@ -392,7 +394,7 @@ class _AssignCategoryWidgetState extends State<AssignCategoryWidget> {
                   ),
                 ],
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
                 // Botones de acción
                 Row(
