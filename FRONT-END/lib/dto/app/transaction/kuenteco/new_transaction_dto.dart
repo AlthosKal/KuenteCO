@@ -4,7 +4,7 @@ class NewTransactionDTO {
   final int? categoryId;
   final int? budgetId;
   final int? debtId;
-  final String? name;
+  final String name; // Requerido como en el backend
   final DescriptionTransaction description;
   final double amount;
 
@@ -12,7 +12,7 @@ class NewTransactionDTO {
     this.categoryId,
     this.budgetId,
     this.debtId,
-    this.name,
+    required this.name,
     required this.description,
     required this.amount,
   });

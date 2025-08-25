@@ -92,7 +92,15 @@ class CategoryController extends ChangeNotifier {
       
       // Log de las inscripciones para debug
       for (int i = 0; i < enrollmentSummaries.length; i++) {
-        print('   Enrollment Summary $i: Category="${enrollmentSummaries[i].categoryName}", EnrollmentIDs=${enrollmentSummaries[i].categoryEnrollmentIds}');
+        final summary = enrollmentSummaries[i];
+        print('   Enrollment Summary $i: Category="${summary.categoryName}", Total=${summary.totalEnrollments}, EnrollmentIDs=${summary.categoryEnrollmentIds}');
+        print('      EnrolledProfiles count: ${summary.enrolledProfiles?.length ?? 0}');
+        if (summary.enrolledProfiles != null) {
+          for (int j = 0; j < summary.enrolledProfiles!.length; j++) {
+            final profile = summary.enrolledProfiles![j];
+            print('         Profile $j: ID=${profile.enrollmentId}, Email=${profile.profileEmail}');
+          }
+        }
       }
       
       _setError(null);
