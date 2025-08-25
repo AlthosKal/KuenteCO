@@ -1,32 +1,34 @@
 import 'package:KuenteCO/dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 
 class ProfileWithTransactionsDTO {
-  final String username;
-  final String email;
-  final DateTime startDate;
-  final List<TransactionDetailDTO> transactions;
-  final int transactionCount;
-  final double totalAmount;
+  final String? username;
+  final String? email;
+  final DateTime? startDate;
+  final List<TransactionDetailDTO>? transactions;
+  final int? transactionCount;
+  final double? totalAmount;
 
   ProfileWithTransactionsDTO({
-    required this.username,
-    required this.email,
-    required this.startDate,
-    required this.transactions,
-    required this.transactionCount,
-    required this.totalAmount,
+    this.username,
+    this.email,
+    this.startDate,
+    this.transactions,
+    this.transactionCount,
+    this.totalAmount,
   });
 
   factory ProfileWithTransactionsDTO.fromJson(Map<String, dynamic> json) {
     return ProfileWithTransactionsDTO(
       username: json['username'],
       email: json['email'],
-      startDate: DateTime.parse(json['startDate']),
-      transactions: (json['transactions'] as List<dynamic>)
-          .map((e) => TransactionDetailDTO.fromJson(e))
-          .toList(),
+      startDate: json['startDate'] != null ? DateTime.parse(json['startDate']) : null,
+      transactions: json['transactions'] != null
+          ? (json['transactions'] as List<dynamic>)
+              .map((e) => TransactionDetailDTO.fromJson(e))
+              .toList()
+          : null,
       transactionCount: json['transactionCount'],
-      totalAmount: (json['totalAmount'] as num).toDouble(),
+      totalAmount: json['totalAmount'] != null ? (json['totalAmount'] as num).toDouble() : null,
     );
   }
 
@@ -34,8 +36,8 @@ class ProfileWithTransactionsDTO {
     return {
       'username': username,
       'email': email,
-      'startDate': startDate.toIso8601String(),
-      'transactions': transactions.map((e) => e.toJson()).toList(),
+      'startDate': startDate?.toIso8601String(),
+      'transactions': transactions?.map((e) => e.toJson()).toList(),
       'transactionCount': transactionCount,
       'totalAmount': totalAmount,
     };
