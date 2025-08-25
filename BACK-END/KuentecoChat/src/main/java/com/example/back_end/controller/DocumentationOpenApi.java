@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 // Controlador para redireccionar a la documentación de la API
 @Controller
 @RequestMapping("/v1/documentation")
-public class DocumentationController {
+public class DocumentationOpenApi {
     // Endpoint que redirige a la interfaz Swagger UI para visualizar la documentación de la API
     @Operation(
             summary = "Redirect to Swagger UI",
