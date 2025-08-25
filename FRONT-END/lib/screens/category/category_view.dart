@@ -11,6 +11,7 @@ import '../../widgets/common/category/delete_category_widget.dart';
 import '../../widgets/common/category/delete_enrollment_widget.dart' as ComponentEnrollmentDelete;
 import '../../widgets/common/category/edit_category_widget.dart';
 import '../../widgets/common/category/assign_category_widget.dart';
+import '../../widgets/common/category/batch_assign_category_widget.dart';
 import '../../core/services/app/auth_service.dart';
 import '../../dto/app/category/category_enrollment_dto.dart';
 
@@ -453,11 +454,40 @@ class _CategoryViewState extends State<CategoryView> {
                           ),
                         ),
                       ),
+                      // Botón para asignación masiva
+                      IconButton(
+                        onPressed: () => _showBatchAssignDialog(),
+                        icon: const Icon(Icons.assignment_add, color: Colors.green),
+                        tooltip: 'Asignación masiva',
+                      ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
                         icon: const Icon(Icons.close),
                       ),
                     ],
+                  ),
+                  // Información sobre asignación masiva
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.info, color: Colors.green, size: 20),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'Usa el botón de asignación masiva (➕) para asignar múltiples categorías a múltiples perfiles de una vez.',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const Divider(),
                   // Lista de enrollments
@@ -1045,9 +1075,9 @@ class _CategoryViewState extends State<CategoryView> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
+                color: Colors.orange.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
@@ -1163,9 +1193,9 @@ class _CategoryViewState extends State<CategoryView> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red.withOpacity(0.3)),
+                border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
@@ -1463,6 +1493,30 @@ class _CategoryViewState extends State<CategoryView> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Asignaciones eliminadas exitosamente'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+  
+  // Método para mostrar diálogo de asignación masiva
+  Future<void> _showBatchAssignDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => const BatchAssignCategoryWidget(),
+    );
+    
+    if (result == true) {
+      // Cerrar el diálogo de gestión de asignaciones
+      Navigator.pop(context);
+      
+      // La asignación masiva fue exitosa, recargar enrollment summaries
+      final categoryController = Provider.of<CategoryController>(context, listen: false);
+      await categoryController.loadEnrollments();
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Asignaciones masivas creadas exitosamente'),
           backgroundColor: Colors.green,
         ),
       );
