@@ -4,8 +4,8 @@ class UpdateTransactionDTO {
   final int id;
   final int categoryId;
   final int budgetId;
-  final int debtId;
-  final String? name;
+  final int? debtId; // Opcional como en el backend
+  final String name; // Requerido como en el backend
   final DescriptionTransaction description;
   final double amount;
 
@@ -13,8 +13,8 @@ class UpdateTransactionDTO {
     required this.id,
     required this.categoryId,
     required this.budgetId,
-    required this.debtId,
-    this.name,
+    this.debtId,
+    required this.name,
     required this.description,
     required this.amount,
   });

@@ -12,6 +12,7 @@ class CategoryEnrollmentSummaryDTO {
   final DateTime? categoryFinishDate;
   final String? categoryStatus;
   final List<int>? categoryEnrollmentIds; // IDs de los enrollments individuales
+  final List<EnrolledProfileSummaryDTO>? enrolledProfiles; // Información detallada de cada perfil
 
   CategoryEnrollmentSummaryDTO({
     this.categoryId,
@@ -27,6 +28,7 @@ class CategoryEnrollmentSummaryDTO {
     this.categoryFinishDate,
     this.categoryStatus,
     this.categoryEnrollmentIds,
+    this.enrolledProfiles,
   });
 
   factory CategoryEnrollmentSummaryDTO.fromJson(Map<String, dynamic> json) {
@@ -38,29 +40,58 @@ class CategoryEnrollmentSummaryDTO {
           .toList();
     }
     
+    // Crear perfiles básicos usando los IDs disponibles
+    List<EnrolledProfileSummaryDTO>? profiles;
+    if (enrollmentIds != null && enrollmentIds.isNotEmpty) {
+      profiles = enrollmentIds.map((id) {
+        return EnrolledProfileSummaryDTO(
+          enrollmentId: id,
+          profileEmail: 'Perfil #$id',
+          profileName: 'Perfil asignado #$id',
+          userEmail: 'Usuario propietario',
+          enrollmentDate: json['firstEnrollmentDate'] != null
+              ? DateTime.parse(json['firstEnrollmentDate'])
+              : null,
+        );
+      }).toList();
+    }
+    
     return CategoryEnrollmentSummaryDTO(
-      categoryId: json['categoryId'],
+      categoryId: null, // El backend no envía categoryId en la proyección
       categoryName: json['categoryName'],
-      categoryOwnerId: json['categoryOwnerId'],
-      ownerUserId: json['ownerUserId'],
-      enrolledUsersCount: json['enrolledUsersCount'],
-      enrolledProfilesCount: json['enrolledProfilesCount'],
-      totalEnrollments: json['totalEnrollments'],
+      categoryOwnerId: json['ownerUserId']?.toString(),
+      ownerUserId: json['ownerUserId']?.toString(),
+      enrolledUsersCount: null, // No disponible en la proyección
+      enrolledProfilesCount: json['totalEnrollments']?.toInt(),
+      totalEnrollments: json['totalEnrollments']?.toInt(),
       firstEnrollmentDate: json['firstEnrollmentDate'] != null
           ? DateTime.parse(json['firstEnrollmentDate'])
           : null,
       lastEnrollmentDate: json['lastEnrollmentDate'] != null
           ? DateTime.parse(json['lastEnrollmentDate'])
           : null,
-      categoryStartDate: json['categoryStartDate'] != null
-          ? DateTime.parse(json['categoryStartDate'])
+      categoryStartDate: json['categoryRegisterDate'] != null
+          ? DateTime.parse(json['categoryRegisterDate'])
           : null,
-      categoryFinishDate: json['categoryFinishDate'] != null
-          ? DateTime.parse(json['categoryFinishDate'])
-          : null,
-      categoryStatus: json['categoryStatus'],
+      categoryFinishDate: null, // No disponible en la proyección
+      categoryStatus: _mapCategoryState(json['categoryState']),
       categoryEnrollmentIds: enrollmentIds,
+      enrolledProfiles: profiles,
     );
+  }
+  
+  // Método auxiliar para mapear el estado de la categoría
+  static String? _mapCategoryState(dynamic state) {
+    if (state == null) return null;
+    switch (state.toString().toUpperCase()) {
+      case 'ACTIVE':
+        return 'ACTIVA';
+      case 'INACTIVE':
+      case 'CANCELLED':
+        return 'FINALIZADA';
+      default:
+        return state.toString();
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -78,6 +109,104 @@ class CategoryEnrollmentSummaryDTO {
       'categoryFinishDate': categoryFinishDate?.toIso8601String(),
       'categoryStatus': categoryStatus,
       'categoryEnrollmentIds': categoryEnrollmentIds,
+      'enrolledProfiles': enrolledProfiles?.map((e) => e.toJson()).toList(),
+    };
+  }
+
+  // Método auxiliar para crear desde enrollments existentes
+  factory CategoryEnrollmentSummaryDTO.fromSummaryAndEnrollments(
+    Map<String, dynamic> summaryJson,
+    List<Map<String, dynamic>> enrollmentsJson,
+  ) {
+    // Filtrar enrollments por categoría
+    final categoryName = summaryJson['categoryName'];
+    final relevantEnrollments = enrollmentsJson
+        .where((e) => e['categoryName'] == categoryName)
+        .toList();
+
+    // Crear perfiles basados en los enrollments individuales
+    List<EnrolledProfileSummaryDTO> profiles = relevantEnrollments
+        .map((e) => EnrolledProfileSummaryDTO.fromEnrollmentJson(e))
+        .toList();
+
+    // Obtener IDs de enrollments
+    List<int> enrollmentIds = relevantEnrollments
+        .map((e) => e['id'] as int)
+        .toList();
+
+    return CategoryEnrollmentSummaryDTO(
+      categoryId: summaryJson['categoryId'],
+      categoryName: summaryJson['categoryName'],
+      categoryOwnerId: summaryJson['categoryOwnerId'],
+      ownerUserId: summaryJson['ownerUserId'],
+      enrolledUsersCount: summaryJson['enrolledUsersCount'],
+      enrolledProfilesCount: summaryJson['enrolledProfilesCount'],
+      totalEnrollments: summaryJson['totalEnrollments'],
+      firstEnrollmentDate: summaryJson['firstEnrollmentDate'] != null
+          ? DateTime.parse(summaryJson['firstEnrollmentDate'])
+          : null,
+      lastEnrollmentDate: summaryJson['lastEnrollmentDate'] != null
+          ? DateTime.parse(summaryJson['lastEnrollmentDate'])
+          : null,
+      categoryStartDate: summaryJson['categoryStartDate'] != null
+          ? DateTime.parse(summaryJson['categoryStartDate'])
+          : null,
+      categoryFinishDate: summaryJson['categoryFinishDate'] != null
+          ? DateTime.parse(summaryJson['categoryFinishDate'])
+          : null,
+      categoryStatus: summaryJson['categoryStatus'],
+      categoryEnrollmentIds: enrollmentIds,
+      enrolledProfiles: profiles,
+    );
+  }
+}
+
+class EnrolledProfileSummaryDTO {
+  final int enrollmentId;
+  final String profileEmail;
+  final String? profileName;
+  final String userEmail;
+  final DateTime? enrollmentDate;
+
+  EnrolledProfileSummaryDTO({
+    required this.enrollmentId,
+    required this.profileEmail,
+    this.profileName,
+    required this.userEmail,
+    this.enrollmentDate,
+  });
+
+  factory EnrolledProfileSummaryDTO.fromJson(Map<String, dynamic> json) {
+    return EnrolledProfileSummaryDTO(
+      enrollmentId: json['enrollmentId'],
+      profileEmail: json['profileEmail'],
+      profileName: json['profileName'],
+      userEmail: json['userEmail'],
+      enrollmentDate: json['enrollmentDate'] != null
+          ? DateTime.parse(json['enrollmentDate'])
+          : null,
+    );
+  }
+
+  factory EnrolledProfileSummaryDTO.fromEnrollmentJson(Map<String, dynamic> json) {
+    return EnrolledProfileSummaryDTO(
+      enrollmentId: json['id'],
+      profileEmail: json['profileEmail'],
+      profileName: json['profileName'],
+      userEmail: json['userEmail'],
+      enrollmentDate: json['enrollmentDate'] != null
+          ? DateTime.parse(json['enrollmentDate'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'enrollmentId': enrollmentId,
+      'profileEmail': profileEmail,
+      'profileName': profileName,
+      'userEmail': userEmail,
+      'enrollmentDate': enrollmentDate?.toIso8601String(),
     };
   }
 }

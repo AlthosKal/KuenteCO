@@ -8,9 +8,9 @@ import '../../controllers/category_controller.dart';
 import '../../widgets/common/category/category_list_widget.dart';
 import '../../widgets/common/category/create_category_widget.dart';
 import '../../widgets/common/category/delete_category_widget.dart';
+import '../../widgets/common/category/delete_enrollment_widget.dart' as ComponentEnrollmentDelete;
 import '../../widgets/common/category/edit_category_widget.dart';
 import '../../widgets/common/category/assign_category_widget.dart';
-import '../../widgets/components/app/category/enrollment_delete_widget.dart' as ComponentEnrollmentDelete;
 import '../../core/services/app/auth_service.dart';
 import '../../dto/app/category/category_enrollment_dto.dart';
 
@@ -500,15 +500,28 @@ class _CategoryViewState extends State<CategoryView> {
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                // Botón para intentar ver asignaciones individuales
-                                if (enrollmentSummary.totalEnrollments! > 0)
+                                // Botón para eliminar asignación individual (usando el primer ID)
+                                if (enrollmentSummary.totalEnrollments == 1 && 
+                                    enrollmentSummary.categoryEnrollmentIds != null &&
+                                    enrollmentSummary.categoryEnrollmentIds!.isNotEmpty)
+                                  IconButton(
+                                    onPressed: () => _deleteIndividualEnrollment(
+                                      controller, 
+                                      enrollmentSummary.categoryEnrollmentIds![0],
+                                      enrollmentSummary.categoryName ?? 'Categoría'
+                                    ),
+                                    icon: const Icon(Icons.delete, color: Colors.orange),
+                                    tooltip: 'Eliminar única asignación',
+                                  ),
+                                // Botón para ver asignaciones individuales (solo si hay más de 1)
+                                if (enrollmentSummary.totalEnrollments! > 1)
                                   IconButton(
                                     onPressed: () => _showDetailedEnrollmentsDialog(controller, enrollmentSummary),
                                     icon: const Icon(Icons.people, color: Colors.blue),
-                                    tooltip: 'Intentar ver asignaciones individuales',
+                                    tooltip: 'Ver asignaciones individuales',
                                   ),
-                                // Botón para eliminar TODAS las asignaciones de esta categoría
-                                if (enrollmentSummary.totalEnrollments! > 0)
+                                // Botón para eliminar TODAS las asignaciones (solo si hay más de 1)
+                                if (enrollmentSummary.totalEnrollments! > 1)
                                   IconButton(
                                     onPressed: () => _deleteAllCategoryAssignments(controller, enrollmentSummary),
                                     icon: const Icon(Icons.delete_sweep, color: Colors.red),
@@ -1009,6 +1022,124 @@ class _CategoryViewState extends State<CategoryView> {
           );
   }
   
+  // Individual delete enrollment by ID
+  Future<void> _deleteIndividualEnrollment(CategoryController controller, int enrollmentId, String categoryName) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar Asignación'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Se eliminará la asignación de la categoría:',
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '"$categoryName"',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.info, color: Colors.orange, size: 20),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      'Esta acción no se puede deshacer.',
+                      style: TextStyle(fontSize: 13),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+    
+    if (confirmed != true) return;
+    
+    // Mostrar loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+    
+    try {
+      print('📌 CategoryView: Deleting individual enrollment ID: $enrollmentId');
+      print('📌 CategoryView: Category: $categoryName');
+      
+      await controller.deleteEnrollment(enrollmentId);
+      
+      // Cerrar loading
+      Navigator.pop(context);
+      
+      // Cerrar el diálogo de gestión de asignaciones
+      Navigator.pop(context);
+      
+      // Recargar los datos para actualizar la UI
+      await _loadDataBasedOnRole();
+      
+      // Mostrar éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Asignación eliminada de "$categoryName"'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      // Cerrar loading
+      Navigator.pop(context);
+      
+      // Mostrar error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Error al eliminar asignación',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              Text('$e'),
+            ],
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
+  }
+  
   // Direct delete all category assignments
   Future<void> _deleteAllCategoryAssignments(CategoryController controller, enrollmentSummary) async {
     final confirmed = await showDialog<bool>(
@@ -1136,56 +1267,16 @@ class _CategoryViewState extends State<CategoryView> {
   
   // Detailed enrollment management dialog
   Future<void> _showDetailedEnrollmentsDialog(CategoryController controller, enrollmentSummary) async {
-    // Mostrar loading
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
+    print('🔍 Debug: Showing detailed enrollments for category: "${enrollmentSummary.categoryName}"');
+    print('🔍 Debug: Total enrollments: ${enrollmentSummary.totalEnrollments}');
+    print('🔍 Debug: Enrollment IDs: ${enrollmentSummary.categoryEnrollmentIds}');
     
-    List<dynamic> categoryEnrollments = [];
-    
-    try {
-      // Cargar enrollments detallados
-      await controller.loadDetailedEnrollments();
-      
-      print('🔍 Debug: Total detailed enrollments loaded: ${controller.detailedEnrollments.length}');
-      print('🔍 Debug: Looking for category: "${enrollmentSummary.categoryName}"');
-      
-      // Filtrar enrollments por categoria
-      categoryEnrollments = controller.detailedEnrollments
-          .where((enrollment) => enrollment.categoryName == enrollmentSummary.categoryName)
-          .toList();
-      
-      print('🔍 Debug: Found ${categoryEnrollments.length} enrollments for this category');
-      
-      // Debug: Log all detailed enrollments
-      for (int i = 0; i < controller.detailedEnrollments.length; i++) {
-        final enrollment = controller.detailedEnrollments[i];
-        print('🔍 Debug Enrollment $i: ID=${enrollment.id}, Category="${enrollment.categoryName}", Profile="${enrollment.profileEmail}"');
-      }
-      
-      // Cerrar loading
-      Navigator.pop(context);
-      
-      if (categoryEnrollments.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('No se encontraron asignaciones detalladas para "${enrollmentSummary.categoryName}"'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-        return;
-      }
-    } catch (e) {
-      // Cerrar loading si hay error
-      Navigator.pop(context);
+    // Verificar que tenemos IDs de enrollments
+    if (enrollmentSummary.categoryEnrollmentIds == null || enrollmentSummary.categoryEnrollmentIds!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error cargando asignaciones detalladas: $e'),
-          backgroundColor: Colors.red,
+          content: Text('No hay asignaciones disponibles para "${enrollmentSummary.categoryName}"'),
+          backgroundColor: Colors.orange,
         ),
       );
       return;
@@ -1229,7 +1320,7 @@ class _CategoryViewState extends State<CategoryView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Asignaciones de:',
+                              'Asignaciones individuales:',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey[600],
@@ -1245,12 +1336,6 @@ class _CategoryViewState extends State<CategoryView> {
                           ],
                         ),
                       ),
-                      // Botón para eliminación masiva
-                      IconButton(
-                        onPressed: () => _showMassDeleteForCategory(context, controller, categoryEnrollments),
-                        icon: const Icon(Icons.checklist, color: Colors.orange),
-                        tooltip: 'Eliminación masiva',
-                      ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
                         icon: const Icon(Icons.close),
@@ -1258,85 +1343,95 @@ class _CategoryViewState extends State<CategoryView> {
                     ],
                   ),
                   const Divider(),
-                  // Lista de enrollments detallados
+                  // Lista de enrollments con información detallada de perfiles
                   Expanded(
-                    child: ListView.builder(
-                      controller: scrollController,
-                      itemCount: categoryEnrollments.length,
-                      itemBuilder: (context, index) {
-                        final enrollment = categoryEnrollments[index];
-                        return Card(
-                          margin: const EdgeInsets.symmetric(vertical: 4),
-                          child: ListTile(
-                            leading: const CircleAvatar(
-                              backgroundColor: Colors.green,
-                              child: Icon(Icons.person, color: Colors.white),
-                            ),
-                            title: Text(
-                              enrollment.profileEmail,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Text('Asignado por: ${enrollment.userEmail}'),
-                            trailing: enrollment.id != null
-                                ? IconButton(
-                                    onPressed: () async {
-                                      final confirmed = await showDialog<bool>(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                          title: const Text('Eliminar Asignación'),
-                                          content: Text(
-                                            '¿Estás seguro de que quieres eliminar la asignación de "${enrollment.categoryName}" para ${enrollment.profileEmail}?',
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () => Navigator.pop(context, false),
-                                              child: const Text('Cancelar'),
-                                            ),
-                                            ElevatedButton(
-                                              onPressed: () => Navigator.pop(context, true),
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.red,
-                                                foregroundColor: Colors.white,
-                                              ),
-                                              child: const Text('Eliminar'),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                      
-                                      if (confirmed == true) {
-                                        try {
-                                          await controller.deleteEnrollment(enrollment.id!);
-                                          Navigator.pop(context); // Cerrar el diálogo detallado
-                                          Navigator.pop(context); // Cerrar el diálogo de gestión
-                                          
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text('Asignación eliminada: ${enrollment.profileEmail}'),
-                                              backgroundColor: Colors.green,
-                                            ),
-                                          );
-                                          
-                                          // Recargar la lista de resúmenes
-                                          await controller.loadEnrollments();
-                                        } catch (e) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text('Error al eliminar asignación: $e'),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
-                                        }
-                                      }
-                                    },
+                    child: enrollmentSummary.enrolledProfiles != null && enrollmentSummary.enrolledProfiles!.isNotEmpty
+                        ? ListView.builder(
+                            controller: scrollController,
+                            itemCount: enrollmentSummary.enrolledProfiles!.length,
+                            itemBuilder: (context, index) {
+                              final enrolledProfile = enrollmentSummary.enrolledProfiles![index];
+                              final enrollmentDateStr = enrolledProfile.enrollmentDate != null
+                                  ? "${enrolledProfile.enrollmentDate!.day}/${enrolledProfile.enrollmentDate!.month}/${enrolledProfile.enrollmentDate!.year}"
+                                  : 'Sin fecha';
+                              
+                              return Card(
+                                margin: const EdgeInsets.symmetric(vertical: 4),
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: Colors.green,
+                                    child: Text(
+                                      enrolledProfile.profileEmail.substring(0, 1).toUpperCase(),
+                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  title: Text(
+                                    enrolledProfile.profileName ?? enrolledProfile.profileEmail,
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('📧 ${enrolledProfile.profileEmail}'),
+                                      Text('👤 Propietario: ${enrolledProfile.userEmail}'),
+                                      Text('📅 Asignado: $enrollmentDateStr'),
+                                    ],
+                                  ),
+                                  trailing: IconButton(
+                                    onPressed: () => _deleteIndividualEnrollment(
+                                      controller,
+                                      enrolledProfile.enrollmentId,
+                                      enrollmentSummary.categoryName ?? 'Categoría'
+                                    ),
                                     icon: const Icon(Icons.delete, color: Colors.red),
                                     tooltip: 'Eliminar asignación',
-                                  )
-                                : const Icon(Icons.info_outline, color: Colors.grey),
+                                  ),
+                                  isThreeLine: true,
+                                ),
+                              );
+                            },
+                          )
+                        : ListView.builder(
+                            controller: scrollController,
+                            itemCount: enrollmentSummary.categoryEnrollmentIds?.length ?? 0,
+                            itemBuilder: (context, index) {
+                              final enrollmentId = enrollmentSummary.categoryEnrollmentIds![index];
+                              return Card(
+                                margin: const EdgeInsets.symmetric(vertical: 4),
+                                child: ListTile(
+                                  leading: const CircleAvatar(
+                                    backgroundColor: Colors.orange,
+                                    child: Icon(Icons.person, color: Colors.white),
+                                  ),
+                                  title: Text(
+                                    'Perfil asignado #${index + 1}',
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('ID de asignación: $enrollmentId'),
+                                      Text('Categoría: ${enrollmentSummary.categoryName}'),
+                                      const Text(
+                                        'ℹ️ Información detallada no disponible',
+                                        style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: IconButton(
+                                    onPressed: () => _deleteIndividualEnrollment(
+                                      controller,
+                                      enrollmentId,
+                                      enrollmentSummary.categoryName ?? 'Categoría'
+                                    ),
+                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    tooltip: 'Eliminar asignación',
+                                  ),
+                                  isThreeLine: true,
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
                   ),
                 ],
               ),

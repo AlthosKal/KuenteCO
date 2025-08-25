@@ -119,9 +119,124 @@ class CategoryService {
     
     print('📌 CategoryService: /enroll/user data list length: ${dataList.length}');
     
-    return dataList
-        .map((e) => CategoryEnrollmentSummaryDTO.fromJson(e as Map<String, dynamic>))
-        .toList();
+    // PASO 1: Agrupar por categoría ya que el backend envía un elemento por perfil
+    Map<String, List<Map<String, dynamic>>> groupedByCategory = {};
+    
+    for (final item in dataList) {
+      final itemMap = item as Map<String, dynamic>;
+      final categoryName = itemMap['categoryName'] as String;
+      
+      if (!groupedByCategory.containsKey(categoryName)) {
+        groupedByCategory[categoryName] = [];
+      }
+      groupedByCategory[categoryName]!.add(itemMap);
+    }
+    
+    print('📌 CategoryService: Grouped into ${groupedByCategory.length} categories');
+    
+    // PASO 2: Crear CategoryEnrollmentSummaryDTO agrupados
+    List<CategoryEnrollmentSummaryDTO> result = [];
+    
+    groupedByCategory.forEach((categoryName, categoryItems) {
+      print('📌 CategoryService: Processing category "$categoryName" with ${categoryItems.length} profiles');
+      
+      // Combinar todos los enrollmentIds de esta categoría
+      List<int> allEnrollmentIds = [];
+      List<EnrolledProfileSummaryDTO> enrolledProfiles = [];
+      
+      // Usar el primer item para obtener información base de la categoría
+      final firstItem = categoryItems.first;
+      
+      for (final item in categoryItems) {
+        // Agregar enrollmentIds de este item
+        if (item['categoryEnrollmentIds'] != null) {
+          final ids = (item['categoryEnrollmentIds'] as List<dynamic>)
+              .map((e) => e as int)
+              .toList();
+          allEnrollmentIds.addAll(ids);
+        }
+        
+        // Crear perfil para este item
+        if (item['categoryEnrollmentIds'] != null && (item['categoryEnrollmentIds'] as List).isNotEmpty) {
+          final enrollmentId = (item['categoryEnrollmentIds'] as List)[0] as int;
+          enrolledProfiles.add(EnrolledProfileSummaryDTO(
+            enrollmentId: enrollmentId,
+            profileEmail: item['profileName'] ?? 'Perfil #$enrollmentId',
+            profileName: item['profileName'] ?? 'Perfil #$enrollmentId',
+            userEmail: 'Usuario propietario',
+            enrollmentDate: item['firstEnrollmentDate'] != null
+                ? DateTime.parse(item['firstEnrollmentDate'])
+                : null,
+          ));
+        }
+      }
+      
+      // Crear el DTO agrupado
+      final groupedDTO = CategoryEnrollmentSummaryDTO(
+        categoryId: null,
+        categoryName: categoryName,
+        categoryOwnerId: firstItem['ownerUserId']?.toString(),
+        ownerUserId: firstItem['ownerUserId']?.toString(),
+        enrolledUsersCount: null,
+        enrolledProfilesCount: categoryItems.length,
+        totalEnrollments: allEnrollmentIds.length,
+        firstEnrollmentDate: _getEarliestDate(categoryItems, 'firstEnrollmentDate'),
+        lastEnrollmentDate: _getLatestDate(categoryItems, 'lastEnrollmentDate'),
+        categoryStartDate: firstItem['categoryRegisterDate'] != null
+            ? DateTime.parse(firstItem['categoryRegisterDate'])
+            : null,
+        categoryFinishDate: null,
+        categoryStatus: _mapCategoryState(firstItem['categoryState']),
+        categoryEnrollmentIds: allEnrollmentIds,
+        enrolledProfiles: enrolledProfiles,
+      );
+      
+      result.add(groupedDTO);
+      print('✅ CategoryService: Created grouped DTO for "$categoryName" with ${enrolledProfiles.length} profiles');
+    });
+    
+    return result;
+  }
+  
+  // Métodos auxiliares para fechas
+  DateTime? _getEarliestDate(List<Map<String, dynamic>> items, String dateField) {
+    DateTime? earliest;
+    for (final item in items) {
+      if (item[dateField] != null) {
+        final date = DateTime.parse(item[dateField]);
+        if (earliest == null || date.isBefore(earliest)) {
+          earliest = date;
+        }
+      }
+    }
+    return earliest;
+  }
+  
+  DateTime? _getLatestDate(List<Map<String, dynamic>> items, String dateField) {
+    DateTime? latest;
+    for (final item in items) {
+      if (item[dateField] != null) {
+        final date = DateTime.parse(item[dateField]);
+        if (latest == null || date.isAfter(latest)) {
+          latest = date;
+        }
+      }
+    }
+    return latest;
+  }
+  
+  // Método auxiliar para mapear el estado de la categoría
+  String? _mapCategoryState(dynamic state) {
+    if (state == null) return null;
+    switch (state.toString().toUpperCase()) {
+      case 'ACTIVE':
+        return 'ACTIVA';
+      case 'INACTIVE':
+      case 'CANCELLED':
+        return 'FINALIZADA';
+      default:
+        return state.toString();
+    }
   }
 
   // ✅ POST /category/add
