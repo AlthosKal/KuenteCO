@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
-import '../../controllers/user_controller.dart';
-import '../../dto/app/image/image_dto.dart';
+import '../../../controllers/user_controller.dart';
+import '../../../dto/app/image/image_dto.dart';
 
 class UserImageWidget extends StatefulWidget {
   final UserController userController;

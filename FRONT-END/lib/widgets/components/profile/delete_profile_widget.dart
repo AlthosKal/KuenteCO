@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/services/app/profile_service.dart';
+import '../../../core/services/app/profile_service.dart';
 
 class DeleteProfileButton extends StatefulWidget {
   final int profileId;

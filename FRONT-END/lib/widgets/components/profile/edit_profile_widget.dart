@@ -1,11 +1,11 @@
+import 'package:KuenteCO/widgets/components/profile/profile_image_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:KuenteCO/widgets/profile/profile_image_widget.dart';
-import '../../controllers/profile_controller.dart';
-import '../../dto/app/profile/profile_detail_dto.dart';
-import '../../dto/app/profile/update_profile_dto.dart';
-import '../../screens/auth/verification_code_email_view.dart';
-import '../common/primary_buttom_widget.dart';
+import '../../../controllers/profile_controller.dart';
+import '../../../dto/app/profile/profile_detail_dto.dart';
+import '../../../dto/app/profile/update_profile_dto.dart';
+import '../../../screens/auth/verification_code_email_view.dart';
+import '../../common/primary_buttom_widget.dart';
 
 class EditProfile extends StatefulWidget {
   final ProfileDetailDTO profile;

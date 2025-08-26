@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../core/services/app/auth_service.dart';
-import '../../routes/app_routes.dart';
+import '../../../core/services/app/auth_service.dart';
+import '../../../routes/app_routes.dart';
 
-class UserButtomPersonalWidget extends StatelessWidget {
+class ProfileButtonBusiness extends StatelessWidget {
   final String? profileImageUrl;
 
-  const UserButtomPersonalWidget({
+  const ProfileButtonBusiness({
     super.key,
     this.profileImageUrl,
   });
@@ -13,19 +13,23 @@ class UserButtomPersonalWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
-      tooltip: 'Opciones de cuenta personal',
+      tooltip: 'Opciones de cuenta de Negocio',
       child: (profileImageUrl != null && profileImageUrl!.isNotEmpty)
           ? CircleAvatar(
         backgroundImage: NetworkImage(profileImageUrl!),
       )
           : const CircleAvatar(
         backgroundColor: Colors.white,
-        child: Icon(Icons.person),
+        child: Icon(Icons.business),
       ),
       itemBuilder: (BuildContext context) => const [
         PopupMenuItem<String>(
           value: 'account',
           child: Text('Mis datos'),
+        ),
+        PopupMenuItem<String>(
+          value: 'add_profile',
+          child: Text('Perfiles'),
         ),
         PopupMenuItem<String>(
           value: 'subscription',
@@ -40,6 +44,9 @@ class UserButtomPersonalWidget extends StatelessWidget {
         switch (value) {
           case 'account':
             Navigator.pushNamed(context, AppRoutes.accountScreen);
+            break;
+          case 'add_profile':
+            Navigator.pushNamed(context, AppRoutes.profileScreen);
             break;
           case 'subscription':
             Navigator.pushNamed(context, AppRoutes.suscriptions);

@@ -1,5 +1,3 @@
-import 'package:KuenteCO/widgets/user/user_buttom_business_widget.dart';
-import 'package:KuenteCO/widgets/user/user_buttom_personal_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../core/services/app/auth_service.dart';
@@ -9,7 +7,9 @@ import '../../../dto/app/profile/profile_detail_dto.dart';
 import '../../../screens/home/logged_home_business_view.dart';
 import '../../../screens/home/logged_home_personal_view.dart';
 import '../../../screens/home/logged_home_profile_view.dart';
-import '../../profile/profile_buttom_widget.dart';
+import '../../components/profile/profile_buttom_widget.dart';
+import '../../components/user/user_buttom_business_widget.dart';
+import '../../components/user/user_buttom_personal_widget.dart';
 
 class KuentecoLoggedNavbar extends StatefulWidget {
   final String currentRoute;
