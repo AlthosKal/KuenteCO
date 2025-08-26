@@ -40,6 +40,7 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
     private final SlaveMercadoPagoPaymentRepository slaveMercadoPagoPaymentRepository;
     private final MercadoPagoWebhookValidationService validationService;
 
+
     @Override
     @Async
     @Transactional
@@ -82,12 +83,8 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
             }
 
             log.info("Webhook de preapproval procesado exitosamente: {}", preapprovalId);
-
         } catch (MPException | MPApiException e) {
-            log.error(
-                    "Error al obtener datos del preapproval desde MercadoPago: {}",
-                    e.getMessage(),
-                    e);
+            log.error("Error al obtener datos del preapproval desde MercadoPago: {}", e.getMessage(), e);
         } catch (Exception e) {
             log.error("Error procesando webhook de preapproval: {}", e.getMessage(), e);
         }
@@ -112,10 +109,8 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
             }
 
             log.info("Webhook de payment procesado exitosamente: {}", paymentId);
-
         } catch (MPException | MPApiException e) {
-            log.error(
-                    "Error al obtener datos del payment desde MercadoPago: {}", e.getMessage(), e);
+            log.error("Error al obtener datos del payment desde MercadoPago: {}", e.getMessage(), e);
         } catch (Exception e) {
             log.error("Error procesando webhook de payment: {}", e.getMessage(), e);
         }
