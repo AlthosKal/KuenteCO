@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../utils/formatters.dart';
+import '../../../utils/formatters.dart';
 
 class TransactionFilterWidget extends StatefulWidget {
   final Function(Map<String, dynamic>) onFiltersChanged;

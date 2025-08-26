@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import '../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
-import '../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
-import '../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
-import '../../dto/app/extra/description_transaction_extra.dart';
-import '../../utils/enum/transaction_type_enum.dart';
-import '../../utils/formatters.dart';
+import '../../../dto/app/extra/description_transaction_extra.dart';
+import '../../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
+import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
+import '../../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
+import '../../../utils/enum/transaction_type_enum.dart';
+import '../../../utils/formatters.dart';
 
 class TransactionFormWidget extends StatefulWidget {
   final TransactionDetailDTO? transaction; // Si es null, es para crear nueva transacción

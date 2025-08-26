@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../../../controllers/category_controller.dart';
 import '../../../dto/app/category/category_dto.dart';
 import '../../../dto/app/extra/description_category_extra.dart';
-import '../../../utils/enum/state_enum.dart' as state_enum;
 
 class EditCategoryWidget extends StatefulWidget {
   final CategoryDTO category;

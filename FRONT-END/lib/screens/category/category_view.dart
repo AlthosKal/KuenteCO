@@ -1,19 +1,19 @@
-import 'package:KuenteCO/widgets/common/category/create_multiple_categories_widget.dart';
-import 'package:KuenteCO/widgets/common/category/delete_multiple_categories_widget.dart';
-import 'package:KuenteCO/widgets/common/category/edit_multiple_categories_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../controllers/category_controller.dart';
-import '../../widgets/common/category/category_list_widget.dart';
-import '../../widgets/common/category/create_category_widget.dart';
-import '../../widgets/common/category/delete_category_widget.dart';
-import '../../widgets/common/category/delete_enrollment_widget.dart' as ComponentEnrollmentDelete;
-import '../../widgets/common/category/edit_category_widget.dart';
-import '../../widgets/common/category/assign_category_widget.dart';
-import '../../widgets/common/category/batch_assign_category_widget.dart';
 import '../../core/services/app/auth_service.dart';
 import '../../dto/app/category/category_enrollment_dto.dart';
+import '../../widgets/components/category/assign_category_widget.dart';
+import '../../widgets/components/category/batch_assign_category_widget.dart';
+import '../../widgets/components/category/category_list_widget.dart';
+import '../../widgets/components/category/create_category_widget.dart';
+import '../../widgets/components/category/create_multiple_categories_widget.dart';
+import '../../widgets/components/category/delete_category_widget.dart';
+import '../../widgets/components/category/delete_enrollment_widget.dart' as ComponentEnrollmentDelete;
+import '../../widgets/components/category/delete_multiple_categories_widget.dart';
+import '../../widgets/components/category/edit_category_widget.dart';
+import '../../widgets/components/category/edit_multiple_categories_widget.dart';
 
 class CategoryView extends StatefulWidget {
   const CategoryView({super.key});

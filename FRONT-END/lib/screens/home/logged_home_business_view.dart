@@ -4,7 +4,7 @@ import '../../widgets/common/background/background_widget.dart';
 import '../../widgets/common/blurred_card_widget.dart';
 import '../../widgets/common/footer/footer_logged_widget.dart';
 import '../../widgets/common/navbar/navbar_logged_widget.dart';
-import '../../widgets/common/category/category_card_widget.dart';
+import '../../widgets/components/category/category_card_widget.dart';
 
 class LoggedHomeBusinessView extends StatefulWidget {
   final String userName;

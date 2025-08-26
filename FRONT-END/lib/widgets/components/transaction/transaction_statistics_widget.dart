@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../controllers/transaction_controller.dart';
-import '../../dto/app/transaction/kuenteco/transaction_summary_dto.dart';
-import '../../utils/formatters.dart';
+import '../../../controllers/transaction_controller.dart';
+import '../../../utils/formatters.dart';
 
 class TransactionStatisticsWidget extends StatefulWidget {
   const TransactionStatisticsWidget({Key? key}) : super(key: key);

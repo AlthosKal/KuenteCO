@@ -5,8 +5,8 @@ import '../../dto/app/profile/profile_detail_dto.dart';
 import '../../widgets/common/background/background_widget.dart';
 import '../../widgets/common/blurred_card_widget.dart';
 import '../../widgets/common/footer/footer_logged_widget.dart';
-import '../../widgets/common/category/category_card_widget.dart';
 import '../../core/services/app/profile_service.dart';
+import '../../widgets/components/category/category_card_widget.dart';
 
 class LoggedHomeProfileView extends StatefulWidget {
   final String profileName;
