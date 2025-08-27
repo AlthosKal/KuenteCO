@@ -7,7 +7,7 @@ import '../../../utils/enum/state_enum.dart' as state_enum;
 class EditMultipleCategoriesWidget extends StatefulWidget {
   final CategoryController controller;
   final List<CategoryDTO> categoriesToEdit;
-  
+
   const EditMultipleCategoriesWidget({
     Key? key,
     required this.controller,
@@ -38,6 +38,11 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
         registerDate: category.registerDate,
       );
     }).toList();
+  }
+
+  // Método helper para obtener nombre del estado
+  String _getStateDisplayName(state_enum.State state) {
+    return state.name; // Usar directamente .name de la extensión
   }
 
   @override
@@ -73,7 +78,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
               ],
             ),
             const SizedBox(height: 16),
-            
+
             Text(
               'Editando ${editableCategories.length} categorías',
               style: TextStyle(
@@ -81,9 +86,9 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
                 color: Colors.blueGrey[600],
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Categories list
             Expanded(
               child: Form(
@@ -108,7 +113,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
                               ),
                             ),
                             const SizedBox(height: 12),
-                            
+
                             // Name field
                             TextFormField(
                               initialValue: editableCategories[index].name,
@@ -138,9 +143,9 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
                                 );
                               },
                             ),
-                            
+
                             const SizedBox(height: 12),
-                            
+
                             // Budget field
                             TextFormField(
                               initialValue: editableCategories[index].description.assignedBudget.toString(),
@@ -179,10 +184,10 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
                                 );
                               },
                             ),
-                            
+
                             const SizedBox(height: 12),
-                            
-                            // State dropdown
+
+                            // State dropdown - CORREGIDO
                             DropdownButtonFormField<state_enum.State>(
                               value: editableCategories[index].description.state,
                               decoration: InputDecoration(
@@ -195,7 +200,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
                               items: state_enum.State.values.map((state) {
                                 return DropdownMenuItem<state_enum.State>(
                                   value: state,
-                                  child: Text(state.name),
+                                  child: Text(_getStateDisplayName(state)), // ✅ ARREGLADO: Usar método helper
                                 );
                               }).toList(),
                               onChanged: (state_enum.State? newValue) {
@@ -223,9 +228,9 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Action buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -280,7 +285,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
 
       // Close loading dialog
       Navigator.of(context).pop();
-      
+
       // Close edit dialog
       Navigator.of(context).pop();
 
@@ -295,7 +300,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
     } catch (e) {
       // Close loading dialog
       Navigator.of(context).pop();
-      
+
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

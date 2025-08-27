@@ -6,9 +6,9 @@ import '../../controllers/login_controller.dart';
 import '../../routes/app_routes.dart';
 import '../../widgets/common/background/animated_background_scaffold_widget.dart';
 import '../../widgets/common/blurred_card_widget.dart';
+import '../../widgets/common/buttoms/primary_buttom_widget.dart';
 import '../../widgets/common/form/form_title_text_widget.dart';
 import '../../widgets/common/form/password_form_widget.dart';
-import '../../widgets/common/primary_buttom_widget.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
