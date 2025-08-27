@@ -34,22 +34,18 @@ class CategoryController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clearError() {
+    errorMessage = null;
+    notifyListeners();
+  }
+
   // 📌 Cargar todas las categorías
   Future<void> loadCategories() async {
     _setLoading(true);
     try {
-      print('🔄 CategoryController: Loading categories from server...');
       categories = await _service.getAllCategories();
-      print('✅ CategoryController: Loaded ${categories.length} categories from server');
-      
-      // Log de todas las categorías para debug
-      for (int i = 0; i < categories.length; i++) {
-        print('   Category $i: ID=${categories[i].id}, Name="${categories[i].name}", State=${categories[i].description.state.name}');
-      }
-      
       _setError(null);
     } catch (e) {
-      print('❌ CategoryController: Error loading categories: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
@@ -262,12 +258,15 @@ class CategoryController extends ChangeNotifier {
       // Eliminar la categoría en el servidor
       await _service.deleteCategory(id);
       
-      // Recargar toda la lista desde el servidor para asegurar consistencia
-      categories = await _service.getAllCategories();
-      
+      // Limpiar error antes de recargar
       _setError(null);
+      
+      // Recargar toda la lista desde el servidor
+      await loadCategories();
+      
     } catch (e) {
       _setError(e.toString());
+      rethrow;
     } finally {
       _setLoading(false);
     }
