@@ -43,6 +43,7 @@ cloudinary:
 mercadopago:
   access-token: ${MERCADOPAGO_ACCESS_TOKEN}
   public-key: ${MERCADOPAGO_PUBLIC_KEY}
+  environment: ${MERCADOPAGO_ENVIRONMENT:sandbox}
   webhooks:
     base-url: ${MERCADOPAGO_WEBHOOK_BASE_URL}
     preapproval-url: ${MERCADOPAGO_WEBHOOK_PREAPPROVAL_URL}
