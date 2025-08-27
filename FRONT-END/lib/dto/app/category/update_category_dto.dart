@@ -17,8 +17,10 @@ class UpdateCategoryDTO {
     return {
       'id': id,
       'name': name,
-      'assignedBudget': assignedBudget,
-      'state': state,
+      'description': {
+        'assignedBudget': assignedBudget,
+        'state': state,
+      },
       if (budgetId != null) 'budgetId': budgetId,
     };
   }
@@ -33,13 +35,13 @@ class UpdateCategoryDTO {
     );
   }
 
-  // Método de conveniencia para crear desde CategoryDTO
+  // Método de conveniencia para crear desde CategoryDTO - CORREGIDO
   factory UpdateCategoryDTO.fromCategoryDTO(dynamic categoryDto) {
     return UpdateCategoryDTO(
       id: categoryDto.id,
       name: categoryDto.name,
       assignedBudget: categoryDto.description.assignedBudget,
-      state: categoryDto.description.state.name,
+      state: categoryDto.description.state.toString().split('.').last,
       budgetId: categoryDto.budgetId,
     );
   }
