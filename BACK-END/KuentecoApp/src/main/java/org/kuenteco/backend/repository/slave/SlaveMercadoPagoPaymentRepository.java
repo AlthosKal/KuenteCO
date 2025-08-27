@@ -1,9 +1,11 @@
 package org.kuenteco.backend.repository.slave;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.kuenteco.backend.entity.MercadoPagoPayment;
 import org.kuenteco.backend.entity.MercadoPagoPreapproval;
+import org.kuenteco.backend.enums.PaymentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,4 +18,7 @@ public interface SlaveMercadoPagoPaymentRepository
             MercadoPagoPreapproval preapproval);
 
     Optional<MercadoPagoPayment> findByPaymentId(String paymentId);
+
+    List<MercadoPagoPayment> findByStatusAndDateCreatedBefore(
+            PaymentStatus status, LocalDateTime dateCreatedBefore);
 }

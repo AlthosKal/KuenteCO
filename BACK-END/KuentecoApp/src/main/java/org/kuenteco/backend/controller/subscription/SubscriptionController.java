@@ -170,7 +170,6 @@ public class SubscriptionController implements SubscriptionResource {
     // WEBHOOKS DE MERCADOPAGO
     // ================================
 
-
     @PostMapping("/webhook")
     public ResponseEntity<String> handleWebhook(
             @RequestBody Map<String, Object> notification,
@@ -197,15 +196,20 @@ public class SubscriptionController implements SubscriptionResource {
             }
 
             // Determinar tipo de webhook y procesar
-            if (isPreapprovalNotification(action, type)) {
+            if ("subscription_preapproval".equals(type)) {
                 log.info("Procesando webhook de preapproval: ID={}, action={}", id, action);
                 mercadoPagoWebhookService.processPreapprovalWebhook(id, action, notification);
-            }
-            else if (isPaymentNotification(action, type)) {
+            } else if ("subscription_authorized_payment".equals(type)) {
+                log.info(
+                        "Procesando webhook de subscription_authorized_payment: ID={}, action={}",
+                        id,
+                        action);
+                mercadoPagoWebhookService.processSubscriptionAuthorizedPaymentWebhook(
+                        id, action, notification);
+            } else if ("payment".equals(type)) {
                 log.info("Procesando webhook de payment: ID={}, action={}", id, action);
                 mercadoPagoWebhookService.processPaymentWebhook(id, action, notification);
-            }
-            else {
+            } else {
                 log.info("Procesando webhook genérico: action={}, type={}", action, type);
                 mercadoPagoWebhookService.processGenericWebhook(notification);
             }
@@ -218,27 +222,23 @@ public class SubscriptionController implements SubscriptionResource {
         }
     }
 
-    /**
-     * Determina si la notificación corresponde a un preapproval
-     */
+    /** Determina si la notificación corresponde a un preapproval */
     private boolean isPreapprovalNotification(String action, String type) {
         if ("subscription".equals(type) || "preapproval".equals(type)) {
             return true;
         }
         if (action != null) {
-            return action.contains("preapproval") ||
-                    "authorized".equals(action) ||
-                    "pending".equals(action) ||
-                    "cancelled".equals(action) ||
-                    "rejected".equals(action) ||
-                    "paused".equals(action);
+            return action.contains("preapproval")
+                    || "authorized".equals(action)
+                    || "pending".equals(action)
+                    || "cancelled".equals(action)
+                    || "rejected".equals(action)
+                    || "paused".equals(action);
         }
         return false;
     }
 
-    /**
-     * Determina si la notificación corresponde a un payment
-     */
+    /** Determina si la notificación corresponde a un payment */
     private boolean isPaymentNotification(String action, String type) {
         if ("payment".equals(type)) {
             return true;
