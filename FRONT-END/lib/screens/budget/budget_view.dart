@@ -1,31 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../../controllers/category_controller.dart';
+import '../../controllers/budget_controller.dart';
 import '../../core/services/app/auth_service.dart';
-import '../../dto/app/category/category_enrollment_dto.dart';
-import '../../widgets/components/category/assign_category_widget.dart';
-import '../../widgets/components/category/batch_assign_category_widget.dart';
-import '../../widgets/components/category/category_list_widget.dart';
-import '../../widgets/components/category/create_category_widget.dart';
-import '../../widgets/components/category/create_multiple_categories_widget.dart';
-import '../../widgets/components/category/delete_category_widget.dart';
-import '../../widgets/components/category/delete_enrollment_widget.dart' as ComponentEnrollmentDelete;
-import '../../widgets/components/category/delete_multiple_categories_widget.dart';
-import '../../widgets/components/category/edit_category_widget.dart';
-import '../../widgets/components/category/edit_multiple_categories_widget.dart';
-import '../../widgets/common/buttoms/primary_buttom_widget.dart';
-import '../../widgets/components/category/enrollment_management_widget.dart';
+import '../../widgets/components/budget/budget_list_widget.dart';
+import '../../widgets/components/budget/create_budget_widget.dart';
+import '../../widgets/components/budget/edit_budget_widget.dart';
+import '../../widgets/components/budget/delete_budget_widget.dart';
 import '../../mixins/multi_selection_mixin.dart';
 
-class CategoryView extends StatefulWidget {
-  const CategoryView({super.key});
+class BudgetView extends StatefulWidget {
+  const BudgetView({super.key});
 
   @override
-  State<CategoryView> createState() => _CategoryViewState();
+  State<BudgetView> createState() => _BudgetViewState();
 }
 
-class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
+class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
   final _storage = const FlutterSecureStorage();
   bool _isBusinessUser = false;
 
@@ -40,40 +31,34 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
   
   /// Cargar datos según el rol del usuario
   Future<void> _loadDataBasedOnRole() async {
-    final categoryController = Provider.of<CategoryController>(context, listen: false);
+    print('BudgetView: _loadDataBasedOnRole() called');
+    final budgetController = Provider.of<BudgetController>(context, listen: false);
     
     try {
       final role = await _storage.read(key: 'role');
+      print('BudgetView: User role detected: $role');
       
       if (role == 'ROLE_PROFILE') {
-        // Si es un perfil, cargar sus inscripciones de categorías
-        await categoryController.loadProfileEnrollments();
+        // Si es un perfil, cargar sus enrollments de presupuestos
+        print('BudgetView: Loading enrollments for profile');
+        await budgetController.loadEnrollments();
       } else {
-        // Si es un usuario regular, cargar sus categorías
-        await categoryController.loadCategories();
-        
-        // Si es usuario business, también cargar enrollment summaries (opcional)
-        if (_isBusinessUser) {
-          try {
-            await categoryController.loadEnrollments();
-            print('✅ CategoryView: Enrollment summaries loaded successfully');
-          } catch (enrollmentError) {
-            print('⚠️ CategoryView: Error loading enrollment summaries: $enrollmentError');
-            print('📌 CategoryView: Continuing without enrollment summaries - categories will still be available');
-            // No es crítico si fallan los enrollment summaries
-            // Las categorías seguirán siendo visibles y funcionales
-          }
-        }
+        // Si es un usuario regular, cargar sus presupuestos
+        print('BudgetView: Loading budgets for regular user');
+        await budgetController.loadBudgets();
       }
+      print('BudgetView: Data loading completed successfully');
     } catch (e) {
-      print('Error loading data in CategoryView: $e');
+      print('BudgetView: Error loading data: $e');
       // No hacer fallback para perfiles, solo para usuarios
       final role = await _storage.read(key: 'role');
       if (role != 'ROLE_PROFILE') {
+        print('BudgetView: Attempting fallback loadBudgets()');
         try {
-          await categoryController.loadCategories();
+          await budgetController.loadBudgets();
+          print('BudgetView: Fallback loadBudgets() succeeded');
         } catch (fallbackError) {
-          print('CategoryView: Fallback also failed: $fallbackError');
+          print('BudgetView: Fallback also failed: $fallbackError');
         }
       }
     }
@@ -104,52 +89,22 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     }
   }
 
-  Future<void> _handleDeleteCategory(category) async {
-    final result = await DeleteCategoryWidget.showDeleteDialog(context, category);
+  Future<void> _handleDeleteBudget(budget) async {
+    final result = await DeleteBudgetWidget.showDeleteDialog(context, budget);
     if (result == true) {
       // La eliminación fue exitosa, la lista se actualizará automáticamente
-      // gracias al Provider y el controlador
     }
   }
 
-  Future<void> _handleEditCategory(category) async {
-    final result = await EditCategoryWidget.showEditDialog(context, category);
+  Future<void> _handleEditBudget(budget) async {
+    final result = await EditBudgetWidget.showEditDialog(context, budget);
     if (result == true) {
       // La edición fue exitosa, la lista se actualizará automáticamente
-      // gracias al Provider y el controlador
     }
   }
 
-  Future<void> _handleAssignCategory(category) async {
-    final result = await AssignCategoryWidget.showAssignDialog(context, category);
-    if (result == true) {
-      // La asignación fue exitosa - para usuarios business necesitamos
-      // recargar los enrollment summaries para actualizar los contadores
-      if (_isBusinessUser) {
-        final categoryController = Provider.of<CategoryController>(context, listen: false);
-        await categoryController.loadEnrollments();
-      }
-    }
-  }
-  
-  // Método para manejar eliminación individual de asignaciones
-  Future<void> _handleDeleteSingleEnrollment(enrollment) async {
-    final categoryController = Provider.of<CategoryController>(context, listen: false);
-    
-    final result = await ComponentEnrollmentDelete.EnrollmentDeleteWidget.showDeleteSingleDialog(
-      context,
-      categoryController,
-      enrollment,
-    );
-    
-    if (result == true) {
-      // La eliminación fue exitosa, recargar los datos
-      await _loadDataBasedOnRole();
-    }
-  }
-
-  void _showCategoryDetail(BuildContext context, category) {
-    final registerDateStr = "${category.registerDate.day}/${category.registerDate.month}/${category.registerDate.year}";
+  void _showBudgetDetail(BuildContext context, budget) {
+    final registerDateStr = "${budget.creationDate.day}/${budget.creationDate.month}/${budget.creationDate.year}";
 
     showModalBottomSheet(
       context: context,
@@ -174,17 +129,18 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
               ),
               const SizedBox(height: 10),
               Text(
-                category.name,
+                budget.name,
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const Divider(),
-              Text("📅 Fecha de registro: $registerDateStr"),
-              Text("💰 Presupuesto asignado: \$${category.description.assignedBudget}"),
-              Text("💰 Presupuesto ID: ${category.budgetId ?? 'Sin asignar'}"),
-              Text("🔄 Estado: ${category.description.state}"),
+              Text("📅 Fecha de creación: $registerDateStr"),
+              Text("💰 Monto total: \$${budget.totalAmount}"),
+              Text("📊 Estado: ${budget.status}"),
+              if (budget.description != null)
+                Text("📝 Descripción: ${budget.description}"),
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 onPressed: () {
@@ -201,13 +157,6 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     );
   }
   
-  /// Obtener elementos a mostrar según el rol
-  List<dynamic> _getItemsToDisplay(CategoryController controller) {
-    // Para perfiles, usar enrollments pero mostrar como si fueran categorías
-    // Para usuarios, usar categories normal
-    return controller.categories;
-  }
-  
   /// Verificar si el usuario actual es un perfil
   Future<bool> _isProfile() async {
     final role = await _storage.read(key: 'role');
@@ -216,69 +165,43 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
   
   // ============= BATCH OPERATIONS =============
   
-  // Batch operations for categories
   Future<void> _showBatchCreateDialog() async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => const CreateMultipleCategoriesWidget(),
+      builder: (context) => const CreateBudgetWidget(),
     );
     
-    // Si se crearon categorías exitosamente, recargar la lista
     if (result == true) {
       await _loadDataBasedOnRole();
     }
   }
   
-  Future<void> _showBatchEditDialog(CategoryController controller) async {
-    final selectedCategories = controller.categories
-        .where((category) => selectedCategoryIds.contains(category.id))
+  Future<void> _showBatchEditDialog(BudgetController controller) async {
+    final selectedBudgets = controller.budgets
+        .where((budget) => selectedCategoryIds.contains(budget.id))
         .toList();
         
-    if (selectedCategories.isEmpty) {
-      _showNoSelectionSnackBar('No hay categorías seleccionadas para editar');
+    if (selectedBudgets.isEmpty) {
+      _showNoSelectionSnackBar('No hay presupuestos seleccionados para editar');
       return;
     }
     
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => EditMultipleCategoriesWidget(
-        controller: controller,
-        categoriesToEdit: selectedCategories,
-      ),
-    );
-    
+    // Mostrar diálogo de edición múltiple aquí
     clearSelection();
-    
-    // Si se editaron categorías exitosamente, recargar la lista
-    if (result == true) {
-      await _loadDataBasedOnRole();
-    }
   }
   
-  Future<void> _showBatchDeleteDialog(CategoryController controller) async {
-    final selectedCategories = controller.categories
-        .where((category) => selectedCategoryIds.contains(category.id))
+  Future<void> _showBatchDeleteDialog(BudgetController controller) async {
+    final selectedBudgets = controller.budgets
+        .where((budget) => selectedCategoryIds.contains(budget.id))
         .toList();
         
-    if (selectedCategories.isEmpty) {
-      _showNoSelectionSnackBar('No hay categorías seleccionadas para eliminar');
+    if (selectedBudgets.isEmpty) {
+      _showNoSelectionSnackBar('No hay presupuestos seleccionados para eliminar');
       return;
     }
     
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => DeleteMultipleCategoriesWidget(
-        controller: controller,
-        categoriesToDelete: selectedCategories,
-      ),
-    );
-    
+    // Mostrar diálogo de eliminación múltiple aquí
     clearSelection();
-    
-    // Si se eliminaron categorías exitosamente, recargar la lista
-    if (result == true) {
-      await _loadDataBasedOnRole();
-    }
   }
   
   void _showNoSelectionSnackBar(String message) {
@@ -289,12 +212,10 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
       ),
     );
   }
-  
-  // Se movió al EnrollmentManagementWidget
-  
+
   // ============= APP BAR BUILDER =============
   
-  PreferredSizeWidget _buildAppBar(CategoryController controller, bool isProfile) {
+  PreferredSizeWidget _buildAppBar(BudgetController controller, bool isProfile) {
     // Los perfiles nunca entran en modo selección, solo tienen AppBar simple
     if (isSelectionMode && !isProfile) {
       // Selection mode AppBar with batch operations (solo para usuarios regulares)
@@ -303,12 +224,12 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
           icon: const Icon(Icons.close),
           onPressed: clearSelection,
         ),
-        title: Text('${selectedCategoryIds.length} seleccionadas'),
+        title: Text('${selectedCategoryIds.length} seleccionados'),
         actions: [
           // Select All button
           IconButton(
             icon: const Icon(Icons.select_all),
-            onPressed: () => selectAllCategories(controller.categories),
+            onPressed: () => selectAllCategories(controller.budgets),
             tooltip: 'Seleccionar todo',
           ),
           
@@ -330,7 +251,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                   value: 'batch_edit',
                   child: ListTile(
                     leading: Icon(Icons.edit, color: Colors.blue),
-                    title: Text('Editar seleccionadas'),
+                    title: Text('Editar seleccionados'),
                     contentPadding: EdgeInsets.zero,
                   ),
                 ),
@@ -338,7 +259,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                   value: 'batch_delete',
                   child: ListTile(
                     leading: Icon(Icons.delete, color: Colors.red),
-                    title: Text('Eliminar seleccionadas'),
+                    title: Text('Eliminar seleccionados'),
                     contentPadding: EdgeInsets.zero,
                   ),
                 ),
@@ -351,40 +272,31 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     } else {
       // Normal AppBar para perfiles (sin acciones) y usuarios regulares
       return AppBar(
-        title: Text(isProfile ? "Mis Categorías Asignadas" : "Categorías"),
+        title: Text(isProfile ? "Mis Presupuestos Asignados" : "Presupuestos"),
         actions: [
-          // Multi-select toggle button (only for regular users with categories)
-          if (!isProfile && controller.categories.isNotEmpty)
+          // Multi-select toggle button (only for regular users with budgets)
+          if (!isProfile && controller.budgets.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.checklist),
               onPressed: toggleSelectionMode,
               tooltip: 'Selección múltiple',
             ),
           
-          // Enrollment management button (only for business users)
-          if (!isProfile && _isBusinessUser)
-            IconButton(
-              icon: const Icon(Icons.manage_accounts),
-              onPressed: () => EnrollmentManagementWidget.show(context, onEnrollmentChanged: _loadDataBasedOnRole),
-              tooltip: 'Gestionar asignaciones',
-            ),
-          
-          // Batch create button (only for regular users)
+          // Create budget button (only for regular users)
           if (!isProfile)
             IconButton(
               icon: const Icon(Icons.add_box),
               onPressed: _showBatchCreateDialog,
-              tooltip: 'Crear múltiples categorías',
+              tooltip: 'Crear presupuesto',
             ),
         ],
       );
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<CategoryController>(context);
+    final controller = Provider.of<BudgetController>(context);
 
     return FutureBuilder<bool>(
       future: _isProfile(),
@@ -420,12 +332,12 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     );
   }
   
-  /// Construir botón reutilizable para crear categoría
-  Widget _buildCreateCategoryButton(String title, String subtitle) {
+  /// Construir botón reutilizable para crear presupuesto
+  Widget _buildCreateBudgetButton(String title, String subtitle) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: InkWell(
-        onTap: () => _showCreateCategoryDialog(),
+        onTap: () => _showCreateBudgetDialog(),
         borderRadius: BorderRadius.circular(12),
         child: Card(
           elevation: 2,
@@ -436,7 +348,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Colors.purpleAccent.withValues(alpha: 0.3),
+                color: Colors.blueAccent.withValues(alpha: 0.3),
                 width: 1.5,
                 style: BorderStyle.solid,
               ),
@@ -448,13 +360,13 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.purpleAccent.withValues(alpha: 0.15),
+                      color: Colors.blueAccent.withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.add_rounded,
                       size: 24,
-                      color: Colors.purpleAccent,
+                      color: Colors.blueAccent,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -467,7 +379,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.purpleAccent,
+                            color: Colors.blueAccent,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -484,7 +396,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                   const Icon(
                     Icons.arrow_forward_ios_rounded,
                     size: 16,
-                    color: Colors.purpleAccent,
+                    color: Colors.blueAccent,
                   ),
                 ],
               ),
@@ -495,26 +407,26 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     );
   }
   
-  /// Mostrar diálogo para crear categoría
-  Future<void> _showCreateCategoryDialog() async {
+  /// Mostrar diálogo para crear presupuesto
+  Future<void> _showCreateBudgetDialog() async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => const CreateCategoryWidget(),
+      builder: (context) => const CreateBudgetWidget(),
     );
     if (result == true) {
       await _loadDataBasedOnRole();
     }
   }
   
-  /// Vista para usuarios regulares (pueden crear/editar categorías)
-  Widget _buildUserView(CategoryController controller) {
-    if (controller.categories.isEmpty) {
+  /// Vista para usuarios regulares (pueden crear/editar presupuestos)
+  Widget _buildUserView(BudgetController controller) {
+    if (controller.budgets.isEmpty) {
       return _buildEmptyState();
     }
     
     return ListView.builder(
       padding: const EdgeInsets.all(8),
-      itemCount: controller.categories.length + 1, // +1 para el botón de agregar
+      itemCount: controller.budgets.length + 1, // +1 para el botón de agregar
       itemBuilder: (context, index) => _buildUserViewItem(context, controller, index),
     );
   }
@@ -530,13 +442,13 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.category_outlined,
+                    Icons.account_balance_wallet_outlined,
                     size: 64,
                     color: Colors.grey[400],
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No tienes categorías aún',
+                    'No tienes presupuestos aún',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey[600],
@@ -545,7 +457,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Crea tu primera categoría usando el botón de abajo',
+                    'Crea tu primer presupuesto usando el botón de abajo',
                     style: TextStyle(
                       color: Colors.grey[500],
                     ),
@@ -555,44 +467,43 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
               ),
             ),
           ),
-          _buildCreateCategoryButton(
-            'Crear primera categoría',
-            'Toca para comenzar a organizar tus gastos',
+          _buildCreateBudgetButton(
+            'Crear primer presupuesto',
+            'Toca para comenzar a gestionar tu dinero',
           ),
         ],
       ),
     );
   }
   
-  Widget _buildUserViewItem(BuildContext context, CategoryController controller, int index) {
+  Widget _buildUserViewItem(BuildContext context, BudgetController controller, int index) {
     // Si es el último item, mostrar el botón de agregar
-    if (index == controller.categories.length) {
-      return _buildCreateCategoryButton(
-        'Crear nueva categoría',
-        'Toca para agregar una nueva categoría',
+    if (index == controller.budgets.length) {
+      return _buildCreateBudgetButton(
+        'Crear nuevo presupuesto',
+        'Toca para agregar un nuevo presupuesto',
       );
     }
     
-    // Items normales de categorías
-    final category = controller.categories[index];
-    return CategoryListWidget(
-      key: ValueKey(category.id),
-      category: category,
-      onTap: () => _showCategoryDetail(context, category),
-      onEdit: () => _handleEditCategory(category),
-      onDelete: () => _handleDeleteCategory(category),
-      onAssign: _isBusinessUser ? () => _handleAssignCategory(category) : null,
+    // Items normales de presupuestos
+    final budget = controller.budgets[index];
+    return BudgetListWidget(
+      key: ValueKey(budget.id),
+      budget: budget,
+      onTap: () => _showBudgetDetail(context, budget),
+      onEdit: () => _handleEditBudget(budget),
+      onDelete: () => _handleDeleteBudget(budget),
       isSelectionMode: isSelectionMode,
-      isSelected: selectedCategoryIds.contains(category.id),
+      isSelected: selectedCategoryIds.contains(budget.id),
       onSelectionToggle: () {
-        toggleCategorySelection(category.id);
+        toggleCategorySelection(budget.id);
         enterSelectionMode();
       },
     );
   }
   
-  /// Vista para perfiles (solo pueden ver categorías asignadas)
-  Widget _buildProfileView(CategoryController controller) {
+  /// Vista para perfiles (solo pueden ver presupuestos asignados)
+  Widget _buildProfileView(BudgetController controller) {
     return controller.enrollments.isEmpty
         ? Padding(
             padding: const EdgeInsets.all(8),
@@ -601,13 +512,13 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.assignment_ind_outlined,
+                    Icons.account_balance_outlined,
                     size: 64,
                     color: Colors.grey[400],
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No tienes categorías asignadas',
+                    'No tienes presupuestos asignados',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey[600],
@@ -616,7 +527,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Contacta al administrador para que te asigne categorías',
+                    'Contacta al administrador para que te asigne presupuestos',
                     style: TextStyle(
                       color: Colors.grey[500],
                     ),
@@ -643,7 +554,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: Colors.green.withValues(alpha: 0.3),
+                        color: Colors.blue.withValues(alpha: 0.3),
                         width: 1.5,
                         style: BorderStyle.solid,
                       ),
@@ -655,13 +566,13 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.green.withValues(alpha: 0.15),
+                              color: Colors.blue.withValues(alpha: 0.15),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
-                              Icons.assignment_turned_in,
+                              Icons.account_balance,
                               size: 24,
-                              color: Colors.green,
+                              color: Colors.blue,
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -670,16 +581,16 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  enrollment.categoryName,
+                                  enrollment.budgetName,
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.green,
+                                    color: Colors.blue,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'Categoría asignada por ${enrollment.userEmail}',
+                                  'Presupuesto asignado por ${enrollment.userEmail}',
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey,
@@ -687,16 +598,6 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                                 ),
                               ],
                             ),
-                          ),
-                          // Botón para eliminar la asignación individual
-                          IconButton(
-                            onPressed: () => _handleDeleteSingleEnrollment(enrollment),
-                            icon: const Icon(
-                              Icons.link_off,
-                              size: 20,
-                              color: Colors.orange,
-                            ),
-                            tooltip: 'Eliminar asignación',
                           ),
                         ],
                       ),
@@ -707,7 +608,4 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
             },
           );
   }
-  
-  // Métodos de enrollment management movidos a EnrollmentManagementWidget
-  
 }

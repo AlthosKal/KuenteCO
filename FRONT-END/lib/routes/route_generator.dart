@@ -1,4 +1,5 @@
 import 'package:KuenteCO/screens/account_view.dart';
+import 'package:KuenteCO/screens/budget/budget_view.dart';
 import 'package:KuenteCO/screens/category/category_view.dart';
 import 'package:KuenteCO/screens/home/logged_home_profile_view.dart';
 import 'package:flutter/material.dart';
@@ -150,9 +151,11 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => ProfileScreen());
       case AppRoutes.accountScreen:
         return MaterialPageRoute(builder: (_) => AccountScreen());
-      
       case AppRoutes.categoryView:
         return MaterialPageRoute(builder: (_) => const CategoryView());
+      case AppRoutes.budgetView:
+        return MaterialPageRoute(builder: (_) => const BudgetView());
+
 
     // ✅ DEFAULT -> RUTA NO ENCONTRADA
       default:

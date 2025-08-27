@@ -5,6 +5,7 @@ import '../../widgets/common/blurred_card_widget.dart';
 import '../../widgets/common/footer/footer_logged_widget.dart';
 import '../../widgets/common/navbar/navbar_logged_widget.dart';
 import '../../widgets/components/category/category_card_widget.dart';
+import '../../widgets/components/budget/budget_card_widget.dart';
 
 class LoggedHomeBusinessView extends StatefulWidget {
   final String userName;
@@ -85,7 +86,7 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
 
                       const SizedBox(height: 24),
 
-                      /// 🔲 GRID DE 4 CARDS (con categoría en el primero)
+                      /// 🔲 GRID DE 4 CARDS
                       Expanded(
                         child: GridView.count(
                           crossAxisCount: 2,
@@ -98,15 +99,9 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                               child: CategoryCardWidget(),
                             ),
 
-                            /// 🔹 RESTO DE CARDS
-                            BlurredCard(
-                              child: _buildCardItem(
-                                icon: Icons.wallet_outlined,
-                                title: "Mi saldo",
-                                onTap: () {
-                                  // Navegar a saldo
-                                },
-                              ),
+                            /// 🔹 PRESUPUESTOS CARD
+                            const BlurredCard(
+                              child: BudgetCardWidget(),
                             ),
                             BlurredCard(
                               child: _buildCardItem(

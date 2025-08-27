@@ -22,5 +22,6 @@ class AppRoutes {
   static const privacyLogged = '/privacyLogged';
   static const accountScreen = '/accountScreen';
   static const categoryView = '/categoryView';
+  static const budgetView = '/budgetView';
 
 }

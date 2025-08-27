@@ -35,7 +35,6 @@ class UpdateCategoryDTO {
     );
   }
 
-  // Método de conveniencia para crear desde CategoryDTO - CORREGIDO
   factory UpdateCategoryDTO.fromCategoryDTO(dynamic categoryDto) {
     return UpdateCategoryDTO(
       id: categoryDto.id,
