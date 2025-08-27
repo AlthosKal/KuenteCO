@@ -15,8 +15,28 @@ class CategoryService {
   // ✅ GET /category
   Future<List<CategoryDTO>> getAllCategories() async {
     final response = await _apiClient.getApp('/category');
-    final data = response.data['data'] as List;
-    return data
+    
+    // Manejar diferentes estructuras de respuesta
+    final responseData = response.data;
+    List dataList;
+    
+    if (responseData is List) {
+      dataList = responseData;
+    } else if (responseData is Map && responseData.containsKey('data')) {
+      final dataValue = responseData['data'];
+      if (dataValue is String) {
+        // Si es un mensaje, retornar lista vacía
+        return [];
+      } else if (dataValue is List) {
+        dataList = dataValue;
+      } else {
+        return [];
+      }
+    } else {
+      return [];
+    }
+    
+    return dataList
         .map((e) => CategoryDTO.fromJson(e))
         .toList();
   }

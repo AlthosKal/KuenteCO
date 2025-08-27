@@ -45,6 +45,9 @@ class _DeleteCategoryWidgetState extends State<DeleteCategoryWidget> {
   }
 
   Future<void> _deleteCategory() async {
+    // Evitar múltiples eliminaciones si ya se está ejecutando
+    if (_isDeleting) return;
+    
     setState(() {
       _isDeleting = true;
       _errorMessage = null;
@@ -52,31 +55,19 @@ class _DeleteCategoryWidgetState extends State<DeleteCategoryWidget> {
 
     try {
       final controller = Provider.of<CategoryController>(context, listen: false);
-      
       await controller.deleteCategory(widget.category.id);
       
       if (mounted) {
-        if (controller.errorMessage == null) {
-          Navigator.pop(context, true);
-          _showSnackBar(
-            'Categoría "${widget.category.name}" eliminada exitosamente',
-            backgroundColor: Colors.green,
-          );
-        } else {
-          setState(() {
-            _errorMessage = controller.errorMessage;
-          });
-        }
+        Navigator.pop(context, true);
+        _showSnackBar(
+          'Categoría "${widget.category.name}" eliminada exitosamente',
+          backgroundColor: Colors.green,
+        );
       }
     } catch (e) {
       if (mounted) {
         setState(() {
           _errorMessage = 'Error al eliminar la categoría: $e';
-        });
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
           _isDeleting = false;
         });
       }
