@@ -1,5 +1,6 @@
 package org.kuenteco.backend.repository.slave;
 
+import java.util.List;
 import java.util.Optional;
 import org.kuenteco.backend.entity.MercadoPagoPreapproval;
 import org.kuenteco.backend.entity.User;
@@ -23,4 +24,6 @@ public interface SlaveMercadoPagoPreapprovalRepository
     }
 
     Optional<MercadoPagoPreapproval> findByExternalReference(String externalReference);
+
+    List<MercadoPagoPreapproval> findTop10ByOrderByLastModifiedDesc();
 }

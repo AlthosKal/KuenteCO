@@ -21,7 +21,6 @@ public class MercadoPagoPayment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "id_preapproval",
-            nullable = false,
             foreignKey =
                     @ForeignKey(
                             name = "fk_preapproval",

@@ -1,9 +1,16 @@
 package org.kuenteco.backend.service.webhook;
 
 import java.util.Map;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Servicio para procesar webhooks de MercadoPago */
 public interface MercadoPagoWebhookService {
+
+    @Async
+    @Transactional
+    void processSubscriptionAuthorizedPaymentWebhook(
+            String paymentId, String action, Map<String, Object> notification);
 
     /**
      * Procesa webhooks de preapproval (suscripciones)
