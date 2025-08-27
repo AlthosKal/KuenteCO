@@ -27,28 +27,27 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
   Future<void> _loadDataBasedOnRole() async {
     final categoryController = Provider.of<CategoryController>(context, listen: false);
     
+    // Forzar limpieza del error antes de cargar
+    categoryController.clearError();
+    
     try {
       final role = await _storage.read(key: 'role');
-      print('🔄 CategoryCardWidget: User role detected: $role');
       
       if (role == 'ROLE_PROFILE') {
         // Si es un perfil, cargar sus inscripciones de categorías
-        print('📌 CategoryCardWidget: Loading profile enrollments...');
         await categoryController.loadProfileEnrollments();
       } else {
         // Si es un usuario regular, cargar sus categorías
-        print('📌 CategoryCardWidget: Loading user categories...');
         await categoryController.loadCategories();
       }
     } catch (e) {
-      print('❌ CategoryCardWidget: Error loading data: $e');
       // No hacer fallback para perfiles, solo para usuarios
       final role = await _storage.read(key: 'role');
       if (role != 'ROLE_PROFILE') {
         try {
           await categoryController.loadCategories();
         } catch (fallbackError) {
-          print('❌ CategoryCardWidget: Fallback also failed: $fallbackError');
+          // Error en fallback
         }
       }
     }
@@ -58,7 +57,7 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
   Widget build(BuildContext context) {
     final categoryController = Provider.of<CategoryController>(context);
 
-    // 🔄 Estado de carga
+    // Si está cargando, mostrar loading
     if (categoryController.isLoading) {
       return const Center(
         child: Padding(
@@ -68,24 +67,23 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
       );
     }
 
-    // ⚠️ Estado de error
-    if (categoryController.errorMessage != null) {
-      return _buildErrorCard(
-        errorMessage: categoryController.errorMessage!,
-        onRetry: () => _loadDataBasedOnRole(),
-      );
-    }
-
     return FutureBuilder<String?>(
       future: _storage.read(key: 'role'),
       builder: (context, snapshot) {
         final role = snapshot.data;
         
+        // Solo mostrar error si hay un error grave de conexión/datos
+        if (categoryController.errorMessage != null && 
+            !categoryController.errorMessage!.contains('Data field is a string message')) {
+          return _buildErrorCard(
+            errorMessage: categoryController.errorMessage!,
+            onRetry: () => _loadDataBasedOnRole(),
+          );
+        }
+        
         if (role == 'ROLE_PROFILE') {
-          // Mostrar enrollments para perfiles
           return _buildEnrollmentCard(categoryController);
         } else {
-          // Mostrar categorías para usuarios
           return _buildCategoryCard(categoryController);
         }
       },

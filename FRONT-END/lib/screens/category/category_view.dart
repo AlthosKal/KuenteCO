@@ -107,8 +107,8 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
   Future<void> _handleDeleteCategory(category) async {
     final result = await DeleteCategoryWidget.showDeleteDialog(context, category);
     if (result == true) {
-      // La eliminación fue exitosa, la lista se actualizará automáticamente
-      // gracias al Provider y el controlador
+      // Forzar recarga después de eliminación exitosa
+      await _loadDataBasedOnRole();
     }
   }
 
