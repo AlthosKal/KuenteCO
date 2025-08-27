@@ -1,5 +1,6 @@
 package org.kuenteco.backend.repository.slave;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.kuenteco.backend.entity.MercadoPagoPreapproval;
@@ -26,4 +27,6 @@ public interface SlaveMercadoPagoPreapprovalRepository
     Optional<MercadoPagoPreapproval> findByExternalReference(String externalReference);
 
     List<MercadoPagoPreapproval> findTop10ByOrderByLastModifiedDesc();
+    
+    List<MercadoPagoPreapproval> findByDateCreatedAfterOrderByDateCreatedDesc(LocalDateTime threshold);
 }

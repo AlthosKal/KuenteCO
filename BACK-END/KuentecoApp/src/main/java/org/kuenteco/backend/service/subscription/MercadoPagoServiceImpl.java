@@ -293,8 +293,12 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
                 pendingSubscriptions.size());
 
         for (Subscription pendingSubscription : pendingSubscriptions) {
-            cancelSubscription(pendingSubscription);
-            cancelPendingPreapproval(pendingSubscription, user);
+            // Cargar la suscripción completa con su preapproval
+            Subscription fullSubscription = masterSubscriptionRepository.findById(pendingSubscription.getId())
+                    .orElse(pendingSubscription);
+            
+            cancelSubscription(fullSubscription);
+            cancelPendingPreapproval(fullSubscription, user);
         }
     }
 
@@ -324,16 +328,26 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
     /** Cancela el preapproval asociado a una suscripción pendiente */
     private void cancelPendingPreapproval(Subscription pendingSubscription, User user) {
         try {
-            // Inicializar la relación lazy de manera segura
-            Hibernate.initialize(pendingSubscription.getMercadoPagoPreapproval());
-
+            // Si la subscription ya tiene el preapproval cargado
             if (pendingSubscription.getMercadoPagoPreapproval() != null) {
-                MercadoPagoPreapproval pendingPreapproval =
-                        pendingSubscription.getMercadoPagoPreapproval();
-                updatePreapprovalStatus(pendingPreapproval, PreapprovalStatus.CANCELLED);
+                MercadoPagoPreapproval pendingPreapproval = pendingSubscription.getMercadoPagoPreapproval();
+                
+                // Asegurar que tenemos la entidad completa
+                if (pendingPreapproval.getId() != null) {
+                    MercadoPagoPreapproval fullPreapproval = masterMercadoPagoPreapprovalRepository
+                            .findById(pendingPreapproval.getId())
+                            .orElse(pendingPreapproval);
+                    updatePreapprovalStatus(fullPreapproval, PreapprovalStatus.CANCELLED);
+                    return;
+                }
             }
 
-        } catch (org.hibernate.LazyInitializationException e) {
+            // Fallback: buscar por usuario
+            handleLazyInitializationException(user);
+            
+        } catch (Exception e) {
+            log.error("Error cancelando preapproval para suscripción {}: {}", 
+                     pendingSubscription.getId(), e.getMessage());
             handleLazyInitializationException(user);
         }
     }
@@ -430,6 +444,8 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
     private MercadoPagoPreapproval saveMercadoPagoPreapproval(
             Preapproval preapproval, User user, SubscriptionPriceConfigDTO priceConfig) {
 
+        // En SDK v2.5.0, usar getInitPoint() que automáticamente devuelve el correcto
+        // según el entorno configurado por el access token
         MercadoPagoPreapproval entity =
                 MercadoPagoPreapproval.builder()
                         .user(user)

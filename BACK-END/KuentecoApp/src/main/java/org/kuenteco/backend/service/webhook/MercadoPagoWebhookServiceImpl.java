@@ -330,21 +330,35 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
                     retryCount++;
                     log.warn("Intento {} fallido al obtener pago {}: {}", retryCount, paymentId, e.getMessage());
 
-                    if (e.getApiResponse() != null && e.getApiResponse().getStatusCode() == 404) {
-                        if (retryCount >= maxRetries) {
-                            log.warn("Pago {} no encontrado después de {} reintentos", paymentId, maxRetries);
-
-                            // Si el pago no se encuentra, asumimos que fue rechazado o cancelado
-                            handleMissingPayment(paymentId, action);
+                    if (e.getApiResponse() != null) {
+                        int statusCode = e.getApiResponse().getStatusCode();
+                        String content = e.getApiResponse().getContent();
+                        log.error("MercadoPago API Error - Status: {}, Content: {}", statusCode, content);
+                        
+                        if (statusCode == 404) {
+                            if (retryCount >= maxRetries) {
+                                log.warn("Pago {} no encontrado después de {} reintentos. " +
+                                       "Esto es NORMAL en sandbox - MercadoPago envía webhooks de pagos simulados.", 
+                                       paymentId, maxRetries);
+                                handleMissingPayment(paymentId, action);
+                                return;
+                            }
+                        } else if (statusCode == 401) {
+                            log.error("Error de autenticación - verificar access token");
+                            return;
+                        } else if (statusCode == 403) {
+                            log.error("Sin permisos para acceder al pago {}", paymentId);
+                            return;
+                        } else if (statusCode >= 500) {
+                            log.error("Error del servidor de MercadoPago - reintentando...");
+                            // Continuar con reintentos para errores de servidor
+                        } else {
+                            // Otros errores 4xx no reintentar
+                            log.error("Error cliente (4xx) - no reintentando");
                             return;
                         }
                     } else {
-                        // Si no es un error 404, no reintentar
-                        log.error("Error de API de MercadoPago al obtener pago {}: {}", paymentId, e.getMessage());
-                        if (e.getApiResponse() != null) {
-                            log.error("Status: {}", e.getApiResponse().getStatusCode());
-                            log.error("Content: {}", e.getApiResponse().getContent());
-                        }
+                        log.error("Error de API sin respuesta: {}", e.getMessage());
                         return;
                     }
                 }
@@ -397,15 +411,23 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
                         .description("Payment not found - assumed rejected")
                         .build();
 
-                // Intentar asociar a un preapproval
+                // IMPORTANTE: Solo asociar al preapproval más reciente si no encontramos otra forma
+                // En producción, esto puede causar problemas si hay múltiples usuarios creando suscripciones
                 try {
+                    // Buscar preapprovals creados recientemente (últimos 15 minutos)
+                    LocalDateTime recentThreshold = LocalDateTime.now().minusMinutes(15);
                     List<MercadoPagoPreapproval> recentPreapprovals =
-                            slaveMercadoPagoPreapprovalRepository.findTop10ByOrderByLastModifiedDesc();
+                            slaveMercadoPagoPreapprovalRepository
+                                .findByDateCreatedAfterOrderByDateCreatedDesc(recentThreshold);
 
                     if (!recentPreapprovals.isEmpty()) {
-                        payment.setPreapproval(recentPreapprovals.get(0));
-                        log.info("Pago rechazado asociado al preapproval más reciente: {}",
-                                recentPreapprovals.get(0).getPreapprovalId());
+                        MercadoPagoPreapproval mostRecentPreapproval = recentPreapprovals.get(0);
+                        payment.setPreapproval(mostRecentPreapproval);
+                        log.warn("Pago rechazado asociado al preapproval más reciente (último 15 min): {}. " +
+                               "ESTO PUEDE SER PROBLEMÁTICO en producción con múltiples usuarios.",
+                               mostRecentPreapproval.getPreapprovalId());
+                    } else {
+                        log.warn("No se encontraron preapprovals recientes para asociar el pago rechazado: {}", paymentId);
                     }
                 } catch (Exception e) {
                     log.warn("No se pudo asociar el pago rechazado a un preapproval: {}", e.getMessage());
