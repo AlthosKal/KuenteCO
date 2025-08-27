@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import '../../controllers/change_password_controller.dart';
 import '../../widgets/common/background/animated_background_scaffold_widget.dart';
 import '../../widgets/common/blurred_card_widget.dart';
+import '../../widgets/common/buttoms/primary_buttom_widget.dart';
 import '../../widgets/common/form/form_title_text_widget.dart';
 import '../../widgets/common/form/password_form_widget.dart';
-import '../../widgets/common/primary_buttom_widget.dart';
 
 class RecoverPasswordScreen extends StatelessWidget {
   final String email;

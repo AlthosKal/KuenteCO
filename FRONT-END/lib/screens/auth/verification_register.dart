@@ -5,8 +5,8 @@ import '../../core/services/app/auth_service.dart';
 import '../../dto/app/auth/request/send_verification_code_dto.dart';
 import '../../widgets/common/background/animated_background_scaffold_widget.dart';
 import '../../widgets/common/blurred_card_widget.dart';
+import '../../widgets/common/buttoms/primary_buttom_widget.dart';
 import '../../widgets/common/form/form_title_text_widget.dart';
-import '../../widgets/common/primary_buttom_widget.dart';
 
 class VerificationRegisterScreen extends StatelessWidget {
   final String email;

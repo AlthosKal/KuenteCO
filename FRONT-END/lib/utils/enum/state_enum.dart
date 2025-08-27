@@ -5,3 +5,9 @@ enum State {
   SUSPENDED,
   CANCELLED
 }
+
+extension StateExtension on State {
+  String get name {
+    return toString().split('.').last;
+  }
+}

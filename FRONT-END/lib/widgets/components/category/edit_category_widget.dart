@@ -3,10 +3,11 @@ import 'package:provider/provider.dart';
 import '../../../controllers/category_controller.dart';
 import '../../../dto/app/category/category_dto.dart';
 import '../../../dto/app/extra/description_category_extra.dart';
+import '../../../utils/enum/state_enum.dart' as state_enum;
 
 class EditCategoryWidget extends StatefulWidget {
   final CategoryDTO category;
-  
+
   const EditCategoryWidget({
     super.key,
     required this.category,
@@ -17,9 +18,9 @@ class EditCategoryWidget extends StatefulWidget {
 
   /// Método estático para mostrar el diálogo de edición
   static Future<bool?> showEditDialog(
-    BuildContext context,
-    CategoryDTO category,
-  ) {
+      BuildContext context,
+      CategoryDTO category,
+      ) {
     return showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -33,6 +34,7 @@ class EditCategoryWidget extends StatefulWidget {
 class _EditCategoryWidgetState extends State<EditCategoryWidget> {
   late final TextEditingController nameController;
   late final TextEditingController budgetController;
+  late state_enum.State selectedState;
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -43,6 +45,7 @@ class _EditCategoryWidgetState extends State<EditCategoryWidget> {
     budgetController = TextEditingController(
       text: widget.category.description.assignedBudget.toStringAsFixed(2),
     );
+    selectedState = widget.category.description.state;
   }
 
   @override
@@ -82,7 +85,7 @@ class _EditCategoryWidgetState extends State<EditCategoryWidget> {
 
       final updatedDescription = DescriptionCategory(
         assignedBudget: double.parse(budgetController.text),
-        state: widget.category.description.state, // Mantener el estado original
+        state: selectedState, // Usar el estado seleccionado
       );
 
       final updatedCategory = CategoryDTO(
@@ -172,6 +175,28 @@ class _EditCategoryWidgetState extends State<EditCategoryWidget> {
               keyboardType: const TextInputType.numberWithOptions(
                   decimal: true),
               enabled: !_isLoading,
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<state_enum.State>(
+              value: selectedState,
+              decoration: const InputDecoration(
+                labelText: 'Estado',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.flag),
+              ),
+              items: state_enum.State.values.map((state) {
+                return DropdownMenuItem<state_enum.State>(
+                  value: state,
+                  child: Text(state.name),
+                );
+              }).toList(),
+              onChanged: _isLoading ? null : (state_enum.State? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    selectedState = newValue;
+                  });
+                }
+              },
             ),
             if (_errorMessage != null) ...[
               const SizedBox(height: 16),
