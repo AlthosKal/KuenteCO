@@ -399,6 +399,29 @@ class _AssignmentListWidgetState extends State<AssignmentListWidget> with MultiS
     final enrollmentKey = _getEnrollmentKey(enrollment);
     final isSelected = selectedEnrollmentKeys.contains(enrollmentKey);
 
+    // Determine display name and subtitle
+    String displayName;
+    String displaySubtitle;
+    
+    if (enrollment.profileEmail.isNotEmpty) {
+      // If we have a profile email, use it
+      if (enrollment.profileEmail.contains('@')) {
+        // It's an actual email
+        displayName = enrollment.profileEmail.split('@')[0];
+        displaySubtitle = enrollment.profileEmail;
+      } else {
+        // It's probably a profile name
+        displayName = enrollment.profileEmail;
+        displaySubtitle = 'Perfil asignado';
+      }
+    } else {
+      // No profile email/name available
+      displayName = 'Perfil #${enrollment.id}';
+      displaySubtitle = enrollment.userEmail.isNotEmpty 
+          ? 'Usuario: ${enrollment.userEmail}' 
+          : 'ID: ${enrollment.id}';
+    }
+
     return Container(
       margin: const EdgeInsets.only(left: 16, bottom: 8),
       child: ListTile(
@@ -410,15 +433,11 @@ class _AssignmentListWidgetState extends State<AssignmentListWidget> with MultiS
           },
         ),
         title: Text(
-          enrollment.profileEmail.isNotEmpty 
-            ? enrollment.profileEmail.split('@')[0] 
-            : 'Perfil sin nombre', // Fallback si el email está vacío
+          displayName,
           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
         subtitle: Text(
-          enrollment.profileEmail.isNotEmpty 
-            ? enrollment.profileEmail 
-            : 'Email no disponible',
+          displaySubtitle,
           style: const TextStyle(fontSize: 12),
         ),
         onTap: () {
