@@ -207,3 +207,27 @@ GROUP BY
     p.username
 ORDER BY
     total_enrollments DESC;
+
+-- Vista de categorías con información de enrollments (ya tenía category_owner_id correctamente)
+CREATE OR REPLACE VIEW vw_budget_enrollments AS
+SELECT
+    ARRAY_AGG(be.id) AS budget_enrollment_ids,
+    b.id_user AS owner_user_id,
+    b.name AS budget_name,
+    p.username profile_name,
+    COUNT(DISTINCT be.id) AS total_enrollments,
+    MIN(be.enrollment_date) AS first_enrollment_date,
+    MAX(be.enrollment_date) AS last_enrollment_date
+FROM
+    budget b
+        INNER JOIN budget_enrollment be
+                   ON b.id = be.id_budget
+        LEFT JOIN profile p ON be.id_profile = p.id
+WHERE be.id IS NOT NULL
+GROUP BY
+    b.id,
+    b.name,
+    b.id_user,
+    p.username
+ORDER BY
+    total_enrollments DESC;

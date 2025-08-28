@@ -7,7 +7,6 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UpdateDebtMapper {
-    @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
     Debt toEntity(DebtDTO dto);
 }
