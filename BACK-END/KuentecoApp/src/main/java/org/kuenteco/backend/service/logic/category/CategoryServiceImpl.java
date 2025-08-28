@@ -157,10 +157,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
         slaveCategoryRepository
                 .findById(dto.getId())
-                .orElseThrow(
-                        () ->
-                                new CategoryException(
-                                        "Categoría no encontrada con el Id: " + dto.getId()));
+                .orElseThrow(() -> new CategoryException("Categoría no encontrada con el Id: "));
         Category category = prepareUpdateCategory(dto);
         User user =
                 slaveUserRepository

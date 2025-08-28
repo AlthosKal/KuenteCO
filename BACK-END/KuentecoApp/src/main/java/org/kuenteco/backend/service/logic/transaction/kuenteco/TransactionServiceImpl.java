@@ -126,6 +126,9 @@ public class TransactionServiceImpl implements TransactionService {
         AuthCredentials credentials = getCredentials();
         String email = credentials.email();
         RoleList role = credentials.role();
+        slaveTransactionRepository
+                .findById(dto.getId())
+                .orElseThrow(() -> new TransactionException("Transacción no encontrada"));
         log.info("Actualizando transacciones para: {}", email);
         Transaction transaction = prepareUpdateTransaction(dto);
 

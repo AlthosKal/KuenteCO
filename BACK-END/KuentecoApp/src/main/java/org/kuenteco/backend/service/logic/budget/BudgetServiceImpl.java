@@ -120,8 +120,7 @@ public class BudgetServiceImpl implements BudgetService {
                         .orElseThrow(() -> new BudgetException("Usuario no encontrado: " + email));
         slaveBudgetRepository
                 .findById(dto.getId())
-                .orElseThrow(
-                        () -> new BudgetException("No existe el budget con el id: " + dto.getId()));
+                .orElseThrow(() -> new BudgetException("No existe el budget con el id: "));
         Budget budget = updateBudgetMapper.toEntity(dto);
         budget.setUser(user);
         log.info("Actualizando la presupuesto para: {}", email);
