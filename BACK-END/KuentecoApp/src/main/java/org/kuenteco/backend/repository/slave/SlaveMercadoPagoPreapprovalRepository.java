@@ -27,6 +27,7 @@ public interface SlaveMercadoPagoPreapprovalRepository
     Optional<MercadoPagoPreapproval> findByExternalReference(String externalReference);
 
     List<MercadoPagoPreapproval> findTop10ByOrderByLastModifiedDesc();
-    
-    List<MercadoPagoPreapproval> findByDateCreatedAfterOrderByDateCreatedDesc(LocalDateTime threshold);
+
+    List<MercadoPagoPreapproval> findByDateCreatedAfterOrderByDateCreatedDesc(
+            LocalDateTime threshold);
 }
