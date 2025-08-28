@@ -55,9 +55,12 @@ mixin MultiSelectionMixin<T extends StatefulWidget> on State<T> {
     setState(() {
       _selectedEnrollmentKeys.clear();
       for (final enrollment in enrollments) {
-        final key = '${enrollment.categoryName}-${enrollment.profileEmail}-${enrollment.userEmail}';
+        // Para BudgetEnrollmentDTO usamos esta estructura de key
+        final key = '${enrollment.budgetName}-${enrollment.profileEmail}-${enrollment.userEmail}';
         _selectedEnrollmentKeys.add(key);
+        print('MultiSelectionMixin: Added enrollment key: $key');
       }
+      print('MultiSelectionMixin: Total selected enrollment keys: ${_selectedEnrollmentKeys.length}');
     });
   }
 

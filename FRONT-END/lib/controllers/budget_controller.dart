@@ -198,6 +198,80 @@ class BudgetController extends ChangeNotifier {
     }
   }
 
+  // ✅ Asignar presupuesto a perfil
+  Future<void> enrollProfileToBudget(int profileId, int budgetId) async {
+    try {
+      print('BudgetController: Enrolling profile $profileId to budget $budgetId');
+      await _service.enrollProfileToBudget(profileId, budgetId);
+      print('BudgetController: Profile enrolled successfully');
+    } catch (e) {
+      print('BudgetController: Error enrolling profile to budget: $e');
+      rethrow;
+    }
+  }
+
+  // ✅ Eliminar múltiples enrollments
+  Future<void> deleteEnrollmentsBatch(List<int> ids) async {
+    print('BudgetController: deleteEnrollmentsBatch called with ${ids.length} IDs: $ids');
+    _setLoading(true);
+    try {
+      print('BudgetController: Calling service.deleteEnrollmentsBatch');
+      await _service.deleteEnrollmentsBatch(ids);
+      print('BudgetController: Batch enrollment delete completed');
+      
+      // Actualizar la lista local de enrollments
+      enrollments.removeWhere((enrollment) => ids.contains(enrollment.id));
+      print('BudgetController: Removed ${ids.length} enrollments from local list');
+      
+      errorMessage = null;
+      notifyListeners();
+    } catch (e) {
+      print('BudgetController: Error in batch enrollment delete: $e');
+      errorMessage = 'Error al eliminar asignaciones: $e';
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // ✅ Asignar múltiples perfiles a presupuestos
+  Future<void> enrollProfileToBudgetBatch(List<Map<String, int>> enrollments) async {
+    print('BudgetController: enrollProfileToBudgetBatch called with ${enrollments.length} enrollments');
+    _setLoading(true);
+    try {
+      print('BudgetController: Calling service.enrollProfileToBudgetBatch');
+      await _service.enrollProfileToBudgetBatch(enrollments);
+      print('BudgetController: Batch enrollment completed successfully');
+      
+      errorMessage = null;
+      notifyListeners();
+    } catch (e) {
+      print('BudgetController: Error in batch enrollment: $e');
+      errorMessage = 'Error al asignar presupuestos: $e';
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // ✅ Obtener enrollments por usuario
+  Future<void> loadUserEnrollments() async {
+    print('BudgetController: loadUserEnrollments() called');
+    _setLoading(true);
+    try {
+      print('BudgetController: Calling service.getEnrollmentsByUser()');
+      enrollments = await _service.getEnrollmentsByUser();
+      print('BudgetController: Received ${enrollments.length} user enrollments');
+      errorMessage = null;
+    } catch (e) {
+      print('BudgetController: Error loading user enrollments: $e');
+      errorMessage = 'Error al cargar asignaciones del usuario: $e';
+    } finally {
+      _setLoading(false);
+      print('BudgetController: loadUserEnrollments() finished, loading: $isLoading');
+    }
+  }
+
   void _setLoading(bool value) {
     isLoading = value;
     notifyListeners();

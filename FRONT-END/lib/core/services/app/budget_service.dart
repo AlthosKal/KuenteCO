@@ -123,4 +123,67 @@ class BudgetService {
   Future<void> deleteEnrollment(int id) async {
     await _apiClient.deleteApp('/budget/enroll/$id');
   }
+
+  // ✅ Eliminar múltiples enrollments
+  Future<void> deleteEnrollmentsBatch(List<int> ids) async {
+    final queryParams = ids.map((id) => 'id=$id').join('&');
+    await _apiClient.deleteApp('/budget/enroll/batch?$queryParams');
+  }
+
+  // ✅ Enrolar múltiples perfiles a presupuestos
+  Future<void> enrollProfileToBudgetBatch(List<Map<String, int>> enrollments) async {
+    await _apiClient.postApp('/budget/enroll/add/batch', enrollments);
+  }
+
+  // ✅ Obtener enrollments por usuario
+  Future<List<BudgetEnrollmentDTO>> getEnrollmentsByUser() async {
+    print('BudgetService: Sending GET to /budget/enroll/user');
+    final response = await _apiClient.getApp('/budget/enroll/user');
+    
+    // Log complete response details
+    print('BudgetService: === RAW RESPONSE DEBUG ===');
+    print('BudgetService: Status Code: ${response.statusCode}');
+    print('BudgetService: Headers: ${response.headers}');
+    print('BudgetService: Response data: ${response.data}');
+    print('BudgetService: Response data type: ${response.data.runtimeType}');
+    
+    // Check if response.data is Map and log all keys
+    if (response.data is Map<String, dynamic>) {
+      final map = response.data as Map<String, dynamic>;
+      print('BudgetService: Response is Map with keys: ${map.keys.toList()}');
+      for (final key in map.keys) {
+        print('BudgetService: Map[$key] = ${map[key]} (${map[key].runtimeType})');
+      }
+    }
+    
+    // Manejar diferentes estructuras de respuesta del backend
+    final data = response.data is Map<String, dynamic> 
+        ? response.data['data'] ?? response.data
+        : response.data;
+        
+    print('BudgetService: Extracted data: $data');
+    print('BudgetService: Extracted data type: ${data.runtimeType}');
+    
+    if (data is List) {
+      print('BudgetService: Processing ${data.length} user enrollment items');
+      // Log each individual item before processing
+      for (int i = 0; i < data.length; i++) {
+        print('BudgetService: Item[$i] = ${data[i]} (${data[i].runtimeType})');
+        if (data[i] is Map<String, dynamic>) {
+          final itemMap = data[i] as Map<String, dynamic>;
+          print('BudgetService: Item[$i] keys: ${itemMap.keys.toList()}');
+          for (final key in itemMap.keys) {
+            print('BudgetService: Item[$i][$key] = ${itemMap[key]} (${itemMap[key].runtimeType})');
+          }
+        }
+      }
+      return data.map((json) => BudgetEnrollmentDTO.fromJson(json)).toList();
+    } else if (data is String) {
+      print('BudgetService: Received string response: $data');
+      return [];
+    } else {
+      print('BudgetService: Unexpected data format, returning empty list');
+      return [];
+    }
+  }
 }
