@@ -6,7 +6,9 @@ import '../../core/services/app/auth_service.dart';
 import '../../widgets/components/budget/budget_list_widget.dart';
 import '../../widgets/components/budget/create_budget_widget.dart';
 import '../../widgets/components/budget/edit_budget_widget.dart';
+import '../../widgets/components/budget/edit_multiple_budgets_widget.dart';
 import '../../widgets/components/budget/delete_budget_widget.dart';
+import '../../widgets/components/budget/delete_multiple_budgets_widget.dart';
 import '../../mixins/multi_selection_mixin.dart';
 
 class BudgetView extends StatefulWidget {
@@ -186,8 +188,12 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
       return;
     }
     
-    // Mostrar diálogo de edición múltiple aquí
-    clearSelection();
+    final result = await EditMultipleBudgetsWidget.showEditDialog(context, selectedBudgets);
+    
+    if (result == true) {
+      clearSelection();
+      // La actualización se refleja automáticamente a través del Provider
+    }
   }
   
   Future<void> _showBatchDeleteDialog(BudgetController controller) async {
@@ -200,8 +206,12 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
       return;
     }
     
-    // Mostrar diálogo de eliminación múltiple aquí
-    clearSelection();
+    final result = await DeleteMultipleBudgetsWidget.showDeleteDialog(context, selectedBudgets);
+    
+    if (result == true) {
+      clearSelection();
+      // La eliminación se refleja automáticamente a través del Provider
+    }
   }
   
   void _showNoSelectionSnackBar(String message) {

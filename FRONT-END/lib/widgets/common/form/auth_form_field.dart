@@ -1,18 +1,6 @@
 import 'package:flutter/material.dart';
-//Usar este widget para todos los form
+
 class AuthFormField extends StatelessWidget {
-  final TextEditingController controller;
-  final String label;
-  final bool obscureText;
-  final Widget? suffixIcon;
-  final String? Function(String?)? validator;
-  final TextInputType? keyboardType;
-
-  // 🔹 Nuevas propiedades para navegación entre campos
-  final FocusNode? focusNode;
-  final TextInputAction? textInputAction;
-  final void Function(String)? onFieldSubmitted;
-
   const AuthFormField({
     super.key,
     required this.controller,
@@ -25,6 +13,16 @@ class AuthFormField extends StatelessWidget {
     this.textInputAction,
     this.onFieldSubmitted,
   });
+
+  final TextEditingController controller;
+  final String label;
+  final bool obscureText;
+  final Widget? suffixIcon;
+  final String? Function(String?)? validator;
+  final TextInputType? keyboardType;
+  final FocusNode? focusNode;
+  final TextInputAction? textInputAction;
+  final void Function(String)? onFieldSubmitted;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +37,7 @@ class AuthFormField extends StatelessWidget {
         focusNode: focusNode,
         textInputAction: textInputAction,
         onFieldSubmitted: onFieldSubmitted,
+        validator: validator,
         decoration: InputDecoration(
           labelText: label,
           labelStyle: const TextStyle(color: Colors.white),
@@ -49,8 +48,13 @@ class AuthFormField extends StatelessWidget {
           focusedBorder: const UnderlineInputBorder(
             borderSide: BorderSide(color: Colors.white),
           ),
+          errorBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.redAccent),
+          ),
+          focusedErrorBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.red),
+          ),
         ),
-        validator: validator,
       ),
     );
   }

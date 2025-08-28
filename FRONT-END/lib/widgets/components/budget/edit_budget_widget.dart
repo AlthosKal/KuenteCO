@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:decimal/decimal.dart';
 import '../../../controllers/budget_controller.dart';
 import '../../../dto/app/budget/budget_dto.dart';
+import '../../../dto/app/budget/update_budget_dto.dart';
 
 class EditBudgetWidget extends StatefulWidget {
   final BudgetDTO budget;
@@ -156,18 +157,34 @@ class _EditBudgetWidgetState extends State<EditBudgetWidget> {
     setState(() => _isLoading = true);
 
     try {
+      print('EditBudgetWidget: Starting budget update');
       final budgetController = Provider.of<BudgetController>(context, listen: false);
       
-      final updatedBudget = BudgetDTO(
+      final double totalBudget = double.parse(_amountController.text);
+      print('EditBudgetWidget: Parsed total budget: $totalBudget');
+      
+      // Calcular el presupuesto restante manteniendo la proporción
+      final double currentTotal = widget.budget.totalBudget.toDouble();
+      final double currentRemaining = widget.budget.remainingBudget.toDouble();
+      final double remainingPercentage = currentTotal > 0 ? currentRemaining / currentTotal : 1.0;
+      final double newRemaining = totalBudget * remainingPercentage;
+      
+      print('EditBudgetWidget: Current total: $currentTotal, remaining: $currentRemaining');
+      print('EditBudgetWidget: New remaining: $newRemaining');
+      
+      final updateDto = UpdateBudgetDTO(
         id: widget.budget.id,
         name: _nameController.text.trim(),
-        totalBudget: Decimal.parse(_amountController.text),
-        remainingBudget: widget.budget.remainingBudget,
-        status: widget.budget.status,
-        creationDate: widget.budget.creationDate,
+        totalBudget: totalBudget,
+        remainingBudget: newRemaining,
       );
 
-      await budgetController.updateBudget(updatedBudget);
+      print('EditBudgetWidget: Created UpdateBudgetDTO: ${updateDto.toJson()}');
+      print('EditBudgetWidget: Calling budgetController.updateBudget');
+      
+      await budgetController.updateBudget(updateDto);
+      
+      print('EditBudgetWidget: Budget update completed successfully');
 
       if (mounted) {
         Navigator.pop(context, true);
@@ -179,6 +196,7 @@ class _EditBudgetWidgetState extends State<EditBudgetWidget> {
         );
       }
     } catch (e) {
+      print('EditBudgetWidget: Error updating budget: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
