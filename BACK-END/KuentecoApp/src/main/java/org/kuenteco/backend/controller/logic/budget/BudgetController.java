@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.kuenteco.backend.dto.logic.budget.BatchEnrollmentRequestDTO;
 import org.kuenteco.backend.dto.logic.budget.BudgetDTO;
 import org.kuenteco.backend.dto.logic.budget.BudgetEnrollmentDTO;
 import org.kuenteco.backend.dto.logic.budget.NewBudgetDTO;
@@ -50,6 +51,21 @@ public class BudgetController implements BudgetResource {
         return new ResponseEntity<>(
                 ApiResponse.ok(
                         "Presupuestos obtenidos correctamente", result, request.getRequestURI()),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/enroll/user")
+    public ResponseEntity<?> getBusinessUserCategoryEnrollments(
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
+        Object result = budgetEnrollmentService.getBusinessUserBudgetEnrollments();
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Resumen de transacciones por presupuesto obtenido correctamente",
+                        result,
+                        request.getRequestURI()),
                 HttpStatus.OK);
     }
 
@@ -133,6 +149,22 @@ public class BudgetController implements BudgetResource {
                 HttpStatus.CREATED);
     }
 
+    @PostMapping("/enroll/add/batch")
+    public ResponseEntity<?> enrollProfileToBudgets(
+            @RequestBody List<BatchEnrollmentRequestDTO> dto, HttpServletRequest request) {
+        List<BudgetEnrollmentDTO> results =
+                dto.stream()
+                        .map(
+                                e ->
+                                        budgetEnrollmentService.enrollProfileToBudget(
+                                                e.profileId(), e.budgetId()))
+                        .toList();
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Presupuesto asignado correctamente", results, request.getRequestURI()),
+                HttpStatus.CREATED);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBudget(@PathVariable Integer id, HttpServletRequest request) {
         budgetService.deleteBudget(id);
@@ -154,9 +186,19 @@ public class BudgetController implements BudgetResource {
                 HttpStatus.NO_CONTENT);
     }
 
-    @Override
-    public ResponseEntity<?> unenrollBudget(Integer id, HttpServletRequest request) {
+    @DeleteMapping("/enroll/{id}")
+    public ResponseEntity<?> removeBudgetEnrollment(
+            @PathVariable Integer id, HttpServletRequest request) {
         budgetEnrollmentService.removeBudgetEnrollment(id);
+        return new ResponseEntity<>(
+                ApiResponse.ok("Asignación eliminada correctamente", null, request.getRequestURI()),
+                HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/enroll/batch")
+    public ResponseEntity<?> removeBudgetEnrollments(
+            @RequestParam List<Integer> id, HttpServletRequest request) {
+        id.forEach(budgetEnrollmentService::removeBudgetEnrollment);
         return new ResponseEntity<>(
                 ApiResponse.ok("Asignación eliminada correctamente", null, request.getRequestURI()),
                 HttpStatus.NO_CONTENT);

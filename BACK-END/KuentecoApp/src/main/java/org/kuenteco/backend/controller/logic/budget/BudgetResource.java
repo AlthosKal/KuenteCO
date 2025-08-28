@@ -195,5 +195,5 @@ public interface BudgetResource {
                         required = true)
             })
     @DeleteMapping("/enroll/{id}")
-    ResponseEntity<?> unenrollBudget(@PathVariable Integer id, HttpServletRequest request);
+    ResponseEntity<?> removeBudgetEnrollment(@PathVariable Integer id, HttpServletRequest request);
 }
