@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:decimal/decimal.dart';
 import '../core/services/app/budget_service.dart';
 import '../dto/app/budget/budget_dto.dart';
 import '../dto/app/budget/budget_enrollment_dto.dart';
 import '../dto/app/budget/budget_summary_dto.dart';
 import '../dto/app/budget/budget_vs_actual_dto.dart';
 import '../dto/app/budget/new_budget_dto.dart';
+import '../dto/app/budget/update_budget_dto.dart';
 
 class BudgetController extends ChangeNotifier {
   final BudgetService _service;
@@ -88,17 +90,68 @@ class BudgetController extends ChangeNotifier {
     }
   }
 
-  // ✅ Actualizar presupuesto
-  Future<void> updateBudget(BudgetDTO dto) async {
+  // ✅ Actualizar presupuesto individual
+  Future<void> updateBudget(UpdateBudgetDTO dto) async {
+    print('BudgetController: updateBudget called with DTO: ${dto.toJson()}');
     _setLoading(true);
     try {
+      print('BudgetController: Calling service.updateBudget');
       final updated = await _service.updateBudget(dto);
+      print('BudgetController: Service returned updated budget: ${updated.toJson()}');
       final index = budgets.indexWhere((b) => b.id == dto.id);
-      if (index != -1) budgets[index] = updated;
+      if (index != -1) {
+        budgets[index] = updated;
+        print('BudgetController: Updated budget at index $index');
+      } else {
+        print('BudgetController: Budget with ID ${dto.id} not found in local list');
+      }
       errorMessage = null;
       notifyListeners();
     } catch (e) {
+      print('BudgetController: Error updating budget: $e');
       errorMessage = 'Error al actualizar presupuesto: $e';
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // ✅ Actualizar múltiples presupuestos
+  Future<void> updateBudgetsBatch(List<UpdateBudgetDTO> dtos) async {
+    print('BudgetController: updateBudgetsBatch called with ${dtos.length} DTOs');
+    for (final dto in dtos) {
+      print('BudgetController: DTO: ${dto.toJson()}');
+    }
+    _setLoading(true);
+    try {
+      print('BudgetController: Calling service.updateBudgetsBatch');
+      await _service.updateBudgetsBatch(dtos);
+      print('BudgetController: Batch update completed, updating local budgets');
+      
+      // Actualizar los presupuestos en la lista local
+      for (final dto in dtos) {
+        final index = budgets.indexWhere((b) => b.id == dto.id);
+        if (index != -1) {
+          // Crear un nuevo BudgetDTO con los datos actualizados
+          budgets[index] = BudgetDTO(
+            id: dto.id,
+            name: dto.name,
+            totalBudget: Decimal.parse(dto.totalBudget.toString()),
+            remainingBudget: Decimal.parse(dto.remainingBudget.toString()),
+            status: budgets[index].status,
+            creationDate: budgets[index].creationDate,
+          );
+          print('BudgetController: Updated budget at index $index with ID ${dto.id}');
+        } else {
+          print('BudgetController: Budget with ID ${dto.id} not found in local list');
+        }
+      }
+      
+      errorMessage = null;
+      notifyListeners();
+    } catch (e) {
+      print('BudgetController: Error in batch update: $e');
+      errorMessage = 'Error al actualizar presupuestos: $e';
       rethrow;
     } finally {
       _setLoading(false);
@@ -115,6 +168,30 @@ class BudgetController extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       errorMessage = 'Error al eliminar presupuesto: $e';
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // ✅ Eliminar múltiples presupuestos
+  Future<void> deleteBudgetsBatch(List<int> ids) async {
+    print('BudgetController: deleteBudgetsBatch called with ${ids.length} IDs: $ids');
+    _setLoading(true);
+    try {
+      print('BudgetController: Calling service.deleteBudgetsBatch');
+      await _service.deleteBudgetsBatch(ids);
+      print('BudgetController: Batch delete completed, removing from local budgets');
+      
+      // Eliminar los presupuestos de la lista local
+      budgets.removeWhere((budget) => ids.contains(budget.id));
+      print('BudgetController: Removed ${ids.length} budgets from local list');
+      
+      errorMessage = null;
+      notifyListeners();
+    } catch (e) {
+      print('BudgetController: Error in batch delete: $e');
+      errorMessage = 'Error al eliminar presupuestos: $e';
       rethrow;
     } finally {
       _setLoading(false);

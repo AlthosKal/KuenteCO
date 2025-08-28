@@ -3,9 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../controllers/category_controller.dart';
 import '../../core/services/app/auth_service.dart';
-import '../../dto/app/category/category_enrollment_dto.dart';
 import '../../widgets/components/category/assign_category_widget.dart';
-import '../../widgets/components/category/batch_assign_category_widget.dart';
 import '../../widgets/components/category/category_list_widget.dart';
 import '../../widgets/components/category/create_category_widget.dart';
 import '../../widgets/components/category/create_multiple_categories_widget.dart';
@@ -14,7 +12,6 @@ import '../../widgets/components/category/delete_enrollment_widget.dart' as Comp
 import '../../widgets/components/category/delete_multiple_categories_widget.dart';
 import '../../widgets/components/category/edit_category_widget.dart';
 import '../../widgets/components/category/edit_multiple_categories_widget.dart';
-import '../../widgets/common/buttoms/primary_buttom_widget.dart';
 import '../../widgets/components/category/enrollment_management_widget.dart';
 import '../../mixins/multi_selection_mixin.dart';
 
@@ -26,54 +23,62 @@ class CategoryView extends StatefulWidget {
 }
 
 class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
-  final _storage = const FlutterSecureStorage();
+  static const FlutterSecureStorage _storage = FlutterSecureStorage();
   bool _isBusinessUser = false;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() async {
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    try {
       await _checkUserType();
       await _loadDataBasedOnRole();
-    });
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
   
-  /// Cargar datos según el rol del usuario
   Future<void> _loadDataBasedOnRole() async {
-    final categoryController = Provider.of<CategoryController>(context, listen: false);
+    final CategoryController categoryController = 
+        Provider.of<CategoryController>(context, listen: false);
     
     try {
-      final role = await _storage.read(key: 'role');
+      final String? role = await _storage.read(key: 'role');
       
       if (role == 'ROLE_PROFILE') {
-        // Si es un perfil, cargar sus inscripciones de categorías
         await categoryController.loadProfileEnrollments();
       } else {
-        // Si es un usuario regular, cargar sus categorías
         await categoryController.loadCategories();
         
-        // Si es usuario business, también cargar enrollment summaries (opcional)
         if (_isBusinessUser) {
           try {
             await categoryController.loadEnrollments();
-            print('✅ CategoryView: Enrollment summaries loaded successfully');
           } catch (enrollmentError) {
-            print('⚠️ CategoryView: Error loading enrollment summaries: $enrollmentError');
-            print('📌 CategoryView: Continuing without enrollment summaries - categories will still be available');
-            // No es crítico si fallan los enrollment summaries
-            // Las categorías seguirán siendo visibles y funcionales
+            if (mounted) {
+              debugPrint('⚠️ CategoryView: Error loading enrollment summaries: $enrollmentError');
+            }
           }
         }
       }
     } catch (e) {
-      print('Error loading data in CategoryView: $e');
-      // No hacer fallback para perfiles, solo para usuarios
-      final role = await _storage.read(key: 'role');
+      if (mounted) {
+        debugPrint('❌ Error loading data in CategoryView: $e');
+      }
+      
+      final String? role = await _storage.read(key: 'role');
       if (role != 'ROLE_PROFILE') {
         try {
           await categoryController.loadCategories();
         } catch (fallbackError) {
-          print('CategoryView: Fallback also failed: $fallbackError');
+          if (mounted) {
+            debugPrint('❌ CategoryView: Fallback also failed: $fallbackError');
+          }
         }
       }
     }
@@ -81,26 +86,27 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
 
   Future<void> _checkUserType() async {
     try {
-      final role = await _storage.read(key: 'role');
+      final String? role = await _storage.read(key: 'role');
       if (role == 'ROLE_PROFILE') {
-        // Los perfiles no son usuarios Business
-        setState(() {
-          _isBusinessUser = false;
-        });
+        if (mounted) {
+          setState(() => _isBusinessUser = false);
+        }
         return;
       }
       
-      // Para usuarios normales, verificar el userType
-      final authService = AuthService();
+      final AuthService authService = AuthService();
       final user = await authService.getAuthenticatedUser();
-      setState(() {
-        _isBusinessUser = user.userType.toLowerCase() != 'personal';
-      });
+      
+      if (mounted) {
+        setState(() {
+          _isBusinessUser = user.userType.toLowerCase() != 'personal';
+        });
+      }
     } catch (e) {
-      print('Error checking user type: $e');
-      setState(() {
-        _isBusinessUser = false;
-      });
+      if (mounted) {
+        debugPrint('❌ Error checking user type: $e');
+        setState(() => _isBusinessUser = false);
+      }
     }
   }
 
@@ -203,8 +209,6 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
   
   /// Obtener elementos a mostrar según el rol
   List<dynamic> _getItemsToDisplay(CategoryController controller) {
-    // Para perfiles, usar enrollments pero mostrar como si fueran categorías
-    // Para usuarios, usar categories normal
     return controller.categories;
   }
   
@@ -290,14 +294,10 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     );
   }
   
-  // Se movió al EnrollmentManagementWidget
-  
   // ============= APP BAR BUILDER =============
   
   PreferredSizeWidget _buildAppBar(CategoryController controller, bool isProfile) {
-    // Los perfiles nunca entran en modo selección, solo tienen AppBar simple
     if (isSelectionMode && !isProfile) {
-      // Selection mode AppBar with batch operations (solo para usuarios regulares)
       return AppBar(
         leading: IconButton(
           icon: const Icon(Icons.close),
@@ -707,7 +707,4 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
             },
           );
   }
-  
-  // Métodos de enrollment management movidos a EnrollmentManagementWidget
-  
 }

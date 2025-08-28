@@ -3,6 +3,7 @@ import '../../../dto/app/budget/budget_enrollment_dto.dart';
 import '../../../dto/app/budget/budget_summary_dto.dart';
 import '../../../dto/app/budget/budget_vs_actual_dto.dart';
 import '../../../dto/app/budget/new_budget_dto.dart';
+import '../../../dto/app/budget/update_budget_dto.dart';
 import '../api_client.dart';
 
 class BudgetService {
@@ -76,16 +77,30 @@ class BudgetService {
     await _apiClient.postApp('/budget/batch/add', data);
   }
 
-  // ✅ Actualizar presupuesto
-  Future<BudgetDTO> updateBudget(BudgetDTO dto) async {
-    final response = await _apiClient.patchApp('/budget/update', dto.toJson());
-    return BudgetDTO.fromJson(response.data);
+  // ✅ Actualizar presupuesto individual
+  Future<BudgetDTO> updateBudget(UpdateBudgetDTO dto) async {
+    print('BudgetService: Updating budget with data: ${dto.toJson()}');
+    final jsonData = dto.toJson();
+    print('BudgetService: Serialized JSON: $jsonData');
+    print('BudgetService: About to call patchApp...');
+    final response = await _apiClient.patchApp('/budget/update', jsonData);
+    print('BudgetService: patchApp completed, processing response...');
+    print('BudgetService: Update response: ${response.data}');
+    
+    // Manejar la estructura de respuesta del backend
+    final data = response.data['data'] ?? response.data;
+    print('BudgetService: Extracted data for BudgetDTO: $data');
+    return BudgetDTO.fromJson(data);
   }
 
   // ✅ Actualizar múltiples presupuestos
-  Future<void> updateBudgetsBatch(List<BudgetDTO> dtos) async {
+  Future<void> updateBudgetsBatch(List<UpdateBudgetDTO> dtos) async {
+    print('BudgetService: Batch updating ${dtos.length} budgets');
     final data = dtos.map((e) => e.toJson()).toList();
-    await _apiClient.putApp('/budget/batch/update', data);
+    print('BudgetService: Batch update data: $data');
+    final response = await _apiClient.putApp('/budget/batch/update', data);
+    print('BudgetService: Batch update response: ${response.data}');
+    print('BudgetService: Batch update completed successfully');
   }
 
   // ✅ Enrolar perfil a presupuesto
