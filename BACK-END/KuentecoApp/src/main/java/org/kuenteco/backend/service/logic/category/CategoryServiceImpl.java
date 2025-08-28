@@ -155,6 +155,12 @@ public class CategoryServiceImpl implements CategoryService {
         if (role == RoleList.ROLE_PROFILE) {
             throw new CategoryException("Endpoint solo disponible para usuarios");
         }
+        slaveCategoryRepository
+                .findById(dto.getId())
+                .orElseThrow(
+                        () ->
+                                new CategoryException(
+                                        "Categoría no encontrada con el Id: " + dto.getId()));
         Category category = prepareUpdateCategory(dto);
         User user =
                 slaveUserRepository

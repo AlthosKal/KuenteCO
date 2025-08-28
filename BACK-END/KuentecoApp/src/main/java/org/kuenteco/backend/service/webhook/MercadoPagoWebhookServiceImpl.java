@@ -325,21 +325,33 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
 
                     payment = client.get(Long.valueOf(paymentId));
                     success = true;
-                    log.info("Pago obtenido exitosamente en el intento {}: {}", retryCount + 1, paymentId);
+                    log.info(
+                            "Pago obtenido exitosamente en el intento {}: {}",
+                            retryCount + 1,
+                            paymentId);
                 } catch (MPApiException e) {
                     retryCount++;
-                    log.warn("Intento {} fallido al obtener pago {}: {}", retryCount, paymentId, e.getMessage());
+                    log.warn(
+                            "Intento {} fallido al obtener pago {}: {}",
+                            retryCount,
+                            paymentId,
+                            e.getMessage());
 
                     if (e.getApiResponse() != null) {
                         int statusCode = e.getApiResponse().getStatusCode();
                         String content = e.getApiResponse().getContent();
-                        log.error("MercadoPago API Error - Status: {}, Content: {}", statusCode, content);
-                        
+                        log.error(
+                                "MercadoPago API Error - Status: {}, Content: {}",
+                                statusCode,
+                                content);
+
                         if (statusCode == 404) {
                             if (retryCount >= maxRetries) {
-                                log.warn("Pago {} no encontrado después de {} reintentos. " +
-                                       "Esto es NORMAL en sandbox - MercadoPago envía webhooks de pagos simulados.", 
-                                       paymentId, maxRetries);
+                                log.warn(
+                                        "Pago {} no encontrado después de {} reintentos. "
+                                                + "Esto es NORMAL en sandbox - MercadoPago envía webhooks de pagos simulados.",
+                                        paymentId,
+                                        maxRetries);
                                 handleMissingPayment(paymentId, action);
                                 return;
                             }
@@ -365,7 +377,10 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
             }
 
             if (!success || payment == null) {
-                log.error("No se pudo obtener el pago {} después de {} reintentos", paymentId, maxRetries);
+                log.error(
+                        "No se pudo obtener el pago {} después de {} reintentos",
+                        paymentId,
+                        maxRetries);
                 return;
             }
 
@@ -378,15 +393,17 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
 
             log.info("Webhook de payment procesado exitosamente: {}", paymentId);
         } catch (MPException e) {
-            log.error("Error de conexión con MercadoPago al procesar payment {}: {}", paymentId, e.getMessage(), e);
+            log.error(
+                    "Error de conexión con MercadoPago al procesar payment {}: {}",
+                    paymentId,
+                    e.getMessage(),
+                    e);
         } catch (Exception e) {
             log.error("Error procesando webhook de payment: {}", e.getMessage(), e);
         }
     }
 
-    /**
-     * Maneja el caso cuando un pago no se encuentra en MercadoPago
-     */
+    /** Maneja el caso cuando un pago no se encuentra en MercadoPago */
     private void handleMissingPayment(String paymentId, String action) {
         try {
             log.info("Procesando pago no encontrado: ID={}, action={}", paymentId, action);
@@ -402,35 +419,42 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
                 log.info("Pago existente encontrado: {}", paymentId);
             } else {
                 // Crear un registro de pago rechazado
-                payment = MercadoPagoPayment.builder()
-                        .paymentId(paymentId)
-                        .status(PaymentStatus.DECLINED) // Asumimos que fue rechazado
-                        .statusDetail("Payment not found in MercadoPago API")
-                        .dateCreated(LocalDateTime.now())
-                        .dateLastUpdated(LocalDateTime.now())
-                        .description("Payment not found - assumed rejected")
-                        .build();
+                payment =
+                        MercadoPagoPayment.builder()
+                                .paymentId(paymentId)
+                                .status(PaymentStatus.DECLINED) // Asumimos que fue rechazado
+                                .statusDetail("Payment not found in MercadoPago API")
+                                .dateCreated(LocalDateTime.now())
+                                .dateLastUpdated(LocalDateTime.now())
+                                .description("Payment not found - assumed rejected")
+                                .build();
 
                 // IMPORTANTE: Solo asociar al preapproval más reciente si no encontramos otra forma
-                // En producción, esto puede causar problemas si hay múltiples usuarios creando suscripciones
+                // En producción, esto puede causar problemas si hay múltiples usuarios creando
+                // suscripciones
                 try {
                     // Buscar preapprovals creados recientemente (últimos 15 minutos)
                     LocalDateTime recentThreshold = LocalDateTime.now().minusMinutes(15);
                     List<MercadoPagoPreapproval> recentPreapprovals =
                             slaveMercadoPagoPreapprovalRepository
-                                .findByDateCreatedAfterOrderByDateCreatedDesc(recentThreshold);
+                                    .findByDateCreatedAfterOrderByDateCreatedDesc(recentThreshold);
 
                     if (!recentPreapprovals.isEmpty()) {
                         MercadoPagoPreapproval mostRecentPreapproval = recentPreapprovals.get(0);
                         payment.setPreapproval(mostRecentPreapproval);
-                        log.warn("Pago rechazado asociado al preapproval más reciente (último 15 min): {}. " +
-                               "ESTO PUEDE SER PROBLEMÁTICO en producción con múltiples usuarios.",
-                               mostRecentPreapproval.getPreapprovalId());
+                        log.warn(
+                                "Pago rechazado asociado al preapproval más reciente (último 15 min): {}. "
+                                        + "ESTO PUEDE SER PROBLEMÁTICO en producción con múltiples usuarios.",
+                                mostRecentPreapproval.getPreapprovalId());
                     } else {
-                        log.warn("No se encontraron preapprovals recientes para asociar el pago rechazado: {}", paymentId);
+                        log.warn(
+                                "No se encontraron preapprovals recientes para asociar el pago rechazado: {}",
+                                paymentId);
                     }
                 } catch (Exception e) {
-                    log.warn("No se pudo asociar el pago rechazado a un preapproval: {}", e.getMessage());
+                    log.warn(
+                            "No se pudo asociar el pago rechazado a un preapproval: {}",
+                            e.getMessage());
                 }
 
                 masterMercadoPagoPaymentRepository.save(payment);
@@ -440,7 +464,8 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
             // Si el pago está marcado como rechazado, manejar la cancelación de la suscripción
             if (payment.getStatus() == PaymentStatus.DECLINED && payment.getPreapproval() != null) {
                 Optional<Subscription> subscriptionOpt =
-                        slaveSubscriptionRepository.findByMercadoPagoPreapproval(payment.getPreapproval());
+                        slaveSubscriptionRepository.findByMercadoPagoPreapproval(
+                                payment.getPreapproval());
 
                 if (subscriptionOpt.isPresent()) {
                     Subscription subscription = subscriptionOpt.get();
@@ -1099,8 +1124,8 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
     }
 
     /**
-     * Procesa pagos que quedaron pendientes por no estar disponibles en MercadoPago
-     * Este método podría ser llamado por una tarea programada
+     * Procesa pagos que quedaron pendientes por no estar disponibles en MercadoPago Este método
+     * podría ser llamado por una tarea programada
      */
     @Scheduled(fixedDelay = 300000) // Cada 5 minutos
     public void processPendingPayments() {
@@ -1108,8 +1133,9 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
 
         // Buscar pagos pendientes con más de 5 minutos de antigüedad
         LocalDateTime threshold = LocalDateTime.now().minusMinutes(5);
-        List<MercadoPagoPayment> pendingPayments = slaveMercadoPagoPaymentRepository
-                .findByStatusAndDateCreatedBefore(PaymentStatus.PENDING, threshold);
+        List<MercadoPagoPayment> pendingPayments =
+                slaveMercadoPagoPaymentRepository.findByStatusAndDateCreatedBefore(
+                        PaymentStatus.PENDING, threshold);
 
         if (pendingPayments.isEmpty()) {
             log.info("No hay pagos pendientes para procesar");
@@ -1130,7 +1156,9 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
                     payment = client.get(Long.valueOf(pendingPayment.getPaymentId()));
                 } catch (MPApiException e) {
                     if (e.getApiResponse() != null && e.getApiResponse().getStatusCode() == 404) {
-                        log.warn("Pago {} no encontrado en MercadoPago, asumimos rechazado", pendingPayment.getPaymentId());
+                        log.warn(
+                                "Pago {} no encontrado en MercadoPago, asumimos rechazado",
+                                pendingPayment.getPaymentId());
 
                         // Marcar el pago como rechazado
                         pendingPayment.setStatus(PaymentStatus.DECLINED);
@@ -1141,7 +1169,8 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
                         // Cancelar la suscripción asociada
                         if (pendingPayment.getPreapproval() != null) {
                             Optional<Subscription> subscriptionOpt =
-                                    slaveSubscriptionRepository.findByMercadoPagoPreapproval(pendingPayment.getPreapproval());
+                                    slaveSubscriptionRepository.findByMercadoPagoPreapproval(
+                                            pendingPayment.getPreapproval());
 
                             if (subscriptionOpt.isPresent()) {
                                 Subscription subscription = subscriptionOpt.get();
@@ -1150,12 +1179,15 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
                                 masterSubscriptionRepository.save(subscription);
 
                                 // También actualizar el preapproval
-                                MercadoPagoPreapproval preapproval = pendingPayment.getPreapproval();
+                                MercadoPagoPreapproval preapproval =
+                                        pendingPayment.getPreapproval();
                                 preapproval.setStatus(PreapprovalStatus.CANCELLED);
                                 preapproval.setLastModified(LocalDateTime.now());
                                 masterMercadoPagoPreapprovalRepository.save(preapproval);
 
-                                log.info("Suscripción cancelada por pago no encontrado: {}", subscription.getId());
+                                log.info(
+                                        "Suscripción cancelada por pago no encontrado: {}",
+                                        subscription.getId());
                             }
                         }
 
@@ -1171,24 +1203,30 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
                     // Intentar encontrar por external_reference
                     if (payment.getExternalReference() != null) {
                         Optional<MercadoPagoPreapproval> preapprovalOpt =
-                                slaveMercadoPagoPreapprovalRepository.findByExternalReference(payment.getExternalReference());
+                                slaveMercadoPagoPreapprovalRepository.findByExternalReference(
+                                        payment.getExternalReference());
 
                         if (preapprovalOpt.isPresent()) {
                             pendingPayment.setPreapproval(preapprovalOpt.get());
-                            log.info("Preapproval encontrado para pago {}: {}",
-                                    pendingPayment.getPaymentId(), preapprovalOpt.get().getPreapprovalId());
+                            log.info(
+                                    "Preapproval encontrado para pago {}: {}",
+                                    pendingPayment.getPaymentId(),
+                                    preapprovalOpt.get().getPreapprovalId());
                         }
                     }
 
                     // Si aún no tenemos preapproval, intentar con el más reciente
                     if (pendingPayment.getPreapproval() == null) {
                         List<MercadoPagoPreapproval> recentPreapprovals =
-                                slaveMercadoPagoPreapprovalRepository.findTop10ByOrderByLastModifiedDesc();
+                                slaveMercadoPagoPreapprovalRepository
+                                        .findTop10ByOrderByLastModifiedDesc();
 
                         if (!recentPreapprovals.isEmpty()) {
                             pendingPayment.setPreapproval(recentPreapprovals.get(0));
-                            log.info("Usando preapproval más reciente para pago {}: {}",
-                                    pendingPayment.getPaymentId(), recentPreapprovals.get(0).getPreapprovalId());
+                            log.info(
+                                    "Usando preapproval más reciente para pago {}: {}",
+                                    pendingPayment.getPaymentId(),
+                                    recentPreapprovals.get(0).getPreapprovalId());
                         }
                     }
                 }
@@ -1204,7 +1242,8 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
                     // Si el pago está aprobado, activar la suscripción asociada
                     if (pendingPayment.getPreapproval() != null) {
                         Optional<Subscription> subscriptionOpt =
-                                slaveSubscriptionRepository.findByMercadoPagoPreapproval(pendingPayment.getPreapproval());
+                                slaveSubscriptionRepository.findByMercadoPagoPreapproval(
+                                        pendingPayment.getPreapproval());
 
                         if (subscriptionOpt.isPresent()) {
                             Subscription subscription = subscriptionOpt.get();
@@ -1230,18 +1269,21 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
                             preapproval.setNextPaymentDate(newExpiration);
                             masterMercadoPagoPreapprovalRepository.save(preapproval);
 
-                            log.info("Suscripción activada por pago aprobado: {}, nueva expiración: {}",
-                                    subscription.getId(), newExpiration);
+                            log.info(
+                                    "Suscripción activada por pago aprobado: {}, nueva expiración: {}",
+                                    subscription.getId(),
+                                    newExpiration);
                         }
                     }
-                } else if (pendingPayment.getStatus() == PaymentStatus.DECLINED ||
-                        pendingPayment.getStatus() == PaymentStatus.ERROR) {
+                } else if (pendingPayment.getStatus() == PaymentStatus.DECLINED
+                        || pendingPayment.getStatus() == PaymentStatus.ERROR) {
                     handlePaymentFailed(pendingPayment);
 
                     // Si el pago está rechazado, cancelar la suscripción asociada
                     if (pendingPayment.getPreapproval() != null) {
                         Optional<Subscription> subscriptionOpt =
-                                slaveSubscriptionRepository.findByMercadoPagoPreapproval(pendingPayment.getPreapproval());
+                                slaveSubscriptionRepository.findByMercadoPagoPreapproval(
+                                        pendingPayment.getPreapproval());
 
                         if (subscriptionOpt.isPresent()) {
                             Subscription subscription = subscriptionOpt.get();
@@ -1255,19 +1297,27 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
                             preapproval.setLastModified(LocalDateTime.now());
                             masterMercadoPagoPreapprovalRepository.save(preapproval);
 
-                            log.info("Suscripción cancelada por pago rechazado: {}", subscription.getId());
+                            log.info(
+                                    "Suscripción cancelada por pago rechazado: {}",
+                                    subscription.getId());
                         }
                     }
                 }
 
-                log.info("Pago pendiente procesado exitosamente: {}", pendingPayment.getPaymentId());
+                log.info(
+                        "Pago pendiente procesado exitosamente: {}", pendingPayment.getPaymentId());
 
             } catch (MPApiException e) {
                 if (e.getApiResponse() != null && e.getApiResponse().getStatusCode() == 404) {
-                    log.warn("Pago {} aún no está disponible en MercadoPago", pendingPayment.getPaymentId());
+                    log.warn(
+                            "Pago {} aún no está disponible en MercadoPago",
+                            pendingPayment.getPaymentId());
                     // Mantenemos el pago como pendiente para el siguiente ciclo
                 } else {
-                    log.error("Error al obtener pago pendiente {}: {}", pendingPayment.getPaymentId(), e.getMessage());
+                    log.error(
+                            "Error al obtener pago pendiente {}: {}",
+                            pendingPayment.getPaymentId(),
+                            e.getMessage());
                     // Marcar como error para no reintentar
                     pendingPayment.setStatus(PaymentStatus.ERROR);
                     pendingPayment.setStatusDetail("Error al obtener información de MercadoPago");
@@ -1275,7 +1325,11 @@ public class MercadoPagoWebhookServiceImpl implements MercadoPagoWebhookService 
                     masterMercadoPagoPaymentRepository.save(pendingPayment);
                 }
             } catch (Exception e) {
-                log.error("Error procesando pago pendiente {}: {}", pendingPayment.getPaymentId(), e.getMessage(), e);
+                log.error(
+                        "Error procesando pago pendiente {}: {}",
+                        pendingPayment.getPaymentId(),
+                        e.getMessage(),
+                        e);
             }
         }
 

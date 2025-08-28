@@ -118,11 +118,12 @@ public class BudgetServiceImpl implements BudgetService {
                 slaveUserRepository
                         .findByEmail(email)
                         .orElseThrow(() -> new BudgetException("Usuario no encontrado: " + email));
-        Budget budget =
-                slaveBudgetRepository
-                        .getBudgetByUserAndId(user, dto.getId())
-                        .orElseThrow(() -> new BudgetException("Presupuesto no encontrado"));
-        updateBudgetMapper.toEntity(dto);
+        slaveBudgetRepository
+                .findById(dto.getId())
+                .orElseThrow(
+                        () -> new BudgetException("No existe el budget con el id: " + dto.getId()));
+        Budget budget = updateBudgetMapper.toEntity(dto);
+        budget.setUser(user);
         log.info("Actualizando la presupuesto para: {}", email);
         masterBudgetRepository.save(budget);
     }
@@ -134,12 +135,9 @@ public class BudgetServiceImpl implements BudgetService {
 
         if (role == RoleList.ROLE_PROFILE) {
             throw new BudgetException("Endpoint solo disponible para usuarios");
-        }
-        if (id == null) {
+        } else if (id == null) {
             throw new BudgetException("ID del presupuesto no puede ser nulo");
-        }
-
-        if (!slaveBudgetRepository.existsById(id)) {
+        } else if (!slaveBudgetRepository.existsById(id)) {
             throw new BudgetException("ID del presupuesto no encontrado con el ID: " + id);
         }
 

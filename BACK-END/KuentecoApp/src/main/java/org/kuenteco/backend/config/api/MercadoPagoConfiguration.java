@@ -22,21 +22,23 @@ public class MercadoPagoConfiguration {
     public void init() {
         try {
             MercadoPagoConfig.setAccessToken(accessToken);
-            
+
             // En el SDK v2.5.0, el entorno se determina automáticamente por el access token:
             // - TEST-* tokens usan sandbox
             // - APP_USR-* tokens usan production
-            
+
             if (accessToken != null) {
                 if (accessToken.startsWith("TEST-")) {
                     log.info("MercadoPago configurado en modo SANDBOX (token TEST detectado)");
                 } else if (accessToken.startsWith("APP_USR-")) {
-                    log.info("MercadoPago configurado en modo PRODUCCIÓN (token APP_USR detectado)");
+                    log.info(
+                            "MercadoPago configurado en modo PRODUCCIÓN (token APP_USR detectado)");
                 } else {
-                    log.warn("Token de MercadoPago no reconocido. Formato esperado: TEST-* o APP_USR-*");
+                    log.warn(
+                            "Token de MercadoPago no reconocido. Formato esperado: TEST-* o APP_USR-*");
                 }
             }
-            
+
             log.info("MercadoPago configurado correctamente con entorno: {}", environment);
         } catch (Exception e) {
             log.error("Error al configurar MercadoPago", e);

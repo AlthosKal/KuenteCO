@@ -16,7 +16,6 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
 import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.dto.subscription.SubscriptionPriceConfigDTO;
 import org.kuenteco.backend.dto.subscription.request.CreateSubscriptionRequestDTO;
@@ -294,9 +293,11 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
 
         for (Subscription pendingSubscription : pendingSubscriptions) {
             // Cargar la suscripción completa con su preapproval
-            Subscription fullSubscription = masterSubscriptionRepository.findById(pendingSubscription.getId())
-                    .orElse(pendingSubscription);
-            
+            Subscription fullSubscription =
+                    masterSubscriptionRepository
+                            .findById(pendingSubscription.getId())
+                            .orElse(pendingSubscription);
+
             cancelSubscription(fullSubscription);
             cancelPendingPreapproval(fullSubscription, user);
         }
@@ -330,13 +331,15 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
         try {
             // Si la subscription ya tiene el preapproval cargado
             if (pendingSubscription.getMercadoPagoPreapproval() != null) {
-                MercadoPagoPreapproval pendingPreapproval = pendingSubscription.getMercadoPagoPreapproval();
-                
+                MercadoPagoPreapproval pendingPreapproval =
+                        pendingSubscription.getMercadoPagoPreapproval();
+
                 // Asegurar que tenemos la entidad completa
                 if (pendingPreapproval.getId() != null) {
-                    MercadoPagoPreapproval fullPreapproval = masterMercadoPagoPreapprovalRepository
-                            .findById(pendingPreapproval.getId())
-                            .orElse(pendingPreapproval);
+                    MercadoPagoPreapproval fullPreapproval =
+                            masterMercadoPagoPreapprovalRepository
+                                    .findById(pendingPreapproval.getId())
+                                    .orElse(pendingPreapproval);
                     updatePreapprovalStatus(fullPreapproval, PreapprovalStatus.CANCELLED);
                     return;
                 }
@@ -344,10 +347,12 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
 
             // Fallback: buscar por usuario
             handleLazyInitializationException(user);
-            
+
         } catch (Exception e) {
-            log.error("Error cancelando preapproval para suscripción {}: {}", 
-                     pendingSubscription.getId(), e.getMessage());
+            log.error(
+                    "Error cancelando preapproval para suscripción {}: {}",
+                    pendingSubscription.getId(),
+                    e.getMessage());
             handleLazyInitializationException(user);
         }
     }
