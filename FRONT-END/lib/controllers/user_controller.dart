@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import '../core/services/app/user_service.dart';
 import '../dto/app/auth/response/user_detail_dto.dart';
 import '../dto/app/image/image_dto.dart';
@@ -13,48 +15,60 @@ class UserController extends ChangeNotifier {
 
   UserController({required UserService userService}) : _userService = userService;
 
-  /// Cargar usuario
   Future<void> loadUser() async {
     try {
       isLoading.value = true;
       user.value = await _userService.getUserDetail();
       userImage = user.value?.image;
-      print("✅ Usuario cargado correctamente");
+      if (kDebugMode) {
+        debugPrint('✅ Usuario cargado correctamente');
+      }
     } catch (e) {
-      print("🛑 Error cargando usuario: $e");
+      if (kDebugMode) {
+        debugPrint('🛑 Error cargando usuario: $e');
+      }
     } finally {
       isLoading.value = false;
       notifyListeners();
     }
   }
 
-
-
-  /// Subir imagen de usuario
-  Future<void> uploadUserImage(MultipartFile multipartfile, String fileName) async {
+  Future<void> uploadUserImage(
+    MultipartFile multipartFile, 
+    String fileName,
+  ) async {
     try {
       isLoading.value = true;
-      final result = await _userService.uploadUserImage(multipartfile, fileName);
+      final ImageDTO result = await _userService.uploadUserImage(multipartFile, fileName);
       userImage = result;
-      // CRÍTICO: Actualizar user.value para que la vista se refresque
-      if (user.value != null) {
-        final updatedUser = UserDetailDTO(
-          version: user.value!.version,
-          image: result,
-          username: user.value!.username,
-          email: user.value!.email,
-          userType: user.value!.userType,
-          subscriptionType: user.value!.subscriptionType,
-          state: user.value!.state,
-        );
-        user.value = updatedUser; // Esto dispara el ValueListenableBuilder
+      
+      _updateUserWithNewImage(result);
+      
+      if (kDebugMode) {
+        debugPrint('✅ Imagen de usuario subida correctamente');
       }
-      print("✅ Imagen de usuario subida correctamente");
     } catch (e) {
-      print("🛑 Error subiendo imagen: $e");
-      rethrow; // Re-lanza el error para que la vista lo maneje
+      if (kDebugMode) {
+        debugPrint('🛑 Error subiendo imagen: $e');
+      }
+      rethrow;
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  void _updateUserWithNewImage(ImageDTO newImage) {
+    final UserDetailDTO? currentUser = user.value;
+    if (currentUser != null) {
+      user.value = UserDetailDTO(
+        version: currentUser.version,
+        image: newImage,
+        username: currentUser.username,
+        email: currentUser.email,
+        userType: currentUser.userType,
+        subscriptionType: currentUser.subscriptionType,
+        state: currentUser.state,
+      );
     }
   }
 

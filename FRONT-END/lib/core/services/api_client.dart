@@ -1,8 +1,10 @@
 import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import '../../routes/app_routes.dart';
 
 class ApiClient {
@@ -37,18 +39,23 @@ class ApiClient {
     } else if (Platform.isAndroid) {
       baseUrlApp = dotenv.get('APP_URL_ANDROID');
       baseUrlChat = dotenv.get('CHAT_URL_ANDROID');
+    } else {
+      // Default fallback for other platforms
+      baseUrlApp = dotenv.get('APP_URL_WEB');
+      baseUrlChat = dotenv.get('CHAT_URL_WEB');
     }
   }
 
   Dio _createDio(String baseUrl) {
-    final dio = Dio(
+    final Dio dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
-        headers: {'Content-Type': 'application/json',
-          'Accept':'application/json'
-        }
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
       ),
     );
 
@@ -64,9 +71,12 @@ class ApiClient {
           }
           return handler.next(options);
         },
-        onError: (DioException e, handler) {
+        onError: (DioException e, ErrorInterceptorHandler handler) {
           if (e.response?.statusCode == 401) {
-            AppRoutes.login; // puedes redirigir desde un navigator global si lo tienes
+            // TODO: Implement proper navigation to login
+            if (kDebugMode) {
+              print('🔐 Unauthorized access - redirect to ${AppRoutes.login}');
+            }
           }
           return handler.next(e);
         },
@@ -91,15 +101,16 @@ class ApiClient {
     }
   }
 
-  Future<Response> postApp(String path, dynamic data) async {
+  Future<Response<dynamic>> postApp(String path, dynamic data) async {
     try {
-      // Si es FormData, permitir que Dio maneje el Content-Type automáticamente
-      final options = data is FormData 
-          ? Options(headers: {'Accept': 'application/json'}) 
+      final Options? options = data is FormData 
+          ? Options(headers: <String, String>{'Accept': 'application/json'}) 
           : null;
       return await _dioApp.post(path, data: data, options: options);
     } on DioException catch (e) {
-      final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al enviar datos.';
+      final String mensaje = e.response?.data?['message'] ?? 
+                            e.message ?? 
+                            'Error al enviar datos.';
       throw Exception(mensaje);
     }
   }

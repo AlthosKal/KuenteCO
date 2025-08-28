@@ -17,59 +17,67 @@ import 'package:KuenteCO/core/services/app/budget_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: '.env');
 
-  final role = await getRoleIfAuthenticated();
-
-  // ✅ Crear instancia de ApiClient y servicios
-  final apiClient = ApiClient();
-  final userService = UserService(apiClient);
-  final subscriptionService = SubscriptionService(apiClient);
-  final categoryService = CategoryService(apiClient);
-  final budgetService = BudgetService(apiClient);
+  final String? role = await getRoleIfAuthenticated();
+  final String initialRoute = _getInitialRoute(role);
 
   runApp(
     MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (_) => UserController(userService: userService)..loadUser(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => SubscriptionController(subscriptionService),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => CategoryController(categoryService),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => BudgetController(budgetService),
-        ),
-      ],
-      child: MyApp(
-        initialRoute: role == null
-            ? AppRoutes.homeGuest
-            : role == 'ROLE_PROFILE'
-            ? AppRoutes.homeProfile
-            : role == 'personal'
-            ? AppRoutes.homePersonal
-            : AppRoutes.homeBusiness,
-      ),
+      providers: _createProviders(),
+      child: MyApp(initialRoute: initialRoute),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  final String initialRoute;
+String _getInitialRoute(String? role) {
+  if (role == null) return AppRoutes.homeGuest;
+  
+  switch (role) {
+    case 'ROLE_PROFILE':
+      return AppRoutes.homeProfile;
+    case 'personal':
+      return AppRoutes.homePersonal;
+    default:
+      return AppRoutes.homeBusiness;
+  }
+}
 
-  const MyApp({super.key, required this.initialRoute});
+List<ChangeNotifierProvider> _createProviders() {
+  final ApiClient apiClient = ApiClient();
+  
+  return [
+    ChangeNotifierProvider<UserController>(
+      create: (_) => UserController(userService: UserService(apiClient))..loadUser(),
+    ),
+    ChangeNotifierProvider<SubscriptionController>(
+      create: (_) => SubscriptionController(SubscriptionService(apiClient)),
+    ),
+    ChangeNotifierProvider<CategoryController>(
+      create: (_) => CategoryController(CategoryService(apiClient)),
+    ),
+    ChangeNotifierProvider<BudgetController>(
+      create: (_) => BudgetController(BudgetService(apiClient)),
+    ),
+  ];
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({
+    super.key,
+    required this.initialRoute,
+  });
+
+  final String initialRoute;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: initialRoute,
-      title: "KuenteCO",
+      title: 'KuenteCO',
       onGenerateRoute: RouteGenerator.generateRoute,
-      builder: (context, child) {
+      builder: (BuildContext context, Widget? child) {
         return child ?? const SizedBox.shrink();
       },
     );
