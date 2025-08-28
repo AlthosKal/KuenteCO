@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/debt")
 @AllArgsConstructor
-public class DebtController {
+public class DebtController implements DebtResource {
 
     private DebtService debtService;
 

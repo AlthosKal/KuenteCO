@@ -25,8 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 public interface AuthResource {
 
     @Operation(
+            summary = "Autenticación de usuario",
             description =
-                    "Autentica al usuario utilizando nombre/email y contraseña, devolviendo un token JWT",
+                    "Autentica al usuario utilizando nombre/email y contraseña, devolviendo un token JWT válido",
             responses = {
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
                         responseCode = "200",
@@ -37,11 +38,18 @@ public interface AuthResource {
                                         schema = @Schema(implementation = TokenResponseDTO.class),
                                         examples =
                                                 @ExampleObject(
+                                                        name = "Login exitoso",
                                                         value =
                                                                 """
                         {
-                          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                          "role": "ROLE_USER"
+                          "success": true,
+                          "message": "Inicio de Sesión exitoso",
+                          "data": {
+                            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3VhcmlvMTIzIiwiaWF0IjoxNjQwOTk1MjAwLCJleHAiOjE2NDEwODE2MDB9.signature",
+                            "role": "ROLE_USER"
+                          },
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/login"
                         }
                     """))),
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -51,12 +59,75 @@ public interface AuthResource {
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                         schema = @Schema(implementation = ApiResponse.class),
+                                        examples = {
+                                            @ExampleObject(
+                                                    name = "Credenciales incorrectas",
+                                                    value =
+                                                            """
+                        {
+                          "success": false,
+                          "message": "Credenciales inválidas",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/login"
+                        }
+                    """),
+                                            @ExampleObject(
+                                                    name = "Usuario no activado",
+                                                    value =
+                                                            """
+                        {
+                          "success": false,
+                          "message": "Cuenta no activada. Por favor, verifica tu email",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/login"
+                        }
+                    """),
+                                            @ExampleObject(
+                                                    name = "Campos requeridos",
+                                                    value =
+                                                            """
+                        {
+                          "success": false,
+                          "message": "nameOrEmail y password son requeridos",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/login"
+                        }
+                    """)
+                                        })),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "429",
+                        description = "Demasiados intentos de inicio de sesión",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
                                                                 """
                         {
-                          "message": "Credenciales inválidas"
+                          "success": false,
+                          "message": "Demasiados intentos de inicio de sesión. Intenta de nuevo en 15 minutos",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/login"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "500",
+                        description = "Error interno del servidor",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Error interno del servidor",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/login"
                         }
                     """)))
             },
@@ -73,7 +144,7 @@ public interface AuthResource {
                                                                 """
                                 {
                                   "nameOrEmail": "usuario@example.com",
-                                  "password": "contraseña123"
+                                  "password": "MiPassword123@"
                                 }
                             """),
                                                 @ExampleObject(
@@ -82,7 +153,7 @@ public interface AuthResource {
                                                                 """
                                 {
                                   "nameOrEmail": "usuario123",
-                                  "password": "contraseña123"
+                                  "password": "MiPassword123@"
                                 }
                             """)
                                             })))
@@ -395,10 +466,11 @@ public interface AuthResource {
             @Valid @RequestBody ChangePasswordDTO dto, HttpServletRequest request);
 
     @Operation(
-            description = "Invalida el token JWT actual del usuario",
+            summary = "Cerrar sesión de usuario",
+            description = "Invalida el token JWT actual del usuario y cierra la sesión activa",
             responses = {
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                        responseCode = "200",
+                        responseCode = "204",
                         description = "Sesión cerrada correctamente",
                         content =
                                 @Content(
@@ -409,11 +481,14 @@ public interface AuthResource {
                                                         value =
                                                                 """
                         {
-                          "message": "Cierre de sesión exitoso"
+                          "success": true,
+                          "message": "Cierre de sesión exitoso",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/logout"
                         }
                     """))),
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                        responseCode = "400",
+                        responseCode = "401",
                         description = "Token no proporcionado o inválido",
                         content =
                                 @Content(
@@ -424,18 +499,63 @@ public interface AuthResource {
                                                         value =
                                                                 """
                         {
-                          "message": "Token no proporcionado"
+                          "success": false,
+                          "message": "Token de autenticación requerido",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/logout"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "500",
+                        description = "Error interno del servidor",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Error interno del servidor",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/logout"
                         }
                     """)))
+            },
+            security = {
+                @io.swagger.v3.oas.annotations.security.SecurityRequirement(
+                        name = "Bearer Authentication")
             })
     ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response);
 
     @Operation(
-            description = "Elimina un usuario del sistema por su ID",
+            summary = "Eliminar cuenta de usuario",
+            description =
+                    "Elimina permanentemente la cuenta del usuario autenticado y todos sus datos asociados",
             responses = {
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
                         responseCode = "204",
                         description = "Usuario eliminado correctamente"),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "401",
+                        description = "Token no proporcionado o inválido",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Token de autenticación requerido",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/user/delete"
+                        }
+                    """))),
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
                         responseCode = "404",
                         description = "Usuario no encontrado",
@@ -448,28 +568,41 @@ public interface AuthResource {
                                                         value =
                                                                 """
                         {
-                          "message": "Usuario no encontrado"
+                          "success": false,
+                          "message": "Usuario no encontrado",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/user/delete"
                         }
                     """))),
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
                         responseCode = "500",
-                        description = "Error interno del servidor")
+                        description = "Error interno del servidor",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Error interno del servidor",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/user/delete"
+                        }
+                    """)))
             },
-            parameters = {
-                @Parameter(
-                        in = ParameterIn.PATH,
-                        name = "id",
-                        description = "ID del usuario a eliminar",
-                        required = true,
-                        schema =
-                                @Schema(
-                                        type = "string",
-                                        example = "123e4567-e89b-12d3-a456-426614174000"))
+            security = {
+                @io.swagger.v3.oas.annotations.security.SecurityRequirement(
+                        name = "Bearer Authentication")
             })
     ResponseEntity<?> delete() throws IOException;
 
     @Operation(
-            description = "Carga una nueva imagen de perfil para el usuario autenticado",
+            summary = "Subir imagen de perfil",
+            description =
+                    "Carga una nueva imagen de perfil para el usuario autenticado. Formatos soportados: JPG, PNG, GIF. Tamaño máximo: 5MB",
             responses = {
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
                         responseCode = "201",
@@ -483,26 +616,94 @@ public interface AuthResource {
                                                         value =
                                                                 """
                         {
-                          "id": 1,
-                          "name": "profile_1234.jpg",
-                          "type": "image/jpeg",
-                          "url": "/api/images/profile_1234.jpg"
+                          "success": true,
+                          "message": "Imagen guardada",
+                          "data": {
+                            "id": 1,
+                            "name": "profile_1234.jpg",
+                            "type": "image/jpeg",
+                            "url": "https://res.cloudinary.com/kuenteco/image/upload/v1234567890/profile_1234.jpg"
+                          },
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/user/image/add"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "401",
+                        description = "Token no proporcionado o inválido",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Token de autenticación requerido",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/user/image/add"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "400",
+                        description = "Archivo no válido o formato incorrecto",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Formato de imagen no soportado. Use JPG, PNG o GIF",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/user/image/add"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "413",
+                        description = "Archivo muy grande",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "El archivo excede el tamaño máximo permitido de 5MB",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/user/image/add"
                         }
                     """))),
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
                         responseCode = "500",
-                        description = "Error al procesar la imagen")
+                        description = "Error interno al procesar la imagen",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Error interno al procesar la imagen",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/user/image/add"
+                        }
+                    """)))
             },
-            parameters = {
-                @Parameter(
-                        in = ParameterIn.HEADER,
-                        name = "Authorization",
-                        description = "Token de autorización (Bearer)",
-                        required = true,
-                        schema =
-                                @Schema(
-                                        type = "string",
-                                        example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."))
+            security = {
+                @io.swagger.v3.oas.annotations.security.SecurityRequirement(
+                        name = "Bearer Authentication")
             })
     @PostMapping("/user/image/add")
     ResponseEntity<?> uploadImage(
@@ -573,7 +774,9 @@ public interface AuthResource {
     ResponseEntity<?> deleteImage(HttpServletResponse response) throws IOException;
 
     @Operation(
-            description = "Recupera los datos del usuario actualmente autenticado",
+            summary = "Obtener detalles del usuario autenticado",
+            description =
+                    "Recupera los datos completos del usuario actualmente autenticado incluyendo información de perfil, suscripción e imagen",
             responses = {
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
                         responseCode = "200",
@@ -584,26 +787,27 @@ public interface AuthResource {
                                         schema = @Schema(implementation = UserDetailDTO.class),
                                         examples =
                                                 @ExampleObject(
+                                                        name = "Usuario con imagen",
                                                         value =
                                                                 """
                         {
-                          "name": "usuario123",
-                          "email": "usuario@example.com",
-                          "role": {
-                            "name": "USER"
-                          },
                           "version": 1,
-                          "masterImage": {
+                          "image": {
                             "id": 1,
                             "name": "profile_1234.jpg",
                             "type": "image/jpeg",
-                            "url": "/api/images/profile_1234.jpg"
-                          }
+                            "url": "https://res.cloudinary.com/kuenteco/image/upload/v1234567890/profile_1234.jpg"
+                          },
+                          "username": "usuario123",
+                          "email": "usuario@example.com",
+                          "userType": "PERSONAL",
+                          "subscriptionType": "FREE",
+                          "state": "ACTIVE"
                         }
                     """))),
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                        responseCode = "400",
-                        description = "Error al obtener datos del usuario",
+                        responseCode = "401",
+                        description = "Token no proporcionado o inválido",
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -613,9 +817,52 @@ public interface AuthResource {
                                                         value =
                                                                 """
                         {
-                          "message": "Usuario no autenticado"
+                          "success": false,
+                          "message": "Token de autenticación requerido",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/user/details"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "403",
+                        description = "Token expirado o usuario no autorizado",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Token expirado o acceso denegado",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/user/details"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "500",
+                        description = "Error interno del servidor",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Error interno del servidor",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/auth/user/details"
                         }
                     """)))
+            },
+            security = {
+                @io.swagger.v3.oas.annotations.security.SecurityRequirement(
+                        name = "Bearer Authentication")
             })
-    ResponseEntity<?> getAuthenticatedUser(HttpServletRequest request);
+    ResponseEntity<?> getAuthenticatedUser(@Parameter(hidden = true) HttpServletRequest request);
 }
