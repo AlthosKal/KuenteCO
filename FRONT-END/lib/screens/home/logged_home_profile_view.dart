@@ -9,7 +9,6 @@ import '../../widgets/common/navbar/navbar_logged_widget.dart';
 import '../../widgets/components/category/category_card_widget.dart';
 import '../../widgets/components/budget/budget_card_widget.dart';
 import '../../widgets/components/transaction/transaction_card_widget.dart';
-import '../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 
 class LoggedHomeProfileView extends StatefulWidget {
   final String profileName;
@@ -69,7 +68,7 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
               /// CONTENIDO PRINCIPAL
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(16),
                   child: ValueListenableBuilder<ProfileDetailDTO?>(
                     valueListenable: _profileController.authenticatedProfile,
                     builder: (context, profile, _) {
@@ -103,19 +102,23 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 20),
 
 
-                          /// GRID DE 4 CARDS
+                          /// 🔲 CARD CONTENEDOR GRANDE
+                          BlurredCard(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: /// GRID DE 4 CARDS
                           GridView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: 4,
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
-                              crossAxisSpacing: 6,
+                              crossAxisSpacing: 8,
                               mainAxisSpacing: 6,
-                              childAspectRatio: 2.8,
+                              childAspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
                             ),
                             itemBuilder: (context, index) {
                               switch (index) {
@@ -124,23 +127,16 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
                                 case 1:
                                   return const BudgetCardWidget();
                                 case 2:
-                                  return BlurredCard(
-                                    child: TransactionCardWidget(
-                                      transaction: TransactionDetailDTO(
-                                        id: 0,
-                                        name: 'Transacciones',
-                                        amount: 0,
-                                        date: DateTime.now().toIso8601String(),
-                                        description: 'Ver todas las transacciones',
-                                      ),
-                                      showActions: false,
-                                      onTap: () {
-                                        Navigator.pushNamed(context, '/transactions');
-                                      },
-                                    ),
+                                  return const TransactionCardWidget(
+                                    isHomeCard: true,
+                                    showActions: false,
                                   );
                                 case 3:
-                                  return BlurredCard(
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
                                     child: _buildCardItem(
                                       icon: Icons.settings_outlined,
                                       title: "Configuración",
@@ -152,15 +148,19 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
                               }
                             },
                           ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 40),
+
+                          /// ✅ FOOTER
+                          const FooterLoggedWidget(),
                         ],
                       );
                     },
                   ),
                 ),
               ),
-
-              /// FOOTER
-              const FooterLoggedWidget(),
             ],
           ),
         ),

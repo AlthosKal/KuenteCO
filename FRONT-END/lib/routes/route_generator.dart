@@ -1,3 +1,4 @@
+import 'package:KuenteCO/screens/transaction_view.dart';
 import 'package:flutter/material.dart';
 import '../screens/account_view.dart';
 import '../screens/auth/code_recovery_view.dart';
@@ -19,7 +20,7 @@ import '../screens/legal/privacy_view.dart';
 import '../screens/legal/terms_logged_view.dart';
 import '../screens/legal/terms_view.dart';
 import '../screens/profile/profiles_view.dart';
-import '../screens/subscriptions_view.dart';
+import '../screens/suscription/subscriptions_view.dart';
 import 'app_routes.dart';
 
 class RouteGenerator {
@@ -155,6 +156,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const CategoryView());
       case AppRoutes.budgetView:
         return MaterialPageRoute(builder: (_) => const BudgetView());
+      case AppRoutes.transactionView:
+        return MaterialPageRoute(builder: (_) => const TransactionView());
 
 
     // ✅ DEFAULT -> RUTA NO ENCONTRADA

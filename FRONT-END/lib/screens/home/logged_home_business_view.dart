@@ -7,7 +7,6 @@ import '../../widgets/common/footer/footer_logged_widget.dart';
 import '../../widgets/common/navbar/navbar_logged_widget.dart';
 import '../../widgets/components/category/category_card_widget.dart';
 import '../../widgets/components/budget/budget_card_widget.dart';
-import '../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 
 class LoggedHomeBusinessView extends StatefulWidget {
   final String userName;
@@ -49,10 +48,10 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                 },
               ),
 
-              /// ✅ CONTENIDO SCROLLABLE
+              /// ✅ CONTENIDO SCROLLABLE  
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -86,7 +85,7 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                         ],
                       ),
 
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 20),
 
                       /// 🔲 CARD CONTENEDOR GRANDE
                       BlurredCard(
@@ -94,12 +93,13 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                           padding: const EdgeInsets.all(16),
                           child: GridView.builder(
                             shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
                             itemCount: 4,
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                              childAspectRatio: 2.9,
+                              crossAxisSpacing: 8,
+                              mainAxisSpacing: 6,
+                              childAspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
                             ),
                             itemBuilder: (context, index) {
                               switch (index) {
@@ -108,18 +108,9 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                                 case 1:
                                   return const BudgetCardWidget();
                                 case 2:
-                                  return TransactionCardWidget(
-                                    transaction: TransactionDetailDTO(
-                                      id: 0,
-                                      name: 'Transacciones',
-                                      amount: 0,
-                                      date: DateTime.now().toIso8601String(),
-                                      description: 'Ver todas las transacciones',
-                                    ),
+                                  return const TransactionCardWidget(
+                                    isHomeCard: true,
                                     showActions: false,
-                                    onTap: () {
-                                      Navigator.pushNamed(context, '/transactions');
-                                    },
                                   );
                                 case 3:
                                   return Container(
@@ -140,6 +131,8 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                           ),
                         ),
                       ),
+
+                      const SizedBox(height: 40),
 
                       /// ✅ FOOTER
                       const FooterLoggedWidget(),
