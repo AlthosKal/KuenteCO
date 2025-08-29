@@ -46,7 +46,17 @@ class CategoryController extends ChangeNotifier {
       categories = await _service.getAllCategories();
       _setError(null);
     } catch (e) {
-      _setError(e.toString());
+      // Si es un error de "no hay datos" o lista vacía, no es realmente un error
+      if (e.toString().toLowerCase().contains('empty') ||
+          e.toString().toLowerCase().contains('no data') ||
+          e.toString().toLowerCase().contains('not found') ||
+          e.toString().contains('404')) {
+        print('📝 CategoryController: No categories found for user - this is normal');
+        categories = []; // Asegurar lista vacía
+        _setError(null); // No mostrar como error
+      } else {
+        _setError(e.toString());
+      }
     } finally {
       _setLoading(false);
     }
@@ -124,7 +134,18 @@ class CategoryController extends ChangeNotifier {
       _setError(null);
     } catch (e) {
       print('❌ CategoryController: Error loading profile enrollments: $e');
-      _setError(e.toString());
+      
+      // Si es un error de "no hay datos" o lista vacía, no es realmente un error
+      if (e.toString().toLowerCase().contains('empty') ||
+          e.toString().toLowerCase().contains('no data') ||
+          e.toString().toLowerCase().contains('not found') ||
+          e.toString().contains('404')) {
+        print('📝 CategoryController: No enrollments found for profile - this is normal');
+        enrollments = []; // Asegurar lista vacía
+        _setError(null); // No mostrar como error
+      } else {
+        _setError(e.toString());
+      }
     } finally {
       _setLoading(false);
     }

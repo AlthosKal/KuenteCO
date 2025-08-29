@@ -9,8 +9,13 @@ import '../widgets/common/navbar/navbar_logged_widget.dart';
 import '../widgets/components/transaction/transaction_list_widget.dart';
 import '../widgets/components/transaction/transaction_form_widget.dart';
 import '../widgets/components/transaction/transaction_statistics_widget.dart';
+import '../widgets/components/transaction/create_transaction_widget.dart';
+import '../widgets/components/transaction/edit_transaction_widget.dart';
+import '../widgets/components/transaction/delete_transaction_widget.dart';
 import '../core/services/app/transaction_service.dart';
+import '../core/services/app/category_service.dart';
 import '../core/services/api_client.dart';
+import '../controllers/category_controller.dart';
 
 class TransactionView extends StatefulWidget {
   const TransactionView({Key? key}) : super(key: key);
@@ -22,15 +27,18 @@ class TransactionView extends StatefulWidget {
 class _TransactionViewState extends State<TransactionView> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late TransactionController _transactionController;
+  late CategoryController _categoryController;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     _transactionController = TransactionController(TransactionService(ApiClient()));
+    _categoryController = CategoryController(CategoryService(ApiClient()));
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _transactionController.loadTransactions();
+      _categoryController.loadCategories();
     });
   }
 
@@ -38,13 +46,17 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
   void dispose() {
     _tabController.dispose();
     _transactionController.dispose();
+    _categoryController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<TransactionController>.value(
-      value: _transactionController,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<TransactionController>.value(value: _transactionController),
+        ChangeNotifierProvider<CategoryController>.value(value: _categoryController),
+      ],
       child: Background(
         child: Scaffold(
           backgroundColor: Colors.transparent,
@@ -72,9 +84,6 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
                       
                       /// TAB 2: ESTAD�STICAS
                       _buildStatisticsTab(),
-                      
-                      /// TAB 3: CREAR/EDITAR TRANSACCI�N
-                      _buildFormTab(),
                     ],
                   ),
                 ),
@@ -132,10 +141,6 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
                   icon: Icon(Icons.bar_chart, size: 20),
                   text: 'Estad�sticas',
                 ),
-                Tab(
-                  icon: Icon(Icons.add, size: 20),
-                  text: 'Crear',
-                ),
               ],
             ),
           ),
@@ -152,10 +157,10 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
         onTransactionEdit: _editTransaction,
         onTransactionDelete: _deleteTransaction,
         onAddTransaction: () {
-          _tabController.animateTo(2);
+          _showCreateTransactionModal();
         },
         showFilters: true,
-        showFab: true,
+        showFab: false,
         compact: false,
       ),
     );
@@ -177,31 +182,6 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
     );
   }
 
-  Widget _buildFormTab() {
-    return Consumer<TransactionController>(
-      builder: (context, controller, child) {
-        return Padding(
-          padding: const EdgeInsets.all(16),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: SingleChildScrollView(
-              child: TransactionFormWidget(
-                transaction: controller.currentTransaction,
-                onCreateTransaction: _createTransaction,
-                onUpdateTransaction: _updateTransaction,
-                categories: const ['Comida', 'Transporte', 'Entretenimiento', 'Servicios', 'Otros'],
-                isLoading: controller.isLoading,
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
 
   void _showTransactionDetail(TransactionDetailDTO transaction) {
     showModalBottomSheet(
@@ -329,7 +309,7 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
                   child: ElevatedButton.icon(
                     onPressed: () {
                       Navigator.pop(context);
-                      _confirmDeleteTransaction(transaction);
+                      _showDeleteTransactionModal(transaction);
                     },
                     icon: const Icon(Icons.delete),
                     label: const Text('Eliminar'),
@@ -377,21 +357,17 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
       await _transactionController.addTransaction(newTransaction);
       
       if (mounted) {
+        Navigator.pop(context); // Close modal
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Transacci�n creada exitosamente'),
             backgroundColor: Colors.green,
           ),
         );
-        
-        // Volver al tab de lista
-        _tabController.animateTo(0);
-        
-        // Limpiar transacci�n seleccionada
-        _transactionController.currentTransaction = null;
       }
     } catch (e) {
       if (mounted) {
+        Navigator.pop(context); // Close modal
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al crear la transacci�n: ${e.toString()}'),
@@ -407,21 +383,17 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
       await _transactionController.updateTransaction(updateTransaction);
       
       if (mounted) {
+        Navigator.pop(context); // Close modal
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Transacci�n actualizada exitosamente'),
             backgroundColor: Colors.green,
           ),
         );
-        
-        // Volver al tab de lista
-        _tabController.animateTo(0);
-        
-        // Limpiar transacci�n seleccionada
-        _transactionController.currentTransaction = null;
       }
     } catch (e) {
       if (mounted) {
+        Navigator.pop(context); // Close modal
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al actualizar la transacci�n: ${e.toString()}'),
@@ -433,8 +405,63 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
   }
 
   void _editTransaction(TransactionDetailDTO transaction) {
-    _transactionController.currentTransaction = transaction;
-    _tabController.animateTo(2);
+    _showEditTransactionModal(transaction);
+  }
+
+  void _showCreateTransactionModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => MultiProvider(
+        providers: [
+          ChangeNotifierProvider<TransactionController>.value(value: _transactionController),
+          ChangeNotifierProvider<CategoryController>.value(value: _categoryController),
+        ],
+        child: CreateTransactionWidget(
+          onCreateTransaction: (newTransaction) {
+            _createTransaction(newTransaction);
+          },
+          isLoading: _transactionController.isLoading,
+        ),
+      ),
+    );
+  }
+
+  void _showEditTransactionModal(TransactionDetailDTO transaction) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => MultiProvider(
+        providers: [
+          ChangeNotifierProvider<TransactionController>.value(value: _transactionController),
+          ChangeNotifierProvider<CategoryController>.value(value: _categoryController),
+        ],
+        child: EditTransactionWidget(
+          transaction: transaction,
+          onUpdateTransaction: (updateTransaction) {
+            _updateTransaction(updateTransaction);
+          },
+          isLoading: _transactionController.isLoading,
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteTransactionModal(TransactionDetailDTO transaction) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DeleteTransactionWidget(
+        transaction: transaction,
+        onDeleteTransaction: (transactionToDelete) {
+          _deleteTransaction(transactionToDelete);
+        },
+        isLoading: _transactionController.isLoading,
+      ),
+    );
   }
 
   void _deleteTransaction(TransactionDetailDTO transaction) async {
@@ -461,30 +488,4 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
     }
   }
 
-  void _confirmDeleteTransaction(TransactionDetailDTO transaction) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirmar eliminaci�n'),
-        content: Text('�Est�s seguro de que deseas eliminar "${transaction.name}"?\n\nEsta acci�n no se puede deshacer.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _deleteTransaction(transaction);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Eliminar'),
-          ),
-        ],
-      ),
-    );
-  }
 }

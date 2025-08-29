@@ -20,8 +20,22 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
     super.initState();
     // Cargar presupuestos cuando se monta el widget
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadDataBasedOnRole();
+      _forceCleanStateAndLoad();
     });
+  }
+  
+  /// Fuerza un estado limpio antes de cargar datos
+  Future<void> _forceCleanStateAndLoad() async {
+    final budgetController = Provider.of<BudgetController>(context, listen: false);
+    
+    // Limpiar completamente el estado antes de empezar
+    budgetController.clearError();
+    
+    // Esperar un frame para asegurar que la UI se actualice
+    await Future.delayed(const Duration(milliseconds: 10));
+    
+    // Ahora cargar los datos
+    await _loadDataBasedOnRole();
   }
   
   /// Cargar datos seg�n el rol del usuario
@@ -164,7 +178,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
       );
     }
 
-    // =9 Si hay presupuestos � mostrar informaci�n del primero
+    // Si existen presupuestos
     final budget = budgetController.budgets.first;
     return InkWell(
       onTap: () => Navigator.pushNamed(context, AppRoutes.budgetView),
@@ -253,11 +267,12 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
   
   /// Widget para mostrar enrollments de presupuestos para perfiles
   Widget _buildEnrollmentCard(BudgetController budgetController) {
-    // =9 Si no hay enrollments � mostrar mensaje
+    // Si no existen enrollments
     if (budgetController.enrollments.isEmpty) {
-      return InkWell(
-        onTap: () => Navigator.pushNamed(context, AppRoutes.budgetView),
-        borderRadius: BorderRadius.circular(20),
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+        ),
         child: GlassmorphicContainer(
           width: 180,
           height: 180,
@@ -269,14 +284,14 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFFFF9800).withOpacity(0.3),
-              const Color(0xFFFFC107).withOpacity(0.1),
+              const Color(0xFF890cac).withOpacity(0.3),
+              const Color(0xFF890cac).withOpacity(0.3),
             ],
           ),
           borderGradient: LinearGradient(
             colors: [
-              Colors.white.withOpacity(0.5),
-              Colors.white.withOpacity(0.5),
+              Colors.transparent,
+              Colors.transparent,
             ],
           ),
             child: Padding(
@@ -298,7 +313,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                   ),
                   const SizedBox(height: 12),
                   const Text(
-                    'Mis Presupuestos',
+                    'Presupuestos',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -308,7 +323,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                   ),
                   const SizedBox(height: 4),
                   const Text(
-                    'No tienes presupuestos asignados',
+                    'El administrador aún no te ha asignado presupuestos',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.purple,
@@ -322,7 +337,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
       );
     }
 
-    // =9 Si hay enrollments � mostrar informaci�n del primero
+    // Si Existen enrollments
     final enrollment = budgetController.enrollments.first;
     return InkWell(
       onTap: () => Navigator.pushNamed(context, AppRoutes.budgetView),

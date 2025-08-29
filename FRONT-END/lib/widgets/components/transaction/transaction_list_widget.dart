@@ -379,3 +379,75 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
     );
   }
 }
+
+class TransactionListItemWidget extends StatelessWidget {
+  final TransactionDetailDTO transaction;
+  final VoidCallback? onTap;
+
+  const TransactionListItemWidget({
+    Key? key,
+    required this.transaction,
+    this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final isIncome = transaction.name.toLowerCase().contains('ingreso') || 
+                    transaction.name.toLowerCase().contains('income');
+    final isExpense = transaction.name.toLowerCase().contains('gasto') || 
+                     transaction.name.toLowerCase().contains('expense');
+    final isDebt = transaction.name.toLowerCase().contains('deuda') || 
+                   transaction.name.toLowerCase().contains('debt');
+
+    Color cardColor = Colors.blue;
+    IconData transactionIcon = Icons.swap_horiz;
+
+    if (isIncome) {
+      cardColor = Colors.green;
+      transactionIcon = Icons.trending_up;
+    } else if (isExpense) {
+      cardColor = Colors.orange;
+      transactionIcon = Icons.trending_down;
+    } else if (isDebt) {
+      cardColor = Colors.red;
+      transactionIcon = Icons.account_balance_wallet;
+    }
+
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: cardColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          transactionIcon,
+          color: cardColor,
+          size: 20,
+        ),
+      ),
+      title: Text(
+        transaction.name,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      subtitle: Text(
+        transaction.date,
+        style: TextStyle(
+          color: Colors.grey[600],
+          fontSize: 12,
+        ),
+      ),
+      trailing: Text(
+        '\$${transaction.amount.toStringAsFixed(0)}',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: cardColor,
+          fontSize: 16,
+        ),
+      ),
+      onTap: onTap,
+    );
+  }
+}

@@ -32,7 +32,13 @@ class TransactionService {
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
       print('📌 TransactionService: Response has data key, extracting list');
-      dataList = responseData['data'] as List<dynamic>;
+      final dataValue = responseData['data'];
+      if (dataValue is List<dynamic>) {
+        dataList = dataValue;
+      } else {
+        print('❌ TransactionService: Data key exists but value is not a List, it is ${dataValue.runtimeType}');
+        return [];
+      }
     } else if (responseData is List<dynamic>) {
       print('📌 TransactionService: Response is direct list');
       dataList = responseData;
@@ -69,7 +75,13 @@ class TransactionService {
     
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      dataList = responseData['data'] as List<dynamic>;
+      final dataValue = responseData['data'];
+      if (dataValue is List<dynamic>) {
+        dataList = dataValue;
+      } else {
+        print('❌ TransactionService: Summary data key exists but value is not a List, it is ${dataValue.runtimeType}');
+        return [];
+      }
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {
@@ -107,7 +119,13 @@ class TransactionService {
     
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      dataList = responseData['data'] as List<dynamic>;
+      final dataValue = responseData['data'];
+      if (dataValue is List<dynamic>) {
+        dataList = dataValue;
+      } else {
+        print('❌ TransactionService: Category data key exists but value is not a List, it is ${dataValue.runtimeType}');
+        return [];
+      }
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {
@@ -156,7 +174,12 @@ class TransactionService {
     List<dynamic> dataList;
     
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      dataList = responseData['data'] as List<dynamic>;
+      final dataValue = responseData['data'];
+      if (dataValue is List<dynamic>) {
+        dataList = dataValue;
+      } else {
+        throw Exception('Batch create data key exists but value is not a List, it is ${dataValue.runtimeType}');
+      }
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {
@@ -204,7 +227,12 @@ class TransactionService {
     List<dynamic> dataList;
     
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      dataList = responseData['data'] as List<dynamic>;
+      final dataValue = responseData['data'];
+      if (dataValue is List<dynamic>) {
+        dataList = dataValue;
+      } else {
+        throw Exception('Batch update data key exists but value is not a List, it is ${dataValue.runtimeType}');
+      }
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {
@@ -277,7 +305,13 @@ class TransactionService {
     List<dynamic> dataList;
     
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      dataList = responseData['data'] as List<dynamic>;
+      final dataValue = responseData['data'];
+      if (dataValue is List<dynamic>) {
+        dataList = dataValue;
+      } else {
+        print('❌ TransactionService: Bancolombia data key exists but value is not a List, it is ${dataValue.runtimeType}');
+        return [];
+      }
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {
@@ -329,7 +363,13 @@ class TransactionService {
     
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      dataList = responseData['data'] as List<dynamic>;
+      final dataValue = responseData['data'];
+      if (dataValue is List<dynamic>) {
+        dataList = dataValue;
+      } else {
+        print('❌ TransactionService: Filter data key exists but value is not a List, it is ${dataValue.runtimeType}');
+        return [];
+      }
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {
