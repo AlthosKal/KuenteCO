@@ -16,12 +16,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Budgets", description = "API para la gestión completa de presupuestos y control financiero")
+@Tag(
+        name = "Budgets",
+        description = "API para la gestión completa de presupuestos y control financiero")
 public interface BudgetResource {
 
     @Operation(
             summary = "Obtener todos los presupuestos",
-            description = "Recupera una lista de todos los presupuestos con filtros opcionales por fechas y tipo",
+            description =
+                    "Recupera una lista de todos los presupuestos con filtros opcionales por fechas y tipo",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -67,7 +70,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -85,7 +92,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -102,18 +113,31 @@ public interface BudgetResource {
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "from",
-                        description = "Fecha de inicio para filtrar presupuestos (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        description =
+                                "Fecha de inicio para filtrar presupuestos (formato ISO 8601)",
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
                         description = "Fecha de fin para filtrar presupuestos (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de presupuesto para filtrar",
-                        schema = @Schema(type = "string", allowableValues = {"MONTHLY", "YEARLY", "CUSTOM"}, example = "MONTHLY"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {"MONTHLY", "YEARLY", "CUSTOM"},
+                                        example = "MONTHLY"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -128,7 +152,8 @@ public interface BudgetResource {
 
     @Operation(
             summary = "Obtener asignaciones de presupuestos",
-            description = "Recupera todas las asignaciones de presupuestos a perfiles con filtros opcionales",
+            description =
+                    "Recupera todas las asignaciones de presupuestos a perfiles con filtros opcionales",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -171,7 +196,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -189,7 +218,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -206,18 +239,31 @@ public interface BudgetResource {
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "from",
-                        description = "Fecha de inicio para filtrar asignaciones (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        description =
+                                "Fecha de inicio para filtrar asignaciones (formato ISO 8601)",
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
                         description = "Fecha de fin para filtrar asignaciones (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de asignación para filtrar",
-                        schema = @Schema(type = "string", allowableValues = {"ACTIVE", "INACTIVE"}, example = "ACTIVE"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {"ACTIVE", "INACTIVE"},
+                                        example = "ACTIVE"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -232,11 +278,13 @@ public interface BudgetResource {
 
     @Operation(
             summary = "Obtener asignaciones de presupuestos del usuario",
-            description = "Recupera las asignaciones de presupuestos específicas del usuario autenticado",
+            description =
+                    "Recupera las asignaciones de presupuestos específicas del usuario autenticado",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
-                        description = "Asignaciones de presupuestos del usuario obtenidas correctamente",
+                        description =
+                                "Asignaciones de presupuestos del usuario obtenidas correctamente",
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -269,7 +317,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -287,7 +339,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -304,18 +360,31 @@ public interface BudgetResource {
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "from",
-                        description = "Fecha de inicio para filtrar asignaciones (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        description =
+                                "Fecha de inicio para filtrar asignaciones (formato ISO 8601)",
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
                         description = "Fecha de fin para filtrar asignaciones (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de asignación para filtrar",
-                        schema = @Schema(type = "string", allowableValues = {"ACTIVE", "INACTIVE"}, example = "ACTIVE"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {"ACTIVE", "INACTIVE"},
+                                        example = "ACTIVE"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -330,7 +399,8 @@ public interface BudgetResource {
 
     @Operation(
             summary = "Obtener comparación presupuesto vs gasto real",
-            description = "Genera un reporte detallado comparando el presupuesto asignado contra los gastos reales con análisis de desviaciones",
+            description =
+                    "Genera un reporte detallado comparando el presupuesto asignado contra los gastos reales con análisis de desviaciones",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -382,7 +452,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -400,7 +474,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -418,17 +496,29 @@ public interface BudgetResource {
                         in = ParameterIn.QUERY,
                         name = "from",
                         description = "Fecha de inicio para el reporte (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
                         description = "Fecha de fin para el reporte (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de análisis para incluir en el reporte",
-                        schema = @Schema(type = "string", allowableValues = {"VARIANCE", "TREND", "DETAILED"}, example = "VARIANCE"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {"VARIANCE", "TREND", "DETAILED"},
+                                        example = "VARIANCE"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -443,7 +533,8 @@ public interface BudgetResource {
 
     @Operation(
             summary = "Obtener resumen ejecutivo de presupuestos",
-            description = "Genera un resumen consolidado de todos los presupuestos con estadísticas clave y métricas de rendimiento",
+            description =
+                    "Genera un resumen consolidado de todos los presupuestos con estadísticas clave y métricas de rendimiento",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -492,7 +583,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -510,7 +605,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -528,17 +627,29 @@ public interface BudgetResource {
                         in = ParameterIn.QUERY,
                         name = "from",
                         description = "Fecha de inicio para el resumen (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
                         description = "Fecha de fin para el resumen (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de resumen para generar",
-                        schema = @Schema(type = "string", allowableValues = {"EXECUTIVE", "DETAILED", "ALERTS_ONLY"}, example = "EXECUTIVE"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {"EXECUTIVE", "DETAILED", "ALERTS_ONLY"},
+                                        example = "EXECUTIVE"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -553,7 +664,8 @@ public interface BudgetResource {
 
     @Operation(
             summary = "Crear nuevo presupuesto",
-            description = "Registra un nuevo presupuesto en el sistema con validaciones completas y cálculo automático de métricas",
+            description =
+                    "Registra un nuevo presupuesto en el sistema con validaciones completas y cálculo automático de métricas",
             responses = {
                 @ApiResponse(
                         responseCode = "201",
@@ -583,7 +695,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples = {
                                             @ExampleObject(
                                                     name = "Campos requeridos",
@@ -625,7 +741,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -643,7 +763,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -678,11 +802,14 @@ public interface BudgetResource {
                         name = "Bearer Authentication")
             })
     @PostMapping("/add")
-    ResponseEntity<?> addBudget(@Valid @RequestBody NewBudgetDTO dto, @Parameter(hidden = true) HttpServletRequest request);
+    ResponseEntity<?> addBudget(
+            @Valid @RequestBody NewBudgetDTO dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Crear múltiples presupuestos",
-            description = "Registra múltiples presupuestos en el sistema de forma eficiente con validación individual",
+            description =
+                    "Registra múltiples presupuestos en el sistema de forma eficiente con validación individual",
             responses = {
                 @ApiResponse(
                         responseCode = "201",
@@ -719,7 +846,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -737,7 +868,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -755,7 +890,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -773,7 +912,10 @@ public interface BudgetResource {
                             content =
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = NewBudgetDTO.class, type = "array"),
+                                            schema =
+                                                    @Schema(
+                                                            implementation = NewBudgetDTO.class,
+                                                            type = "array"),
                                             examples =
                                                     @ExampleObject(
                                                             name = "Múltiples presupuestos",
@@ -797,11 +939,14 @@ public interface BudgetResource {
                         name = "Bearer Authentication")
             })
     @PostMapping("/batch/add")
-    ResponseEntity<?> addBudgets(@Valid @RequestBody List<NewBudgetDTO> dto, @Parameter(hidden = true) HttpServletRequest request);
+    ResponseEntity<?> addBudgets(
+            @Valid @RequestBody List<NewBudgetDTO> dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Actualizar presupuesto existente",
-            description = "Actualiza los datos de un presupuesto existente con recalculo automático de métricas y validaciones",
+            description =
+                    "Actualiza los datos de un presupuesto existente con recalculo automático de métricas y validaciones",
             responses = {
                 @ApiResponse(
                         responseCode = "201",
@@ -832,7 +977,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples = {
                                             @ExampleObject(
                                                     name = "ID requerido",
@@ -874,7 +1023,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -892,7 +1045,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -910,7 +1067,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -946,11 +1107,14 @@ public interface BudgetResource {
                         name = "Bearer Authentication")
             })
     @PatchMapping("/update")
-    ResponseEntity<?> updateBudget(@Valid @RequestBody BudgetDTO dto, @Parameter(hidden = true) HttpServletRequest request);
+    ResponseEntity<?> updateBudget(
+            @Valid @RequestBody BudgetDTO dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Actualizar múltiples presupuestos",
-            description = "Actualiza múltiples presupuestos existentes de forma eficiente con validación individual",
+            description =
+                    "Actualiza múltiples presupuestos existentes de forma eficiente con validación individual",
             responses = {
                 @ApiResponse(
                         responseCode = "201",
@@ -989,7 +1153,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1007,7 +1175,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1025,7 +1197,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1043,7 +1219,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1061,7 +1241,10 @@ public interface BudgetResource {
                             content =
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = BudgetDTO.class, type = "array"),
+                                            schema =
+                                                    @Schema(
+                                                            implementation = BudgetDTO.class,
+                                                            type = "array"),
                                             examples =
                                                     @ExampleObject(
                                                             name = "Múltiples actualizaciones",
@@ -1087,11 +1270,14 @@ public interface BudgetResource {
                         name = "Bearer Authentication")
             })
     @PutMapping("/batch/update")
-    ResponseEntity<?> updateBudgets(@Valid @RequestBody List<BudgetDTO> dto, @Parameter(hidden = true) HttpServletRequest request);
+    ResponseEntity<?> updateBudgets(
+            @Valid @RequestBody List<BudgetDTO> dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Asignar perfil a presupuesto",
-            description = "Asigna un perfil específico a un presupuesto para seguimiento y control de gastos personalizado",
+            description =
+                    "Asigna un perfil específico a un presupuesto para seguimiento y control de gastos personalizado",
             responses = {
                 @ApiResponse(
                         responseCode = "201",
@@ -1099,7 +1285,8 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = BudgetEnrollmentDTO.class),
+                                        schema =
+                                                @Schema(implementation = BudgetEnrollmentDTO.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1124,7 +1311,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples = {
                                             @ExampleObject(
                                                     name = "Asignación duplicada",
@@ -1155,7 +1346,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1173,7 +1368,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1191,7 +1390,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1230,7 +1433,8 @@ public interface BudgetResource {
 
     @Operation(
             summary = "Asignar múltiples perfiles a presupuestos",
-            description = "Realiza asignaciones masivas de perfiles a presupuestos de forma eficiente",
+            description =
+                    "Realiza asignaciones masivas de perfiles a presupuestos de forma eficiente",
             responses = {
                 @ApiResponse(
                         responseCode = "201",
@@ -1271,7 +1475,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1289,7 +1497,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1307,7 +1519,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1325,7 +1541,11 @@ public interface BudgetResource {
                             content =
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = BatchEnrollmentRequestDTO.class, type = "array"),
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    BatchEnrollmentRequestDTO.class,
+                                                            type = "array"),
                                             examples =
                                                     @ExampleObject(
                                                             name = "Asignaciones múltiples",
@@ -1343,11 +1563,13 @@ public interface BudgetResource {
             })
     @PostMapping("/enroll/add/batch")
     ResponseEntity<?> enrollProfileToBudgets(
-            @RequestBody List<BatchEnrollmentRequestDTO> dto, @Parameter(hidden = true) HttpServletRequest request);
+            @RequestBody List<BatchEnrollmentRequestDTO> dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Eliminar presupuesto",
-            description = "Elimina un presupuesto específico del sistema por su ID, incluyendo todas sus asignaciones",
+            description =
+                    "Elimina un presupuesto específico del sistema por su ID, incluyendo todas sus asignaciones",
             responses = {
                 @ApiResponse(
                         responseCode = "204",
@@ -1373,7 +1595,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1391,7 +1617,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1409,7 +1639,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1427,7 +1661,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1453,7 +1691,8 @@ public interface BudgetResource {
                         name = "Bearer Authentication")
             })
     @DeleteMapping("/{id}")
-    ResponseEntity<?> deleteBudget(@PathVariable Integer id, @Parameter(hidden = true) HttpServletRequest request);
+    ResponseEntity<?> deleteBudget(
+            @PathVariable Integer id, @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Eliminar múltiples presupuestos",
@@ -1483,7 +1722,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1501,7 +1744,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1519,7 +1766,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1537,7 +1788,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1594,7 +1849,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1612,7 +1871,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1630,7 +1893,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1687,7 +1954,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1705,7 +1976,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1723,7 +1998,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1741,7 +2020,11 @@ public interface BudgetResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =

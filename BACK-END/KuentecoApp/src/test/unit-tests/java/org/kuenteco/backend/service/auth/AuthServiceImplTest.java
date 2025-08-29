@@ -143,7 +143,9 @@ class AuthServiceImplTest {
                             authService.authenticate(loginDTO, httpServletResponse);
                         });
 
-        assertEquals("Cuenta no activada, Por favor verifica tu correo", exception.getMessage());
+        assertEquals(
+                "Credenciales Invalidas, verifique sus datos e intente nuevamente",
+                exception.getMessage());
         verify(authenticationManager, never()).authenticate(any());
     }
 
@@ -162,7 +164,9 @@ class AuthServiceImplTest {
                             authService.authenticate(loginDTO, httpServletResponse);
                         });
 
-        assertEquals("Cuenta no activada, Por favor verifica tu correo", exception.getMessage());
+        assertEquals(
+                "Credenciales Invalidas, verifique sus datos e intente nuevamente",
+                exception.getMessage());
     }
 
     @Test

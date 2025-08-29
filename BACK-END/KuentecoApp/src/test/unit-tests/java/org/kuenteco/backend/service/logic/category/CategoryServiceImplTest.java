@@ -343,16 +343,23 @@ class CategoryServiceImplTest {
     void shouldUpdateCategorySuccessfully() {
         // Given
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
+
+        updateCategoryDTO.setId(1);
+        updateCategoryDTO.setName("Updated Category");
+
         Category updatedCategory = new Category();
+        updatedCategory.setName("Updated Category");
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+
             authService
-                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                    .when(org.kuenteco.backend.service.auth.AuthServiceImpl::getCredentials)
                     .thenReturn(credentials);
 
             when(slaveUserRepository.findByEmail("test@kuenteco.com"))
                     .thenReturn(Optional.of(testUser));
+            when(slaveCategoryRepository.findById(1)).thenReturn(Optional.of(testCategory));
             when(updateCategoryMapper.toEntity(updateCategoryDTO)).thenReturn(updatedCategory);
             when(slaveBudgetRepository.findById(1)).thenReturn(Optional.of(testBudget));
 
@@ -361,7 +368,16 @@ class CategoryServiceImplTest {
 
             // Then
             verify(updateCategoryMapper).toEntity(updateCategoryDTO);
-            verify(masterCategoryRepository).save(any(Category.class));
+            verify(slaveCategoryRepository).findById(1);
+
+            // Validamos que se guarde la categoría con el usuario asignado
+            verify(masterCategoryRepository)
+                    .save(
+                            argThat(
+                                    c ->
+                                            c != null
+                                                    && c.getUser().equals(testUser)
+                                                    && "Updated Category".equals(c.getName())));
         }
     }
 

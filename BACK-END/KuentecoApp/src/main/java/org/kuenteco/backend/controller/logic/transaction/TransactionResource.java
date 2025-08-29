@@ -18,12 +18,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Transactions", description = "API para la gestión completa de transacciones financieras")
+@Tag(
+        name = "Transactions",
+        description = "API para la gestión completa de transacciones financieras")
 public interface TransactionResource {
 
     @Operation(
             summary = "Obtener transacciones",
-            description = "Recupera una lista de transacciones con filtros opcionales por fechas y tipo",
+            description =
+                    "Recupera una lista de transacciones con filtros opcionales por fechas y tipo",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -63,7 +66,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -81,7 +88,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -98,18 +109,31 @@ public interface TransactionResource {
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "from",
-                        description = "Fecha de inicio para filtrar transacciones (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        description =
+                                "Fecha de inicio para filtrar transacciones (formato ISO 8601)",
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
                         description = "Fecha de fin para filtrar transacciones (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de transacción a filtrar",
-                        schema = @Schema(type = "string", allowableValues = {"INCOME", "EXPENSE"}, example = "EXPENSE"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {"INCOME", "EXPENSE"},
+                                        example = "EXPENSE"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -124,7 +148,8 @@ public interface TransactionResource {
 
     @Operation(
             summary = "Obtener resumen de transacciones",
-            description = "Recupera un resumen estadístico de las transacciones con totales por tipo y período",
+            description =
+                    "Recupera un resumen estadístico de las transacciones con totales por tipo y período",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -159,7 +184,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -177,7 +206,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -195,17 +228,29 @@ public interface TransactionResource {
                         in = ParameterIn.QUERY,
                         name = "from",
                         description = "Fecha de inicio para el resumen (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
                         description = "Fecha de fin para el resumen (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de transacción para incluir en el resumen",
-                        schema = @Schema(type = "string", allowableValues = {"INCOME", "EXPENSE"}, example = "EXPENSE"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {"INCOME", "EXPENSE"},
+                                        example = "EXPENSE"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -220,7 +265,8 @@ public interface TransactionResource {
 
     @Operation(
             summary = "Verificar estado del servicio Bancolombia",
-            description = "Comprueba el estado de salud del servicio de integración con Bancolombia",
+            description =
+                    "Comprueba el estado de salud del servicio de integración con Bancolombia",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -260,7 +306,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class)))
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class)))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -271,7 +321,8 @@ public interface TransactionResource {
 
     @Operation(
             summary = "Obtener transacciones de Bancolombia",
-            description = "Genera una URL de archivo con transacciones filtradas desde el sistema Bancolombia",
+            description =
+                    "Genera una URL de archivo con transacciones filtradas desde el sistema Bancolombia",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -297,7 +348,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -315,7 +370,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -333,7 +392,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -351,7 +414,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -369,7 +436,11 @@ public interface TransactionResource {
                             content =
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = BancolombiaTransactionRequestDTO.class),
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    BancolombiaTransactionRequestDTO
+                                                                            .class),
                                             examples =
                                                     @ExampleObject(
                                                             name = "Solicitud Bancolombia",
@@ -428,7 +499,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples = {
                                             @ExampleObject(
                                                     name = "Campos requeridos",
@@ -470,7 +545,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -488,7 +567,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -506,7 +589,10 @@ public interface TransactionResource {
                             content =
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = NewTransactionDTO.class),
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    NewTransactionDTO.class),
                                             examples =
                                                     @ExampleObject(
                                                             name = "Nueva transacción",
@@ -530,7 +616,8 @@ public interface TransactionResource {
             })
     @PostMapping("/add")
     ResponseEntity<?> addTransaction(
-            @Valid @RequestBody NewTransactionDTO dto, @Parameter(hidden = true) HttpServletRequest request);
+            @Valid @RequestBody NewTransactionDTO dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Agregar múltiples transacciones",
@@ -560,7 +647,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -578,7 +669,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -596,7 +691,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -614,7 +713,11 @@ public interface TransactionResource {
                             content =
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = NewTransactionDTO.class, type = "array"),
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    NewTransactionDTO.class,
+                                                            type = "array"),
                                             examples =
                                                     @ExampleObject(
                                                             name = "Múltiples transacciones",
@@ -651,11 +754,13 @@ public interface TransactionResource {
             })
     @PostMapping("/batch/add")
     ResponseEntity<?> registerTransactions(
-            @Valid @RequestBody List<NewTransactionDTO> dto, @Parameter(hidden = true) HttpServletRequest request);
+            @Valid @RequestBody List<NewTransactionDTO> dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Actualizar transacción existente",
-            description = "Actualiza los datos de una transacción existente con validaciones completas",
+            description =
+                    "Actualiza los datos de una transacción existente con validaciones completas",
             responses = {
                 @ApiResponse(
                         responseCode = "201",
@@ -692,7 +797,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples = {
                                             @ExampleObject(
                                                     name = "ID requerido",
@@ -723,7 +832,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -741,7 +854,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -759,7 +876,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -777,7 +898,10 @@ public interface TransactionResource {
                             content =
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = UpdateTransactionDTO.class),
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    UpdateTransactionDTO.class),
                                             examples =
                                                     @ExampleObject(
                                                             name = "Actualizar transacción",
@@ -802,7 +926,8 @@ public interface TransactionResource {
             })
     @PatchMapping("/update")
     ResponseEntity<?> updateTransaction(
-            @Valid @RequestBody UpdateTransactionDTO dto, @Parameter(hidden = true) HttpServletRequest request);
+            @Valid @RequestBody UpdateTransactionDTO dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Actualizar múltiples transacciones",
@@ -845,7 +970,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -863,7 +992,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -881,7 +1014,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -899,7 +1036,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -917,7 +1058,11 @@ public interface TransactionResource {
                             content =
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = UpdateTransactionDTO.class, type = "array"),
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    UpdateTransactionDTO.class,
+                                                            type = "array"),
                                             examples =
                                                     @ExampleObject(
                                                             name = "Múltiples actualizaciones",
@@ -956,7 +1101,8 @@ public interface TransactionResource {
             })
     @PutMapping("/batch/update")
     ResponseEntity<?> updateTransactions(
-            @Valid @RequestBody List<UpdateTransactionDTO> dto, @Parameter(hidden = true) HttpServletRequest request);
+            @Valid @RequestBody List<UpdateTransactionDTO> dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Eliminar transacción",
@@ -986,7 +1132,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1004,7 +1154,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1022,7 +1176,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1079,7 +1237,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1097,7 +1259,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1115,7 +1281,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1133,7 +1303,11 @@ public interface TransactionResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =

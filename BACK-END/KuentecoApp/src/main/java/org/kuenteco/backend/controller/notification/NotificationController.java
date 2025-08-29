@@ -2,39 +2,39 @@ package org.kuenteco.backend.controller.notification;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.exception.ApiResponse;
 import org.kuenteco.backend.service.notification.NotificationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controlador REST para la gestión de notificaciones
+ * Controlador REST para la gestión de notificaciones del usuario.
  *
- * <p>Este controlador maneja las operaciones relacionadas con las notificaciones, incluyendo la
- * consulta, búsqueda y filtrado por fechas.
+ * <p>Este controlador maneja todas las operaciones relacionadas con las notificaciones, incluyendo:
+ * - Consulta de todas las notificaciones del usuario - Filtrado de notificaciones por rango de
+ * fechas - Búsqueda de notificaciones por palabra clave en el título
+ *
+ * <p>Soporta tanto usuarios individuales (ROLE_USER) como perfiles empresariales (ROLE_PROFILE).
  *
  * @author KuenteCO Team
  * @version 1.0
  * @since 2024
  */
+@Slf4j
 @RestController
 @RequestMapping("/v1/notification")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class NotificationController implements NotificationResource {
 
     private final NotificationService notificationService;
 
-    /**
-     * Obtiene todas las notificaciones del usuario autenticado
-     *
-     * @param request La petición HTTP que contiene el token de autenticación
-     * @return ResponseEntity con la lista de notificaciones
-     */
-    @Override
+    @GetMapping
     public ResponseEntity<?> getAllNotifications(HttpServletRequest request) {
         Object notifications = notificationService.getAllNotifications();
         return new ResponseEntity<>(
@@ -45,15 +45,7 @@ public class NotificationController implements NotificationResource {
                 HttpStatus.OK);
     }
 
-    /**
-     * Obtiene notificaciones del usuario filtradas por rango de fechas
-     *
-     * @param fromDate Fecha de inicio del rango
-     * @param toDate Fecha final del rango
-     * @param request La petición HTTP que contiene el token de autenticación
-     * @return ResponseEntity con las notificaciones del rango especificado
-     */
-    @Override
+    @GetMapping("/range")
     public ResponseEntity<?> getNotificationsByDateRange(
             @RequestParam LocalDateTime fromDate,
             @RequestParam LocalDateTime toDate,
@@ -68,14 +60,7 @@ public class NotificationController implements NotificationResource {
                 HttpStatus.OK);
     }
 
-    /**
-     * Busca notificaciones del usuario por palabra clave
-     *
-     * @param keyword Palabra clave para buscar en las notificaciones
-     * @param request La petición HTTP que contiene el token de autenticación
-     * @return ResponseEntity con los resultados de la búsqueda
-     */
-    @Override
+    @GetMapping("/search")
     public ResponseEntity<?> searchNotificationsByUserId(
             @RequestParam String keyword, HttpServletRequest request) {
 

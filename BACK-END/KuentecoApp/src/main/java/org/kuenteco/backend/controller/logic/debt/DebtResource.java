@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import java.math.BigDecimal;
 import java.util.List;
 import org.kuenteco.backend.dto.logic.debt.DebtDTO;
 import org.kuenteco.backend.dto.logic.debt.DebtPaymentDTO;
@@ -26,7 +25,8 @@ public interface DebtResource {
 
     @Operation(
             summary = "Obtener todas las deudas",
-            description = "Recupera una lista completa de todas las deudas del usuario con filtros opcionales por fechas y tipo",
+            description =
+                    "Recupera una lista completa de todas las deudas del usuario con filtros opcionales por fechas y tipo",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -79,7 +79,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -97,7 +101,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -115,17 +123,34 @@ public interface DebtResource {
                         in = ParameterIn.QUERY,
                         name = "from",
                         description = "Fecha de inicio para filtrar deudas (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
                         description = "Fecha de fin para filtrar deudas (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de deuda para filtrar",
-                        schema = @Schema(type = "string", allowableValues = {"ACTIVE", "PAID", "OVERDUE", "CANCELLED"}, example = "ACTIVE"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {
+                                            "ACTIVE",
+                                            "PAID",
+                                            "OVERDUE",
+                                            "CANCELLED"
+                                        },
+                                        example = "ACTIVE"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -140,7 +165,8 @@ public interface DebtResource {
 
     @Operation(
             summary = "Obtener deudas por estado",
-            description = "Recupera todas las deudas filtradas por su estado específico (ACTIVE, PAID, OVERDUE, CANCELLED)",
+            description =
+                    "Recupera todas las deudas filtradas por su estado específico (ACTIVE, PAID, OVERDUE, CANCELLED)",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -180,7 +206,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -198,7 +228,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -216,7 +250,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -235,22 +273,43 @@ public interface DebtResource {
                         name = "state",
                         description = "Estado de la deuda para filtrar",
                         required = true,
-                        schema = @Schema(type = "string", allowableValues = {"ACTIVE", "PAID", "OVERDUE", "CANCELLED"}, example = "ACTIVE")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {
+                                            "ACTIVE",
+                                            "PAID",
+                                            "OVERDUE",
+                                            "CANCELLED"
+                                        },
+                                        example = "ACTIVE")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "from",
                         description = "Fecha de inicio para filtrar deudas (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
                         description = "Fecha de fin para filtrar deudas (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo adicional de filtro para aplicar",
-                        schema = @Schema(type = "string", allowableValues = {"HIGH_AMOUNT", "LOW_AMOUNT", "PRIORITY"}, example = "HIGH_AMOUNT"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {"HIGH_AMOUNT", "LOW_AMOUNT", "PRIORITY"},
+                                        example = "HIGH_AMOUNT"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -266,7 +325,8 @@ public interface DebtResource {
 
     @Operation(
             summary = "Obtener deudas vencidas",
-            description = "Recupera todas las deudas que han superado su fecha de vencimiento y requieren atención inmediata",
+            description =
+                    "Recupera todas las deudas que han superado su fecha de vencimiento y requieren atención inmediata",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -324,7 +384,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -342,7 +406,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -359,18 +427,32 @@ public interface DebtResource {
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "from",
-                        description = "Fecha de inicio para filtrar deudas vencidas (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        description =
+                                "Fecha de inicio para filtrar deudas vencidas (formato ISO 8601)",
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
-                        description = "Fecha de fin para filtrar deudas vencidas (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        description =
+                                "Fecha de fin para filtrar deudas vencidas (formato ISO 8601)",
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de análisis de deudas vencidas",
-                        schema = @Schema(type = "string", allowableValues = {"WITH_FEES", "CRITICAL_ONLY", "SUMMARY"}, example = "WITH_FEES"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {"WITH_FEES", "CRITICAL_ONLY", "SUMMARY"},
+                                        example = "WITH_FEES"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -385,7 +467,8 @@ public interface DebtResource {
 
     @Operation(
             summary = "Obtener deudas próximas a vencer",
-            description = "Recupera todas las deudas que vencerán dentro del número de días especificado para planificación de pagos",
+            description =
+                    "Recupera todas las deudas que vencerán dentro del número de días especificado para planificación de pagos",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -443,7 +526,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -461,7 +548,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -479,7 +570,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -498,22 +593,43 @@ public interface DebtResource {
                         name = "days",
                         description = "Número de días para buscar deudas próximas a vencer",
                         required = true,
-                        schema = @Schema(type = "integer", minimum = "1", maximum = "365", example = "7")),
+                        schema =
+                                @Schema(
+                                        type = "integer",
+                                        minimum = "1",
+                                        maximum = "365",
+                                        example = "7")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "from",
                         description = "Fecha de inicio para filtrar deudas (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
                         description = "Fecha de fin para filtrar deudas (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de análisis de vencimiento",
-                        schema = @Schema(type = "string", allowableValues = {"WITH_SUGGESTIONS", "CRITICAL_ONLY", "ALL"}, example = "WITH_SUGGESTIONS"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {
+                                            "WITH_SUGGESTIONS",
+                                            "CRITICAL_ONLY",
+                                            "ALL"
+                                        },
+                                        example = "WITH_SUGGESTIONS"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -529,7 +645,8 @@ public interface DebtResource {
 
     @Operation(
             summary = "Obtener monto total pendiente",
-            description = "Calcula y retorna el monto total de todas las deudas pendientes del usuario",
+            description =
+                    "Calcula y retorna el monto total de todas las deudas pendientes del usuario",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -572,7 +689,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -590,7 +711,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -607,18 +732,36 @@ public interface DebtResource {
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "from",
-                        description = "Fecha de inicio para calcular total pendiente (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        description =
+                                "Fecha de inicio para calcular total pendiente (formato ISO 8601)",
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
-                        description = "Fecha de fin para calcular total pendiente (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        description =
+                                "Fecha de fin para calcular total pendiente (formato ISO 8601)",
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de cálculo para el total pendiente",
-                        schema = @Schema(type = "string", allowableValues = {"SIMPLE", "WITH_DETAILS", "WITH_PROJECTIONS"}, example = "WITH_DETAILS"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {
+                                            "SIMPLE",
+                                            "WITH_DETAILS",
+                                            "WITH_PROJECTIONS"
+                                        },
+                                        example = "WITH_DETAILS"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -633,7 +776,8 @@ public interface DebtResource {
 
     @Operation(
             summary = "Obtener resumen ejecutivo de deudas",
-            description = "Genera un reporte consolidado con estadísticas clave, análisis de riesgo y recomendaciones de pago",
+            description =
+                    "Genera un reporte consolidado con estadísticas clave, análisis de riesgo y recomendaciones de pago",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -691,7 +835,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -709,7 +857,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -727,17 +879,34 @@ public interface DebtResource {
                         in = ParameterIn.QUERY,
                         name = "from",
                         description = "Fecha de inicio para el resumen (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
                         description = "Fecha de fin para el resumen (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de resumen para generar",
-                        schema = @Schema(type = "string", allowableValues = {"EXECUTIVE", "DETAILED", "RISK_ANALYSIS", "PAYMENT_PLAN"}, example = "EXECUTIVE"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {
+                                            "EXECUTIVE",
+                                            "DETAILED",
+                                            "RISK_ANALYSIS",
+                                            "PAYMENT_PLAN"
+                                        },
+                                        example = "EXECUTIVE"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -752,7 +921,8 @@ public interface DebtResource {
 
     @Operation(
             summary = "Crear nueva deuda",
-            description = "Registra una nueva deuda en el sistema con validaciones completas y cálculo automático de métricas de pago",
+            description =
+                    "Registra una nueva deuda en el sistema con validaciones completas y cálculo automático de métricas de pago",
             responses = {
                 @ApiResponse(
                         responseCode = "201",
@@ -786,7 +956,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples = {
                                             @ExampleObject(
                                                     name = "Campos requeridos",
@@ -839,7 +1013,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -857,7 +1035,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -875,7 +1057,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -914,11 +1100,14 @@ public interface DebtResource {
                         name = "Bearer Authentication")
             })
     @PostMapping("/add")
-    ResponseEntity<?> addDebt(@Valid @RequestBody NewDebtDTO dto, @Parameter(hidden = true) HttpServletRequest request);
+    ResponseEntity<?> addDebt(
+            @Valid @RequestBody NewDebtDTO dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Crear múltiples deudas",
-            description = "Registra múltiples deudas en el sistema de forma eficiente con validación individual y procesamiento en lote",
+            description =
+                    "Registra múltiples deudas en el sistema de forma eficiente con validación individual y procesamiento en lote",
             responses = {
                 @ApiResponse(
                         responseCode = "201",
@@ -965,7 +1154,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -983,7 +1176,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1001,7 +1198,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1019,7 +1220,10 @@ public interface DebtResource {
                             content =
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = NewDebtDTO.class, type = "array"),
+                                            schema =
+                                                    @Schema(
+                                                            implementation = NewDebtDTO.class,
+                                                            type = "array"),
                                             examples =
                                                     @ExampleObject(
                                                             name = "Múltiples deudas",
@@ -1051,11 +1255,14 @@ public interface DebtResource {
                         name = "Bearer Authentication")
             })
     @PostMapping("/batch/add")
-    ResponseEntity<?> addDebts(@Valid @RequestBody List<NewDebtDTO> dto, @Parameter(hidden = true) HttpServletRequest request);
+    ResponseEntity<?> addDebts(
+            @Valid @RequestBody List<NewDebtDTO> dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Actualizar deuda existente",
-            description = "Actualiza los datos de una deuda existente con validaciones y recalculo automático de métricas",
+            description =
+                    "Actualiza los datos de una deuda existente con validaciones y recalculo automático de métricas",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -1089,7 +1296,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples = {
                                             @ExampleObject(
                                                     name = "ID requerido",
@@ -1131,7 +1342,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1149,7 +1364,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1167,7 +1386,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1206,11 +1429,13 @@ public interface DebtResource {
                         name = "Bearer Authentication")
             })
     @PatchMapping("/update")
-    ResponseEntity<?> updateDebt(@Valid @RequestBody DebtDTO dto, @Parameter(hidden = true) HttpServletRequest request);
+    ResponseEntity<?> updateDebt(
+            @Valid @RequestBody DebtDTO dto, @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Actualizar múltiples deudas",
-            description = "Actualiza múltiples deudas existentes de forma eficiente con validación individual",
+            description =
+                    "Actualiza múltiples deudas existentes de forma eficiente con validación individual",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -1247,7 +1472,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1265,7 +1494,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1283,7 +1516,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1301,7 +1538,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1319,7 +1560,10 @@ public interface DebtResource {
                             content =
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = DebtDTO.class, type = "array"),
+                                            schema =
+                                                    @Schema(
+                                                            implementation = DebtDTO.class,
+                                                            type = "array"),
                                             examples =
                                                     @ExampleObject(
                                                             name = "Múltiples actualizaciones",
@@ -1342,11 +1586,14 @@ public interface DebtResource {
                         name = "Bearer Authentication")
             })
     @PutMapping("/batch/update")
-    ResponseEntity<?> updateDebts(@Valid @RequestBody List<DebtDTO> dto, @Parameter(hidden = true) HttpServletRequest request);
+    ResponseEntity<?> updateDebts(
+            @Valid @RequestBody List<DebtDTO> dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Realizar pago de deuda",
-            description = "Registra un pago hacia una deuda específica, actualiza el saldo pendiente y genera registro de transacción",
+            description =
+                    "Registra un pago hacia una deuda específica, actualiza el saldo pendiente y genera registro de transacción",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -1381,7 +1628,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples = {
                                             @ExampleObject(
                                                     name = "Monto de pago inválido",
@@ -1423,7 +1674,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1441,7 +1696,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1459,7 +1718,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1495,11 +1758,14 @@ public interface DebtResource {
                         name = "Bearer Authentication")
             })
     @PostMapping("/payment")
-    ResponseEntity<?> makePayment(@Valid @RequestBody DebtPaymentDTO dto, @Parameter(hidden = true) HttpServletRequest request);
+    ResponseEntity<?> makePayment(
+            @Valid @RequestBody DebtPaymentDTO dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Actualizar estado de deuda",
-            description = "Cambia el estado de una deuda específica (ACTIVE, PAID, OVERDUE, CANCELLED) con validaciones de transición",
+            description =
+                    "Cambia el estado de una deuda específica (ACTIVE, PAID, OVERDUE, CANCELLED) con validaciones de transición",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -1531,7 +1797,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples = {
                                             @ExampleObject(
                                                     name = "Estado inválido",
@@ -1573,7 +1843,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1591,7 +1865,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1609,7 +1887,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1634,7 +1916,16 @@ public interface DebtResource {
                         name = "state",
                         description = "Nuevo estado para la deuda",
                         required = true,
-                        schema = @Schema(type = "string", allowableValues = {"ACTIVE", "PAID", "OVERDUE", "CANCELLED"}, example = "PAID"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {
+                                            "ACTIVE",
+                                            "PAID",
+                                            "OVERDUE",
+                                            "CANCELLED"
+                                        },
+                                        example = "PAID"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -1642,11 +1933,14 @@ public interface DebtResource {
             })
     @PatchMapping("/{id}/state/{state}")
     ResponseEntity<?> updateDebtState(
-            @PathVariable Integer id, @PathVariable StateDebt state, @Parameter(hidden = true) HttpServletRequest request);
+            @PathVariable Integer id,
+            @PathVariable StateDebt state,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Eliminar deuda",
-            description = "Elimina una deuda específica del sistema por su ID, incluyendo todos sus registros de pago",
+            description =
+                    "Elimina una deuda específica del sistema por su ID, incluyendo todos sus registros de pago",
             responses = {
                 @ApiResponse(
                         responseCode = "204",
@@ -1672,7 +1966,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1690,7 +1988,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1708,7 +2010,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1726,7 +2032,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1752,11 +2062,13 @@ public interface DebtResource {
                         name = "Bearer Authentication")
             })
     @DeleteMapping("/{id}")
-    ResponseEntity<?> deleteDebt(@PathVariable Integer id, @Parameter(hidden = true) HttpServletRequest request);
+    ResponseEntity<?> deleteDebt(
+            @PathVariable Integer id, @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Eliminar múltiples deudas",
-            description = "Elimina múltiples deudas del sistema usando una lista de IDs con validaciones de integridad",
+            description =
+                    "Elimina múltiples deudas del sistema usando una lista de IDs con validaciones de integridad",
             responses = {
                 @ApiResponse(
                         responseCode = "204",
@@ -1786,7 +2098,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1804,7 +2120,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1822,7 +2142,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1840,7 +2164,11 @@ public interface DebtResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =

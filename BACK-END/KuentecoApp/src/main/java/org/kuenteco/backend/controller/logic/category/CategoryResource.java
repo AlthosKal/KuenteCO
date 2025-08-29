@@ -16,12 +16,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Categories", description = "API para la gestión completa de categorías de gastos e ingresos")
+@Tag(
+        name = "Categories",
+        description = "API para la gestión completa de categorías de gastos e ingresos")
 public interface CategoryResource {
 
     @Operation(
             summary = "Obtener todas las categorías",
-            description = "Recupera una lista de todas las categorías con filtros opcionales por fechas y tipo",
+            description =
+                    "Recupera una lista de todas las categorías con filtros opcionales por fechas y tipo",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -66,7 +69,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -84,7 +91,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -102,17 +113,29 @@ public interface CategoryResource {
                         in = ParameterIn.QUERY,
                         name = "from",
                         description = "Fecha de inicio para filtrar categorías (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
                         description = "Fecha de fin para filtrar categorías (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de categoría para filtrar",
-                        schema = @Schema(type = "string", allowableValues = {"INCOME", "EXPENSE"}, example = "EXPENSE"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {"INCOME", "EXPENSE"},
+                                        example = "EXPENSE"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -127,7 +150,8 @@ public interface CategoryResource {
 
     @Operation(
             summary = "Obtener asignaciones de categorías",
-            description = "Recupera todas las asignaciones de categorías a perfiles con filtros opcionales",
+            description =
+                    "Recupera todas las asignaciones de categorías a perfiles con filtros opcionales",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -161,7 +185,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -179,7 +207,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -196,18 +228,31 @@ public interface CategoryResource {
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "from",
-                        description = "Fecha de inicio para filtrar asignaciones (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        description =
+                                "Fecha de inicio para filtrar asignaciones (formato ISO 8601)",
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
                         description = "Fecha de fin para filtrar asignaciones (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de asignación para filtrar",
-                        schema = @Schema(type = "string", allowableValues = {"ACTIVE", "INACTIVE"}, example = "ACTIVE"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {"ACTIVE", "INACTIVE"},
+                                        example = "ACTIVE"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -222,7 +267,8 @@ public interface CategoryResource {
 
     @Operation(
             summary = "Obtener reporte de categoría específica",
-            description = "Genera un reporte detallado de una categoría específica con estadísticas y transacciones",
+            description =
+                    "Genera un reporte detallado de una categoría específica con estadísticas y transacciones",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
@@ -260,7 +306,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -278,7 +328,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -296,7 +350,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -320,17 +378,29 @@ public interface CategoryResource {
                         in = ParameterIn.QUERY,
                         name = "from",
                         description = "Fecha de inicio para el reporte (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
                         description = "Fecha de fin para el reporte (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de transacciones para incluir en el reporte",
-                        schema = @Schema(type = "string", allowableValues = {"INCOME", "EXPENSE"}, example = "EXPENSE"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {"INCOME", "EXPENSE"},
+                                        example = "EXPENSE"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -346,11 +416,13 @@ public interface CategoryResource {
 
     @Operation(
             summary = "Obtener resumen de transacciones por categoría",
-            description = "Recupera un resumen estadístico de todas las transacciones agrupadas por categorías",
+            description =
+                    "Recupera un resumen estadístico de todas las transacciones agrupadas por categorías",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
-                        description = "Resumen de transacciones por categoría obtenido correctamente",
+                        description =
+                                "Resumen de transacciones por categoría obtenido correctamente",
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -391,7 +463,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -409,7 +485,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -427,17 +507,29 @@ public interface CategoryResource {
                         in = ParameterIn.QUERY,
                         name = "from",
                         description = "Fecha de inicio para el resumen (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
                         description = "Fecha de fin para el resumen (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de transacciones para incluir en el resumen",
-                        schema = @Schema(type = "string", allowableValues = {"INCOME", "EXPENSE"}, example = "EXPENSE"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {"INCOME", "EXPENSE"},
+                                        example = "EXPENSE"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -452,11 +544,13 @@ public interface CategoryResource {
 
     @Operation(
             summary = "Obtener asignaciones de categorías del usuario",
-            description = "Recupera las asignaciones de categorías específicas del usuario autenticado",
+            description =
+                    "Recupera las asignaciones de categorías específicas del usuario autenticado",
             responses = {
                 @ApiResponse(
                         responseCode = "200",
-                        description = "Asignaciones de categorías del usuario obtenidas correctamente",
+                        description =
+                                "Asignaciones de categorías del usuario obtenidas correctamente",
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -487,7 +581,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -505,7 +603,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -522,18 +624,31 @@ public interface CategoryResource {
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "from",
-                        description = "Fecha de inicio para filtrar asignaciones (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-01T00:00:00Z")),
+                        description =
+                                "Fecha de inicio para filtrar asignaciones (formato ISO 8601)",
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-01T00:00:00Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "to",
                         description = "Fecha de fin para filtrar asignaciones (formato ISO 8601)",
-                        schema = @Schema(type = "string", format = "date-time", example = "2024-01-31T23:59:59Z")),
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        format = "date-time",
+                                        example = "2024-01-31T23:59:59Z")),
                 @Parameter(
                         in = ParameterIn.QUERY,
                         name = "kind",
                         description = "Tipo de asignación para filtrar",
-                        schema = @Schema(type = "string", allowableValues = {"ACTIVE", "INACTIVE"}, example = "ACTIVE"))
+                        schema =
+                                @Schema(
+                                        type = "string",
+                                        allowableValues = {"ACTIVE", "INACTIVE"},
+                                        example = "ACTIVE"))
             },
             security = {
                 @io.swagger.v3.oas.annotations.security.SecurityRequirement(
@@ -581,7 +696,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples = {
                                             @ExampleObject(
                                                     name = "Campos requeridos",
@@ -623,7 +742,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -641,7 +764,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -680,7 +807,8 @@ public interface CategoryResource {
             })
     @PostMapping("/add")
     ResponseEntity<?> addCategory(
-            @Valid @RequestBody NewCategoryDTO dto, @Parameter(hidden = true) HttpServletRequest request);
+            @Valid @RequestBody NewCategoryDTO dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Crear múltiples categorías",
@@ -727,7 +855,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -745,7 +877,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -763,7 +899,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -781,7 +921,10 @@ public interface CategoryResource {
                             content =
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = NewCategoryDTO.class, type = "array"),
+                                            schema =
+                                                    @Schema(
+                                                            implementation = NewCategoryDTO.class,
+                                                            type = "array"),
                                             examples =
                                                     @ExampleObject(
                                                             name = "Múltiples categorías",
@@ -812,11 +955,13 @@ public interface CategoryResource {
             })
     @PostMapping("/batch/add")
     ResponseEntity<?> addCategories(
-            @Valid @RequestBody List<NewCategoryDTO> dto, @Parameter(hidden = true) HttpServletRequest request);
+            @Valid @RequestBody List<NewCategoryDTO> dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Actualizar categoría existente",
-            description = "Actualiza los datos de una categoría existente con validaciones completas",
+            description =
+                    "Actualiza los datos de una categoría existente con validaciones completas",
             responses = {
                 @ApiResponse(
                         responseCode = "201",
@@ -850,7 +995,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples = {
                                             @ExampleObject(
                                                     name = "ID requerido",
@@ -881,7 +1030,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -899,7 +1052,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -917,7 +1074,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -935,7 +1096,10 @@ public interface CategoryResource {
                             content =
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = UpdateCategoryDTO.class),
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    UpdateCategoryDTO.class),
                                             examples =
                                                     @ExampleObject(
                                                             name = "Actualizar categoría",
@@ -957,7 +1121,8 @@ public interface CategoryResource {
             })
     @PatchMapping("/update")
     ResponseEntity<?> updateCategory(
-            @Valid @RequestBody UpdateCategoryDTO dto, @Parameter(hidden = true) HttpServletRequest request);
+            @Valid @RequestBody UpdateCategoryDTO dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Actualizar múltiples categorías",
@@ -997,7 +1162,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1015,7 +1184,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1033,7 +1206,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1051,7 +1228,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1069,7 +1250,11 @@ public interface CategoryResource {
                             content =
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = UpdateCategoryDTO.class, type = "array"),
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    UpdateCategoryDTO.class,
+                                                            type = "array"),
                                             examples =
                                                     @ExampleObject(
                                                             name = "Múltiples actualizaciones",
@@ -1102,7 +1287,8 @@ public interface CategoryResource {
             })
     @PutMapping("/batch/update")
     ResponseEntity<?> updateCategories(
-            @Valid @RequestBody List<UpdateCategoryDTO> dto, @Parameter(hidden = true) HttpServletRequest request);
+            @Valid @RequestBody List<UpdateCategoryDTO> dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Asignar perfil a categoría",
@@ -1114,7 +1300,10 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = CategoryEnrollmentDTO.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                CategoryEnrollmentDTO.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1139,7 +1328,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples = {
                                             @ExampleObject(
                                                     name = "Asignación duplicada",
@@ -1170,7 +1363,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1188,7 +1385,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1206,7 +1407,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1245,7 +1450,8 @@ public interface CategoryResource {
 
     @Operation(
             summary = "Asignar múltiples perfiles a categorías",
-            description = "Realiza asignaciones masivas de perfiles a categorías de forma eficiente",
+            description =
+                    "Realiza asignaciones masivas de perfiles a categorías de forma eficiente",
             responses = {
                 @ApiResponse(
                         responseCode = "201",
@@ -1286,7 +1492,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1304,7 +1514,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1322,7 +1536,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1340,7 +1558,11 @@ public interface CategoryResource {
                             content =
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = BatchEnrollmentRequestDTO.class, type = "array"),
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    BatchEnrollmentRequestDTO.class,
+                                                            type = "array"),
                                             examples =
                                                     @ExampleObject(
                                                             name = "Asignaciones múltiples",
@@ -1358,7 +1580,8 @@ public interface CategoryResource {
             })
     @PostMapping("/enroll/add/batch")
     ResponseEntity<?> enrollProfilesToCategories(
-            @RequestBody List<BatchEnrollmentRequestDTO> dto, @Parameter(hidden = true) HttpServletRequest request);
+            @RequestBody List<BatchEnrollmentRequestDTO> dto,
+            @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Eliminar categoría",
@@ -1388,7 +1611,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1406,7 +1633,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1424,7 +1655,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1442,7 +1677,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1468,7 +1707,8 @@ public interface CategoryResource {
                         name = "Bearer Authentication")
             })
     @DeleteMapping("/{id}")
-    ResponseEntity<?> deleteCategory(@PathVariable Integer id, @Parameter(hidden = true) HttpServletRequest request);
+    ResponseEntity<?> deleteCategory(
+            @PathVariable Integer id, @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Eliminar múltiples categorías",
@@ -1498,7 +1738,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1516,7 +1760,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1534,7 +1782,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1552,7 +1804,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1609,7 +1865,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1627,7 +1887,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1645,7 +1909,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1702,7 +1970,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1720,7 +1992,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1738,7 +2014,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
@@ -1756,7 +2036,11 @@ public interface CategoryResource {
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = org.kuenteco.backend.exception.ApiResponse.class),
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                org.kuenteco.backend.exception
+                                                                        .ApiResponse.class),
                                         examples =
                                                 @ExampleObject(
                                                         value =
