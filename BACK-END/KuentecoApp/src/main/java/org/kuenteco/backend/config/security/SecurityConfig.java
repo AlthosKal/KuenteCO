@@ -3,6 +3,7 @@ package org.kuenteco.backend.config.security;
 import java.util.List;
 import org.kuenteco.backend.config.jwt.JwtAuthenticationFilter;
 import org.kuenteco.backend.config.jwt.JwtEntryPoint;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +23,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Value("${front-end.web-url}")
+    private String webUrl;
+
+    @Value("${front-end.mobile-url}")
+    private String mobileUrl;
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -80,7 +87,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOriginPatterns(List.of("*")); // Permite todos los orígenes
+        corsConfiguration.setAllowedOriginPatterns(List.of(webUrl, mobileUrl));
         corsConfiguration.setAllowedMethods(
                 List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(
