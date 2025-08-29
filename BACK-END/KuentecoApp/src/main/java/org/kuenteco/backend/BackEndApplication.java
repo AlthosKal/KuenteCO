@@ -71,6 +71,9 @@ public class BackEndApplication {
         System.setProperty(
                 "SPRING_DATASOURCE_PASSWORD_SLAVE", dotenv.get("SPRING_DATASOURCE_PASSWORD_SLAVE"));
 
+        System.setProperty("WEB_URL", dotenv.get("WEB_URL"));
+        System.setProperty("MOBILE_URL", dotenv.get("MOBILE_URL"));
+
         SpringApplication.run(BackEndApplication.class, args);
     }
 }
