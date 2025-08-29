@@ -233,6 +233,40 @@ class CategoryController extends ChangeNotifier {
       _setError(e.toString());
     }
   }
+
+  // 📌 Asignar presupuesto a categoría
+  Future<void> assignBudgetToCategory(int categoryId, int budgetId) async {
+    print('🔄 CategoryController: Assigning budget $budgetId to category $categoryId');
+    _setError(null);
+    
+    try {
+      // Buscar la categoría
+      final categoryIndex = categories.indexWhere((c) => c.id == categoryId);
+      if (categoryIndex == -1) {
+        throw Exception('Categoría no encontrada');
+      }
+      
+      final category = categories[categoryIndex];
+      
+      // Crear nuevo CategoryDTO con budgetId actualizado
+      final updatedCategory = CategoryDTO(
+        id: category.id,
+        budgetId: budgetId,
+        name: category.name,
+        description: category.description,
+        registerDate: category.registerDate,
+      );
+      
+      // Usar el método updateCategory existente
+      await updateCategory(updatedCategory);
+      print('✅ CategoryController: Budget assigned successfully');
+      
+    } catch (e) {
+      print('❌ CategoryController: Error assigning budget to category: $e');
+      _setError(e.toString());
+      rethrow;
+    }
+  }
   
   // 📌 Actualizar múltiples categorías (batch)
   Future<void> updateCategoriesBatch(List<CategoryDTO> dtos) async {

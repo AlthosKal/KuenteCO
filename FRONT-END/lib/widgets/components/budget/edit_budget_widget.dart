@@ -28,6 +28,7 @@ class _EditBudgetWidgetState extends State<EditBudgetWidget> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _amountController;
+  late final TextEditingController _remainingController;
   
   bool _isLoading = false;
 
@@ -35,13 +36,15 @@ class _EditBudgetWidgetState extends State<EditBudgetWidget> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.budget.name);
-    _amountController = TextEditingController(text: widget.budget.totalAmount.toString());
+    _amountController = TextEditingController(text: widget.budget.totalBudget.toString());
+    _remainingController = TextEditingController(text: widget.budget.remainingBudget.toString());
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _amountController.dispose();
+    _remainingController.dispose();
     super.dispose();
   }
 
@@ -115,6 +118,32 @@ class _EditBudgetWidgetState extends State<EditBudgetWidget> {
                       return null;
                     },
                   ),
+                  const SizedBox(height: 16),
+                  
+                  TextFormField(
+                    controller: _remainingController,
+                    decoration: const InputDecoration(
+                      labelText: 'Presupuesto restante',
+                      prefixIcon: Icon(Icons.savings),
+                      border: OutlineInputBorder(),
+                      helperText: 'Cantidad disponible para gastar',
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'El presupuesto restante es requerido';
+                      }
+                      final remaining = double.tryParse(value);
+                      if (remaining == null || remaining < 0) {
+                        return 'Ingresa un monto válido (puede ser 0)';
+                      }
+                      final total = double.tryParse(_amountController.text);
+                      if (total != null && remaining > total) {
+                        return 'El restante no puede ser mayor al total';
+                      }
+                      return null;
+                    },
+                  ),
                 ],
               ),
             ),
@@ -161,22 +190,16 @@ class _EditBudgetWidgetState extends State<EditBudgetWidget> {
       final budgetController = Provider.of<BudgetController>(context, listen: false);
       
       final double totalBudget = double.parse(_amountController.text);
+      final double remainingBudget = double.parse(_remainingController.text);
+      
       print('EditBudgetWidget: Parsed total budget: $totalBudget');
-      
-      // Calcular el presupuesto restante manteniendo la proporción
-      final double currentTotal = widget.budget.totalBudget.toDouble();
-      final double currentRemaining = widget.budget.remainingBudget.toDouble();
-      final double remainingPercentage = currentTotal > 0 ? currentRemaining / currentTotal : 1.0;
-      final double newRemaining = totalBudget * remainingPercentage;
-      
-      print('EditBudgetWidget: Current total: $currentTotal, remaining: $currentRemaining');
-      print('EditBudgetWidget: New remaining: $newRemaining');
+      print('EditBudgetWidget: Parsed remaining budget: $remainingBudget');
       
       final updateDto = UpdateBudgetDTO(
         id: widget.budget.id,
         name: _nameController.text.trim(),
         totalBudget: totalBudget,
-        remainingBudget: newRemaining,
+        remainingBudget: remainingBudget,
       );
 
       print('EditBudgetWidget: Created UpdateBudgetDTO: ${updateDto.toJson()}');

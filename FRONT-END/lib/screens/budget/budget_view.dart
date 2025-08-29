@@ -9,6 +9,8 @@ import '../../widgets/components/budget/edit_budget_widget.dart';
 import '../../widgets/components/budget/edit_multiple_budgets_widget.dart';
 import '../../widgets/components/budget/delete_budget_widget.dart';
 import '../../widgets/components/budget/delete_multiple_budgets_widget.dart';
+import '../../widgets/components/budget/assign_budget_to_profiles_widget.dart';
+import '../../widgets/components/budget/assignment_management_widget.dart';
 import '../../mixins/multi_selection_mixin.dart';
 
 class BudgetView extends StatefulWidget {
@@ -102,6 +104,13 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
     final result = await EditBudgetWidget.showEditDialog(context, budget);
     if (result == true) {
       // La edición fue exitosa, la lista se actualizará automáticamente
+    }
+  }
+
+  Future<void> _handleAssignBudget(budget) async {
+    final result = await AssignBudgetToProfilesWidget.showAssignDialog(context, budget);
+    if (result == true) {
+      // La asignación fue exitosa
     }
   }
 
@@ -284,6 +293,14 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
       return AppBar(
         title: Text(isProfile ? "Mis Presupuestos Asignados" : "Presupuestos"),
         actions: [
+          // Assignment management button (only for business users)
+          if (!isProfile && _isBusinessUser)
+            IconButton(
+              icon: const Icon(Icons.assignment_outlined),
+              onPressed: () => AssignmentManagementWidget.showAssignmentManagement(context),
+              tooltip: 'Gestionar asignaciones',
+            ),
+          
           // Multi-select toggle button (only for regular users with budgets)
           if (!isProfile && controller.budgets.isNotEmpty)
             IconButton(
@@ -503,6 +520,7 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
       onTap: () => _showBudgetDetail(context, budget),
       onEdit: () => _handleEditBudget(budget),
       onDelete: () => _handleDeleteBudget(budget),
+      onAssign: () => _handleAssignBudget(budget),
       isSelectionMode: isSelectionMode,
       isSelected: selectedCategoryIds.contains(budget.id),
       onSelectionToggle: () {

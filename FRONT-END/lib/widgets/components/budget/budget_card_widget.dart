@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:glassmorphism/glassmorphism.dart';
 import '../../../controllers/budget_controller.dart';
 import '../../../routes/app_routes.dart';
 
@@ -96,27 +97,30 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
   Widget _buildBudgetCard(BudgetController budgetController) {
     // =9 Si no hay presupuestos � mostrar bot�n para crear
     if (budgetController.budgets.isEmpty) {
-      return Container(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF2196F3), Color(0xFF21CBF3)],
+      return InkWell(
+        onTap: () => Navigator.pushNamed(context, AppRoutes.budgetView),
+        borderRadius: BorderRadius.circular(20),
+        child: GlassmorphicContainer(
+          width: 180,
+          height: 180,
+          borderRadius: 20,
+          blur: 15,
+          alignment: Alignment.center,
+          border: 2,
+          linearGradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
+            colors: [
+              const Color(0xFF2196F3).withOpacity(0.3),
+              const Color(0xFF21CBF3).withOpacity(0.1),
+            ],
           ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.blue.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => Navigator.pushNamed(context, AppRoutes.budgetView),
-            borderRadius: BorderRadius.circular(16),
+          borderGradient: LinearGradient(
+            colors: [
+              Colors.white.withOpacity(0.5),
+              Colors.white.withOpacity(0.5),
+            ],
+          ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -131,7 +135,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                     child: const Icon(
                       Icons.account_balance_wallet_outlined,
                       size: 28,
-                      color: Colors.white,
+                      color: Colors.purpleAccent,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -140,7 +144,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Colors.purpleAccent,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -149,7 +153,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                     'Gestionar presupuestos',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.white70,
+                      color: Colors.purpleAccent,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -157,33 +161,35 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
               ),
             ),
           ),
-        ),
       );
     }
 
     // =9 Si hay presupuestos � mostrar informaci�n del primero
     final budget = budgetController.budgets.first;
-    return Container(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF4CAF50), Color(0xFF81C784)],
+    return InkWell(
+      onTap: () => Navigator.pushNamed(context, AppRoutes.budgetView),
+      borderRadius: BorderRadius.circular(20),
+      child: GlassmorphicContainer(
+        width: double.infinity,
+        height: double.infinity,
+        borderRadius: 20,
+        blur: 15,
+        alignment: Alignment.center,
+        border: 2,
+        linearGradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF4CAF50).withOpacity(0.3),
+            const Color(0xFF81C784).withOpacity(0.1),
+          ],
         ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.green.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => Navigator.pushNamed(context, AppRoutes.budgetView),
-          borderRadius: BorderRadius.circular(16),
+        borderGradient: LinearGradient(
+          colors: [
+            Colors.white.withOpacity(0.5),
+            Colors.white.withOpacity(0.5),
+          ],
+        ),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -198,7 +204,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                   child: const Icon(
                     Icons.account_balance_wallet,
                     size: 28,
-                    color: Colors.white,
+                    color: Colors.purpleAccent,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -207,7 +213,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Colors.purpleAccent,
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 1,
@@ -218,7 +224,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                   '\$${budget.totalBudget}',
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Colors.white70,
+                    color: Colors.purpleAccent,
                     fontWeight: FontWeight.w500,
                   ),
                   textAlign: TextAlign.center,
@@ -234,7 +240,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                     '${budgetController.budgets.length} presupuesto${budgetController.budgets.length > 1 ? 's' : ''}',
                     style: const TextStyle(
                       fontSize: 10,
-                      color: Colors.white70,
+                      color: Colors.purpleAccent,
                     ),
                   ),
                 ),
@@ -242,7 +248,6 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
             ),
           ),
         ),
-      ),
     );
   }
   
@@ -250,27 +255,30 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
   Widget _buildEnrollmentCard(BudgetController budgetController) {
     // =9 Si no hay enrollments � mostrar mensaje
     if (budgetController.enrollments.isEmpty) {
-      return Container(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFFFF9800), Color(0xFFFFC107)],
+      return InkWell(
+        onTap: () => Navigator.pushNamed(context, AppRoutes.budgetView),
+        borderRadius: BorderRadius.circular(20),
+        child: GlassmorphicContainer(
+          width: 180,
+          height: 180,
+          borderRadius: 20,
+          blur: 15,
+          alignment: Alignment.center,
+          border: 2,
+          linearGradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
+            colors: [
+              const Color(0xFFFF9800).withOpacity(0.3),
+              const Color(0xFFFFC107).withOpacity(0.1),
+            ],
           ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.orange.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => Navigator.pushNamed(context, AppRoutes.budgetView),
-            borderRadius: BorderRadius.circular(16),
+          borderGradient: LinearGradient(
+            colors: [
+              Colors.white.withOpacity(0.5),
+              Colors.white.withOpacity(0.5),
+            ],
+          ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -285,7 +293,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                     child: const Icon(
                       Icons.account_balance_outlined,
                       size: 28,
-                      color: Colors.white,
+                      color: Colors.purple,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -294,7 +302,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Colors.purple,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -303,7 +311,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                     'No tienes presupuestos asignados',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.white70,
+                      color: Colors.purple,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -311,33 +319,35 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
               ),
             ),
           ),
-        ),
       );
     }
 
     // =9 Si hay enrollments � mostrar informaci�n del primero
     final enrollment = budgetController.enrollments.first;
-    return Container(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF673AB7), Color(0xFF9C27B0)],
+    return InkWell(
+      onTap: () => Navigator.pushNamed(context, AppRoutes.budgetView),
+      borderRadius: BorderRadius.circular(20),
+      child: GlassmorphicContainer(
+        width: double.infinity,
+        height: double.infinity,
+        borderRadius: 20,
+        blur: 15,
+        alignment: Alignment.center,
+        border: 2,
+        linearGradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF673AB7).withOpacity(0.3),
+            const Color(0xFF9C27B0).withOpacity(0.1),
+          ],
         ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.purple.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => Navigator.pushNamed(context, AppRoutes.budgetView),
-          borderRadius: BorderRadius.circular(16),
+        borderGradient: LinearGradient(
+          colors: [
+            Colors.white.withOpacity(0.5),
+            Colors.white.withOpacity(0.5),
+          ],
+        ),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -352,7 +362,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                   child: const Icon(
                     Icons.account_balance,
                     size: 28,
-                    color: Colors.white,
+                    color: Colors.purple,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -361,7 +371,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Colors.purple,
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 1,
@@ -388,7 +398,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                     '${budgetController.enrollments.length} asignado${budgetController.enrollments.length > 1 ? 's' : ''}',
                     style: const TextStyle(
                       fontSize: 10,
-                      color: Colors.white70,
+                      color: Colors.purple,
                     ),
                   ),
                 ),
@@ -396,7 +406,6 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
             ),
           ),
         ),
-      ),
     );
   }
 
@@ -405,27 +414,30 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
     required String errorMessage,
     required VoidCallback onRetry,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
+    return InkWell(
+      onTap: () => Navigator.pushNamed(context, AppRoutes.budgetView),
+      borderRadius: BorderRadius.circular(20),
+      child: GlassmorphicContainer(
+        width: double.infinity,
+        height: double.infinity,
+        borderRadius: 20,
+        blur: 15,
+        alignment: Alignment.center,
+        border: 2,
+        linearGradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFFF6B6B).withOpacity(0.3),
+            const Color(0xFFFF8E53).withOpacity(0.1),
+          ],
         ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.red.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => Navigator.pushNamed(context, AppRoutes.budgetView),
-          borderRadius: BorderRadius.circular(16),
+        borderGradient: LinearGradient(
+          colors: [
+            Colors.white.withOpacity(0.5),
+            Colors.white.withOpacity(0.5),
+          ],
+        ),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -440,7 +452,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                   child: const Icon(
                     Icons.warning_rounded,
                     size: 28,
-                    color: Colors.white,
+                    color: Colors.purple,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -449,7 +461,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Colors.purple,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -466,7 +478,6 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
             ),
           ),
         ),
-      ),
     );
   }
 }

@@ -1,34 +1,121 @@
 import 'package:flutter/material.dart';
+import 'package:glassmorphism/glassmorphism.dart';
 import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 import '../../../utils/formatters.dart';
 
 class TransactionCardWidget extends StatelessWidget {
-  final TransactionDetailDTO transaction;
+  final TransactionDetailDTO? transaction; // Opcional para el home
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
   final bool showActions;
   final Color? customColor;
+  final bool isHomeCard; // Para mostrar como card del home
 
   const TransactionCardWidget({
     Key? key,
-    required this.transaction,
+    this.transaction,
     this.onTap,
     this.onEdit,
     this.onDelete,
     this.showActions = true,
     this.customColor,
+    this.isHomeCard = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    if (isHomeCard) {
+      return _buildHomeCard(context);
+    }
+    
+    return _buildDetailCard(context);
+  }
+
+  Widget _buildHomeCard(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: onTap ?? () {
+        Navigator.pushNamed(context, '/transactionView');
+      },
+      child: GlassmorphicContainer(
+        width: 180,
+        height: 180,
+        borderRadius: 20,
+        blur: 15,
+        alignment: Alignment.center,
+        border: 2,
+        linearGradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.blue.shade400.withOpacity(0.3),
+            Colors.blue.shade600.withOpacity(0.1),
+          ],
+        ),
+        borderGradient: LinearGradient(
+          colors: [
+            Colors.transparent,
+            Colors.transparent,
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.swap_horiz,
+                size: 28,
+                color: Colors.purpleAccent,
+              ),
+            ),
+            const SizedBox(height: 12),
+            
+            // Título
+            const Text(
+              'Transacciones',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.purpleAccent,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            
+            const SizedBox(height: 8),
+            
+            // Información
+            const Text(
+              'Ver todas las transacciones',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.purpleAccent,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailCard(BuildContext context) {
+    if (transaction == null) {
+      return const SizedBox.shrink();
+    }
+
     final theme = Theme.of(context);
-    final isIncome = transaction.name.toLowerCase().contains('ingreso') || 
-                    transaction.name.toLowerCase().contains('income');
-    final isExpense = transaction.name.toLowerCase().contains('gasto') || 
-                     transaction.name.toLowerCase().contains('expense');
-    final isDebt = transaction.name.toLowerCase().contains('deuda') || 
-                   transaction.name.toLowerCase().contains('debt');
+    final isIncome = transaction!.name.toLowerCase().contains('ingreso') || 
+                    transaction!.name.toLowerCase().contains('income');
+    final isExpense = transaction!.name.toLowerCase().contains('gasto') || 
+                     transaction!.name.toLowerCase().contains('expense');
+    final isDebt = transaction!.name.toLowerCase().contains('deuda') || 
+                   transaction!.name.toLowerCase().contains('debt');
 
     // Determinar color basado en el tipo de transacción
     Color cardColor = customColor ?? _getTransactionColor(isIncome, isExpense, isDebt);
@@ -69,7 +156,7 @@ class TransactionCardWidget extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          transaction.name,
+                          transaction!.name,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
@@ -77,9 +164,9 @@ class TransactionCardWidget extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 2),
-                        if (transaction.description?.isNotEmpty == true)
+                        if (transaction!.description?.isNotEmpty == true)
                           Text(
-                            transaction.description!,
+                            transaction!.description!,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurface.withOpacity(0.6),
                             ),
@@ -90,7 +177,7 @@ class TransactionCardWidget extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    Formatters.formatCurrency(transaction.amount),
+                    Formatters.formatCurrency(transaction!.amount),
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: cardColor,
                       fontWeight: FontWeight.bold,
@@ -111,13 +198,13 @@ class TransactionCardWidget extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    Formatters.formatDate(transaction.date),
+                    Formatters.formatDate(transaction!.date),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                   const Spacer(),
-                  if (transaction.categoryId != null) ...[
+                  if (transaction!.categoryId != null) ...[
                     Icon(
                       Icons.category,
                       size: 16,
@@ -125,7 +212,7 @@ class TransactionCardWidget extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Cat. ${transaction.categoryId}',
+                      'Cat. ${transaction!.categoryId}',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurface.withOpacity(0.6),
                       ),

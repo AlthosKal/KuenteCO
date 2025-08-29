@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 
 import 'package:KuenteCO/routes/app_routes.dart';
 import 'package:KuenteCO/routes/route_generator.dart';
@@ -14,6 +15,8 @@ import 'package:KuenteCO/controllers/category_controller.dart';
 import 'package:KuenteCO/core/services/app/category_service.dart';
 import 'package:KuenteCO/controllers/budget_controller.dart';
 import 'package:KuenteCO/core/services/app/budget_service.dart';
+import 'package:KuenteCO/controllers/profile_controller.dart';
+import 'package:KuenteCO/core/services/app/profile_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,7 +46,7 @@ String _getInitialRoute(String? role) {
   }
 }
 
-List<ChangeNotifierProvider> _createProviders() {
+List<SingleChildWidget> _createProviders() {
   final ApiClient apiClient = ApiClient();
   
   return [
@@ -58,6 +61,9 @@ List<ChangeNotifierProvider> _createProviders() {
     ),
     ChangeNotifierProvider<BudgetController>(
       create: (_) => BudgetController(BudgetService(apiClient)),
+    ),
+    Provider<ProfileController>(
+      create: (_) => ProfileController(profileService: ProfileService()),
     ),
   ];
 }

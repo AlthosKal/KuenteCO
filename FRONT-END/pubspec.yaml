@@ -15,6 +15,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   iconsax: ^0.0.8
   toastification: ^3.0.3
+  glassmorphism: ^3.0.0
   
   # HTTP & API
   dio: ^5.8.0+1

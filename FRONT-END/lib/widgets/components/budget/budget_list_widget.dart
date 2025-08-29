@@ -6,6 +6,7 @@ class BudgetListWidget extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
+  final VoidCallback? onAssign;
   final bool isSelectionMode;
   final bool isSelected;
   final VoidCallback? onSelectionToggle;
@@ -16,6 +17,7 @@ class BudgetListWidget extends StatelessWidget {
     this.onTap,
     this.onEdit,
     this.onDelete,
+    this.onAssign,
     this.isSelectionMode = false,
     this.isSelected = false,
     this.onSelectionToggle,
@@ -108,6 +110,11 @@ class BudgetListWidget extends StatelessWidget {
                   
                   // Botones de acción (solo si no está en modo selección)
                   if (!isSelectionMode) ...[
+                    IconButton(
+                      onPressed: onAssign,
+                      icon: const Icon(Icons.group_add, color: Colors.purple),
+                      tooltip: 'Asignar a perfiles',
+                    ),
                     IconButton(
                       onPressed: onEdit,
                       icon: const Icon(Icons.edit, color: Colors.orange),

@@ -6,6 +6,7 @@ import '../../widgets/common/footer/footer_logged_widget.dart';
 import '../../widgets/common/navbar/navbar_logged_widget.dart';
 import '../../widgets/components/category/category_card_widget.dart';
 import '../../widgets/components/budget/budget_card_widget.dart';
+import '../../widgets/components/transaction/transaction_card_widget.dart';
 
 class LoggedHomePersonalView extends StatelessWidget {
   final String userName;
@@ -45,7 +46,7 @@ class LoggedHomePersonalView extends StatelessWidget {
               /// ✅ CONTENIDO PRINCIPAL
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -78,44 +79,62 @@ class LoggedHomePersonalView extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 20),
 
-                      /// ✅ GRID DE 4 CARDS AJUSTADOS
-                      Expanded(
-                        child: GridView.count(
+                      /// 🔲 CARD CONTENEDOR GRANDE
+                      BlurredCard(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: /// ✅ GRID DE 4 CARDS AJUSTADOS
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: 4,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          childAspectRatio: 1.1,
-                          children: [
-                            // 📋 Card de Categorías
-                            const CategoryCardWidget(),
-                            // 💰 Card de Presupuestos (reemplaza Mi saldo)
-                            const BudgetCardWidget(),
-                            BlurredCard(
-                              child: _buildCardItem(
-                                icon: Icons.local_shipping_outlined,
-                                title: "Envíos",
-                                onTap: () {},
-                              ),
-                            ),
-                            BlurredCard(
-                              child: _buildCardItem(
-                                icon: Icons.settings_outlined,
-                                title: "Configuración",
-                                onTap: () {},
-                              ),
-                            ),
-                          ],
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 6,
+                          childAspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
+                        ),
+                        itemBuilder: (context, index) {
+                          switch (index) {
+                            case 0:
+                              return const CategoryCardWidget();
+                            case 1:
+                              return const BudgetCardWidget();
+                            case 2:
+                              return const TransactionCardWidget(
+                                isHomeCard: true,
+                                showActions: false,
+                              );
+                            case 3:
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: _buildCardItem(
+                                  icon: Icons.settings_outlined,
+                                  title: "Configuración",
+                                  onTap: () {},
+                                ),
+                              );
+                            default:
+                              return Container();
+                          }
+                        },
+                      ),
                         ),
                       ),
+
+                      const SizedBox(height: 40),
+
+                      /// ✅ FOOTER
+                      const FooterLoggedWidget(),
                     ],
                   ),
                 ),
               ),
-
-              /// ✅ FOOTER ABAJO
-              const FooterLoggedWidget(),
             ],
           ),
         ),
