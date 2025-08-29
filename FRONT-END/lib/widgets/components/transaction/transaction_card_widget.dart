@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:glassmorphism/glassmorphism.dart';
 import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 import '../../../utils/formatters.dart';
 
@@ -33,47 +34,46 @@ class TransactionCardWidget extends StatelessWidget {
 
   Widget _buildHomeCard(BuildContext context) {
     return InkWell(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(20),
       onTap: onTap ?? () {
         Navigator.pushNamed(context, '/transactionView');
       },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.blue.shade400,
-              Colors.blue.shade600,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.blue.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
+      child: GlassmorphicContainer(
+        width: 180,
+        height: 180,
+        borderRadius: 20,
+        blur: 15,
+        alignment: Alignment.center,
+        border: 2,
+        linearGradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.blue.shade400.withOpacity(0.3),
+            Colors.blue.shade600.withOpacity(0.1),
+          ],
+        ),
+        borderGradient: LinearGradient(
+          colors: [
+            Colors.transparent,
+            Colors.transparent,
           ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Icono principal
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
+                shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.swap_horiz,
-                size: 32,
-                color: Colors.white,
+                size: 28,
+                color: Colors.purpleAccent,
               ),
             ),
-            
             const SizedBox(height: 12),
             
             // Título
@@ -82,7 +82,7 @@ class TransactionCardWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Colors.purpleAccent,
               ),
               textAlign: TextAlign.center,
             ),
@@ -94,7 +94,7 @@ class TransactionCardWidget extends StatelessWidget {
               'Ver todas las transacciones',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.white70,
+                color: Colors.purpleAccent,
               ),
               textAlign: TextAlign.center,
             ),

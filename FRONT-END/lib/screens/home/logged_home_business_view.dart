@@ -120,7 +120,7 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                                     ),
                                     child: _buildCardItem(
                                       icon: Icons.settings_outlined,
-                                      title: "Configuración",
+                                      title: "Reporte",
                                       onTap: () {},
                                     ),
                                   );
