@@ -6,6 +6,8 @@ import '../../widgets/common/footer/footer_logged_widget.dart';
 import '../../widgets/common/navbar/navbar_logged_widget.dart';
 import '../../widgets/components/category/category_card_widget.dart';
 import '../../widgets/components/budget/budget_card_widget.dart';
+import '../../widgets/components/transaction/transaction_card_widget.dart';
+import '../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 
 class LoggedHomePersonalView extends StatelessWidget {
   final String userName;
@@ -45,7 +47,7 @@ class LoggedHomePersonalView extends StatelessWidget {
               /// ✅ CONTENIDO PRINCIPAL
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -78,36 +80,53 @@ class LoggedHomePersonalView extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
 
                       /// ✅ GRID DE 4 CARDS AJUSTADOS
-                      Expanded(
-                        child: GridView.count(
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: 4,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          childAspectRatio: 1.1,
-                          children: [
-                            // 📋 Card de Categorías
-                            const CategoryCardWidget(),
-                            // 💰 Card de Presupuestos (reemplaza Mi saldo)
-                            const BudgetCardWidget(),
-                            BlurredCard(
-                              child: _buildCardItem(
-                                icon: Icons.local_shipping_outlined,
-                                title: "Envíos",
-                                onTap: () {},
-                              ),
-                            ),
-                            BlurredCard(
-                              child: _buildCardItem(
-                                icon: Icons.settings_outlined,
-                                title: "Configuración",
-                                onTap: () {},
-                              ),
-                            ),
-                          ],
+                          crossAxisSpacing: 6,
+                          mainAxisSpacing: 6,
+                          childAspectRatio: 1.5,
                         ),
+                        itemBuilder: (context, index) {
+                          switch (index) {
+                            case 0:
+                              return const CategoryCardWidget();
+                            case 1:
+                              return const BudgetCardWidget();
+                            case 2:
+                              return BlurredCard(
+                                child: TransactionCardWidget(
+                                  transaction: TransactionDetailDTO(
+                                    id: 0,
+                                    name: 'Transacciones',
+                                    amount: 0,
+                                    date: DateTime.now().toIso8601String(),
+                                    description: 'Ver todas las transacciones',
+                                  ),
+                                  showActions: false,
+                                  onTap: () {
+                                    Navigator.pushNamed(context, '/transactions');
+                                  },
+                                ),
+                              );
+                            case 3:
+                              return BlurredCard(
+                                child: _buildCardItem(
+                                  icon: Icons.settings_outlined,
+                                  title: "Configuración",
+                                  onTap: () {},
+                                ),
+                              );
+                            default:
+                              return Container();
+                          }
+                        },
                       ),
                     ],
                   ),

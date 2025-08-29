@@ -1,3 +1,4 @@
+import 'package:KuenteCO/widgets/components/transaction/transaction_card_widget.dart';
 import 'package:flutter/material.dart';
 import '../../core/services/app/auth_service.dart';
 import '../../widgets/common/background/background_widget.dart';
@@ -6,6 +7,7 @@ import '../../widgets/common/footer/footer_logged_widget.dart';
 import '../../widgets/common/navbar/navbar_logged_widget.dart';
 import '../../widgets/components/category/category_card_widget.dart';
 import '../../widgets/components/budget/budget_card_widget.dart';
+import '../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 
 class LoggedHomeBusinessView extends StatefulWidget {
   final String userName;
@@ -50,7 +52,7 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
               /// ✅ CONTENIDO SCROLLABLE
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -84,44 +86,58 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                         ],
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 8),
 
-                      /// 🔲 GRID DE 4 CARDS
-                      Expanded(
-                        child: GridView.count(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 1.1,
-                          children: [
-                            /// 🔹 PRIMER CARD → CategoryCardWidget
-                            const BlurredCard(
-                              child: CategoryCardWidget(),
+                      /// 🔲 CARD CONTENEDOR GRANDE
+                      BlurredCard(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: GridView.builder(
+                            shrinkWrap: true,
+                            itemCount: 4,
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              childAspectRatio: 2.9,
                             ),
-
-                            /// 🔹 PRESUPUESTOS CARD
-                            const BlurredCard(
-                              child: BudgetCardWidget(),
-                            ),
-                            BlurredCard(
-                              child: _buildCardItem(
-                                icon: Icons.local_shipping_outlined,
-                                title: "Envíos",
-                                onTap: () {
-                                  // Navegar a envíos
-                                },
-                              ),
-                            ),
-                            BlurredCard(
-                              child: _buildCardItem(
-                                icon: Icons.settings_outlined,
-                                title: "Configuración",
-                                onTap: () {
-                                  // Navegar a configuración
-                                },
-                              ),
-                            ),
-                          ],
+                            itemBuilder: (context, index) {
+                              switch (index) {
+                                case 0:
+                                  return const CategoryCardWidget();
+                                case 1:
+                                  return const BudgetCardWidget();
+                                case 2:
+                                  return TransactionCardWidget(
+                                    transaction: TransactionDetailDTO(
+                                      id: 0,
+                                      name: 'Transacciones',
+                                      amount: 0,
+                                      date: DateTime.now().toIso8601String(),
+                                      description: 'Ver todas las transacciones',
+                                    ),
+                                    showActions: false,
+                                    onTap: () {
+                                      Navigator.pushNamed(context, '/transactions');
+                                    },
+                                  );
+                                case 3:
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: _buildCardItem(
+                                      icon: Icons.settings_outlined,
+                                      title: "Configuración",
+                                      onTap: () {},
+                                    ),
+                                  );
+                                default:
+                                  return Container();
+                              }
+                            },
+                          ),
                         ),
                       ),
 
