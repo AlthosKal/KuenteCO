@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/transaction")
 @AllArgsConstructor
-public class TransactionController {
+public class TransactionController implements TransactionResource {
     private TransactionService transactionService;
     private ConectaService conectaService;
 

@@ -5,10 +5,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -366,12 +363,21 @@ class BudgetServiceImplTest {
     void shouldUpdateBudgetSuccessfully() {
         // Given
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
+
+        budgetDTO.setId(1);
+        budgetDTO.setName("Test Budget");
+        budgetDTO.setTotalBudget(new BigDecimal("5000.00"));
+
+        // Este será el Budget que devuelva el mapper (con valores seteados)
         Budget updatedBudget = new Budget();
+        updatedBudget.setName("Test Budget");
+        updatedBudget.setTotalBudget(new BigDecimal("5000.00"));
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
+
             authService
-                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                    .when(org.kuenteco.backend.service.auth.AuthServiceImpl::getCredentials)
                     .thenReturn(credentials);
 
             when(slaveUserRepository.findByEmail("test@kuenteco.com"))
@@ -386,7 +392,20 @@ class BudgetServiceImplTest {
             // Then
             verify(updateBudgetMapper).toEntity(budgetDTO);
             verify(slaveBudgetRepository).getBudgetByUserAndId(testUser, 1);
-            verify(masterBudgetRepository).save(testBudget);
+
+            // Verificamos por propiedades en vez de la instancia
+            verify(masterBudgetRepository)
+                    .save(
+                            argThat(
+                                    b ->
+                                            b != null
+                                                    && b.getUser().equals(testUser)
+                                                    && Objects.equals(b.getName(), "Test Budget")
+                                                    && b.getTotalBudget()
+                                                                    .compareTo(
+                                                                            new BigDecimal(
+                                                                                    "5000.00"))
+                                                            == 0));
         }
     }
 
@@ -625,6 +644,8 @@ class BudgetServiceImplTest {
 
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
         Budget updatedBudget = new Budget();
+        updatedBudget.setName(increaseBudgetDTO.getName());
+        updatedBudget.setTotalBudget(increaseBudgetDTO.getTotalBudget());
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
@@ -649,7 +670,18 @@ class BudgetServiceImplTest {
                                             dto.getTotalBudget()
                                                             .compareTo(new BigDecimal("7500.00"))
                                                     == 0));
-            verify(masterBudgetRepository).save(testBudget);
+
+            verify(masterBudgetRepository)
+                    .save(
+                            argThat(
+                                    b ->
+                                            b.getUser().equals(testUser)
+                                                    && b.getName().equals("Increased Budget")
+                                                    && b.getTotalBudget()
+                                                                    .compareTo(
+                                                                            new BigDecimal(
+                                                                                    "7500.00"))
+                                                            == 0));
         }
     }
 

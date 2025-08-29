@@ -33,7 +33,7 @@ public interface ProfileResource {
             responses = {
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
                         responseCode = "200",
-                        description = "List of profiles",
+                        description = "Lista de perfiles obtenida correctamente",
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -41,71 +41,30 @@ public interface ProfileResource {
                                         examples =
                                                 @ExampleObject(
                                                         value =
-                                                                "[ { \"id\": 1, \"username\": \"JohnDoe\" } ]")))
-            })
-    @GetMapping
-    ResponseEntity<?> getAllProfiles(HttpServletRequest request);
-
-    @Operation(
-            summary = "Obtener perfil autenticado",
-            description = "Recupera los detalles del perfil actualmente autenticado",
-            responses = {
+                                                                """
+                        {
+                          "success": true,
+                          "message": "Cuentas obtenidas correctamente",
+                          "data": [
+                            {
+                              "id": 1,
+                              "username": "JohnDoe",
+                              "email": "john@example.com",
+                              "image": {
+                                "id": 1,
+                                "name": "profile_john.jpg",
+                                "type": "image/jpeg",
+                                "url": "https://res.cloudinary.com/kuenteco/image/upload/v1234567890/profile_john.jpg"
+                              }
+                            }
+                          ],
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile"
+                        }
+                    """))),
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                        responseCode = "200",
-                        description = "Perfil autenticado",
-                        content =
-                                @Content(
-                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = ProfileDetailDTO.class),
-                                        examples =
-                                                @ExampleObject(
-                                                        value =
-                                                                "{ \"id\": 1, \"username\": \"JohnDoe\" }")))
-            },
-            parameters = {
-                @Parameter(
-                        in = ParameterIn.HEADER,
-                        name = "Authorization",
-                        description = "Token JWT para autenticación",
-                        required = true)
-            })
-    @GetMapping("/details")
-    ResponseEntity<?> getAuthenticatedProfile(HttpServletRequest request);
-
-    @Operation(
-            summary = "Inicio de sesión de perfil",
-            description = "Autentica al usuario y retorna un token JWT",
-            responses = {
-                @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                        responseCode = "200",
-                        description = "Inicio de sesión exitoso",
-                        content =
-                                @Content(
-                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = TokenResponseDTO.class),
-                                        examples =
-                                                @ExampleObject(
-                                                        value = "{ \"token\": \"jwt-token\" }")))
-            },
-            requestBody =
-                    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                            content =
-                                    @Content(
-                                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = LoginDTO.class))))
-    @PostMapping("/login")
-    ResponseEntity<?> login(
-            @Valid @RequestBody LoginDTO loginDTO,
-            HttpServletRequest request,
-            HttpServletResponse response);
-
-    @Operation(
-            summary = "Registrar nuevo perfil",
-            description = "Registra un nuevo perfil en el sistema",
-            responses = {
-                @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                        responseCode = "201",
-                        description = "Perfil registrado",
+                        responseCode = "401",
+                        description = "Token no proporcionado o inválido",
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -113,17 +72,403 @@ public interface ProfileResource {
                                         examples =
                                                 @ExampleObject(
                                                         value =
-                                                                "{ \"message\": \"Perfil registrado correctamente\" }")))
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Token de autenticación requerido",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "500",
+                        description = "Error interno del servidor",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Error interno del servidor",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile"
+                        }
+                    """)))
+            },
+            security = {
+                @io.swagger.v3.oas.annotations.security.SecurityRequirement(
+                        name = "Bearer Authentication")
+            })
+    @GetMapping
+    ResponseEntity<?> getAllProfiles(HttpServletRequest request);
+
+    @Operation(
+            summary = "Obtener perfil por ID",
+            description = "Recupera un perfil específico por su identificador único",
+            responses = {
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "200",
+                        description = "Perfil encontrado correctamente",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ProfileDetailDTO.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": true,
+                          "message": "Cuenta obtenida correctamente",
+                          "data": {
+                            "id": 1,
+                            "username": "JohnDoe",
+                            "email": "john@example.com",
+                            "image": {
+                              "id": 1,
+                              "name": "profile_john.jpg",
+                              "type": "image/jpeg",
+                              "url": "https://res.cloudinary.com/kuenteco/image/upload/v1234567890/profile_john.jpg"
+                            }
+                          },
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/1"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "401",
+                        description = "Token no proporcionado o inválido",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Token de autenticación requerido",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/1"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "404",
+                        description = "Perfil no encontrado",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Perfil no encontrado con ID: 1",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/1"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "500",
+                        description = "Error interno del servidor",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Error interno del servidor",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/1"
+                        }
+                    """)))
+            },
+            parameters = {
+                @Parameter(
+                        in = ParameterIn.PATH,
+                        name = "id",
+                        description = "ID del perfil a consultar",
+                        required = true,
+                        schema = @Schema(type = "integer", example = "1"))
+            },
+            security = {
+                @io.swagger.v3.oas.annotations.security.SecurityRequirement(
+                        name = "Bearer Authentication")
+            })
+    @GetMapping("/{id}")
+    ResponseEntity<?> getProfileById(
+            @Parameter(hidden = true) HttpServletRequest request, @PathVariable Integer id);
+
+    @Operation(
+            summary = "Obtener perfil autenticado",
+            description = "Recupera los detalles completos del perfil actualmente autenticado",
+            responses = {
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "200",
+                        description = "Perfil autenticado obtenido correctamente",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ProfileDetailDTO.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": true,
+                          "message": "Perfil Autenticado",
+                          "data": {
+                            "id": 1,
+                            "username": "JohnDoe",
+                            "email": "john@example.com",
+                            "image": {
+                              "id": 1,
+                              "name": "profile_john.jpg",
+                              "type": "image/jpeg",
+                              "url": "https://res.cloudinary.com/kuenteco/image/upload/v1234567890/profile_john.jpg"
+                            }
+                          },
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/details"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "401",
+                        description = "Token no proporcionado o inválido",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Token de autenticación requerido",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/details"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "500",
+                        description = "Error interno del servidor",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Error interno del servidor",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/details"
+                        }
+                    """)))
+            },
+            security = {
+                @io.swagger.v3.oas.annotations.security.SecurityRequirement(
+                        name = "Bearer Authentication")
+            })
+    @GetMapping("/details")
+    ResponseEntity<?> getAuthenticatedProfile(@Parameter(hidden = true) HttpServletRequest request);
+
+    @Operation(
+            summary = "Inicio de sesión de perfil",
+            description =
+                    "Autentica un perfil utilizando nombre/email y contraseña, retorna un token JWT para sesión de perfil",
+            responses = {
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "200",
+                        description = "Inicio de sesión de perfil exitoso",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = TokenResponseDTO.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": true,
+                          "message": "Inicio de Sesión exitoso",
+                          "data": {
+                            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwcm9maWxlMSIsImlhdCI6MTY0MDk5NTIwMCwiZXhwIjoxNjQxMDgxNjAwfQ.signature",
+                            "role": "ROLE_PROFILE"
+                          },
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/login"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "400",
+                        description = "Credenciales inválidas o datos incorrectos",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Credenciales de perfil inválidas",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/login"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "500",
+                        description = "Error interno del servidor",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Error interno del servidor",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/login"
+                        }
+                    """)))
             },
             requestBody =
                     @io.swagger.v3.oas.annotations.parameters.RequestBody(
                             content =
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            schema =
-                                                    @Schema(implementation = NewProfileDTO.class))))
+                                            schema = @Schema(implementation = LoginDTO.class),
+                                            examples =
+                                                    @ExampleObject(
+                                                            name = "Login de perfil",
+                                                            value =
+                                                                    """
+                        {
+                          "nameOrEmail": "Dex",
+                          "password": "password123"
+                        }
+                    """))))
+    @PostMapping("/login")
+    ResponseEntity<?> login(
+            @Valid @RequestBody LoginDTO loginDTO,
+            @Parameter(hidden = true) HttpServletRequest request,
+            @Parameter(hidden = true) HttpServletResponse response);
+
+    @Operation(
+            summary = "Registrar nuevo perfil",
+            description = "Registra un nuevo perfil en el sistema con validación de datos",
+            responses = {
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "201",
+                        description = "Perfil registrado correctamente",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": true,
+                          "message": "Cuenta registrada correctamente",
+                          "data": {
+                            "username": "Dex",
+                            "email": "agudelocastanoyeferson270@gmail.com"
+                          },
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/add"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "400",
+                        description = "Datos de validación incorrectos o perfil existente",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples = {
+                                            @ExampleObject(
+                                                    name = "Email ya registrado",
+                                                    value =
+                                                            """
+                        {
+                          "success": false,
+                          "message": "El email ya se encuentra registrado en otro perfil",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/add"
+                        }
+                    """),
+                                            @ExampleObject(
+                                                    name = "Campos requeridos",
+                                                    value =
+                                                            """
+                        {
+                          "success": false,
+                          "message": "El nombre de usuario es requerido",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/add"
+                        }
+                    """)
+                                        })),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "500",
+                        description = "Error interno del servidor",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Error interno del servidor",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/add"
+                        }
+                    """)))
+            },
+            requestBody =
+                    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                            content =
+                                    @Content(
+                                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                            schema = @Schema(implementation = NewProfileDTO.class),
+                                            examples =
+                                                    @ExampleObject(
+                                                            name = "Nuevo perfil",
+                                                            value =
+                                                                    """
+                        {
+                          "username": "Dex",
+                          "email": "agudelocastanoyeferson270@gmail.com",
+                          "password": "password123"
+                        }
+                    """))))
     @PostMapping("/add")
-    ResponseEntity<?> register(@RequestBody NewProfileDTO dto, HttpServletRequest request);
+    ResponseEntity<?> register(
+            @RequestBody NewProfileDTO dto, @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Actualizar perfil",
@@ -188,11 +533,11 @@ public interface ProfileResource {
 
     @Operation(
             summary = "Cerrar sesión de perfil",
-            description = "Invalida el token JWT del usuario actual",
+            description = "Invalida el token JWT del perfil actual y cierra la sesión activa",
             responses = {
                 @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                        responseCode = "200",
-                        description = "Sesión cerrada",
+                        responseCode = "204",
+                        description = "Sesión de perfil cerrada correctamente",
                         content =
                                 @Content(
                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -200,17 +545,59 @@ public interface ProfileResource {
                                         examples =
                                                 @ExampleObject(
                                                         value =
-                                                                "{ \"message\": \"Sesión cerrada correctamente\" }")))
+                                                                """
+                        {
+                          "success": true,
+                          "message": "Cierre de Sesión exitoso",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/logout"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "401",
+                        description = "Token no proporcionado o inválido",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Token de autenticación requerido",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/logout"
+                        }
+                    """))),
+                @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                        responseCode = "500",
+                        description = "Error interno del servidor",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = ApiResponse.class),
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+                        {
+                          "success": false,
+                          "message": "Error interno del servidor",
+                          "timestamp": "2024-01-15T10:30:00Z",
+                          "path": "/v1/profile/logout"
+                        }
+                    """)))
             },
-            parameters = {
-                @Parameter(
-                        in = ParameterIn.HEADER,
-                        name = "Authorization",
-                        description = "Token JWT para autenticación",
-                        required = true)
+            security = {
+                @io.swagger.v3.oas.annotations.security.SecurityRequirement(
+                        name = "Bearer Authentication")
             })
     @PostMapping("/logout")
-    ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response);
+    ResponseEntity<?> logout(
+            @Parameter(hidden = true) HttpServletRequest request,
+            @Parameter(hidden = true) HttpServletResponse response);
 
     @Operation(
             summary = "Eliminar perfil",
@@ -235,8 +622,9 @@ public interface ProfileResource {
                         description = "ID del perfil a eliminar",
                         required = true)
             })
-    @DeleteMapping("/{id}")
-    ResponseEntity<?> delete(@PathVariable Integer id, HttpServletRequest request);
+    @DeleteMapping("/delete/{id}")
+    ResponseEntity<?> delete(
+            @PathVariable Integer id, @Parameter(hidden = true) HttpServletRequest request);
 
     @Operation(
             summary = "Subir imagen de perfil",
@@ -300,6 +688,7 @@ public interface ProfileResource {
                         responseCode = "204",
                         description = "Imagen eliminada")
             })
-    @DeleteMapping("/delete")
-    ResponseEntity<?> deleteImage(HttpServletResponse response) throws IOException;
+    @DeleteMapping("/image/delete")
+    ResponseEntity<?> deleteImage(@Parameter(hidden = true) HttpServletResponse response)
+            throws IOException;
 }

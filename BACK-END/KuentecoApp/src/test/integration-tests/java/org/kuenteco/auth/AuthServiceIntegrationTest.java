@@ -251,7 +251,8 @@ public class AuthServiceIntegrationTest extends BaseIntegrationTestWithoutWireMo
                 assertThrows(
                         AuthException.class, () -> authService.authenticate(loginDTO, response));
 
-        assertThat(exception.getMessage()).contains("Cuenta no activada");
+        assertThat(exception.getMessage())
+                .contains("Credenciales Invalidas, verifique sus datos e intente nuevamente");
     }
 
     @Test

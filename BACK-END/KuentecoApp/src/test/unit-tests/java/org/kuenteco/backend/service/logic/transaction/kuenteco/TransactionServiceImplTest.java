@@ -557,13 +557,19 @@ class TransactionServiceImplTest {
         // Given
         AuthCredentials credentials = new AuthCredentials("test@kuenteco.com", RoleList.ROLE_USER);
         Transaction updatedTransaction = new Transaction();
+        Transaction existingTransaction = new Transaction();
+        existingTransaction.setId(1);
+
+        updateTransactionDTO.setId(1); // importante!
 
         try (MockedStatic<org.kuenteco.backend.service.auth.AuthServiceImpl> authService =
                 mockStatic(org.kuenteco.backend.service.auth.AuthServiceImpl.class)) {
             authService
-                    .when(() -> org.kuenteco.backend.service.auth.AuthServiceImpl.getCredentials())
+                    .when(org.kuenteco.backend.service.auth.AuthServiceImpl::getCredentials)
                     .thenReturn(credentials);
 
+            when(slaveTransactionRepository.findById(1))
+                    .thenReturn(Optional.of(existingTransaction)); // 👈 faltaba este mock
             when(slaveUserRepository.findByEmail("test@kuenteco.com"))
                     .thenReturn(Optional.of(testUser));
             when(updateTransactionMapper.toEntity(updateTransactionDTO))
@@ -574,6 +580,7 @@ class TransactionServiceImplTest {
             transactionService.updateTransaction(updateTransactionDTO);
 
             // Then
+            verify(slaveTransactionRepository).findById(1);
             verify(updateTransactionMapper).toEntity(updateTransactionDTO);
             verify(masterTransactionRepository)
                     .save(argThat(transaction -> transaction.getUser().equals(testUser)));
