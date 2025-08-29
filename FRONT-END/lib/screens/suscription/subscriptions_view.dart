@@ -3,10 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:html' as html;
-import '../dto/app/subscription/request/create_subscription_request_dto.dart';
-import '../controllers/subscription_controller.dart';
-import '../utils/enum/subscription_type_enum.dart';
-import '../widgets/common/buttoms/primary_buttom_widget.dart';
+import '../../dto/app/subscription/request/create_subscription_request_dto.dart';
+import '../../controllers/subscription_controller.dart';
+import '../../utils/enum/subscription_type_enum.dart';
+import '../../widgets/common/buttoms/primary_buttom_widget.dart';
 
 class SubscriptionPlansView extends StatefulWidget {
   const SubscriptionPlansView({super.key});

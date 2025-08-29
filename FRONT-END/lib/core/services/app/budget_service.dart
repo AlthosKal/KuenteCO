@@ -123,4 +123,113 @@ class BudgetService {
   Future<void> deleteEnrollment(int id) async {
     await _apiClient.deleteApp('/budget/enroll/$id');
   }
+
+  // ✅ Eliminar múltiples enrollments
+  Future<void> deleteEnrollmentsBatch(List<int> ids) async {
+    print('BudgetService: deleteEnrollmentsBatch called with IDs: $ids');
+    
+    if (ids.isEmpty) {
+      print('BudgetService: No IDs provided for deletion');
+      return;
+    }
+    
+    // Filter out invalid IDs
+    final validIds = ids.where((id) => id > 0).toList();
+    print('BudgetService: Valid IDs after filtering: $validIds');
+    
+    if (validIds.isEmpty) {
+      print('BudgetService: No valid IDs found after filtering');
+      throw Exception('No se encontraron IDs válidos para eliminar');
+    }
+    
+    final queryParams = validIds.map((id) => 'id=$id').join('&');
+    final url = '/budget/enroll/batch?$queryParams';
+    print('BudgetService: Making DELETE request to: $url');
+    
+    try {
+      final response = await _apiClient.deleteApp(url);
+      print('BudgetService: Delete response status: ${response.statusCode}');
+      print('BudgetService: Delete response data: ${response.data}');
+      
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        throw Exception('Error en el servidor: ${response.statusCode}');
+      }
+      
+      print('BudgetService: Batch deletion completed successfully');
+    } catch (e) {
+      print('BudgetService: Error during batch deletion: $e');
+      rethrow;
+    }
+  }
+
+  // ✅ Enrolar múltiples perfiles a presupuestos
+  Future<void> enrollProfileToBudgetBatch(List<Map<String, int>> enrollments) async {
+    await _apiClient.postApp('/budget/enroll/add/batch', enrollments);
+  }
+
+  // ✅ Obtener enrollments por usuario
+  Future<List<BudgetEnrollmentDTO>> getEnrollmentsByUser() async {
+    print('BudgetService: Sending GET to /budget/enroll/user');
+    final response = await _apiClient.getApp('/budget/enroll/user');
+    
+    print('BudgetService: Raw response data type: ${response.data.runtimeType}');
+    print('BudgetService: Raw response data: ${response.data}');
+    
+    // El backend puede retornar un objeto envuelto o directamente la lista
+    final responseData = response.data;
+    
+    if (responseData is String) {
+      print('BudgetService: Response is string, returning empty list');
+      return [];
+    }
+    
+    List<dynamic> dataList;
+    if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+      print('BudgetService: Response has data key, extracting list');
+      final dataValue = responseData['data'];
+      
+      if (dataValue is String) {
+        print('BudgetService: Data field is a string message, returning empty list');
+        return [];
+      } else if (dataValue is List<dynamic>) {
+        dataList = dataValue;
+      } else {
+        print('BudgetService: Data field has unknown format, returning empty list');
+        return [];
+      }
+    } else if (responseData is List<dynamic>) {
+      print('BudgetService: Response is direct list');
+      dataList = responseData;
+    } else {
+      print('BudgetService: Unknown response format, returning empty list');
+      return [];
+    }
+    
+    print('BudgetService: Data list length: ${dataList.length}');
+    
+    // Log each item structure to understand backend data
+    for (int i = 0; i < dataList.length; i++) {
+      print('BudgetService: Processing item $i: ${dataList[i]}');
+      if (dataList[i] is Map<String, dynamic>) {
+        final itemMap = dataList[i] as Map<String, dynamic>;
+        print('BudgetService: Item $i keys: ${itemMap.keys.toList()}');
+        
+        // Log specific fields we care about
+        print('BudgetService: Item $i id field: ${itemMap['id']} (${itemMap['id'].runtimeType})');
+        print('BudgetService: Item $i profileEmail field: ${itemMap['profileEmail']} (${itemMap['profileEmail'].runtimeType})');
+        print('BudgetService: Item $i userEmail field: ${itemMap['userEmail']} (${itemMap['userEmail'].runtimeType})');
+        print('BudgetService: Item $i budgetName field: ${itemMap['budgetName']} (${itemMap['budgetName'].runtimeType})');
+      }
+    }
+    
+    // Convert grouped backend response to individual DTOs
+    List<BudgetEnrollmentDTO> result = [];
+    for (final item in dataList) {
+      final itemDtos = BudgetEnrollmentDTO.fromBackendGroupedResponse(item as Map<String, dynamic>);
+      result.addAll(itemDtos);
+    }
+    
+    print('BudgetService: Converted to ${result.length} individual DTOs');
+    return result;
+  }
 }

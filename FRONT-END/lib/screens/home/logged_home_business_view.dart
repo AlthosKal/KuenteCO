@@ -1,3 +1,4 @@
+import 'package:KuenteCO/widgets/components/transaction/transaction_card_widget.dart';
 import 'package:flutter/material.dart';
 import '../../core/services/app/auth_service.dart';
 import '../../widgets/common/background/background_widget.dart';
@@ -47,7 +48,7 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                 },
               ),
 
-              /// ✅ CONTENIDO SCROLLABLE
+              /// ✅ CONTENIDO SCROLLABLE  
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -84,46 +85,54 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                         ],
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
 
-                      /// 🔲 GRID DE 4 CARDS
-                      Expanded(
-                        child: GridView.count(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 1.1,
-                          children: [
-                            /// 🔹 PRIMER CARD → CategoryCardWidget
-                            const BlurredCard(
-                              child: CategoryCardWidget(),
+                      /// 🔲 CARD CONTENEDOR GRANDE
+                      BlurredCard(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: 4,
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 8,
+                              mainAxisSpacing: 6,
+                              childAspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
                             ),
-
-                            /// 🔹 PRESUPUESTOS CARD
-                            const BlurredCard(
-                              child: BudgetCardWidget(),
-                            ),
-                            BlurredCard(
-                              child: _buildCardItem(
-                                icon: Icons.local_shipping_outlined,
-                                title: "Envíos",
-                                onTap: () {
-                                  // Navegar a envíos
-                                },
-                              ),
-                            ),
-                            BlurredCard(
-                              child: _buildCardItem(
-                                icon: Icons.settings_outlined,
-                                title: "Configuración",
-                                onTap: () {
-                                  // Navegar a configuración
-                                },
-                              ),
-                            ),
-                          ],
+                            itemBuilder: (context, index) {
+                              switch (index) {
+                                case 0:
+                                  return const CategoryCardWidget();
+                                case 1:
+                                  return const BudgetCardWidget();
+                                case 2:
+                                  return const TransactionCardWidget(
+                                    isHomeCard: true,
+                                    showActions: false,
+                                  );
+                                case 3:
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: _buildCardItem(
+                                      icon: Icons.settings_outlined,
+                                      title: "Configuración",
+                                      onTap: () {},
+                                    ),
+                                  );
+                                default:
+                                  return Container();
+                              }
+                            },
+                          ),
                         ),
                       ),
+
+                      const SizedBox(height: 40),
 
                       /// ✅ FOOTER
                       const FooterLoggedWidget(),
