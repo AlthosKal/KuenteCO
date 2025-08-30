@@ -131,20 +131,6 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
                                     isHomeCard: true,
                                     showActions: false,
                                   );
-                                case 3:
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: _buildCardItem(
-                                      icon: Icons.settings_outlined,
-                                      title: "Configuración",
-                                      onTap: () {},
-                                    ),
-                                  );
-                                default:
-                                  return Container();
                               }
                             },
                           ),

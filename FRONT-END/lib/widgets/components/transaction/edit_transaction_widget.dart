@@ -304,20 +304,6 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                     ),
                     const SizedBox(height: 20),
 
-                    /// FECHA
-                    _buildInputLabel('Fecha'),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: _dateController,
-                      decoration: _buildInputDecoration(
-                        hint: 'YYYY-MM-DD',
-                        icon: Icons.calendar_today,
-                      ),
-                      readOnly: true,
-                      onTap: _selectDate,
-                    ),
-                    const SizedBox(height: 40),
-
                     /// BOTONES
                     Row(
                       children: [

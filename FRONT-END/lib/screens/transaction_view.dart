@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../controllers/transaction_controller.dart';
 import '../dto/app/transaction/kuenteco/new_transaction_dto.dart';
 import '../dto/app/transaction/kuenteco/update_transaction_dto.dart';
@@ -7,7 +8,6 @@ import '../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 import '../widgets/common/background/background_widget.dart';
 import '../widgets/common/navbar/navbar_logged_widget.dart';
 import '../widgets/components/transaction/transaction_list_widget.dart';
-import '../widgets/components/transaction/transaction_form_widget.dart';
 import '../widgets/components/transaction/transaction_statistics_widget.dart';
 import '../widgets/components/transaction/create_transaction_widget.dart';
 import '../widgets/components/transaction/edit_transaction_widget.dart';
@@ -28,6 +28,8 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
   late TabController _tabController;
   late TransactionController _transactionController;
   late CategoryController _categoryController;
+  final _storage = const FlutterSecureStorage();
+  String? _userRole;
 
   @override
   void initState() {
@@ -37,9 +39,42 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
     _categoryController = CategoryController(CategoryService(ApiClient()));
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _transactionController.loadTransactions();
-      _categoryController.loadCategories();
+      print('TransactionView: PostFrameCallback executing - about to call _loadDataBasedOnRole()');
+      _loadDataBasedOnRole();
     });
+  }
+  
+  /// Cargar datos según el rol del usuario
+  Future<void> _loadDataBasedOnRole() async {
+    try {
+      print('TransactionView: Starting _loadDataBasedOnRole()');
+      final role = await _storage.read(key: 'role');
+      _userRole = role;
+      print('TransactionView: User role detected: $role');
+      
+      if (role == 'ROLE_PROFILE') {
+        // Si es un perfil, cargar sus transacciones (puede crear/editar/eliminar)
+        print('TransactionView: Loading profile transactions...');
+        await _transactionController.loadTransactions();
+        print('TransactionView: Profile transactions loaded, count: ${_transactionController.transactions.length}');
+        await _categoryController.loadProfileEnrollments();
+        print('TransactionView: Profile enrollments loaded');
+      } else {
+        // Si es un usuario de negocio, cargar todas las transacciones (igual que perfil)
+        print('TransactionView: Loading business user transactions...');
+        await _transactionController.loadTransactions();
+        print('TransactionView: Business user transactions loaded, count: ${_transactionController.transactions.length}');
+        await _categoryController.loadCategories();
+        print('TransactionView: Categories loaded');
+      }
+      
+      print('TransactionView: About to call setState()');
+      setState(() {}); // Actualizar UI después de detectar el rol
+      print('TransactionView: setState() completed');
+    } catch (e) {
+      print('TransactionView: Error loading data: $e');
+      print('TransactionView: Error stack trace: ${e.toString()}');
+    }
   }
 
   @override
@@ -111,7 +146,9 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
           ),
           const SizedBox(height: 8),
           Text(
-            'Gestiona todos tus movimientos financieros',
+            _userRole == 'ROLE_PROFILE'
+                ? 'Gestiona tus movimientos financieros'
+                : 'Resumen de transacciones de tus perfiles',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Colors.black54,
             ),
@@ -132,16 +169,27 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
                 color: Theme.of(context).primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              tabs: const [
-                Tab(
-                  icon: Icon(Icons.list, size: 20),
-                  text: 'Lista',
-                ),
-                Tab(
-                  icon: Icon(Icons.bar_chart, size: 20),
-                  text: 'Estad�sticas',
-                ),
-              ],
+              tabs: _userRole == 'ROLE_PROFILE'
+                  ? const [
+                      Tab(
+                        icon: Icon(Icons.list, size: 20),
+                        text: 'Mis Transacciones',
+                      ),
+                      Tab(
+                        icon: Icon(Icons.bar_chart, size: 20),
+                        text: 'Estad�sticas',
+                      ),
+                    ]
+                  : const [
+                      Tab(
+                        icon: Icon(Icons.dashboard, size: 20),
+                        text: 'Resumen',
+                      ),
+                      Tab(
+                        icon: Icon(Icons.analytics, size: 20),
+                        text: 'An�lisis',
+                      ),
+                    ],
             ),
           ),
         ],
@@ -152,17 +200,38 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
   Widget _buildTransactionsTab() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: TransactionListWidget(
-        onTransactionTap: _showTransactionDetail,
-        onTransactionEdit: _editTransaction,
-        onTransactionDelete: _deleteTransaction,
-        onAddTransaction: () {
-          _showCreateTransactionModal();
-        },
-        showFilters: true,
-        showFab: false,
-        compact: false,
-      ),
+      child: _userRole == 'ROLE_PROFILE'
+          ? _buildProfileTransactionsView()
+          : _buildBusinessUserSummaryView(),
+    );
+  }
+  
+  /// Vista de transacciones para perfiles (pueden crear/editar/eliminar)
+  Widget _buildProfileTransactionsView() {
+    return TransactionListWidget(
+      onTransactionTap: _showTransactionDetail,
+      onTransactionEdit: _editTransaction,
+      onTransactionDelete: _deleteTransaction,
+      onAddTransaction: () {
+        _showCreateTransactionModal();
+      },
+      showFilters: true,
+      showFab: true, // Habilitar FAB para crear transacciones
+      compact: false,
+    );
+  }
+  
+  /// Vista de resumen para usuarios de negocio (solo lectura)
+  Widget _buildBusinessUserSummaryView() {
+    // Usar exactamente el mismo widget que los perfiles, pero sin botones de acción
+    return TransactionListWidget(
+      onTransactionTap: _showTransactionDetail,
+      onTransactionEdit: null, // Sin editar para business users
+      onTransactionDelete: null, // Sin eliminar para business users
+      onAddTransaction: null, // Sin crear para business users
+      showFilters: true,
+      showFab: false,
+      compact: false,
     );
   }
 
@@ -189,6 +258,109 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => _buildTransactionDetailSheet(transaction),
+    );
+  }
+  
+  void _showSummaryDetail(dynamic summary) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _buildSummaryDetailSheet(summary),
+    );
+  }
+  
+  Widget _buildSummaryDetailSheet(dynamic summary) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// HEADER
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.account_circle,
+                    color: Theme.of(context).primaryColor,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Resumen de Perfil',
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Transacciones registradas',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 24),
+
+            /// DETALLES
+            _buildDetailRow('ID del Perfil', '${summary.profileId ?? "N/A"}'),
+            const SizedBox(height: 16),
+            _buildDetailRow('Total de Transacciones', '${summary.transactionCount ?? 0}'),
+            const SizedBox(height: 16),
+            _buildDetailRow('Ingresos', '\$${(summary.totalIncome ?? 0).toStringAsFixed(2)}'),
+            const SizedBox(height: 16),
+            _buildDetailRow('Gastos', '\$${(summary.totalExpenses ?? 0).toStringAsFixed(2)}'),
+            const SizedBox(height: 16),
+            _buildDetailRow('Monto Neto', '\$${(summary.netAmount ?? 0).toStringAsFixed(2)}'),
+            const SizedBox(height: 16),
+            if (summary.categoryName != null) ...[
+              _buildDetailRow('Categoría', summary.categoryName!),
+              const SizedBox(height: 16),
+            ],
+            if (summary.budgetName != null) ...[
+              _buildDetailRow('Presupuesto', summary.budgetName!),
+              const SizedBox(height: 16),
+            ],
+            const SizedBox(height: 24),
+
+            /// BOTÓN DE CERRAR
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.close),
+                label: const Text('Cerrar'),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -291,36 +463,48 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
               const SizedBox(height: 24),
             ],
 
-            /// BOTONES DE ACCI�N
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      _editTransaction(transaction);
-                    },
-                    icon: const Icon(Icons.edit),
-                    label: const Text('Editar'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      _showDeleteTransactionModal(transaction);
-                    },
-                    icon: const Icon(Icons.delete),
-                    label: const Text('Eliminar'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
+            /// BOTONES DE ACCI�N (solo para perfiles)
+            if (_userRole == 'ROLE_PROFILE') ...[
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _editTransaction(transaction);
+                      },
+                      icon: const Icon(Icons.edit),
+                      label: const Text('Editar'),
                     ),
                   ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _showDeleteTransactionModal(transaction);
+                      },
+                      icon: const Icon(Icons.delete),
+                      label: const Text('Eliminar'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ] else ...[
+              // Para usuarios de negocio, solo mostrar botón de cerrar
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close),
+                  label: const Text('Cerrar'),
                 ),
-              ],
-            ),
+              ),
+            ],
           ],
         ),
       ),
@@ -487,5 +671,7 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
       }
     }
   }
+
+
 
 }
