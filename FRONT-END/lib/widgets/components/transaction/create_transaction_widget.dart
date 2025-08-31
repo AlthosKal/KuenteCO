@@ -4,7 +4,7 @@ import '../../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
 import '../../../dto/app/extra/description_transaction_extra.dart';
 import '../../../utils/enum/transaction_type_enum.dart';
 import '../../../controllers/category_controller.dart';
-import '../../../dto/app/category/category_dto.dart';
+import '../../../dto/app/category/category_enrollment_dto.dart';
 
 class CreateTransactionWidget extends StatefulWidget {
   final Function(NewTransactionDTO) onCreateTransaction;
@@ -27,7 +27,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
   final _amountController = TextEditingController();
   final _dateController = TextEditingController();
   
-  CategoryDTO? _selectedCategory;
+  CategoryEnrollmentDTO? _selectedEnrollment;
   DateTime _selectedDate = DateTime.now();
 
   @override
@@ -35,11 +35,11 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
     super.initState();
     _dateController.text = _formatDate(_selectedDate);
     
-    // Load categories when widget initializes
+    // Load profile enrollments (assigned categories) when widget initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final categoryController = Provider.of<CategoryController>(context, listen: false);
-      if (categoryController.categories.isEmpty) {
-        categoryController.loadCategories();
+      if (categoryController.enrollments.isEmpty) {
+        categoryController.loadProfileEnrollments();
       }
     });
   }
@@ -87,14 +87,6 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
             ),
             child: Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,7 +129,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     /// NOMBRE
-                    _buildInputLabel('Nombre de la transacci�n'),
+                    _buildInputLabel('Nombre de la transaccion'),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _nameController,
@@ -154,7 +146,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                     const SizedBox(height: 20),
 
                     /// DESCRIPCI�N
-                    _buildInputLabel('Descripci�n (opcional)'),
+                    _buildInputLabel('Descripcion (opcional)'),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _descriptionController,
@@ -181,7 +173,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                           return 'El monto es obligatorio';
                         }
                         if (double.tryParse(value!) == null) {
-                          return 'Ingresa un monto v�lido';
+                          return 'Ingresa un monto valido';
                         }
                         return null;
                       },
@@ -211,13 +203,13 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 ),
                                 SizedBox(width: 12),
-                                Text('Cargando categor�as...'),
+                                Text('Cargando categorias...'),
                               ],
                             ),
                           );
                         }
 
-                        if (categoryController.categories.isEmpty) {
+                        if (categoryController.enrollments.isEmpty) {
                           return Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
@@ -229,30 +221,30 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                               children: [
                                 Icon(Icons.bookmarks, color: Colors.purpleAccent),
                                 SizedBox(width: 12),
-                                Text('No hay categor�as disponibles'),
+                                Text('No hay categorias disponibles'),
                               ],
                             ),
                           );
                         }
 
-                        return DropdownButtonFormField<CategoryDTO>(
-                          value: _selectedCategory,
+                        return DropdownButtonFormField<CategoryEnrollmentDTO>(
+                          value: _selectedEnrollment,
                           decoration: _buildInputDecoration(
-                            hint: 'Selecciona una categor�a',
+                            hint: 'Selecciona una categoria',
                             icon: Icons.category,
                           ),
-                          items: categoryController.categories.map((category) {
+                          items: categoryController.enrollments.map((enrollment) {
                             return DropdownMenuItem(
-                              value: category,
-                              child: Text(category.name),
+                              value: enrollment,
+                              child: Text(enrollment.categoryName),
                             );
                           }).toList(),
                           onChanged: (value) {
-                            setState(() => _selectedCategory = value);
+                            setState(() => _selectedEnrollment = value);
                           },
                           validator: (value) {
                             if (value == null) {
-                              return 'Selecciona una categor�a';
+                              return 'Selecciona una categoria';
                             }
                             return null;
                           },
@@ -264,24 +256,6 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                     /// BOTONES
                     Row(
                       children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: widget.isLoading ? null : () {
-                              Navigator.pop(context);
-                            },
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text(
-                              'Cancelar',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
                         Expanded(
                           flex: 2,
                           child: ElevatedButton(
@@ -304,7 +278,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                                     ),
                                   )
                                 : const Text(
-                                    'Crear Transacci�n',
+                                    'Crear Transaccion',
                                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                   ),
                           ),
@@ -401,8 +375,8 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
           type: TransactionType.EXPENSE, // You might want to determine this based on transaction type
         ),
         amount: double.parse(_amountController.text),
-        categoryId: _selectedCategory?.id, // Use the selected category's ID
-        budgetId: _selectedCategory?.budgetId, // Use the selected category's budget ID if available
+        categoryId: _selectedEnrollment?.categoryId, // Use the selected enrollment's category ID
+        budgetId: null, // Enrollment doesn't have budgetId, set to null or get from another source
       );
 
       widget.onCreateTransaction(newTransaction);

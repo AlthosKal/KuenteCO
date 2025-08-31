@@ -72,14 +72,12 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
 
           // Lista de transacciones
           Expanded(child: _buildTransactionsList()),
+          
+          // Botón integrado para agregar transacción
+          if (widget.showFab && widget.onAddTransaction != null)
+            _buildAddTransactionButton(),
         ],
       ),
-      floatingActionButton: widget.showFab && widget.onAddTransaction != null
-          ? FloatingActionButton(
-              onPressed: widget.onAddTransaction,
-              child: const Icon(Icons.add),
-            )
-          : null,
     );
   }
 
@@ -375,6 +373,48 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
             child: const Text('Eliminar'),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAddTransactionButton() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: widget.onAddTransaction,
+            icon: const Icon(Icons.add, color: Colors.white),
+            label: const Text(
+              'Nueva Transacción',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).primaryColor,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 2,
+            ),
+          ),
+        ),
       ),
     );
   }
