@@ -38,6 +38,12 @@ services:
       - "5432:5432"
     networks:
       - kuenteco-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U master -d KuenteCO"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 250s
     restart: unless-stopped
 
 #BASE DE DATOS POSTGRESQL REPLICA
@@ -53,6 +59,12 @@ services:
     depends_on:
       postgres-master-database:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U master || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 250s
     restart: unless-stopped
 
 # API KUENTECO-CHAT DEL BACKEND DE LA APLICACION
