@@ -360,7 +360,7 @@ class IncomeController extends ChangeNotifier {
     final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
     return incomes.where((income) {
       // Use timestamp if available, otherwise parse date string
-      final incomeDate = income.timestamp ?? DateTime.parse(income.date);
+      final incomeDate = income.transactionDate ?? DateTime.parse(income.date);
       return incomeDate.isAfter(thirtyDaysAgo);
     }).toList();
   }
