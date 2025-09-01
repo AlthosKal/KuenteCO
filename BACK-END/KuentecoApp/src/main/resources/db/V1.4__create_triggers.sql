@@ -353,6 +353,81 @@ CREATE TRIGGER trg_log_audit_user_changes
     EXECUTE FUNCTION log_audit_user_changes();
 
 -- ==================================================
+-- 5. TRIGGER PARA ACTUALIZAR PRESUPUESTO RESTANTE AL CAMBIAR CATEGORÍA
+-- ==================================================
+CREATE OR REPLACE FUNCTION update_remaining_budget_on_category()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql AS
+$$
+DECLARE
+    v_old_budget_id INTEGER;
+    v_new_budget_id INTEGER;
+    v_category_expenses NUMERIC := 0;
+BEGIN
+    -- Obtener IDs de presupuesto anterior y nuevo
+    IF TG_OP = 'DELETE' THEN
+        v_old_budget_id := OLD.id_budget;
+        v_new_budget_id := NULL;
+    ELSIF TG_OP = 'INSERT' THEN
+        v_old_budget_id := NULL;
+        v_new_budget_id := NEW.id_budget;
+    ELSE -- UPDATE
+        v_old_budget_id := OLD.id_budget;
+        v_new_budget_id := NEW.id_budget;
+    END IF;
+
+    -- Solo proceder si hay cambio en el presupuesto asociado
+    IF v_old_budget_id = v_new_budget_id THEN
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        END IF;
+        RETURN NEW;
+    END IF;
+
+    -- Calcular gastos totales de la categoría
+    IF TG_OP = 'DELETE' THEN
+        -- Para DELETE, calcular gastos de la categoría eliminada
+        SELECT COALESCE(SUM(t.amount), 0) INTO v_category_expenses
+        FROM transaction t
+        WHERE t.id_category = OLD.id
+          AND (t.description->>'type')::text = 'EXPENSE';
+    ELSE
+        -- Para INSERT/UPDATE, calcular gastos de la categoría
+        SELECT COALESCE(SUM(t.amount), 0) INTO v_category_expenses
+        FROM transaction t
+        WHERE t.id_category = NEW.id
+          AND (t.description->>'type')::text = 'EXPENSE';
+    END IF;
+
+    -- Actualizar presupuesto anterior (devolver gastos)
+    IF v_old_budget_id IS NOT NULL AND v_category_expenses > 0 THEN
+        UPDATE budget
+        SET remaining_budget = remaining_budget + v_category_expenses
+        WHERE id = v_old_budget_id;
+    END IF;
+
+    -- Actualizar presupuesto nuevo (descontar gastos)
+    IF v_new_budget_id IS NOT NULL AND v_category_expenses > 0 THEN
+        UPDATE budget
+        SET remaining_budget = remaining_budget - v_category_expenses
+        WHERE id = v_new_budget_id;
+    END IF;
+
+    IF TG_OP = 'DELETE' THEN
+        RETURN OLD;
+    END IF;
+    
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_update_remaining_budget_on_category ON category;
+CREATE TRIGGER trg_update_remaining_budget_on_category
+    AFTER INSERT OR UPDATE OR DELETE ON category
+    FOR EACH ROW
+    EXECUTE FUNCTION update_remaining_budget_on_category();
+
+-- ==================================================
 -- FUNCIONES AUXILIARES PARA VERIFICAR INTEGRIDAD
 -- ==================================================
 
