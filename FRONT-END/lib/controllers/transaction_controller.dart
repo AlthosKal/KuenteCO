@@ -90,6 +90,32 @@ class TransactionController extends ChangeNotifier {
     }
   }
 
+  // 📌 Cargar perfiles con transacciones (para usuarios de negocio)
+  Future<void> loadUserProfilesWithTransactions() async {
+    _setLoading(true);
+    try {
+      print('🔄 TransactionController: Loading user profiles with transactions...');
+      userProfilesWithTransactions = await _service.getProfilesWithTransactions();
+      print('✅ TransactionController: Loaded profiles with transactions for user: ${userProfilesWithTransactions?.username}');
+      print('✅ TransactionController: Total profiles: ${userProfilesWithTransactions?.profiles?.length ?? 0}');
+      
+      // Log information about each profile
+      if (userProfilesWithTransactions?.profiles != null) {
+        for (int i = 0; i < userProfilesWithTransactions!.profiles!.length; i++) {
+          final profile = userProfilesWithTransactions!.profiles![i];
+          print('   Profile $i: Email=${profile.email}, Transactions=${profile.transactions?.length ?? 0}');
+        }
+      }
+      
+      _setError(null);
+    } catch (e) {
+      print('❌ TransactionController: Error loading profiles with transactions: $e');
+      _setError(e.toString());
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   // 📌 Cargar transacciones por categoría
   Future<void> loadTransactionsByCategory() async {
     _setLoading(true);

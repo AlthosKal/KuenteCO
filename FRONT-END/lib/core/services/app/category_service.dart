@@ -59,8 +59,6 @@ class CategoryService {
   Future<List<CategoryEnrollmentDTO>> getAllEnrollments() async {
     final response = await _apiClient.getApp('/category/enroll');
     
-    print('📌 CategoryService: Raw response data type: ${response.data.runtimeType}');
-    print('📌 CategoryService: Raw response data: ${response.data}');
     
     // El backend puede retornar un objeto envuelto con la estructura:
     // { "data": [...] } o directamente la lista
@@ -68,26 +66,20 @@ class CategoryService {
     
     if (responseData is String) {
       // Si el backend retorna un mensaje de texto (ej: "No tienes categorías asignadas")
-      print('📌 CategoryService: Response is string, returning empty list');
       return [];
     }
     
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
       // Si viene envuelto en un objeto con key 'data'
-      print('📌 CategoryService: Response has data key, extracting list');
       dataList = responseData['data'] as List<dynamic>;
     } else if (responseData is List<dynamic>) {
       // Si viene directamente como lista
-      print('📌 CategoryService: Response is direct list');
       dataList = responseData;
     } else {
       // Si es cualquier otro formato, asumir lista vacía
-      print('❌ CategoryService: Unknown response format, returning empty list');
       return [];
     }
-    
-    print('📌 CategoryService: Data list length: ${dataList.length}');
     
     return dataList
         .map((e) => CategoryEnrollmentDTO.fromJson(e as Map<String, dynamic>))
