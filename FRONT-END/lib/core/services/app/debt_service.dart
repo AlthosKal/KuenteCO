@@ -146,8 +146,8 @@ class DebtService {
     final monthlyTotals = <String, double>{};
     
     for (final payment in debtPayments) {
-      if (payment.timestamp != null) {
-        final monthKey = '${payment.timestamp!.year}-${payment.timestamp!.month.toString().padLeft(2, '0')}';
+      if (payment.transactionDate != null) {
+        final monthKey = '${payment.transactionDate!.year}-${payment.transactionDate!.month.toString().padLeft(2, '0')}';
         monthlyTotals[monthKey] = (monthlyTotals[monthKey] ?? 0.0) + payment.amount;
       }
     }
@@ -186,10 +186,10 @@ class DebtService {
     
     // Sort by timestamp descending (most recent first)
     debtPayments.sort((a, b) {
-      if (a.timestamp == null && b.timestamp == null) return 0;
-      if (a.timestamp == null) return 1;
-      if (b.timestamp == null) return -1;
-      return b.timestamp!.compareTo(a.timestamp!);
+      if (a.transactionDate == null && b.transactionDate == null) return 0;
+      if (a.transactionDate == null) return 1;
+      if (b.transactionDate == null) return -1;
+      return b.transactionDate!.compareTo(a.transactionDate!);
     });
     
     return debtPayments.take(limit).toList();
@@ -215,8 +215,8 @@ class DebtService {
     final frequencyMap = <String, int>{};
     
     for (final payment in debtPayments) {
-      if (payment.timestamp != null) {
-        final monthKey = '${payment.timestamp!.year}-${payment.timestamp!.month.toString().padLeft(2, '0')}';
+      if (payment.transactionDate != null) {
+        final monthKey = '${payment.transactionDate!.year}-${payment.transactionDate!.month.toString().padLeft(2, '0')}';
         frequencyMap[monthKey] = (frequencyMap[monthKey] ?? 0) + 1;
       }
     }
@@ -257,8 +257,8 @@ class DebtService {
     final allDebts = await getAllDebtTransactions();
     // For now, filter by transaction date (timestamp)
     return allDebts.where((debt) {
-      if (debt.timestamp == null) return false;
-      final debtDate = debt.timestamp!;
+      if (debt.transactionDate == null) return false;
+      final debtDate = debt.transactionDate!;
       return debtDate.year == dueDate.year && 
              debtDate.month == dueDate.month && 
              debtDate.day == dueDate.day;

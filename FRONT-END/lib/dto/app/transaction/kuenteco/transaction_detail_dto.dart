@@ -6,7 +6,7 @@ class TransactionDetailDTO {
   final int? budgetId;
   final String name;
   final double amount;
-  final DateTime? timestamp;
+  final DateTime? transactionDate;
   final DescriptionTransaction? descriptionExtra;
   final String? description; // String description for simple text
   final String date; // ISO 8601 string for easier formatting
@@ -17,14 +17,14 @@ class TransactionDetailDTO {
     this.budgetId,
     required this.name,
     required this.amount,
-    this.timestamp,
+    this.transactionDate,
     this.descriptionExtra,
     this.description,
     required this.date,
   });
 
   factory TransactionDetailDTO.fromJson(Map<String, dynamic> json) {
-    final timestampValue = json['timestamp'] != null ? DateTime.parse(json['timestamp']) : DateTime.now();
+    final timestampValue = json['transactionDate'] != null ? DateTime.parse(json['transactionDate']) : DateTime.now();
     
     DescriptionTransaction? descriptionExtra;
     
@@ -47,7 +47,7 @@ class TransactionDetailDTO {
       budgetId: json['budgetId'],
       name: json['name'] ?? '',
       amount: json['amount'] != null ? (json['amount'] as num).toDouble() : 0.0,
-      timestamp: timestampValue,
+      transactionDate: timestampValue,
       descriptionExtra: descriptionExtra,
       description: _parseDescription(json['description']),
       date: json['date'] ?? timestampValue.toIso8601String(),
@@ -61,7 +61,6 @@ class TransactionDetailDTO {
       'budgetId': budgetId,
       'name': name,
       'amount': amount,
-      'timestamp': timestamp?.toIso8601String(),
       'descriptionExtra': descriptionExtra?.toJson(),
       'description': description,
       'date': date,

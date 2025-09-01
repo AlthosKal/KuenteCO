@@ -55,7 +55,7 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
       _descriptionController.text = widget.transaction!.description ?? '';
       _selectedCategoryId = widget.transaction!.categoryId;
       _selectedBudgetId = widget.transaction!.budgetId;
-      _selectedDate = widget.transaction!.timestamp ?? DateTime.now();
+      _selectedDate = widget.transaction!.transactionDate ?? DateTime.now();
       _transactionType = _determineTransactionType(widget.transaction!.name);
     } else {
       // Modo creación
