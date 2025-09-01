@@ -18,7 +18,6 @@ class BudgetEnrollmentDTO {
     final profileEmail = json['profileEmail'] ?? json['profileName'] ?? '';
     final budgetName = json['budgetName'] ?? json['budget_name'] ?? '';
                       
-    print('BudgetEnrollmentDTO.fromJson: FINAL RESULT - ID: $id, ProfileEmail: "$profileEmail", BudgetName: "$budgetName"');
     return BudgetEnrollmentDTO(
       id: id,
       userEmail: userEmail,

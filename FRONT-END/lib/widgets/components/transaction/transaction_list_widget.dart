@@ -72,14 +72,12 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
 
           // Lista de transacciones
           Expanded(child: _buildTransactionsList()),
+          
+          // Botón integrado para agregar transacción
+          if (widget.showFab && widget.onAddTransaction != null)
+            _buildAddTransactionButton(),
         ],
       ),
-      floatingActionButton: widget.showFab && widget.onAddTransaction != null
-          ? FloatingActionButton(
-              onPressed: widget.onAddTransaction,
-              child: const Icon(Icons.add),
-            )
-          : null,
     );
   }
 
@@ -376,6 +374,120 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildAddTransactionButton() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: widget.onAddTransaction,
+            icon: const Icon(Icons.add, color: Colors.white),
+            label: const Text(
+              'Nueva Transacción',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).primaryColor,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 2,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TransactionListItemWidget extends StatelessWidget {
+  final TransactionDetailDTO transaction;
+  final VoidCallback? onTap;
+
+  const TransactionListItemWidget({
+    Key? key,
+    required this.transaction,
+    this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final isIncome = transaction.name.toLowerCase().contains('ingreso') || 
+                    transaction.name.toLowerCase().contains('income');
+    final isExpense = transaction.name.toLowerCase().contains('gasto') || 
+                     transaction.name.toLowerCase().contains('expense');
+    final isDebt = transaction.name.toLowerCase().contains('deuda') || 
+                   transaction.name.toLowerCase().contains('debt');
+
+    Color cardColor = Colors.blue;
+    IconData transactionIcon = Icons.swap_horiz;
+
+    if (isIncome) {
+      cardColor = Colors.green;
+      transactionIcon = Icons.trending_up;
+    } else if (isExpense) {
+      cardColor = Colors.orange;
+      transactionIcon = Icons.trending_down;
+    } else if (isDebt) {
+      cardColor = Colors.red;
+      transactionIcon = Icons.account_balance_wallet;
+    }
+
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: cardColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          transactionIcon,
+          color: cardColor,
+          size: 20,
+        ),
+      ),
+      title: Text(
+        transaction.name,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      subtitle: Text(
+        transaction.date,
+        style: TextStyle(
+          color: Colors.grey[600],
+          fontSize: 12,
+        ),
+      ),
+      trailing: Text(
+        '\$${transaction.amount.toStringAsFixed(0)}',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: cardColor,
+          fontSize: 16,
+        ),
+      ),
+      onTap: onTap,
     );
   }
 }

@@ -17,7 +17,11 @@ class TransactionService {
 
   // ✅ GET /transaction - Get all transactions
   Future<List<TransactionDetailDTO>> getAllTransactions() async {
-    final response = await _apiClient.getApp('/transaction');
+    print('🚀 TransactionService: Starting getAllTransactions() - About to make GET /transaction request');
+    try {
+      final response = await _apiClient.getApp('/transaction');
+      print('📡 TransactionService: Received response from GET /transaction');
+      print('📡 TransactionService: Response status code: ${response.statusCode}');
     
     print('📌 TransactionService: Raw response data type: ${response.data.runtimeType}');
     print('📌 TransactionService: Raw response data: ${response.data}');
@@ -32,12 +36,39 @@ class TransactionService {
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
       print('📌 TransactionService: Response has data key, extracting list');
-      dataList = responseData['data'] as List<dynamic>;
+      final dataValue = responseData['data'];
+      if (dataValue is List<dynamic>) {
+        // Caso 1: data es directamente una lista (para perfiles)
+        dataList = dataValue;
+      } else if (dataValue is Map<String, dynamic> && dataValue.containsKey('profiles')) {
+        // Caso 2: data es un mapa con profiles (para usuarios de negocio)
+        print('📌 TransactionService: Found business user format with profiles');
+        final profiles = dataValue['profiles'] as List<dynamic>;
+        dataList = [];
+        
+        // Extraer todas las transacciones de todos los perfiles
+        for (final profile in profiles) {
+          if (profile is Map<String, dynamic> && profile.containsKey('transactions')) {
+            final transactions = profile['transactions'] as List<dynamic>;
+            dataList.addAll(transactions);
+            print('📌 TransactionService: Added ${transactions.length} transactions from profile: ${profile['email']}');
+          }
+        }
+        print('📌 TransactionService: Total transactions extracted from profiles: ${dataList.length}');
+      } else if (dataValue is String) {
+        print('📌 TransactionService: Data field is a string message, returning empty list');
+        return [];
+      } else {
+        print('❌ TransactionService: Data key exists but value is not a List, String or Map with profiles, it is ${dataValue.runtimeType}');
+        print('❌ TransactionService: Data field content: $dataValue');
+        return [];
+      }
     } else if (responseData is List<dynamic>) {
       print('📌 TransactionService: Response is direct list');
       dataList = responseData;
     } else {
-      print('❌ TransactionService: Unknown response format, returning empty list');
+      print('❌ TransactionService: Response is not a Map with data key or List, it is ${responseData.runtimeType}');
+      print('❌ TransactionService: Response content: $responseData');
       return [];
     }
     
@@ -46,6 +77,10 @@ class TransactionService {
     return dataList
         .map((e) => TransactionDetailDTO.fromJson(e as Map<String, dynamic>))
         .toList();
+    } catch (e) {
+      print('❌ TransactionService: Exception in getAllTransactions(): $e');
+      throw e;
+    }
   }
 
   // ✅ GET /transaction/{id} - Get transaction by ID
@@ -59,6 +94,7 @@ class TransactionService {
     final response = await _apiClient.getApp('/transaction/summary');
     
     print('📌 TransactionService: Transaction summary raw response: ${response.data.runtimeType}');
+    print('📌 TransactionService: Transaction summary raw data: ${response.data}');
     
     final responseData = response.data;
     
@@ -69,13 +105,31 @@ class TransactionService {
     
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      dataList = responseData['data'] as List<dynamic>;
+      final dataValue = responseData['data'];
+      
+      print('📌 TransactionService: Data field type: ${dataValue.runtimeType}');
+      print('📌 TransactionService: Data field content: $dataValue');
+      
+      if (dataValue is List<dynamic>) {
+        dataList = dataValue;
+      } else if (dataValue is String) {
+        print('📌 TransactionService: Summary data field is a string message, returning empty list');
+        return [];
+      } else {
+        // Si es otro tipo (Map, etc), mostrar error y devolver lista vacía
+        print('❌ TransactionService: Summary data field is not a List or String, it is ${dataValue.runtimeType}');
+        print('❌ TransactionService: Data field content: $dataValue');
+        return [];
+      }
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {
-      print('❌ TransactionService: Unknown summary response format, returning empty list');
+      print('❌ TransactionService: Response is not a Map with data key or List, it is ${responseData.runtimeType}');
+      print('❌ TransactionService: Response content: $responseData');
       return [];
     }
+    
+    print('📌 TransactionService: Processing ${dataList.length} transaction summaries');
     
     return dataList
         .map((e) => TransactionSummaryDTO.fromJson(e as Map<String, dynamic>))
@@ -107,7 +161,13 @@ class TransactionService {
     
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      dataList = responseData['data'] as List<dynamic>;
+      final dataValue = responseData['data'];
+      if (dataValue is List<dynamic>) {
+        dataList = dataValue;
+      } else {
+        print('❌ TransactionService: Category data key exists but value is not a List, it is ${dataValue.runtimeType}');
+        return [];
+      }
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {
@@ -156,7 +216,12 @@ class TransactionService {
     List<dynamic> dataList;
     
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      dataList = responseData['data'] as List<dynamic>;
+      final dataValue = responseData['data'];
+      if (dataValue is List<dynamic>) {
+        dataList = dataValue;
+      } else {
+        throw Exception('Batch create data key exists but value is not a List, it is ${dataValue.runtimeType}');
+      }
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {
@@ -204,7 +269,12 @@ class TransactionService {
     List<dynamic> dataList;
     
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      dataList = responseData['data'] as List<dynamic>;
+      final dataValue = responseData['data'];
+      if (dataValue is List<dynamic>) {
+        dataList = dataValue;
+      } else {
+        throw Exception('Batch update data key exists but value is not a List, it is ${dataValue.runtimeType}');
+      }
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {
@@ -277,7 +347,13 @@ class TransactionService {
     List<dynamic> dataList;
     
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      dataList = responseData['data'] as List<dynamic>;
+      final dataValue = responseData['data'];
+      if (dataValue is List<dynamic>) {
+        dataList = dataValue;
+      } else {
+        print('❌ TransactionService: Bancolombia data key exists but value is not a List, it is ${dataValue.runtimeType}');
+        return [];
+      }
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {
@@ -329,7 +405,13 @@ class TransactionService {
     
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      dataList = responseData['data'] as List<dynamic>;
+      final dataValue = responseData['data'];
+      if (dataValue is List<dynamic>) {
+        dataList = dataValue;
+      } else {
+        print('❌ TransactionService: Filter data key exists but value is not a List, it is ${dataValue.runtimeType}');
+        return [];
+      }
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {

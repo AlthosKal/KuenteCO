@@ -36,7 +36,7 @@ class TransactionDetailDTO {
       descriptionExtra: json['descriptionExtra'] != null 
           ? DescriptionTransaction.fromJson(json['descriptionExtra']) 
           : null,
-      description: json['description']?.toString(),
+      description: _parseDescription(json['description']),
       date: json['date'] ?? timestampValue.toIso8601String(),
     );
   }
@@ -53,5 +53,22 @@ class TransactionDetailDTO {
       'description': description,
       'date': date,
     };
+  }
+
+  static String? _parseDescription(dynamic descriptionJson) {
+    if (descriptionJson == null) return null;
+    
+    // Si es un string, devolverlo directamente
+    if (descriptionJson is String) {
+      return descriptionJson;
+    }
+    
+    // Si es un Map (objeto DescriptionTransaction), extraer el campo description
+    if (descriptionJson is Map<String, dynamic>) {
+      return descriptionJson['description']?.toString();
+    }
+    
+    // Fallback: convertir a string
+    return descriptionJson.toString();
   }
 }

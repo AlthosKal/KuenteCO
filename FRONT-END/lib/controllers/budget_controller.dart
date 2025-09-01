@@ -21,6 +21,11 @@ class BudgetController extends ChangeNotifier {
   bool isLoading = false;
   String? errorMessage;
 
+  void clearError() {
+    errorMessage = null;
+    notifyListeners();
+  }
+
   // ✅ Obtener todos los presupuestos
   Future<void> loadBudgets() async {
     print('BudgetController: loadBudgets() called');
@@ -32,7 +37,17 @@ class BudgetController extends ChangeNotifier {
       errorMessage = null;
     } catch (e) {
       print('BudgetController: Error loading budgets: $e');
-      errorMessage = 'Error al cargar presupuestos: $e';
+      // Si es un error de "no hay datos" o lista vacía, no es realmente un error
+      if (e.toString().toLowerCase().contains('empty') ||
+          e.toString().toLowerCase().contains('no data') ||
+          e.toString().toLowerCase().contains('not found') ||
+          e.toString().contains('404')) {
+        print('📝 BudgetController: No budgets found for user - this is normal');
+        budgets = []; // Asegurar lista vacía
+        errorMessage = null; // No mostrar como error
+      } else {
+        errorMessage = 'Error al cargar presupuestos: $e';
+      }
     } finally {
       _setLoading(false);
       print('BudgetController: loadBudgets() finished, loading: $isLoading');
@@ -55,19 +70,25 @@ class BudgetController extends ChangeNotifier {
 
   // ✅ Obtener enrollments
   Future<void> loadEnrollments() async {
-    print('BudgetController: loadEnrollments() called');
     _setLoading(true);
     try {
-      print('BudgetController: Calling service.getEnrollments()');
       enrollments = await _service.getEnrollments();
-      print('BudgetController: Received ${enrollments.length} enrollments');
       errorMessage = null;
     } catch (e) {
       print('BudgetController: Error loading enrollments: $e');
-      errorMessage = 'Error al cargar enrolamientos: $e';
+      // Si es un error de "no hay datos" o lista vacía, no es realmente un error
+      if (e.toString().toLowerCase().contains('empty') ||
+          e.toString().toLowerCase().contains('no data') ||
+          e.toString().toLowerCase().contains('not found') ||
+          e.toString().contains('404')) {
+        print('📝 BudgetController: No enrollments found for profile - this is normal');
+        enrollments = []; // Asegurar lista vacía
+        errorMessage = null; // No mostrar como error
+      } else {
+        errorMessage = 'Error al cargar enrolamientos: $e';
+      }
     } finally {
       _setLoading(false);
-      print('BudgetController: loadEnrollments() finished, loading: $isLoading');
     }
   }
 

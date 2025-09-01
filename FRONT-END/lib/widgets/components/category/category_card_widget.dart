@@ -20,8 +20,22 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
     super.initState();
     // Cargar categorías cuando se monta el widget
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadDataBasedOnRole();
+      _forceCleanStateAndLoad();
     });
+  }
+  
+  /// Fuerza un estado limpio antes de cargar datos
+  Future<void> _forceCleanStateAndLoad() async {
+    final categoryController = Provider.of<CategoryController>(context, listen: false);
+    
+    // Limpiar completamente el estado antes de empezar
+    categoryController.clearError();
+    
+    // Esperar un frame para asegurar que la UI se actualice
+    await Future.delayed(const Duration(milliseconds: 10));
+    
+    // Ahora cargar los datos
+    await _loadDataBasedOnRole();
   }
   
   /// Cargar datos según el rol del usuario
@@ -41,14 +55,35 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
         // Si es un usuario regular, cargar sus categorías
         await categoryController.loadCategories();
       }
+      
+      // Asegurar que el error esté limpio después de cargar exitosamente
+      // Esto es especialmente importante cuando se obtiene una lista vacía válida
+      if (categoryController.errorMessage == null || 
+          categoryController.errorMessage!.isEmpty ||
+          categoryController.errorMessage!.toLowerCase().contains('empty') ||
+          categoryController.errorMessage!.toLowerCase().contains('no data') ||
+          categoryController.errorMessage!.toLowerCase().contains('not found')) {
+        categoryController.clearError();
+      }
+      
     } catch (e) {
       // No hacer fallback para perfiles, solo para usuarios
       final role = await _storage.read(key: 'role');
       if (role != 'ROLE_PROFILE') {
         try {
           await categoryController.loadCategories();
+          // Limpiar error después del fallback exitoso
+          categoryController.clearError();
         } catch (fallbackError) {
-          // Error en fallback
+          // Error en fallback - mantener el error original
+        }
+      } else {
+        // Para perfiles, si hay error verificar si es realmente un error o lista vacía
+        if (e.toString().toLowerCase().contains('empty') ||
+            e.toString().toLowerCase().contains('no data') ||
+            e.toString().toLowerCase().contains('not found') ||
+            e.toString().contains('404')) {
+          categoryController.clearError();
         }
       }
     }
@@ -73,15 +108,37 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
       builder: (context, snapshot) {
         final role = snapshot.data;
         
-        // Solo mostrar error si hay un error grave de conexión/datos
-        if (categoryController.errorMessage != null && 
-            !categoryController.errorMessage!.contains('Data field is a string message')) {
+        // ESTRATEGIA MÁS AGRESIVA: Priorizar el estado correcto sobre el error
+        // Si tenemos datos válidos (aunque sea una lista vacía), mostrar el estado correcto
+        bool hasValidData = role != null && !categoryController.isLoading;
+        bool hasCategories = role != 'ROLE_PROFILE' && categoryController.categories.isNotEmpty;
+        bool hasEnrollments = role == 'ROLE_PROFILE' && categoryController.enrollments.isNotEmpty;
+        bool hasEmptyValidState = role != null && 
+            ((role == 'ROLE_PROFILE' && categoryController.enrollments.isEmpty) ||
+             (role != 'ROLE_PROFILE' && categoryController.categories.isEmpty));
+
+        // Solo mostrar error si realmente no podemos mostrar una interfaz válida
+        bool shouldShowError = categoryController.errorMessage != null && 
+            categoryController.errorMessage!.isNotEmpty &&
+            !hasValidData &&
+            !hasCategories &&
+            !hasEnrollments &&
+            !hasEmptyValidState &&
+            // Excluir errores que sabemos que son de listas vacías válidas
+            !categoryController.errorMessage!.contains('Data field is a string message') &&
+            !categoryController.errorMessage!.toLowerCase().contains('empty') &&
+            !categoryController.errorMessage!.toLowerCase().contains('no data') &&
+            !categoryController.errorMessage!.toLowerCase().contains('not found') &&
+            !categoryController.errorMessage!.contains('404');
+
+        if (shouldShowError) {
           return _buildErrorCard(
             errorMessage: categoryController.errorMessage!,
             onRetry: () => _loadDataBasedOnRole(),
           );
         }
         
+        // Si llegamos aquí, siempre mostrar la interfaz correcta (con o sin datos)
         if (role == 'ROLE_PROFILE') {
           return _buildEnrollmentCard(categoryController);
         } else {
@@ -251,11 +308,12 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
   
   /// Widget para mostrar enrollments de perfiles
   Widget _buildEnrollmentCard(CategoryController categoryController) {
-    // 🔹 Si no hay enrollments → mostrar mensaje
+    // 🔹 Si no hay enrollments → mostrar mensaje sin navegación
     if (categoryController.enrollments.isEmpty) {
-      return InkWell(
-        onTap: () => Navigator.pushNamed(context, AppRoutes.categoryView),
-        borderRadius: BorderRadius.circular(20),
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+        ),
         child: GlassmorphicContainer(
           width: 180,
           height: 180,
@@ -267,14 +325,14 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFFFF9A56).withOpacity(0.3),
-              const Color(0xFFFF6B95).withOpacity(0.1),
+              const Color(0xFF890cac).withOpacity(0.3),
+              const Color(0xFF890cac).withOpacity(0.3),
             ],
           ),
           borderGradient: LinearGradient(
             colors: [
-              Colors.white.withOpacity(0.5),
-              Colors.white.withOpacity(0.5),
+              Colors.transparent,
+              Colors.transparent,
             ],
           ),
           child: Padding(
@@ -291,25 +349,25 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
                   child: const Icon(
                     Icons.assignment_ind_outlined,
                     size: 28,
-                    color: Colors.purple,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 12),
                 const Text(
-                  'Mis Categorías',
+                  'Categorías',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.purple,
+                    color: Colors.white,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'No tienes categorías asignadas',
+                  'El administrador aún no te ha asignado categorías',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white70,
+                    color: Colors.white,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -357,7 +415,7 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
                   child: const Icon(
                     Icons.assignment_turned_in,
                     size: 28,
-                    color: Colors.purple,
+                    color: Colors.purpleAccent,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -366,7 +424,7 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.purple,
+                    color: Colors.purpleAccent,
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 1,
@@ -374,10 +432,10 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Categoría asignada',
+                  'Categorías asignadas',
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Colors.white70,
+                    color: Colors.purpleAccent,
                     fontWeight: FontWeight.w500,
                   ),
                   textAlign: TextAlign.center,
@@ -393,7 +451,7 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
                     '${categoryController.enrollments.length} asignada${categoryController.enrollments.length > 1 ? 's' : ''}',
                     style: const TextStyle(
                       fontSize: 10,
-                      color: Colors.purple,
+                      color: Colors.purpleAccent,
                     ),
                   ),
                 ),
