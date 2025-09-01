@@ -26,6 +26,21 @@ class TransactionDetailDTO {
   factory TransactionDetailDTO.fromJson(Map<String, dynamic> json) {
     final timestampValue = json['timestamp'] != null ? DateTime.parse(json['timestamp']) : DateTime.now();
     
+    DescriptionTransaction? descriptionExtra;
+    
+    // First try to get it from descriptionExtra field
+    if (json['descriptionExtra'] != null) {
+      descriptionExtra = DescriptionTransaction.fromJson(json['descriptionExtra']);
+    } 
+    // If not found, try to get it from description field (which sometimes contains the DescriptionTransaction object)
+    else if (json['description'] != null && json['description'] is Map<String, dynamic>) {
+      try {
+        descriptionExtra = DescriptionTransaction.fromJson(json['description'] as Map<String, dynamic>);
+      } catch (e) {
+        // If parsing fails, descriptionExtra remains null
+      }
+    }
+    
     return TransactionDetailDTO(
       id: json['id'] ?? 0,
       categoryId: json['categoryId'],
@@ -33,9 +48,7 @@ class TransactionDetailDTO {
       name: json['name'] ?? '',
       amount: json['amount'] != null ? (json['amount'] as num).toDouble() : 0.0,
       timestamp: timestampValue,
-      descriptionExtra: json['descriptionExtra'] != null 
-          ? DescriptionTransaction.fromJson(json['descriptionExtra']) 
-          : null,
+      descriptionExtra: descriptionExtra,
       description: _parseDescription(json['description']),
       date: json['date'] ?? timestampValue.toIso8601String(),
     );
