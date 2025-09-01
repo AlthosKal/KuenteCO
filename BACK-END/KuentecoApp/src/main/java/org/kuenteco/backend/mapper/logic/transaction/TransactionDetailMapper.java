@@ -8,7 +8,6 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface TransactionDetailMapper {
-    @Mapping(target = "timestamp", source = "transactionDate")
     @Mapping(target = "categoryId", source = "category.id")
     @Mapping(target = "budgetId", source = "budget.id")
     TransactionDetailDTO toDto(Transaction transaction);
