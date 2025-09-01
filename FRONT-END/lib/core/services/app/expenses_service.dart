@@ -158,8 +158,8 @@ class ExpensesService {
     final monthlyTotals = <String, double>{};
     
     for (final expense in expenses) {
-      if (expense.timestamp != null) {
-        final monthKey = '${expense.timestamp!.year}-${expense.timestamp!.month.toString().padLeft(2, '0')}';
+      if (expense.transactionDate != null) {
+        final monthKey = '${expense.transactionDate!.year}-${expense.transactionDate!.month.toString().padLeft(2, '0')}';
         monthlyTotals[monthKey] = (monthlyTotals[monthKey] ?? 0.0) + expense.amount;
       }
     }

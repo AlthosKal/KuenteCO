@@ -419,7 +419,7 @@ class DebtController extends ChangeNotifier {
   // 📌 Obtener deudas por rango de fechas (desde la lista local)
   List<TransactionDetailDTO> getDebtsByDateRange(DateTime from, DateTime to) {
     return debts.where((debt) {
-      final debtDate = debt.timestamp ?? DateTime.now();
+      final debtDate = debt.transactionDate ?? DateTime.now();
       return debtDate.isAfter(from.subtract(const Duration(days: 1))) &&
              debtDate.isBefore(to.add(const Duration(days: 1)));
     }).toList();
@@ -452,7 +452,7 @@ class DebtController extends ChangeNotifier {
   List<TransactionDetailDTO> get recentDebts {
     final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
     return debts.where((debt) {
-      final debtDate = debt.timestamp ?? DateTime.now();
+      final debtDate = debt.transactionDate ?? DateTime.now();
       return debtDate.isAfter(thirtyDaysAgo);
     }).toList();
   }

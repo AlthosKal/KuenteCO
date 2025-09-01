@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 import '../../../utils/formatters.dart';
+import '../../../utils/enum/transaction_type_enum.dart';
 
 class TransactionCardWidget extends StatelessWidget {
   final TransactionDetailDTO? transaction; // Opcional para el home
@@ -110,16 +111,13 @@ class TransactionCardWidget extends StatelessWidget {
     }
 
     final theme = Theme.of(context);
-    final isIncome = transaction!.name.toLowerCase().contains('ingreso') || 
-                    transaction!.name.toLowerCase().contains('income');
-    final isExpense = transaction!.name.toLowerCase().contains('gasto') || 
-                     transaction!.name.toLowerCase().contains('expense');
-    final isDebt = transaction!.name.toLowerCase().contains('deuda') || 
-                   transaction!.name.toLowerCase().contains('debt');
-
-    // Determinar color basado en el tipo de transacción
-    Color cardColor = customColor ?? _getTransactionColor(isIncome, isExpense, isDebt);
-    IconData transactionIcon = _getTransactionIcon(isIncome, isExpense, isDebt);
+    
+    // Determinar el tipo de transacción usando lógica híbrida
+    TransactionType transactionType = _determineTransactionType(transaction!);
+    
+    // Determinar color e icono basado en el tipo de transacción
+    Color cardColor = customColor ?? _getTransactionColorByType(transactionType);
+    IconData transactionIcon = _getTransactionIconByType(transactionType);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -164,9 +162,9 @@ class TransactionCardWidget extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 2),
-                        if (transaction!.description?.isNotEmpty == true)
+                        if (_getTransactionDescription().isNotEmpty)
                           Text(
-                            transaction!.description!,
+                            _getTransactionDescription(),
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurface.withOpacity(0.6),
                             ),
@@ -260,18 +258,63 @@ class TransactionCardWidget extends StatelessWidget {
     );
   }
 
-  Color _getTransactionColor(bool isIncome, bool isExpense, bool isDebt) {
-    if (isIncome) return Colors.green;
-    if (isExpense) return Colors.orange;
-    if (isDebt) return Colors.red;
-    return Colors.blue; // Default color
+  TransactionType _determineTransactionType(TransactionDetailDTO transaction) {
+    // Primero, intentar obtener el tipo desde descriptionExtra
+    if (transaction.descriptionExtra?.type != null) {
+      return transaction.descriptionExtra!.type;
+    }
+    
+    // Fallback: detectar por nombre si no hay tipo explícito
+    final name = transaction.name.toLowerCase();
+    
+    if (name.contains('ingreso') || name.contains('income')) {
+      return TransactionType.INCOME;
+    }
+    if (name.contains('egreso') || name.contains('gasto') || name.contains('expense')) {
+      return TransactionType.EXPENSE;
+    }
+    
+    // Default a EXPENSE si no podemos determinar
+    return TransactionType.EXPENSE;
   }
 
-  IconData _getTransactionIcon(bool isIncome, bool isExpense, bool isDebt) {
-    if (isIncome) return Icons.trending_up;
-    if (isExpense) return Icons.trending_down;
-    if (isDebt) return Icons.account_balance_wallet;
-    return Icons.swap_horiz; // Default icon
+  Color _getTransactionColorByType(TransactionType type) {
+    switch (type) {
+      case TransactionType.INCOME:
+        return Colors.green;
+      case TransactionType.EXPENSE:
+        return Colors.red;
+      default:
+        return Colors.red;
+    }
+  }
+
+  IconData _getTransactionIconByType(TransactionType type) {
+    switch (type) {
+      case TransactionType.INCOME:
+        return Icons.trending_up;
+      case TransactionType.EXPENSE:
+        return Icons.trending_down;
+      default:
+        return Icons.trending_down;
+    }
+  }
+
+  String _getTransactionDescription() {
+    if (transaction == null) return '';
+    
+    // Priorizar descriptionExtra.description si existe
+    if (transaction!.descriptionExtra != null) {
+      final desc = transaction!.descriptionExtra!.description;
+      return (desc != null && desc != 'No description') ? desc : '';
+    }
+    
+    // Fallback al campo description simple
+    if (transaction!.description != null && transaction!.description != 'No description') {
+      return transaction!.description!;
+    }
+    
+    return '';
   }
 }
 
@@ -291,15 +334,12 @@ class TransactionListItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isIncome = transaction.name.toLowerCase().contains('ingreso') || 
-                    transaction.name.toLowerCase().contains('income');
-    final isExpense = transaction.name.toLowerCase().contains('gasto') || 
-                     transaction.name.toLowerCase().contains('expense');
-    final isDebt = transaction.name.toLowerCase().contains('deuda') || 
-                   transaction.name.toLowerCase().contains('debt');
-
-    Color transactionColor = _getTransactionColor(isIncome, isExpense, isDebt);
-    IconData transactionIcon = _getTransactionIcon(isIncome, isExpense, isDebt);
+    
+    // Determinar el tipo de transacción usando lógica híbrida
+    TransactionType transactionType = _determineTransactionType(transaction);
+    
+    Color transactionColor = _getTransactionColorByType(transactionType);
+    IconData transactionIcon = _getTransactionIconByType(transactionType);
 
     return ListTile(
       onTap: onTap,
@@ -324,9 +364,9 @@ class TransactionListItemWidget extends StatelessWidget {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (transaction.description?.isNotEmpty == true)
+          if (_getDescriptionText(transaction).isNotEmpty)
             Text(
-              transaction.description!,
+              _getDescriptionText(transaction),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodySmall?.copyWith(
@@ -364,17 +404,60 @@ class TransactionListItemWidget extends StatelessWidget {
     );
   }
 
-  Color _getTransactionColor(bool isIncome, bool isExpense, bool isDebt) {
-    if (isIncome) return Colors.green;
-    if (isExpense) return Colors.orange;
-    if (isDebt) return Colors.red;
-    return Colors.blue;
+  TransactionType _determineTransactionType(TransactionDetailDTO transaction) {
+    // Primero, intentar obtener el tipo desde descriptionExtra
+    if (transaction.descriptionExtra?.type != null) {
+      return transaction.descriptionExtra!.type;
+    }
+    
+    // Fallback: detectar por nombre si no hay tipo explícito
+    final name = transaction.name.toLowerCase();
+    
+    if (name.contains('ingreso') || name.contains('income')) {
+      return TransactionType.INCOME;
+    }
+    if (name.contains('egreso') || name.contains('gasto') || name.contains('expense')) {
+      return TransactionType.EXPENSE;
+    }
+    
+    // Default a EXPENSE si no podemos determinar
+    return TransactionType.EXPENSE;
   }
 
-  IconData _getTransactionIcon(bool isIncome, bool isExpense, bool isDebt) {
-    if (isIncome) return Icons.trending_up;
-    if (isExpense) return Icons.trending_down;
-    if (isDebt) return Icons.account_balance_wallet;
-    return Icons.swap_horiz;
+  Color _getTransactionColorByType(TransactionType type) {
+    switch (type) {
+      case TransactionType.INCOME:
+        return Colors.green;
+      case TransactionType.EXPENSE:
+        return Colors.red;
+      default:
+        return Colors.red;
+    }
+  }
+
+  IconData _getTransactionIconByType(TransactionType type) {
+    switch (type) {
+      case TransactionType.INCOME:
+        return Icons.trending_up;
+      case TransactionType.EXPENSE:
+        return Icons.trending_down;
+      default:
+        return Icons.trending_down;
+    }
+  }
+
+  String _getDescriptionText(TransactionDetailDTO transaction) {
+    // Priorizar descriptionExtra.description si existe
+    if (transaction.descriptionExtra != null) {
+      final desc = transaction.descriptionExtra!.description;
+      return (desc != null && desc != 'No description') ? desc : '';
+    }
+    
+    // Fallback al campo description simple
+    if (transaction.description != null && transaction.description != 'No description') {
+      return transaction.description!;
+    }
+    
+    return '';
   }
 }

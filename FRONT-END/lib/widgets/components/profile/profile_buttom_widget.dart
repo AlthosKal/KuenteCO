@@ -34,34 +34,14 @@ class ProfileButtonWidget extends StatelessWidget {
             ],
           ),
         ),
-        const PopupMenuItem(
-          value: 'settings',
-          child: Row(
-            children: [
-              Icon(Icons.settings, size: 20),
-              SizedBox(width: 8),
-              Text('Configuración'),
-            ],
-          ),
-        ),
-        const PopupMenuItem(
-          value: 'contact',
-          child: Row(
-            children: [
-              Icon(Icons.contact_mail, size: 20),
-              SizedBox(width: 8),
-              Text('Contacto'),
-            ],
-          ),
-        ),
         const PopupMenuDivider(),
         const PopupMenuItem(
           value: 'logout',
           child: Row(
             children: [
-              Icon(Icons.logout, size: 20, color: Colors.red),
+              Icon(Icons.logout, size: 20, color: Colors.purpleAccent),
               SizedBox(width: 8),
-              Text('Cerrar sesión', style: TextStyle(color: Colors.red)),
+              Text('Cerrar sesión', style: TextStyle(color: Colors.purpleAccent)),
             ],
           ),
         ),

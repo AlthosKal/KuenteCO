@@ -387,7 +387,7 @@ class ExpensesController extends ChangeNotifier {
   // 📌 Obtener gastos por rango de fechas (desde la lista local)
   List<TransactionDetailDTO> getExpensesByDateRange(DateTime from, DateTime to) {
     return expenses.where((expense) {
-      final expenseDate = expense.timestamp ?? DateTime.now();
+      final expenseDate = expense.transactionDate ?? DateTime.now();
       return expenseDate.isAfter(from.subtract(const Duration(days: 1))) &&
              expenseDate.isBefore(to.add(const Duration(days: 1)));
     }).toList();
@@ -420,7 +420,7 @@ class ExpensesController extends ChangeNotifier {
   List<TransactionDetailDTO> get recentExpenses {
     final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
     return expenses.where((expense) {
-      final expenseDate = expense.timestamp ?? DateTime.now();
+      final expenseDate = expense.transactionDate ?? DateTime.now();
       return expenseDate.isAfter(thirtyDaysAgo);
     }).toList();
   }

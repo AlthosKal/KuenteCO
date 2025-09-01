@@ -2,8 +2,8 @@ import '../../extra/description_transaction_extra.dart';
 
 class UpdateTransactionDTO {
   final int id;
-  final int categoryId;
-  final int budgetId;
+  final int? categoryId;
+  final int? budgetId; // Requerido por el endpoint de actualización del backend
   final int? debtId; // Opcional como en el backend
   final String name; // Requerido como en el backend
   final DescriptionTransaction description;
@@ -11,9 +11,9 @@ class UpdateTransactionDTO {
 
   UpdateTransactionDTO({
     required this.id,
-    required this.categoryId,
-    required this.budgetId,
-    this.debtId,
+    this.categoryId, // Optional - can be null
+    this.budgetId, // Optional - can be null  
+    this.debtId, // Optional - can be null
     required this.name,
     required this.description,
     required this.amount,

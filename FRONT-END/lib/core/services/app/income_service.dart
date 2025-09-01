@@ -158,8 +158,8 @@ class IncomeService {
     final monthlyTotals = <String, double>{};
     
     for (final income in incomes) {
-      if (income.timestamp != null) {
-        final monthKey = '${income.timestamp!.year}-${income.timestamp!.month.toString().padLeft(2, '0')}';
+      if (income.transactionDate != null) {
+        final monthKey = '${income.transactionDate!.year}-${income.transactionDate!.month.toString().padLeft(2, '0')}';
         monthlyTotals[monthKey] = (monthlyTotals[monthKey] ?? 0.0) + income.amount;
       }
     }
