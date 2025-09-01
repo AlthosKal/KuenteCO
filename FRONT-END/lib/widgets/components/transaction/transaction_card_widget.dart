@@ -266,6 +266,7 @@ class TransactionCardWidget extends StatelessWidget {
     
     // Fallback: detectar por nombre si no hay tipo explícito
     final name = transaction.name.toLowerCase();
+    
     if (name.contains('ingreso') || name.contains('income')) {
       return TransactionType.INCOME;
     }
@@ -411,6 +412,7 @@ class TransactionListItemWidget extends StatelessWidget {
     
     // Fallback: detectar por nombre si no hay tipo explícito
     final name = transaction.name.toLowerCase();
+    
     if (name.contains('ingreso') || name.contains('income')) {
       return TransactionType.INCOME;
     }

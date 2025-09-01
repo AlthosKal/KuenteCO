@@ -4,6 +4,8 @@ class CategoryEnrollmentDTO {
   final String userEmail;
   final String profileEmail;
   final String categoryName;
+  final int? profileId;
+  final String? enrollmentDate;
 
   CategoryEnrollmentDTO({
     this.id,
@@ -11,6 +13,8 @@ class CategoryEnrollmentDTO {
     required this.userEmail,
     required this.profileEmail,
     required this.categoryName,
+    this.profileId,
+    this.enrollmentDate,
   });
 
   factory CategoryEnrollmentDTO.fromJson(Map<String, dynamic> json) {
@@ -20,6 +24,8 @@ class CategoryEnrollmentDTO {
       userEmail: json['userEmail'],
       profileEmail: json['profileEmail'],
       categoryName: json['categoryName'],
+      profileId: json['profileId'],
+      enrollmentDate: json['enrollmentDate'],
     );
   }
 
@@ -30,6 +36,8 @@ class CategoryEnrollmentDTO {
       'userEmail': userEmail,
       'profileEmail': profileEmail,
       'categoryName': categoryName,
+      'profileId': profileId,
+      'enrollmentDate': enrollmentDate,
     };
   }
 }

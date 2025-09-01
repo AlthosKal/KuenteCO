@@ -6,6 +6,7 @@ class CategoryDTO {
   final String name;
   final DescriptionCategory description;
   final DateTime registerDate;
+  final int? businessAccountId;
 
   CategoryDTO({
     required this.id,
@@ -13,6 +14,7 @@ class CategoryDTO {
     required this.name,
     required this.description,
     required this.registerDate,
+    this.businessAccountId,
   });
 
   factory CategoryDTO.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,11 @@ class CategoryDTO {
         name: json['name']?.toString() ?? '',
         description: DescriptionCategory.fromJson(json['description'] ?? {}),
         registerDate: DateTime.parse(json['registerDate']?.toString() ?? DateTime.now().toIso8601String()),
+        businessAccountId: json['businessAccountId'] != null 
+            ? (json['businessAccountId'] is int 
+                ? json['businessAccountId'] as int 
+                : int.parse(json['businessAccountId'].toString()))
+            : null,
       );
     } catch (e) {
       throw Exception('Error parsing CategoryDTO from JSON: $json. Error: $e');
@@ -44,6 +51,7 @@ class CategoryDTO {
       'budgetId': budgetId,
       'name': name,
       'description': description.toJson(),
+      'businessAccountId': businessAccountId,
     };
   }
 }

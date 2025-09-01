@@ -10,12 +10,15 @@ class DescriptionTransaction {
   });
 
   factory DescriptionTransaction.fromJson(Map<String, dynamic> json) {
+    final typeString = json['type']?.toString();
+    final parsedType = TransactionType.values.firstWhere(
+      (e) => e.name == typeString,
+      orElse: () => TransactionType.EXPENSE, // o cualquier valor por defecto
+    );
+    
     return DescriptionTransaction(
       description: json['description'],
-      type: TransactionType.values.firstWhere(
-            (e) => e.name == json['type'],
-        orElse: () => TransactionType.EXPENSE, // o cualquier valor por defecto
-      ),
+      type: parsedType,
     );
   }
 
