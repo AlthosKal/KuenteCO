@@ -445,8 +445,8 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
             const SizedBox(height: 24),
 
             /// DETALLES
-            if (transaction.description?.isNotEmpty == true) ...[
-              _buildDetailRow('Descripci�n', transaction.description!),
+            if (_getTransactionDescription(transaction).isNotEmpty) ...[
+              _buildDetailRow('Descripci�n', _getTransactionDescription(transaction)),
               const SizedBox(height: 16),
             ],
             
@@ -672,6 +672,18 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
     }
   }
 
-
-
+  String _getTransactionDescription(TransactionDetailDTO transaction) {
+    // Priorizar descriptionExtra.description si existe
+    if (transaction.descriptionExtra != null) {
+      final desc = transaction.descriptionExtra!.description;
+      return (desc != null && desc != 'No description') ? desc : '';
+    }
+    
+    // Fallback al campo description simple
+    if (transaction.description != null && transaction.description != 'No description') {
+      return transaction.description!;
+    }
+    
+    return '';
+  }
 }

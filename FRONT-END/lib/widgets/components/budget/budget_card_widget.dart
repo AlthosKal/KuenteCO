@@ -44,11 +44,9 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
     
     try {
       final role = await _storage.read(key: 'role');
-      print('= BudgetCardWidget: User role detected: $role');
       
       if (role == 'ROLE_PROFILE') {
         // Si es un perfil, cargar enrollments de presupuestos
-        print('BudgetCardWidget: Loading profile budget enrollments...');
         await budgetController.loadEnrollments();
       } else {
         // Si es un usuario regular, cargar sus presupuestos

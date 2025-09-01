@@ -25,4 +25,9 @@ class DescriptionTransaction {
       'type': type.name,
     };
   }
+
+  @override
+  String toString() {
+    return description; // Solo devolver el texto de la descripción, no toda la estructura
+  }
 }

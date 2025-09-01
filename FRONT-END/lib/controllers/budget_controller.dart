@@ -70,12 +70,9 @@ class BudgetController extends ChangeNotifier {
 
   // ✅ Obtener enrollments
   Future<void> loadEnrollments() async {
-    print('BudgetController: loadEnrollments() called');
     _setLoading(true);
     try {
-      print('BudgetController: Calling service.getEnrollments()');
       enrollments = await _service.getEnrollments();
-      print('BudgetController: Received ${enrollments.length} enrollments');
       errorMessage = null;
     } catch (e) {
       print('BudgetController: Error loading enrollments: $e');
@@ -92,7 +89,6 @@ class BudgetController extends ChangeNotifier {
       }
     } finally {
       _setLoading(false);
-      print('BudgetController: loadEnrollments() finished, loading: $isLoading');
     }
   }
 

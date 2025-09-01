@@ -29,6 +29,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
   
   CategoryEnrollmentDTO? _selectedEnrollment;
   DateTime _selectedDate = DateTime.now();
+  TransactionType _selectedType = TransactionType.EXPENSE; // Default to Egreso
 
   @override
   void initState() {
@@ -55,6 +56,39 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
 
   String _formatDate(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+  
+  String _getTransactionTypeDisplayName(TransactionType type) {
+    switch (type) {
+      case TransactionType.INCOME:
+        return 'Ingreso';
+      case TransactionType.EXPENSE:
+        return 'Egreso';
+      default:
+        return 'Egreso';
+    }
+  }
+  
+  IconData _getTransactionTypeIcon(TransactionType type) {
+    switch (type) {
+      case TransactionType.INCOME:
+        return Icons.trending_up;
+      case TransactionType.EXPENSE:
+        return Icons.trending_down;
+      default:
+        return Icons.trending_down;
+    }
+  }
+  
+  Color _getTransactionTypeColor(TransactionType type) {
+    switch (type) {
+      case TransactionType.INCOME:
+        return Colors.green;
+      case TransactionType.EXPENSE:
+        return Colors.red;
+      default:
+        return Colors.red;
+    }
   }
 
   @override
@@ -157,6 +191,74 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                     ),
                     const SizedBox(height: 20),
 
+                    /// TIPO DE TRANSACCI�N
+                    _buildInputLabel('Tipo de transacci�n'),
+                    const SizedBox(height: 8),
+                    DropdownButtonFormField<TransactionType>(
+                      key: ValueKey(_selectedType), // Force rebuild when type changes
+                      value: _selectedType,
+                      decoration: InputDecoration(
+                        hintText: 'Selecciona el tipo',
+                        prefixIcon: Icon(
+                          _getTransactionTypeIcon(_selectedType),
+                          color: _getTransactionTypeColor(_selectedType),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.3)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.3)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Colors.red),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Colors.red, width: 2),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.withValues(alpha: 0.05),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      ),
+                      items: TransactionType.values.map((type) {
+                        return DropdownMenuItem(
+                          value: type,
+                          child: Row(
+                            children: [
+                              Icon(
+                                _getTransactionTypeIcon(type),
+                                color: _getTransactionTypeColor(type),
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(_getTransactionTypeDisplayName(type)),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            _selectedType = value;
+                          });
+                        }
+                      },
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Selecciona el tipo de transacci�n';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+
                     /// MONTO
                     _buildInputLabel('Monto'),
                     const SizedBox(height: 8),
@@ -181,7 +283,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                     const SizedBox(height: 20),
 
                     /// CATEGOR�A
-                    _buildInputLabel('Categor�a'),
+                    _buildInputLabel('Categoria'),
                     const SizedBox(height: 8),
                     Consumer<CategoryController>(
                       builder: (context, categoryController, child) {
@@ -368,14 +470,25 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
 
   void _submitForm() {
     if (_formKey.currentState?.validate() ?? false) {
+      // Validate that a category is selected
+      if (_selectedEnrollment?.categoryId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Por favor selecciona una categoría'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+
       final newTransaction = NewTransactionDTO(
         name: _nameController.text,
         description: DescriptionTransaction(
           description: _descriptionController.text.isEmpty ? 'No description' : _descriptionController.text,
-          type: TransactionType.EXPENSE, // You might want to determine this based on transaction type
+          type: _selectedType, // Use the selected transaction type
         ),
         amount: double.parse(_amountController.text),
-        categoryId: _selectedEnrollment?.categoryId, // Use the selected enrollment's category ID
+        categoryId: _selectedEnrollment!.categoryId, // Use the selected enrollment's category ID
         budgetId: null, // Enrollment doesn't have budgetId, set to null or get from another source
       );
 

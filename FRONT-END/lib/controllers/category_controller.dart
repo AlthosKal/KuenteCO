@@ -122,14 +122,7 @@ class CategoryController extends ChangeNotifier {
   Future<void> loadProfileEnrollments() async {
     _setLoading(true);
     try {
-      print('🔄 CategoryController: Loading profile enrollments from server...');
       enrollments = await _service.getAllEnrollments();
-      print('✅ CategoryController: Loaded ${enrollments.length} profile enrollments from server');
-      
-      // Log de todas las inscripciones para debug
-      for (int i = 0; i < enrollments.length; i++) {
-        print('   Profile Enrollment $i: ID=${enrollments[i].id}, Category="${enrollments[i].categoryName}", ProfileEmail="${enrollments[i].profileEmail}", UserEmail="${enrollments[i].userEmail}"');
-      }
       
       _setError(null);
     } catch (e) {

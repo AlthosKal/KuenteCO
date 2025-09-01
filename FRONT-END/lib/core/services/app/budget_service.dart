@@ -30,12 +30,10 @@ class BudgetService {
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
       // Si viene envuelto en un objeto con key 'data'
-      print('BudgetService: Response has data key, extracting list');
       final dataValue = responseData['data'];
       
       if (dataValue is String) {
         // Si el campo 'data' contiene un mensaje de texto
-        print('BudgetService: Data field is a string message, returning empty list');
         return [];
       } else if (dataValue is List<dynamic>) {
         dataList = dataValue;
@@ -74,11 +72,7 @@ class BudgetService {
 
   // ✅ Obtener enrollments
   Future<List<BudgetEnrollmentDTO>> getEnrollments() async {
-    print('BudgetService: Sending GET to /budget/enroll');
     final response = await _apiClient.getApp('/budget/enroll');
-    
-    print('BudgetService: Raw response data type: ${response.data.runtimeType}');
-    print('BudgetService: Raw response data: ${response.data}');
     
     // El backend puede retornar un objeto envuelto con la estructura:
     // { "data": [...] } o directamente la lista, o un mensaje
@@ -93,12 +87,10 @@ class BudgetService {
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
       // Si viene envuelto en un objeto con key 'data'
-      print('BudgetService: Response has data key, extracting list');
       final dataValue = responseData['data'];
       
       if (dataValue is String) {
         // Si el campo 'data' contiene un mensaje de texto
-        print('BudgetService: Data field is a string message, returning empty list');
         return [];
       } else if (dataValue is List<dynamic>) {
         dataList = dataValue;
@@ -116,7 +108,6 @@ class BudgetService {
       return [];
     }
     
-    print('BudgetService: Data list length: ${dataList.length}');
     
     return dataList
         .map((e) => BudgetEnrollmentDTO.fromJson(e as Map<String, dynamic>))
@@ -253,11 +244,9 @@ class BudgetService {
     
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      print('BudgetService: Response has data key, extracting list');
       final dataValue = responseData['data'];
       
       if (dataValue is String) {
-        print('BudgetService: Data field is a string message, returning empty list');
         return [];
       } else if (dataValue is List<dynamic>) {
         dataList = dataValue;
@@ -273,7 +262,6 @@ class BudgetService {
       return [];
     }
     
-    print('BudgetService: Data list length: ${dataList.length}');
     
     // Log each item structure to understand backend data
     for (int i = 0; i < dataList.length; i++) {

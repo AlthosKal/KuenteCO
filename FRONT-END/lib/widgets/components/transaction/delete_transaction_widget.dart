@@ -182,7 +182,7 @@ class DeleteTransactionWidget extends StatelessWidget {
                       ),
                       
                       /// Description (if exists)
-                      if (transaction.description?.isNotEmpty == true) ...[
+                      if (_getTransactionDescription(transaction).isNotEmpty) ...[
                         const SizedBox(height: 12),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,7 +195,7 @@ class DeleteTransactionWidget extends StatelessWidget {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                transaction.description!,
+                                _getTransactionDescription(transaction),
                                 style: Theme.of(context).textTheme.bodyMedium,
                               ),
                             ),
@@ -298,5 +298,20 @@ class DeleteTransactionWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _getTransactionDescription(TransactionDetailDTO transaction) {
+    // Priorizar descriptionExtra.description si existe
+    if (transaction.descriptionExtra != null) {
+      final desc = transaction.descriptionExtra!.description;
+      return (desc != null && desc != 'No description') ? desc : '';
+    }
+    
+    // Fallback al campo description simple
+    if (transaction.description != null && transaction.description != 'No description') {
+      return transaction.description!;
+    }
+    
+    return '';
   }
 }
