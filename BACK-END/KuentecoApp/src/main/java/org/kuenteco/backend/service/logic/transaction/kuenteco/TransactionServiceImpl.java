@@ -139,6 +139,10 @@ public class TransactionServiceImpl implements TransactionService {
                                 .findByEmail(email)
                                 .orElseThrow(
                                         () -> new TransactionException("Usuario no encontrado"));
+                if (user.getType().equals(UserType.BUSINESS)) {
+                    throw new TransactionException(
+                            "Solo los perfiles pueden ingresar transacciones");
+                }
                 transaction.setUser(user);
             }
 
