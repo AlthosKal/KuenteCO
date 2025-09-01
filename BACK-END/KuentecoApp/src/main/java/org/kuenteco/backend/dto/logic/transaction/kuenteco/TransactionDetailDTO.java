@@ -16,6 +16,6 @@ public class TransactionDetailDTO {
     private Integer budgetId;
     private String name;
     private BigDecimal amount;
-    private LocalDateTime timestamp;
+    private LocalDateTime transactionDate;
     private DescriptionTransaction description;
 }
