@@ -155,6 +155,9 @@ public class CategoryServiceImpl implements CategoryService {
         if (role == RoleList.ROLE_PROFILE) {
             throw new CategoryException("Endpoint solo disponible para usuarios");
         }
+        slaveCategoryRepository
+                .findById(dto.getId())
+                .orElseThrow(() -> new CategoryException("Categoría no encontrada con el Id: "));
         Category category = prepareUpdateCategory(dto);
         User user =
                 slaveUserRepository
@@ -236,16 +239,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private void resolveCategory(Integer budgetId, Category category) {
-        if (budgetId == null) {
+        if (budgetId != null) {
+            category.setBudget(
+                    slaveBudgetRepository
+                            .findById(budgetId)
+                            .orElseThrow(
+                                    () ->
+                                            new CategoryException(
+                                                    "Budget no encontrado por el Id: "
+                                                            + budgetId)));
+        } else {
             category.setBudget(null);
         }
-        assert budgetId != null;
-        category.setBudget(
-                slaveBudgetRepository
-                        .findById(budgetId)
-                        .orElseThrow(
-                                () ->
-                                        new CategoryException(
-                                                "Budget no encontrado por el Id: " + budgetId)));
     }
 }

@@ -185,27 +185,49 @@ SELECT
     ARRAY_AGG(ce.id) AS category_enrollment_ids,
     c.id_user AS owner_user_id,
     c.name AS category_name,
+    p.username profile_name,
     COUNT(DISTINCT ce.id) AS total_enrollments,
     MIN(ce.enrollment_date) AS first_enrollment_date,
     MAX(ce.enrollment_date) AS last_enrollment_date,
     c.register_date AS category_register_date,
     (c.description->>'assignedBudget')::numeric AS assigned_budget,
-    c.description->>'state' AS category_state,
-    CASE
-        WHEN c.description->>'state' = 'ACTIVE' THEN 'ACTIVA'
-        WHEN c.description->>'state' IN ('INACTIVE', 'CANCELLED') THEN 'FINALIZADA'
-        ELSE c.description->>'state'
-        END AS category_status
+    c.description->>'state' AS category_state
 FROM
     category c
-        LEFT JOIN category_enrollment ce
-                  ON c.id = ce.id_category
+        INNER JOIN category_enrollment ce
+                   ON c.id = ce.id_category
+        LEFT JOIN profile p ON ce.id_profile = p.id
 WHERE ce.id IS NOT NULL
 GROUP BY
     c.id,
     c.name,
     c.description,
     c.id_user,
-    c.register_date
+    c.register_date,
+    p.username
+ORDER BY
+    total_enrollments DESC;
+
+-- Vista de categorías con información de enrollments (ya tenía category_owner_id correctamente)
+CREATE OR REPLACE VIEW vw_budget_enrollments AS
+SELECT
+    ARRAY_AGG(be.id) AS budget_enrollment_ids,
+    b.id_user AS owner_user_id,
+    b.name AS budget_name,
+    p.username profile_name,
+    COUNT(DISTINCT be.id) AS total_enrollments,
+    MIN(be.enrollment_date) AS first_enrollment_date,
+    MAX(be.enrollment_date) AS last_enrollment_date
+FROM
+    budget b
+        INNER JOIN budget_enrollment be
+                   ON b.id = be.id_budget
+        LEFT JOIN profile p ON be.id_profile = p.id
+WHERE be.id IS NOT NULL
+GROUP BY
+    b.id,
+    b.name,
+    b.id_user,
+    p.username
 ORDER BY
     total_enrollments DESC;

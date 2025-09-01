@@ -8,6 +8,8 @@ import '../../../utils/enum/transaction_type_enum.dart';
 import '../../../controllers/category_controller.dart';
 import '../../../dto/app/category/category_dto.dart';
 import '../../../dto/app/category/category_enrollment_dto.dart';
+import '../../../dto/app/extra/description_category_extra.dart';
+import '../../../utils/enum/state_enum.dart' as state_enum;
 
 class EditTransactionWidget extends StatefulWidget {
   final TransactionDetailDTO transaction;
@@ -38,6 +40,30 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
   DateTime _selectedDate = DateTime.now();
   String? _userRole;
   TransactionType _selectedType = TransactionType.EXPENSE;
+  
+  // Special enrollment object to represent "Sin categoría" for profiles
+  static final CategoryEnrollmentDTO _noCategoryOption = CategoryEnrollmentDTO(
+    id: -1, // Use -1 as a special ID for "no category"
+    profileId: -1,
+    categoryId: null, // null means no category
+    categoryName: 'Sin categoría',
+    userEmail: '',
+    profileEmail: '',
+    enrollmentDate: DateTime.now().toIso8601String(),
+  );
+  
+  // Special category object to represent "Sin categoría" for business users
+  static final CategoryDTO _noCategoryBusinessOption = CategoryDTO(
+    id: -1, // Use -1 as a special ID for "no category"
+    name: 'Sin categoría',
+    description: DescriptionCategory(
+      assignedBudget: 0.0,
+      state: state_enum.State.ACTIVE,
+    ),
+    budgetId: null, // null means no budget
+    businessAccountId: -1,
+    registerDate: DateTime.now(),
+  );
 
   @override
   void initState() {
@@ -54,8 +80,13 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
     if (widget.transaction.descriptionExtra?.type != null) {
       _selectedType = widget.transaction.descriptionExtra!.type;
     } else {
-      // Default to EXPENSE if no type found
-      _selectedType = TransactionType.EXPENSE;
+      // Try to determine transaction type from transaction name or amount pattern
+      final name = widget.transaction.name.toLowerCase();
+      if (name.contains('ingreso') || name.contains('income') || name.contains('salario') || name.contains('salary')) {
+        _selectedType = TransactionType.INCOME;
+      } else {
+        _selectedType = TransactionType.EXPENSE;
+      }
     }
     
     try {
@@ -101,39 +132,37 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
           (category) => category.id == widget.transaction.categoryId,
         );
         setState(() {});
+        return;
       } catch (e) {
-        // If no matching category found, leave it null
+        // If no matching category found, use "Sin categoría"
         print('No matching category found for ID: ${widget.transaction.categoryId}');
       }
     }
+    
+    // If no match or categoryId is null, default to "Sin categoría"
+    _selectedCategory = _noCategoryBusinessOption;
+    setState(() {});
   }
   
   void _findMatchingEnrollment() {
     final categoryController = Provider.of<CategoryController>(context, listen: false);
     
-    if (categoryController.enrollments.isNotEmpty) {
-      if (widget.transaction.categoryId != null) {
-        try {
-          // First try to match by categoryId
-          _selectedEnrollment = categoryController.enrollments.firstWhere(
-            (enrollment) => enrollment.categoryId == widget.transaction.categoryId,
-          );
-          setState(() {});
-          return;
-        } catch (e) {
-          // No matching enrollment found by category ID
-        }
-      }
-      
-      // If no match by ID, and if there's only one enrollment, select it as default
-      if (categoryController.enrollments.length == 1) {
-        _selectedEnrollment = categoryController.enrollments.first;
+    if (widget.transaction.categoryId != null && categoryController.enrollments.isNotEmpty) {
+      try {
+        // First try to match by categoryId
+        _selectedEnrollment = categoryController.enrollments.firstWhere(
+          (enrollment) => enrollment.categoryId == widget.transaction.categoryId,
+        );
         setState(() {});
         return;
+      } catch (e) {
+        // No matching enrollment found by category ID
       }
-      
-      // If no specific match and multiple enrollments available, leave it null for user to select
     }
+    
+    // If no match or categoryId is null, default to "Sin categoría"
+    _selectedEnrollment = _noCategoryOption;
+    setState(() {});
   }
 
   @override
@@ -439,24 +468,27 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                               hint: 'Selecciona una categoría',
                               icon: Icons.category,
                             ),
-                            items: categoryController.enrollments.map((enrollment) {
-                              return DropdownMenuItem(
-                                value: enrollment,
-                                child: Text(enrollment.categoryName),
-                              );
-                            }).toList(),
+                            items: [
+                              // Add "Sin categoría" option at the top
+                              DropdownMenuItem(
+                                value: _noCategoryOption,
+                                child: Text(_noCategoryOption.categoryName),
+                              ),
+                              // Add all other enrollments
+                              ...categoryController.enrollments.map((enrollment) {
+                                return DropdownMenuItem(
+                                  value: enrollment,
+                                  child: Text(enrollment.categoryName),
+                                );
+                              }).toList(),
+                            ],
                             onChanged: (value) {
                               setState(() {
                                 _selectedEnrollment = value;
                                 _selectedCategory = null; // Clear business category selection
                               });
                             },
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Selecciona una categoría';
-                              }
-                              return null;
-                            },
+                            // Category is now optional - no validation needed
                           );
                         } else {
                           // For business users, show categories
@@ -466,24 +498,27 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                               hint: 'Selecciona una categoría',
                               icon: Icons.category,
                             ),
-                            items: categoryController.categories.map((category) {
-                              return DropdownMenuItem(
-                                value: category,
-                                child: Text(category.name),
-                              );
-                            }).toList(),
+                            items: [
+                              // Add "Sin categoría" option at the top
+                              DropdownMenuItem(
+                                value: _noCategoryBusinessOption,
+                                child: Text(_noCategoryBusinessOption.name),
+                              ),
+                              // Add all other categories
+                              ...categoryController.categories.map((category) {
+                                return DropdownMenuItem(
+                                  value: category,
+                                  child: Text(category.name),
+                                );
+                              }).toList(),
+                            ],
                             onChanged: (value) {
                               setState(() {
                                 _selectedCategory = value;
                                 _selectedEnrollment = null; // Clear profile enrollment selection
                               });
                             },
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Selecciona una categoría';
-                              }
-                              return null;
-                            },
+                            // Category is now optional - no validation needed
                           );
                         }
                       },
@@ -611,34 +646,27 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
       
       if (_userRole == 'ROLE_PROFILE') {
         // For profiles, use enrollment data
-        categoryId = _selectedEnrollment?.categoryId ?? widget.transaction.categoryId;
+        // If "Sin categoría" is selected (id == -1), use null for categoryId
+        if (_selectedEnrollment?.id == -1) {
+          categoryId = null;
+        } else {
+          categoryId = _selectedEnrollment?.categoryId ?? widget.transaction.categoryId;
+        }
         budgetId = widget.transaction.budgetId;
       } else {
         // For business users, use category data
-        categoryId = _selectedCategory?.id ?? widget.transaction.categoryId;
-        budgetId = _selectedCategory?.budgetId ?? widget.transaction.budgetId;
+        // If "Sin categoría" is selected (id == -1), use null for categoryId and budgetId
+        if (_selectedCategory?.id == -1) {
+          categoryId = null;
+          budgetId = null;
+        } else {
+          categoryId = _selectedCategory?.id ?? widget.transaction.categoryId;
+          budgetId = _selectedCategory?.budgetId ?? widget.transaction.budgetId;
+        }
       }
 
-      // Check if required values are available
-      if (categoryId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error: No se pudo determinar la categoría'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
-      if (budgetId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error: No se pudo determinar el presupuesto'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
+      // Both categoryId and budgetId can now be null - backend has been updated
+      // No validation needed, both fields are optional
 
       final updateTransaction = UpdateTransactionDTO(
         id: widget.transaction.id,

@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../controllers/transaction_controller.dart';
-import '../dto/app/transaction/kuenteco/new_transaction_dto.dart';
-import '../dto/app/transaction/kuenteco/update_transaction_dto.dart';
-import '../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
-import '../widgets/common/background/background_widget.dart';
-import '../widgets/common/navbar/navbar_logged_widget.dart';
-import '../widgets/components/transaction/transaction_list_widget.dart';
-import '../widgets/components/transaction/transaction_statistics_widget.dart';
-import '../widgets/components/transaction/create_transaction_widget.dart';
-import '../widgets/components/transaction/edit_transaction_widget.dart';
-import '../widgets/components/transaction/delete_transaction_widget.dart';
-import '../core/services/app/transaction_service.dart';
-import '../core/services/app/category_service.dart';
-import '../core/services/api_client.dart';
-import '../controllers/category_controller.dart';
+import '../../controllers/transaction_controller.dart';
+import '../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
+import '../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
+import '../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
+import '../../utils/enum/transaction_type_enum.dart';
+import '../../widgets/common/background/background_widget.dart';
+import '../../widgets/common/navbar/navbar_logged_widget.dart';
+import '../../widgets/components/transaction/transaction_list_widget.dart';
+import '../../widgets/components/transaction/transaction_statistics_widget.dart';
+import '../../widgets/components/transaction/create_transaction_widget.dart';
+import '../../widgets/components/transaction/edit_transaction_widget.dart';
+import '../../widgets/components/transaction/delete_transaction_widget.dart';
+import '../../core/services/app/transaction_service.dart';
+import '../../core/services/app/category_service.dart';
+import '../../core/services/api_client.dart';
+import '../../controllers/category_controller.dart';
 
 class TransactionView extends StatefulWidget {
   const TransactionView({Key? key}) : super(key: key);
@@ -177,7 +178,7 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
                       ),
                       Tab(
                         icon: Icon(Icons.bar_chart, size: 20),
-                        text: 'Estad�sticas',
+                        text: 'Estadisticas',
                       ),
                     ]
                   : const [
@@ -187,7 +188,7 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
                       ),
                       Tab(
                         icon: Icon(Icons.analytics, size: 20),
-                        text: 'An�lisis',
+                        text: 'Anilisis',
                       ),
                     ],
             ),
@@ -365,25 +366,41 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
   }
 
   Widget _buildTransactionDetailSheet(TransactionDetailDTO transaction) {
-    final isIncome = transaction.name.toLowerCase().contains('ingreso') || 
-                    transaction.name.toLowerCase().contains('income');
-    final isExpense = transaction.name.toLowerCase().contains('gasto') || 
-                     transaction.name.toLowerCase().contains('expense');
-    final isDebt = transaction.name.toLowerCase().contains('deuda') || 
-                   transaction.name.toLowerCase().contains('debt');
-
+    // First try to get transaction type from descriptionExtra
     Color cardColor = Colors.blue;
     IconData transactionIcon = Icons.swap_horiz;
+    bool isIncome = false;
+    bool isExpense = false;
+    bool isDebt = false;
 
-    if (isIncome) {
-      cardColor = Colors.green;
-      transactionIcon = Icons.trending_up;
-    } else if (isExpense) {
-      cardColor = Colors.orange;
-      transactionIcon = Icons.trending_down;
-    } else if (isDebt) {
-      cardColor = Colors.red;
-      transactionIcon = Icons.account_balance_wallet;
+    if (transaction.descriptionExtra?.type != null) {
+      // Use the type from descriptionExtra if available
+      if (transaction.descriptionExtra!.type == TransactionType.INCOME) {
+        isIncome = true;
+        cardColor = Colors.green;
+        transactionIcon = Icons.trending_up;
+      } else if (transaction.descriptionExtra!.type == TransactionType.EXPENSE) {
+        isExpense = true;
+        cardColor = Colors.orange;
+        transactionIcon = Icons.trending_down;
+      }
+    } else {
+      // Fallback to name-based detection
+      final nameLower = transaction.name.toLowerCase();
+      isIncome = nameLower.contains('ingreso') || nameLower.contains('income') || nameLower.contains('salario') || nameLower.contains('salary');
+      isExpense = nameLower.contains('gasto') || nameLower.contains('expense') || nameLower.contains('egreso');
+      isDebt = nameLower.contains('deuda') || nameLower.contains('debt');
+
+      if (isIncome) {
+        cardColor = Colors.green;
+        transactionIcon = Icons.trending_up;
+      } else if (isExpense) {
+        cardColor = Colors.orange;
+        transactionIcon = Icons.trending_down;
+      } else if (isDebt) {
+        cardColor = Colors.red;
+        transactionIcon = Icons.account_balance_wallet;
+      }
     }
 
     return Container(

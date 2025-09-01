@@ -8,12 +8,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kuenteco.backend.config.jwt.AuthCredentials;
 import org.kuenteco.backend.dto.logic.budget.BudgetEnrollmentDTO;
+import org.kuenteco.backend.dto.logic.budget.BudgetEnrollmentProjection;
 import org.kuenteco.backend.entity.Budget;
 import org.kuenteco.backend.entity.BudgetEnrollment;
 import org.kuenteco.backend.entity.Profile;
 import org.kuenteco.backend.entity.User;
 import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.exception.exceptions.BudgetException;
+import org.kuenteco.backend.exception.exceptions.CategoryException;
 import org.kuenteco.backend.mapper.logic.budget.BudgetEnrollmentMapper;
 import org.kuenteco.backend.repository.master.MasterBudgetEnrollmentRepository;
 import org.kuenteco.backend.repository.slave.SlaveBudgetEnrollmentRepository;
@@ -56,6 +58,23 @@ public class BudgetEnrollmentServiceImpl implements BudgetEnrollmentService {
             return "No tienes presupuesto asignados";
         }
         return budgetEnrollmentMapper.toDTOList(budgetEnrollments);
+    }
+
+    @Override
+    public Object getBusinessUserBudgetEnrollments() {
+        AuthCredentials credentials = getCredentials();
+        String email = credentials.email();
+        RoleList role = credentials.role();
+
+        if (role == RoleList.ROLE_PROFILE) {
+            throw new CategoryException("Endpoint solo disponible para usuarios");
+        }
+        List<BudgetEnrollmentProjection> dto =
+                slaveBudgetEnrollmentRepository.findCategoryEnrollmentsByUserEmail(email);
+        if (dto.isEmpty()) {
+            return "No tienes Perfiles con Presupuestos asociados";
+        }
+        return dto;
     }
 
     @Override

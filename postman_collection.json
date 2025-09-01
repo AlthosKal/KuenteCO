@@ -214,7 +214,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"subscriptionType\": \"PREMIUM\",\n  \"backUrl\": \"https://github.com/AlthosKal/KuenteCO\"\n}\n"
+									"raw": "{\n  \"subscriptionType\": \"PREMIUM\"\n}\n"
 								},
 								"url": "{{base_url}}/v1/subscription/add"
 							},
@@ -1238,6 +1238,21 @@
 							"response": []
 						},
 						{
+							"name": "Get Business UserBudget Enrollments",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": "{{base_url}}/v1/budget/enroll/user"
+							},
+							"response": []
+						},
+						{
 							"name": "Get Budget Comparison",
 							"request": {
 								"method": "GET",
@@ -2067,23 +2082,19 @@
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://localhost:8080/api/app",
-			"type": "string"
+			"value": "http://localhost:8080/api/app"
 		},
 		{
 			"key": "jwt_token",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "base_url_chat",
-			"value": "http://localhost:7070/api/chat",
-			"type": "string"
+			"value": "http://localhost:7070/api/chat"
 		},
 		{
 			"key": "conversation_id",
-			"value": "",
-			"type": "string"
+			"value": ""
 		}
 	]
 }

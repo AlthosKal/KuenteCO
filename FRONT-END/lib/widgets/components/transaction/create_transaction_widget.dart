@@ -30,11 +30,25 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
   CategoryEnrollmentDTO? _selectedEnrollment;
   DateTime _selectedDate = DateTime.now();
   TransactionType _selectedType = TransactionType.EXPENSE; // Default to Egreso
+  
+  // Special enrollment object to represent "Sin categoría"
+  static final CategoryEnrollmentDTO _noCategoryOption = CategoryEnrollmentDTO(
+    id: -1, // Use -1 as a special ID for "no category"
+    profileId: -1,
+    categoryId: null, // null means no category
+    categoryName: 'Sin categoría',
+    userEmail: '',
+    profileEmail: '',
+    enrollmentDate: DateTime.now().toIso8601String(),
+  );
 
   @override
   void initState() {
     super.initState();
     _dateController.text = _formatDate(_selectedDate);
+    
+    // Set "Sin categoría" as default selection
+    _selectedEnrollment = _noCategoryOption;
     
     // Load profile enrollments (assigned categories) when widget initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -335,21 +349,24 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                             hint: 'Selecciona una categoria',
                             icon: Icons.category,
                           ),
-                          items: categoryController.enrollments.map((enrollment) {
-                            return DropdownMenuItem(
-                              value: enrollment,
-                              child: Text(enrollment.categoryName),
-                            );
-                          }).toList(),
+                          items: [
+                            // Add "Sin categoría" option at the top
+                            DropdownMenuItem(
+                              value: _noCategoryOption,
+                              child: Text(_noCategoryOption.categoryName),
+                            ),
+                            // Add all other enrollments
+                            ...categoryController.enrollments.map((enrollment) {
+                              return DropdownMenuItem(
+                                value: enrollment,
+                                child: Text(enrollment.categoryName),
+                              );
+                            }).toList(),
+                          ],
                           onChanged: (value) {
                             setState(() => _selectedEnrollment = value);
                           },
-                          validator: (value) {
-                            if (value == null) {
-                              return 'Selecciona una categoria';
-                            }
-                            return null;
-                          },
+                          // Category is now optional - no validation needed
                         );
                       },
                     ),
@@ -470,17 +487,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
 
   void _submitForm() {
     if (_formKey.currentState?.validate() ?? false) {
-      // Validate that a category is selected
-      if (_selectedEnrollment?.categoryId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Por favor selecciona una categoría'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-        return;
-      }
-
+      // Category is now optional - no need to validate
       final newTransaction = NewTransactionDTO(
         name: _nameController.text,
         description: DescriptionTransaction(
@@ -488,8 +495,8 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
           type: _selectedType, // Use the selected transaction type
         ),
         amount: double.parse(_amountController.text),
-        categoryId: _selectedEnrollment!.categoryId, // Use the selected enrollment's category ID
-        budgetId: null, // Enrollment doesn't have budgetId, set to null or get from another source
+        categoryId: _selectedEnrollment?.categoryId, // Can be null - category is optional
+        budgetId: null, // Can be null - budget is optional
       );
 
       widget.onCreateTransaction(newTransaction);

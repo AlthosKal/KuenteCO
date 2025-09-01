@@ -12,5 +12,6 @@ public class CategoryEnrollmentDTO {
     // Listar Ides
     @NotBlank private String userEmail;
     @NotBlank private String profileEmail;
+    private Integer categoryId;
     @NotBlank private String categoryName;
 }
