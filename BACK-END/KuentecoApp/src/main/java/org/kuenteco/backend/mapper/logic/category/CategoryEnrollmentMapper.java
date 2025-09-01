@@ -12,6 +12,7 @@ public interface CategoryEnrollmentMapper {
     @Mapping(target = "userEmail", source = "user.email")
     @Mapping(target = "profileEmail", source = "profile.email")
     @Mapping(target = "categoryName", source = "category.name")
+    @Mapping(target = "categoryId", source = "category.id")
     CategoryEnrollmentDTO toDTO(CategoryEnrollment categoryEnrollment);
 
     List<CategoryEnrollmentDTO> toDTOList(List<CategoryEnrollment> categoryEnrollments);
