@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+
+import '../../controllers/profile_controller.dart';
 import '../../core/services/app/profile_service.dart';
 import '../../dto/app/profile/profile_detail_dto.dart';
 import '../../widgets/components/profile/create_profile_widget.dart';
 import '../../widgets/components/profile/delete_profile_widget.dart';
 import '../../widgets/components/profile/edit_profile_widget.dart';
 import '../../widgets/components/profile/profile_buttom_widget.dart';
-import '../../controllers/profile_controller.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

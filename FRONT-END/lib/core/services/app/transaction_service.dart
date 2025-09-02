@@ -1,11 +1,11 @@
-import '../../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
-import '../../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
-import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
-import '../../../dto/app/transaction/kuenteco/transaction_summary_dto.dart';
-import '../../../dto/app/transaction/kuenteco/profile_with_transactions_dto.dart';
-import '../../../dto/app/transaction/kuenteco/user_profiles_with_transactions_dto.dart';
 import '../../../dto/app/category/transactions_by_category_dto.dart';
 import '../../../dto/app/transaction/bancolombia/bancolombia_transaction_request_dto.dart';
+import '../../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
+import '../../../dto/app/transaction/kuenteco/profile_with_transactions_dto.dart';
+import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
+import '../../../dto/app/transaction/kuenteco/transaction_summary_dto.dart';
+import '../../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
+import '../../../dto/app/transaction/kuenteco/user_profiles_with_transactions_dto.dart';
 import '../api_client.dart';
 
 class TransactionService {
@@ -201,7 +201,7 @@ class TransactionService {
     print('📌 TransactionService: Creating ${dtos.length} transactions in batch');
     
     final response = await _apiClient.postApp(
-      '/transaction/add/batch',
+      '/transaction/batch/add',
       dtos.map((e) => e.toJson()).toList(),
     );
     
@@ -213,12 +213,29 @@ class TransactionService {
     }
     
     final responseData = response.data;
-    List<dynamic> dataList;
     
+    // El backend ahora devuelve data: null cuando las transacciones se crean exitosamente
+    if (responseData is Map<String, dynamic> && responseData.containsKey('success')) {
+      final success = responseData['success'];
+      if (success == true) {
+        print('✅ TransactionService: Batch creation successful, backend returned data: null (as expected)');
+        // Devolver lista vacía ya que el backend no retorna las transacciones creadas
+        return [];
+      } else {
+        throw Exception('Batch creation failed: ${responseData['message'] ?? 'Unknown error'}');
+      }
+    }
+    
+    // Fallback para otros formatos de respuesta (compatibilidad)
+    List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
       final dataValue = responseData['data'];
       if (dataValue is List<dynamic>) {
         dataList = dataValue;
+      } else if (dataValue == null) {
+        // Backend devuelve data: null, esto es válido para operaciones batch
+        print('📌 TransactionService: Backend returned data: null, treating as successful batch operation');
+        return [];
       } else {
         throw Exception('Batch create data key exists but value is not a List, it is ${dataValue.runtimeType}');
       }
@@ -254,7 +271,7 @@ class TransactionService {
     print('📌 TransactionService: Updating ${dtos.length} transactions in batch');
     
     final response = await _apiClient.putApp(
-      '/transaction/update/batch',
+      '/transaction/batch/update',
       dtos.map((e) => e.toJson()).toList(),
     );
     

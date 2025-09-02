@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:provider/provider.dart';
+
 import '../../controllers/category_controller.dart';
 import '../../core/services/app/auth_service.dart';
+import '../../mixins/multi_selection_mixin.dart';
 import '../../widgets/components/category/assign_category_widget.dart';
 import '../../widgets/components/category/category_list_widget.dart';
 import '../../widgets/components/category/create_category_widget.dart';
@@ -13,7 +15,6 @@ import '../../widgets/components/category/delete_multiple_categories_widget.dart
 import '../../widgets/components/category/edit_category_widget.dart';
 import '../../widgets/components/category/edit_multiple_categories_widget.dart';
 import '../../widgets/components/category/enrollment_management_widget.dart';
-import '../../mixins/multi_selection_mixin.dart';
 
 class CategoryView extends StatefulWidget {
   const CategoryView({super.key});

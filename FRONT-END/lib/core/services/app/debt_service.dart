@@ -1,7 +1,7 @@
 import '../../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
-import '../../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
 import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 import '../../../dto/app/transaction/kuenteco/transaction_summary_dto.dart';
+import '../../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
 import 'transaction_service.dart';
 
 class DebtService {

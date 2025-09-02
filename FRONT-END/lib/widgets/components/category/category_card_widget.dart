@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:glassmorphism/glassmorphism.dart';
+import 'package:provider/provider.dart';
+
 import '../../../controllers/category_controller.dart';
 import '../../../routes/app_routes.dart';
 

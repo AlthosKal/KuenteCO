@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:provider/provider.dart';
+
 import '../../controllers/budget_controller.dart';
 import '../../core/services/app/auth_service.dart';
-import '../../widgets/components/budget/budget_list_widget.dart';
-import '../../widgets/components/budget/create_budget_widget.dart';
-import '../../widgets/components/budget/edit_budget_widget.dart';
-import '../../widgets/components/budget/edit_multiple_budgets_widget.dart';
-import '../../widgets/components/budget/delete_budget_widget.dart';
-import '../../widgets/components/budget/delete_multiple_budgets_widget.dart';
+import '../../mixins/multi_selection_mixin.dart';
 import '../../widgets/components/budget/assign_budget_to_profiles_widget.dart';
 import '../../widgets/components/budget/assignment_management_widget.dart';
-import '../../mixins/multi_selection_mixin.dart';
+import '../../widgets/components/budget/budget_list_widget.dart';
+import '../../widgets/components/budget/create_budget_widget.dart';
+import '../../widgets/components/budget/delete_budget_widget.dart';
+import '../../widgets/components/budget/delete_multiple_budgets_widget.dart';
+import '../../widgets/components/budget/edit_budget_widget.dart';
+import '../../widgets/components/budget/edit_multiple_budgets_widget.dart';
 
 class BudgetView extends StatefulWidget {
   const BudgetView({super.key});

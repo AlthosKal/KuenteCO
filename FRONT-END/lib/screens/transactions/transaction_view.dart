@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:provider/provider.dart';
+
+import '../../controllers/category_controller.dart';
 import '../../controllers/transaction_controller.dart';
+import '../../core/services/api_client.dart';
+import '../../core/services/app/category_service.dart';
+import '../../core/services/app/transaction_service.dart';
 import '../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
-import '../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
 import '../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
+import '../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
 import '../../utils/enum/transaction_type_enum.dart';
 import '../../widgets/common/background/background_widget.dart';
 import '../../widgets/common/navbar/navbar_logged_widget.dart';
+import '../../widgets/components/transaction/create_transaction_widget.dart';
+import '../../widgets/components/transaction/create_multiple_transactions_widget.dart';
+import '../../widgets/components/transaction/delete_transaction_widget.dart';
+import '../../widgets/components/transaction/edit_transaction_widget.dart';
+import '../../widgets/components/transaction/edit_multiple_transactions_widget.dart';
+import '../../widgets/components/transaction/delete_multiple_transactions_widget.dart';
 import '../../widgets/components/transaction/transaction_list_widget.dart';
 import '../../widgets/components/transaction/transaction_statistics_widget.dart';
-import '../../widgets/components/transaction/create_transaction_widget.dart';
-import '../../widgets/components/transaction/edit_transaction_widget.dart';
-import '../../widgets/components/transaction/delete_transaction_widget.dart';
-import '../../core/services/app/transaction_service.dart';
-import '../../core/services/app/category_service.dart';
-import '../../core/services/api_client.dart';
-import '../../controllers/category_controller.dart';
 
 class TransactionView extends StatefulWidget {
   const TransactionView({Key? key}) : super(key: key);
@@ -201,9 +205,20 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
   Widget _buildTransactionsTab() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: _userRole == 'ROLE_PROFILE'
-          ? _buildProfileTransactionsView()
-          : _buildBusinessUserSummaryView(),
+      child: Column(
+        children: [
+          // Botones de operaciones múltiples para perfiles
+          if (_userRole == 'ROLE_PROFILE') 
+            _buildMultipleOperationsButtons(),
+          
+          // Lista de transacciones
+          Expanded(
+            child: _userRole == 'ROLE_PROFILE'
+                ? _buildProfileTransactionsView()
+                : _buildBusinessUserSummaryView(),
+          ),
+        ],
+      ),
     );
   }
   
@@ -248,6 +263,81 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
         child: const SingleChildScrollView(
           child: TransactionStatisticsWidget(),
         ),
+      ),
+    );
+  }
+
+  /// Botones para operaciones múltiples
+  Widget _buildMultipleOperationsButtons() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Operaciones Múltiples',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _navigateToCreateMultiple,
+                  icon: const Icon(Icons.add_box, size: 20),
+                  label: const Text('Crear Múltiples'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _navigateToEditMultiple,
+                  icon: const Icon(Icons.edit_note, size: 20),
+                  label: const Text('Editar Múltiples'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _navigateToDeleteMultiple,
+                  icon: const Icon(Icons.delete_sweep, size: 20),
+                  label: const Text('Eliminar Múltiples'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -686,6 +776,92 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
           ),
         );
       }
+    }
+  }
+
+  /// Métodos de navegación para operaciones múltiples
+  void _navigateToCreateMultiple() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => MultiProvider(
+        providers: [
+          ChangeNotifierProvider<TransactionController>.value(value: _transactionController),
+          ChangeNotifierProvider<CategoryController>.value(value: _categoryController),
+        ],
+        child: const CreateMultipleTransactionsWidget(),
+      ),
+    );
+
+    if (result == true) {
+      _refreshTransactions();
+    }
+  }
+
+  void _navigateToEditMultiple() async {
+    // Primero obtener todas las transacciones
+    await _transactionController.loadTransactions();
+    
+    if (_transactionController.transactions.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No hay transacciones disponibles para editar'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    await showDialog(
+      context: context,
+      builder: (context) => MultiProvider(
+        providers: [
+          ChangeNotifierProvider<TransactionController>.value(value: _transactionController),
+          ChangeNotifierProvider<CategoryController>.value(value: _categoryController),
+        ],
+        child: EditMultipleTransactionsWidget(
+          controller: _transactionController,
+          transactionsToEdit: _transactionController.transactions,
+        ),
+      ),
+    );
+
+    _refreshTransactions();
+  }
+
+  void _navigateToDeleteMultiple() async {
+    // Primero obtener todas las transacciones
+    await _transactionController.loadTransactions();
+    
+    if (_transactionController.transactions.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No hay transacciones disponibles para eliminar'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    await showDialog(
+      context: context,
+      builder: (context) => MultiProvider(
+        providers: [
+          ChangeNotifierProvider<TransactionController>.value(value: _transactionController),
+        ],
+        child: DeleteMultipleTransactionsWidget(
+          controller: _transactionController,
+          transactionsToDelete: _transactionController.transactions,
+        ),
+      ),
+    );
+
+    _refreshTransactions();
+  }
+
+  /// Callback para refrescar la vista después de operaciones múltiples
+  void _refreshTransactions() {
+    if (mounted) {
+      _loadDataBasedOnRole();
     }
   }
 

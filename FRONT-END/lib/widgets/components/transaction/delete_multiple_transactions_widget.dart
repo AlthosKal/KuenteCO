@@ -1,30 +1,33 @@
 import 'package:flutter/material.dart';
 
-import '../../../controllers/category_controller.dart';
-import '../../../dto/app/category/category_dto.dart';
+import '../../../controllers/transaction_controller.dart';
+import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
+import '../../../utils/enum/transaction_type_enum.dart';
 
-class DeleteMultipleCategoriesWidget extends StatefulWidget {
-  final CategoryController controller;
-  final List<CategoryDTO> categoriesToDelete;
+class DeleteMultipleTransactionsWidget extends StatefulWidget {
+  final TransactionController controller;
+  final List<TransactionDetailDTO> transactionsToDelete;
   
-  const DeleteMultipleCategoriesWidget({
+  const DeleteMultipleTransactionsWidget({
     Key? key,
     required this.controller,
-    required this.categoriesToDelete,
+    required this.transactionsToDelete,
   }) : super(key: key);
 
   @override
-  _DeleteMultipleCategoriesWidgetState createState() => _DeleteMultipleCategoriesWidgetState();
+  State<DeleteMultipleTransactionsWidget> createState() =>
+      _DeleteMultipleTransactionsWidgetState();
 }
 
-class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategoriesWidget> {
+class _DeleteMultipleTransactionsWidgetState
+    extends State<DeleteMultipleTransactionsWidget> {
   List<bool> selectedForDeletion = [];
 
   @override
   void initState() {
     super.initState();
     // Inicialmente todas están seleccionadas para eliminar
-    selectedForDeletion = List.generate(widget.categoriesToDelete.length, (index) => true);
+    selectedForDeletion = List.generate(widget.transactionsToDelete.length, (index) => true);
   }
 
   @override
@@ -45,7 +48,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Eliminar Múltiples Categorías',
+                  'Eliminar Múltiples Transacciones',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -75,7 +78,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Esta acción eliminará permanentemente las categorías seleccionadas. Esta operación no se puede deshacer.',
+                      'Esta acción eliminará permanentemente las transacciones seleccionadas. Esta operación no se puede deshacer.',
                       style: TextStyle(
                         color: Colors.red[800],
                         fontWeight: FontWeight.w500,
@@ -89,7 +92,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
             const SizedBox(height: 20),
             
             Text(
-              'Seleccione las categorías que desea eliminar:',
+              'Seleccione las transacciones que desea eliminar:',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[700],
@@ -99,12 +102,12 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
             
             const SizedBox(height: 16),
             
-            // Categories list with checkboxes
+            // Transactions list with checkboxes
             Expanded(
               child: ListView.builder(
-                itemCount: widget.categoriesToDelete.length,
+                itemCount: widget.transactionsToDelete.length,
                 itemBuilder: (context, index) {
-                  final category = widget.categoriesToDelete[index];
+                  final transaction = widget.transactionsToDelete[index];
                   return Card(
                     elevation: 2,
                     margin: const EdgeInsets.only(bottom: 8),
@@ -116,7 +119,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
                         });
                       },
                       title: Text(
-                        category.name,
+                        transaction.name,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -125,10 +128,12 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('ID: ${category.id}'),
-                          Text('Presupuesto: \$${category.description.assignedBudget.toStringAsFixed(2)}'),
-                          Text('Estado: ${category.description.state.name}'),
-                          Text('Fecha: ${category.registerDate.toString().split(' ')[0]}'),
+                          Text('ID: ${transaction.id}'),
+                          Text('Monto: \$${transaction.amount.toStringAsFixed(2)}'),
+                          Text('Tipo: ${(transaction.descriptionExtra?.type ?? TransactionType.EXPENSE).name}'),
+                          Text('Fecha: ${transaction.date}'),
+                          if (transaction.descriptionExtra?.description != null)
+                            Text('Descripción: ${transaction.descriptionExtra!.description}'),
                         ],
                       ),
                       secondary: const Icon(
@@ -155,7 +160,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Categorías seleccionadas: ${selectedForDeletion.where((selected) => selected).length}',
+                    'Transacciones seleccionadas: ${selectedForDeletion.where((selected) => selected).length}',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -166,7 +171,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
                       TextButton(
                         onPressed: () {
                           setState(() {
-                            selectedForDeletion = List.generate(widget.categoriesToDelete.length, (index) => true);
+                            selectedForDeletion = List.generate(widget.transactionsToDelete.length, (index) => true);
                           });
                         },
                         child: const Text('Seleccionar todas'),
@@ -174,7 +179,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
                       TextButton(
                         onPressed: () {
                           setState(() {
-                            selectedForDeletion = List.generate(widget.categoriesToDelete.length, (index) => false);
+                            selectedForDeletion = List.generate(widget.transactionsToDelete.length, (index) => false);
                           });
                         },
                         child: const Text('Deseleccionar todas'),
@@ -212,7 +217,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
                     ),
                   ),
                   child: Text(
-                    'Eliminar ${selectedForDeletion.where((selected) => selected).length} Categorías',
+                    'Eliminar ${selectedForDeletion.where((selected) => selected).length} Transacciones',
                   ),
                 ),
               ],
@@ -235,7 +240,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
             style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
           ),
           content: Text(
-            '¿Está seguro de que desea eliminar $selectedCount categorías?\n\nEsta acción es irreversible y eliminará todas las categorías seleccionadas de forma permanente.',
+            '¿Está seguro de que desea eliminar $selectedCount transacciones?\n\nEsta acción es irreversible y eliminará todas las transacciones seleccionadas de forma permanente.',
           ),
           actions: [
             TextButton(
@@ -245,7 +250,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close confirmation dialog
-                _deleteSelectedCategories();
+                _deleteSelectedTransactions();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
@@ -259,19 +264,19 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
     );
   }
 
-  void _deleteSelectedCategories() async {
-    // Get IDs of selected categories
+  void _deleteSelectedTransactions() async {
+    // Get IDs of selected transactions
     List<int> selectedIds = [];
-    for (int i = 0; i < widget.categoriesToDelete.length; i++) {
+    for (int i = 0; i < widget.transactionsToDelete.length; i++) {
       if (selectedForDeletion[i]) {
-        selectedIds.add(widget.categoriesToDelete[i].id);
+        selectedIds.add(widget.transactionsToDelete[i].id);
       }
     }
 
     if (selectedIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('No hay categorías seleccionadas para eliminar'),
+          content: Text('No hay transacciones seleccionadas para eliminar'),
           backgroundColor: Colors.orange,
         ),
       );
@@ -290,8 +295,8 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
         },
       );
 
-      // Delete categories in batch
-      await widget.controller.deleteCategoriesBatch(selectedIds);
+      // Delete transactions in batch
+      await widget.controller.deleteTransactionsBatch(selectedIds);
 
       // Close loading dialog
       Navigator.of(context).pop();
@@ -302,7 +307,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${selectedIds.length} categorías eliminadas exitosamente'),
+          content: Text('${selectedIds.length} transacciones eliminadas exitosamente'),
           backgroundColor: Colors.green,
           duration: const Duration(seconds: 3),
         ),
@@ -314,7 +319,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error al eliminar las categorías: ${e.toString()}'),
+          content: Text('Error al eliminar las transacciones: ${e.toString()}'),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 5),
         ),

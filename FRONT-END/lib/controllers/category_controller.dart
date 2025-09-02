@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+
 import '../core/services/app/category_service.dart';
+import '../dto/app/category/batch_enrollment_request_dto.dart';
 import '../dto/app/category/category_dto.dart';
 import '../dto/app/category/category_enrollment_dto.dart';
 import '../dto/app/category/category_enrollment_summary_dto.dart';
 import '../dto/app/category/category_report_dto.dart';
 import '../dto/app/category/new_category_dto.dart';
-import '../dto/app/category/batch_enrollment_request_dto.dart';
 import '../dto/app/extra/description_category_extra.dart';
 import '../utils/enum/state_enum.dart' as state_enum;
 

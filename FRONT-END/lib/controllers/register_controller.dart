@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../core/exceptions/global_exception_handler.dart';
 import '../core/services/app/auth_service.dart';
 import '../dto/app/auth/request/new_user_dto.dart';
