@@ -133,6 +133,7 @@ class CategoryController extends ChangeNotifier {
       if (e.toString().toLowerCase().contains('empty') ||
           e.toString().toLowerCase().contains('no data') ||
           e.toString().toLowerCase().contains('not found') ||
+          e.toString().toLowerCase().contains('no tienes categorías') ||
           e.toString().contains('404')) {
         print('📝 CategoryController: No enrollments found for profile - this is normal');
         enrollments = []; // Asegurar lista vacía

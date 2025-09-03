@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../core/services/app/debt_service.dart';
-import '../dto/app/transaction/kuenteco/new_transaction_dto.dart';
+import '../dto/app/debt/new_debt_dto.dart';
+import '../dto/app/debt/debt_dto.dart';
+import '../dto/app/debt/debt_payment_dto.dart';
+import '../dto/app/debt/debt_summary_dto.dart';
 import '../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
-import '../dto/app/transaction/kuenteco/transaction_summary_dto.dart';
-import '../dto/app/transaction/kuenteco/update_transaction_dto.dart';
+import '../utils/enum/state_debt_enum.dart';
 
 class DebtController extends ChangeNotifier {
   final DebtService _service;
@@ -12,9 +14,9 @@ class DebtController extends ChangeNotifier {
   bool isLoading = false;
   String? errorMessage;
 
-  List<TransactionDetailDTO> debts = [];
-  List<TransactionSummaryDTO> debtSummaries = [];
-  TransactionDetailDTO? currentDebt;
+  List<DebtDTO> debts = [];
+  DebtSummaryDTO? debtSummary;
+  DebtDTO? currentDebt;
   
   // Estadísticas específicas de deudas
   double totalDebtAmount = 0.0;
@@ -37,7 +39,7 @@ class DebtController extends ChangeNotifier {
     totalDebtCount = debts.length;
     double total = 0.0;
     for (final debt in debts) {
-      total += debt.amount;
+      total += debt.totalAmount.toDouble();
     }
     totalDebtAmount = total;
     averageDebtAmount = totalDebtCount > 0 ? totalDebtAmount / totalDebtCount : 0.0;
@@ -46,16 +48,16 @@ class DebtController extends ChangeNotifier {
   // ============= LOAD OPERATIONS =============
 
   // 📌 Cargar todas las deudas
-  Future<void> loadDebts() async {
+  Future<void> loadDebts({String? from, String? to, String? kind}) async {
     _setLoading(true);
     try {
       print('🔄 DebtController: Loading all debts from server...');
-      debts = await _service.getAllDebtTransactions();
+      debts = await _service.getAllDebts(from: from, to: to, kind: kind);
       print('✅ DebtController: Loaded ${debts.length} debts from server');
       
       // Log de todas las deudas para debug
       for (int i = 0; i < debts.length; i++) {
-        print('   Debt $i: ID=${debts[i].id}, Name="${debts[i].name}", Amount=${debts[i].amount}');
+        print('   Debt $i: ID=${debts[i].id}, Name="${debts[i].name}", Total=${debts[i].totalAmount}, Pending=${debts[i].pendingAmount}, State=${debts[i].state}');
       }
       
       _updateStatistics();
@@ -68,16 +70,17 @@ class DebtController extends ChangeNotifier {
     }
   }
 
-  // 📌 Cargar deuda por ID
-  Future<void> loadDebtById(int id) async {
+  // 📌 Cargar deudas por estado
+  Future<void> loadDebtsByState(StateDebt state, {String? from, String? to, String? kind}) async {
     _setLoading(true);
     try {
-      print('🔄 DebtController: Loading debt ID: $id');
-      currentDebt = await _service.getDebtTransactionById(id);
-      print('✅ DebtController: Loaded debt: ${currentDebt?.name}');
+      print('🔄 DebtController: Loading debts by state: $state');
+      debts = await _service.getDebtsByState(state, from: from, to: to, kind: kind);
+      print('✅ DebtController: Loaded ${debts.length} debts with state: $state');
+      _updateStatistics();
       _setError(null);
     } catch (e) {
-      print('❌ DebtController: Error loading debt: $e');
+      print('❌ DebtController: Error loading debts by state: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
@@ -85,53 +88,66 @@ class DebtController extends ChangeNotifier {
   }
 
   // 📌 Cargar resumen de deudas
-  Future<void> loadDebtSummaries() async {
+  Future<void> loadDebtSummary({String? from, String? to, String? kind}) async {
     _setLoading(true);
     try {
-      print('🔄 DebtController: Loading debt summaries...');
-      debtSummaries = await _service.getDebtTransactionSummary();
-      print('✅ DebtController: Loaded ${debtSummaries.length} debt summaries');
+      print('🔄 DebtController: Loading debt summary...');
+      debtSummary = await _service.getDebtSummaryReport(from: from, to: to, kind: kind);
+      print('✅ DebtController: Loaded debt summary with ${debtSummary?.totalDebts} total debts');
       _setError(null);
     } catch (e) {
-      print('❌ DebtController: Error loading debt summaries: $e');
+      print('❌ DebtController: Error loading debt summary: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // 📌 Cargar deudas filtradas
-  Future<void> loadFilteredDebts({
-    int? categoryId,
-    int? budgetId,
-    int? profileId,
-    String? from,
-    String? to,
-    double? minAmount,
-    double? maxAmount,
-  }) async {
+  // 📌 Cargar deudas vencidas
+  Future<void> loadOverdueDebts({String? from, String? to, String? kind}) async {
     _setLoading(true);
     try {
-      print('🔄 DebtController: Loading filtered debts...');
-      // Usando métodos existentes del servicio según los filtros
-      if (from != null && to != null) {
-        debts = await _service.getDebtTransactionsByDateRange(from: from, to: to);
-      } else if (minAmount != null || maxAmount != null) {
-        debts = await _service.getDebtTransactionsByAmountRange(
-          minAmount: minAmount,
-          maxAmount: maxAmount,
-        );
-      } else if (profileId != null) {
-        debts = await _service.getDebtTransactionsByProfile(profileId);
-      } else {
-        debts = await _service.getAllDebtTransactions();
-      }
-      print('✅ DebtController: Loaded ${debts.length} filtered debts');
-      
+      print('🔄 DebtController: Loading overdue debts...');
+      debts = await _service.getOverdueDebts(from: from, to: to, kind: kind);
+      print('✅ DebtController: Loaded ${debts.length} overdue debts');
       _updateStatistics();
       _setError(null);
     } catch (e) {
-      print('❌ DebtController: Error loading filtered debts: $e');
+      print('❌ DebtController: Error loading overdue debts: $e');
+      _setError(e.toString());
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // 📌 Cargar deudas próximas a vencer
+  Future<void> loadDebtsExpiringSoon(int days, {String? from, String? to, String? kind}) async {
+    _setLoading(true);
+    try {
+      print('🔄 DebtController: Loading debts expiring in $days days...');
+      debts = await _service.getDebtsExpiringInDays(days, from: from, to: to, kind: kind);
+      print('✅ DebtController: Loaded ${debts.length} debts expiring soon');
+      _updateStatistics();
+      _setError(null);
+    } catch (e) {
+      print('❌ DebtController: Error loading expiring debts: $e');
+      _setError(e.toString());
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // 📌 Obtener total pendiente
+  Future<void> loadTotalPendingAmount({String? from, String? to, String? kind}) async {
+    _setLoading(true);
+    try {
+      print('🔄 DebtController: Loading total pending amount...');
+      final totalPending = await _service.getTotalPendingAmount(from: from, to: to, kind: kind);
+      totalDebtAmount = totalPending;
+      print('✅ DebtController: Total pending amount: \$${totalPending.toStringAsFixed(2)}');
+      _setError(null);
+    } catch (e) {
+      print('❌ DebtController: Error loading total pending: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
@@ -141,12 +157,12 @@ class DebtController extends ChangeNotifier {
   // ============= CRUD OPERATIONS =============
 
   // 📌 Crear deuda
-  Future<void> addDebt(NewTransactionDTO dto) async {
+  Future<void> addDebt(NewDebtDTO dto) async {
     _setError(null);
     
     try {
       print('📌 DebtController: Creating debt...');
-      final createdDebt = await _service.createDebtPayment(dto);
+      final createdDebt = await _service.createDebt(dto);
       print('✅ DebtController: Debt created with ID: ${createdDebt.id}');
       
       // Recargar la lista completa desde el servidor
@@ -159,12 +175,12 @@ class DebtController extends ChangeNotifier {
   }
 
   // 📌 Crear múltiples deudas (batch)
-  Future<void> addDebtsBatch(List<NewTransactionDTO> dtos) async {
+  Future<void> addDebtsBatch(List<NewDebtDTO> dtos) async {
     _setError(null);
     
     try {
       print('📌 DebtController: Creating ${dtos.length} debts in batch...');
-      final createdDebts = await _service.createDebtPaymentsBatch(dtos);
+      final createdDebts = await _service.createDebtsBatch(dtos);
       print('✅ DebtController: Batch creation completed. Created ${createdDebts.length} debts');
       
       // Recargar la lista completa desde el servidor
@@ -177,14 +193,14 @@ class DebtController extends ChangeNotifier {
   }
 
   // 📌 Actualizar deuda
-  Future<void> updateDebt(UpdateTransactionDTO dto) async {
+  Future<void> updateDebt(DebtDTO dto) async {
     print('🔄 DebtController: Starting update for debt ID: ${dto.id}');
     
     _setError(null);
     
     try {
       print('🔄 DebtController: Calling service.updateDebt...');
-      final updatedDebt = await _service.updateDebtPayment(dto);
+      final updatedDebt = await _service.updateDebt(dto);
       print('✅ DebtController: Debt updated successfully: ${updatedDebt.name}');
       
       // Recargar la lista completa desde el servidor
@@ -197,12 +213,12 @@ class DebtController extends ChangeNotifier {
   }
 
   // 📌 Actualizar múltiples deudas (batch)
-  Future<void> updateDebtsBatch(List<UpdateTransactionDTO> dtos) async {
+  Future<void> updateDebtsBatch(List<DebtDTO> dtos) async {
     _setError(null);
     
     try {
       print('📌 DebtController: Updating ${dtos.length} debts in batch...');
-      final updatedDebts = await _service.updateDebtPaymentsBatch(dtos);
+      final updatedDebts = await _service.updateDebtsBatch(dtos);
       print('✅ DebtController: Batch update completed. Updated ${updatedDebts.length} debts');
       
       // Recargar la lista completa desde el servidor
@@ -219,7 +235,7 @@ class DebtController extends ChangeNotifier {
     _setLoading(true);
     try {
       print('📌 DebtController: Deleting debt ID: $id');
-      await _service.deleteDebtPayment(id);
+      await _service.deleteDebt(id);
       print('✅ DebtController: Debt deleted successfully');
       
       // Recargar la lista completa desde el servidor
@@ -240,13 +256,51 @@ class DebtController extends ChangeNotifier {
     
     try {
       print('📌 DebtController: Deleting ${ids.length} debts in batch...');
-      await _service.deleteDebtPaymentsBatch(ids);
+      await _service.deleteDebtsBatch(ids);
       print('✅ DebtController: Batch deletion completed successfully');
       
       // Recargar la lista completa desde el servidor
       await loadDebts();
     } catch (e) {
       print('❌ DebtController: Error in batch deletion: $e');
+      _setError(e.toString());
+      rethrow;
+    }
+  }
+
+  // ============= NEW DEBT SPECIFIC METHODS =============
+
+  // 📌 Realizar pago de deuda
+  Future<void> makeDebtPayment(DebtPaymentDTO dto) async {
+    _setError(null);
+    
+    try {
+      print('💰 DebtController: Making payment to debt ID: ${dto.debtId}');
+      final paymentResult = await _service.makePayment(dto);
+      print('✅ DebtController: Payment made successfully: $paymentResult');
+      
+      // Recargar la lista completa desde el servidor
+      await loadDebts();
+    } catch (e) {
+      print('❌ DebtController: Error making payment: $e');
+      _setError(e.toString());
+      rethrow;
+    }
+  }
+
+  // 📌 Actualizar estado de deuda
+  Future<void> updateDebtState(int id, StateDebt state) async {
+    _setError(null);
+    
+    try {
+      print('🔄 DebtController: Updating debt state for ID: $id to $state');
+      final result = await _service.updateDebtState(id, state);
+      print('✅ DebtController: Debt state updated successfully: $result');
+      
+      // Recargar la lista completa desde el servidor
+      await loadDebts();
+    } catch (e) {
+      print('❌ DebtController: Error updating debt state: $e');
       _setError(e.toString());
       rethrow;
     }
@@ -259,16 +313,14 @@ class DebtController extends ChangeNotifier {
     _setLoading(true);
     try {
       print('🔄 DebtController: Loading monthly debt analysis for $year-$month...');
-      // Implementando análisis mensual usando datos existentes
       final from = '$year-${month.toString().padLeft(2, '0')}-01';
       final to = '$year-${month.toString().padLeft(2, '0')}-31';
-      final monthlyDebts = await _service.getDebtTransactionsByDateRange(from: from, to: to);
+      final monthlyDebts = await _service.getAllDebts(from: from, to: to);
       double total = 0.0;
       for (final debt in monthlyDebts) {
-        total += debt.amount;
+        total += debt.totalAmount.toDouble();
       }
-      final analysis = {'totalAmount': total, 'count': monthlyDebts.length};
-      print('✅ DebtController: Monthly analysis loaded - Total: ${analysis['totalAmount']}, Count: ${analysis['count']}');
+      print('✅ DebtController: Monthly analysis loaded - Total: \$${total.toStringAsFixed(2)}, Count: ${monthlyDebts.length}');
       _setError(null);
     } catch (e) {
       print('❌ DebtController: Error loading monthly analysis: $e');
@@ -283,20 +335,14 @@ class DebtController extends ChangeNotifier {
     _setLoading(true);
     try {
       print('🔄 DebtController: Loading yearly debt analysis for $year...');
-      // Implementando análisis anual usando datos existentes
-      final monthlyTotals = await _service.getMonthlyDebtPaymentsTotals(year);
+      final from = '$year-01-01';
+      final to = '$year-12-31';
+      final yearlyDebts = await _service.getAllDebts(from: from, to: to);
       double totalAmount = 0.0;
-      for (final monthTotal in monthlyTotals.values) {
-        totalAmount += monthTotal;
+      for (final debt in yearlyDebts) {
+        totalAmount += debt.totalAmount.toDouble();
       }
-      // Obtener el conteo total del año
-      final yearlyDebts = await _service.getDebtTransactionsByDateRange(
-        from: '$year-01-01', 
-        to: '$year-12-31',
-      );
-      final totalCount = yearlyDebts.length;
-      final analysis = {'totalAmount': totalAmount, 'count': totalCount};
-      print('✅ DebtController: Yearly analysis loaded - Total: ${analysis['totalAmount']}, Count: ${analysis['count']}');
+      print('✅ DebtController: Yearly analysis loaded - Total: \$${totalAmount.toStringAsFixed(2)}, Count: ${yearlyDebts.length}');
       _setError(null);
     } catch (e) {
       print('❌ DebtController: Error loading yearly analysis: $e');
@@ -306,51 +352,22 @@ class DebtController extends ChangeNotifier {
     }
   }
 
-  // 📌 Obtener deudas por categoría
-  Future<void> loadDebtsByCategory() async {
-    _setLoading(true);
-    try {
-      print('🔄 DebtController: Loading debts by category...');
-      // Usando método existente para obtener deudas categorizadas
-      final debtsByCategory = await _service.getDebtPaymentsByDebtBreakdown();
-      print('✅ DebtController: Loaded debts for ${debtsByCategory.length} categories');
-      _setError(null);
-    } catch (e) {
-      print('❌ DebtController: Error loading debts by category: $e');
-      _setError(e.toString());
-    } finally {
-      _setLoading(false);
-    }
+  // 📌 Obtener deudas activas
+  Future<void> loadActiveDebts() async {
+    await loadDebtsByState(StateDebt.ACTIVE);
   }
 
-  // ============= DEBT SPECIFIC METHODS =============
-
-  // 📌 Obtener deudas activas (no pagadas)
-  Future<void> loadActiveDebts() async {
+  // 📌 Cargar deudas activas usando el nuevo método
+  Future<void> loadActiveDebtsNew() async {
     _setLoading(true);
     try {
       print('🔄 DebtController: Loading active debts...');
-      final activeDebts = await _service.getActiveDebts();
-      print('✅ DebtController: Loaded ${activeDebts.length} active debts');
+      debts = await _service.getActiveDebts();
+      print('✅ DebtController: Loaded ${debts.length} active debts');
+      _updateStatistics();
       _setError(null);
     } catch (e) {
       print('❌ DebtController: Error loading active debts: $e');
-      _setError(e.toString());
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  // 📌 Obtener deudas vencidas
-  Future<void> loadOverdueDebts() async {
-    _setLoading(true);
-    try {
-      print('🔄 DebtController: Loading overdue debts...');
-      final overdueDebts = await _service.getOverdueDebts();
-      print('✅ DebtController: Loaded ${overdueDebts.length} overdue debts');
-      _setError(null);
-    } catch (e) {
-      print('❌ DebtController: Error loading overdue debts: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
@@ -378,8 +395,14 @@ class DebtController extends ChangeNotifier {
     _setLoading(true);
     try {
       print('🔄 DebtController: Loading debts by due date: ${dueDate.toString()}...');
-      final debtsByDueDate = await _service.getDebtsByDueDate(dueDate);
-      print('✅ DebtController: Loaded ${debtsByDueDate.length} debts for due date');
+      // Usar loadDebtsExpiringSoon para obtener deudas próximas a vencer
+      final daysDifference = dueDate.difference(DateTime.now()).inDays;
+      if (daysDifference > 0) {
+        await loadDebtsExpiringSoon(daysDifference);
+      } else {
+        await loadOverdueDebts();
+      }
+      print('✅ DebtController: Loaded debts for due date');
       _setError(null);
     } catch (e) {
       print('❌ DebtController: Error loading debts by due date: $e');
@@ -394,7 +417,7 @@ class DebtController extends ChangeNotifier {
   // 📌 Limpiar datos
   void clearData() {
     debts.clear();
-    debtSummaries.clear();
+    debtSummary = null;
     currentDebt = null;
     totalDebtAmount = 0.0;
     averageDebtAmount = 0.0;
@@ -404,7 +427,7 @@ class DebtController extends ChangeNotifier {
   }
 
   // 📌 Obtener deuda por ID (desde la lista local)
-  TransactionDetailDTO? getDebtById(int id) {
+  DebtDTO? getDebtById(int id) {
     try {
       return debts.firstWhere((debt) => debt.id == id);
     } catch (e) {
@@ -412,65 +435,71 @@ class DebtController extends ChangeNotifier {
     }
   }
 
-  // 📌 Obtener deudas por categoría (desde la lista local)
-  List<TransactionDetailDTO> getDebtsByCategory(int categoryId) {
-    return debts.where((debt) => debt.categoryId == categoryId).toList();
+  // 📌 Obtener deudas por estado (desde la lista local)
+  List<DebtDTO> getDebtsByStateLocal(StateDebt state) {
+    return debts.where((debt) => debt.state == state).toList();
   }
 
   // 📌 Obtener deudas por rango de fechas (desde la lista local)
-  List<TransactionDetailDTO> getDebtsByDateRange(DateTime from, DateTime to) {
+  List<DebtDTO> getDebtsByDateRangeLocal(DateTime from, DateTime to) {
     return debts.where((debt) {
-      final debtDate = debt.transactionDate ?? DateTime.now();
-      return debtDate.isAfter(from.subtract(const Duration(days: 1))) &&
-             debtDate.isBefore(to.add(const Duration(days: 1)));
+      final debtStartDate = debt.startDate;
+      return debtStartDate.isAfter(from.subtract(const Duration(days: 1))) &&
+             debtStartDate.isBefore(to.add(const Duration(days: 1)));
     }).toList();
   }
 
   // 📌 Obtener deudas por rango de monto (desde la lista local)
-  List<TransactionDetailDTO> getDebtsByAmountRange(double minAmount, double maxAmount) {
+  List<DebtDTO> getDebtsByAmountRangeLocal(double minAmount, double maxAmount) {
     return debts.where((debt) => 
-        debt.amount >= minAmount && debt.amount <= maxAmount).toList();
+        debt.totalAmount.toDouble() >= minAmount && 
+        debt.totalAmount.toDouble() <= maxAmount).toList();
   }
 
   // 📌 Verificar si hay deudas cargadas
   bool get hasDebts => debts.isNotEmpty;
 
   // 📌 Obtener la mayor deuda
-  TransactionDetailDTO? get highestDebt {
+  DebtDTO? get highestDebt {
     if (debts.isEmpty) return null;
     return debts.reduce((current, next) => 
-        current.amount > next.amount ? current : next);
+        current.totalAmount > next.totalAmount ? current : next);
   }
 
   // 📌 Obtener la menor deuda
-  TransactionDetailDTO? get lowestDebt {
+  DebtDTO? get lowestDebt {
     if (debts.isEmpty) return null;
     return debts.reduce((current, next) => 
-        current.amount < next.amount ? current : next);
+        current.totalAmount < next.totalAmount ? current : next);
   }
 
   // 📌 Obtener deudas recientes (últimos 30 días)
-  List<TransactionDetailDTO> get recentDebts {
+  List<DebtDTO> get recentDebts {
     final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
     return debts.where((debt) {
-      final debtDate = debt.transactionDate ?? DateTime.now();
-      return debtDate.isAfter(thirtyDaysAgo);
+      return debt.startDate.isAfter(thirtyDaysAgo);
     }).toList();
   }
 
-  // 📌 Obtener deudas activas (desde la lista local - asumiendo que hay un campo isPaid)
-  List<TransactionDetailDTO> get activeDebtsLocal {
-    // Nota: Esto asume que existe un campo 'isPaid' o similar en TransactionDetailDTO
-    // Si no existe, se podría usar otro criterio como fecha de vencimiento
-    return debts.where((debt) => 
-        debt.description?.toLowerCase().contains('activa') == true ||
-        debt.description?.toLowerCase().contains('pendiente') == true).toList();
+  // 📌 Obtener deudas activas (desde la lista local)
+  List<DebtDTO> get activeDebtsLocal {
+    return debts.where((debt) => debt.state == StateDebt.ACTIVE).toList();
   }
 
-  // 📌 Obtener deudas por prioridad (ordenadas por monto descendente)
-  List<TransactionDetailDTO> get debtsByPriority {
-    List<TransactionDetailDTO> sortedDebts = List.from(debts);
-    sortedDebts.sort((a, b) => b.amount.compareTo(a.amount));
+  // 📌 Obtener deudas vencidas (desde la lista local)  
+  List<DebtDTO> get overdueDebtsLocal {
+    return debts.where((debt) => debt.state == StateDebt.DEFEATED).toList();
+  }
+
+  // 📌 Obtener deudas pagadas (desde la lista local)
+  List<DebtDTO> get paidDebtsLocal {
+    return debts.where((debt) => debt.state == StateDebt.PAID).toList();
+  }
+
+  // 📌 Obtener deudas por prioridad (ordenadas por monto pendiente descendente)
+  List<DebtDTO> get debtsByPriority {
+    List<DebtDTO> sortedDebts = List.from(debts);
+    sortedDebts.sort((a, b) => b.pendingAmount.compareTo(a.pendingAmount));
     return sortedDebts;
   }
 
@@ -481,7 +510,28 @@ class DebtController extends ChangeNotifier {
       'totalAmount': totalDebtAmount,
       'averageAmount': averageDebtAmount,
       'activeDebts': activeDebtsLocal.length,
+      'overdueDebts': overdueDebtsLocal.length,
+      'paidDebts': paidDebtsLocal.length,
       'recentDebts': recentDebts.length,
+      'highestDebt': highestDebt?.totalAmount.toDouble() ?? 0.0,
+      'lowestDebt': lowestDebt?.totalAmount.toDouble() ?? 0.0,
     };
+  }
+
+  // ============= MULTIPLE OPERATION METHODS =============
+
+  // 📌 Crear múltiples deudas
+  Future<void> addMultipleDebts(List<NewDebtDTO> dtos) async {
+    await addDebtsBatch(dtos);
+  }
+
+  // 📌 Actualizar múltiples deudas  
+  Future<void> updateMultipleDebts(List<DebtDTO> dtos) async {
+    await updateDebtsBatch(dtos);
+  }
+
+  // 📌 Eliminar múltiples deudas
+  Future<void> deleteMultipleDebts(List<int> ids) async {
+    await deleteDebtsBatch(ids);
   }
 }

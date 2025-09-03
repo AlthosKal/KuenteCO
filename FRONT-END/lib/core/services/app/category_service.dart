@@ -66,8 +66,16 @@ class CategoryService {
     
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      // Si viene envuelto en un objeto con key 'data'
-      dataList = responseData['data'] as List<dynamic>;
+      final dataValue = responseData['data'];
+      if (dataValue is String) {
+        // Si 'data' es un string (mensaje de error), retornar lista vacía
+        return [];
+      } else if (dataValue is List<dynamic>) {
+        // Si 'data' es una lista válida
+        dataList = dataValue;
+      } else {
+        return [];
+      }
     } else if (responseData is List<dynamic>) {
       // Si viene directamente como lista
       dataList = responseData;

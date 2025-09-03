@@ -161,6 +161,7 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const TransactionView());
 
 
+
     // ✅ DEFAULT -> RUTA NO ENCONTRADA
       default:
         return MaterialPageRoute(

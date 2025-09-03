@@ -1,25 +1,8 @@
 import 'package:decimal/decimal.dart';
-
-enum StateDebt {
-  ACTIVE,
-  PAID,
-  OVERDUE,
-  REFINANCED,
-  IN_MORATORIUM,
-  CANCELLED;
-
-  static StateDebt fromString(String value) {
-    return StateDebt.values.firstWhere(
-          (e) => e.name.toLowerCase() == value.toLowerCase(),
-      orElse: () => StateDebt.ACTIVE,
-    );
-  }
-
-  String toJson() => name;
-}
+import '../../../utils/enum/state_debt_enum.dart';
 
 class NewDebtDTO {
-  final int? transactionId;
+  final int transactionId;
   final String name;
   final Decimal totalAmount;
   final Decimal pendingAmount;
@@ -28,7 +11,7 @@ class NewDebtDTO {
   final StateDebt? state;
 
   NewDebtDTO({
-    this.transactionId,
+    required this.transactionId,
     required this.name,
     required this.totalAmount,
     required this.pendingAmount,
@@ -51,7 +34,7 @@ class NewDebtDTO {
 
   Map<String, dynamic> toJson() {
     return {
-      if (transactionId != null) 'transactionId': transactionId,
+      'transactionId': transactionId,
       'name': name,
       'totalAmount': totalAmount.toString(),
       'pendingAmount': pendingAmount.toString(),
