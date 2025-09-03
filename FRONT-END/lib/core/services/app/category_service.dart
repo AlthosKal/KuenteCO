@@ -1,10 +1,10 @@
+import '../../../dto/app/category/batch_enrollment_request_dto.dart';
 import '../../../dto/app/category/category_dto.dart';
 import '../../../dto/app/category/category_enrollment_dto.dart';
 import '../../../dto/app/category/category_enrollment_summary_dto.dart';
 import '../../../dto/app/category/category_report_dto.dart';
 import '../../../dto/app/category/new_category_dto.dart';
 import '../../../dto/app/category/update_category_dto.dart';
-import '../../../dto/app/category/batch_enrollment_request_dto.dart';
 import '../api_client.dart';
 
 class CategoryService {
@@ -58,21 +58,24 @@ class CategoryService {
   // ✅ GET /category/enroll
   Future<List<CategoryEnrollmentDTO>> getAllEnrollments() async {
     final response = await _apiClient.getApp('/category/enroll');
-    
-    
-    // El backend puede retornar un objeto envuelto con la estructura:
-    // { "data": [...] } o directamente la lista
     final responseData = response.data;
     
     if (responseData is String) {
-      // Si el backend retorna un mensaje de texto (ej: "No tienes categorías asignadas")
       return [];
     }
     
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      // Si viene envuelto en un objeto con key 'data'
-      dataList = responseData['data'] as List<dynamic>;
+      final dataValue = responseData['data'];
+      if (dataValue is String) {
+        // Si 'data' es un string (mensaje de error), retornar lista vacía
+        return [];
+      } else if (dataValue is List<dynamic>) {
+        // Si 'data' es una lista válida
+        dataList = dataValue;
+      } else {
+        return [];
+      }
     } else if (responseData is List<dynamic>) {
       // Si viene directamente como lista
       dataList = responseData;
@@ -89,43 +92,26 @@ class CategoryService {
   // ✅ GET /category/enroll/user - Returns enrollment summaries for business users
   Future<List<CategoryEnrollmentSummaryDTO>> getEnrollmentSummariesByUser() async {
     final response = await _apiClient.getApp('/category/enroll/user');
-    
-    print('📌 CategoryService: Raw response data type for /enroll/user: ${response.data.runtimeType}');
-    print('📌 CategoryService: Raw response data for /enroll/user: ${response.data}');
-    
-    // El backend puede retornar un objeto envuelto con la estructura:
-    // { "data": [...] } o directamente la lista
     final responseData = response.data;
     
     if (responseData is String) {
-      // Si el backend retorna un mensaje de texto
-      print('📌 CategoryService: /enroll/user response is string, returning empty list');
       return [];
     }
     
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      // Si viene envuelto en un objeto con key 'data'
-      print('📌 CategoryService: /enroll/user response has data key, extracting list');
       final dataValue = responseData['data'];
       
       if (dataValue is String) {
-        // Si el campo 'data' contiene un mensaje de texto (ej: "No tienes Perfiles con Categorías asociadas")
-        print('📌 CategoryService: Data field is a string message, returning empty list');
         return [];
       } else if (dataValue is List<dynamic>) {
         dataList = dataValue;
       } else {
-        print('❌ CategoryService: Data field has unknown format, returning empty list');
         return [];
       }
     } else if (responseData is List<dynamic>) {
-      // Si viene directamente como lista
-      print('📌 CategoryService: /enroll/user response is direct list');
       dataList = responseData;
     } else {
-      // Si es cualquier otro formato, asumir lista vacía
-      print('❌ CategoryService: Unknown /enroll/user response format, returning empty list');
       return [];
     }
     
@@ -267,18 +253,11 @@ class CategoryService {
       '/category/batch/add',
       dtos.map((e) => e.toJson()).toList(),
     );
-    
-    print('📌 CategoryService: Batch add response type: ${response.data.runtimeType}');
-    print('📌 CategoryService: Batch add response data: ${response.data}');
-    
+
     // Verificamos que la petición fue exitosa
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('Failed to create categories in batch: ${response.statusCode}');
     }
-    
-    // No necesitamos parsear la respuesta ya que CategoryController
-    // recarga todas las categorías después usando getAllCategories()
-    print('✅ CategoryService: Batch creation completed successfully');
   }
 
   // 🔧 PATCH /category/update (CORREGIDO: Ahora usa UpdateCategoryDTO)
@@ -286,12 +265,7 @@ class CategoryService {
     // Convertir CategoryDTO a UpdateCategoryDTO
     final updateDto = UpdateCategoryDTO.fromCategoryDTO(dto);
     final payload = updateDto.toJson();
-    print('🔄 Updating category with payload: $payload');
-    
     final response = await _apiClient.patchApp('/category/update', payload);
-    
-    print('📡 Server response status: ${response.statusCode}');
-    print('📡 Server response data: ${response.data}');
     
     // Verificamos que la petición fue exitosa
     if (response.statusCode != 200 && response.statusCode != 201) {
@@ -527,8 +501,4 @@ class CategoryService {
       rethrow;
     }
   }
-  
-  // ❌ REMOVED: deleteAllEnrollmentsByCategory 
-  // NOTA: El endpoint DELETE /category/enroll/category/{categoryId} NO EXISTE en el backend
-  // En su lugar, usar deleteEnrollmentsBatch() con los IDs específicos
 }

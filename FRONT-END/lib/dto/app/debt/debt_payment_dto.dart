@@ -28,8 +28,8 @@ class DebtPaymentDTO {
     return {
       'debtId': debtId,
       'paymentAmount': paymentAmount.toString(),
-      'description': description,
-      'paymentDate': paymentDate?.toIso8601String(),
+      if (description != null) 'description': description,
+      if (paymentDate != null) 'paymentDate': paymentDate!.toIso8601String(),
     };
   }
 }

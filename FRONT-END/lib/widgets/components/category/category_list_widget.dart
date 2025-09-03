@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../dto/app/category/category_dto.dart';
 
 class CategoryListWidget extends StatelessWidget {

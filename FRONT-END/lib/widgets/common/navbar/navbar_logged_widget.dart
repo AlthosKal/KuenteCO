@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import '../../../core/services/app/auth_service.dart';
 import '../../../core/services/app/profile_service.dart';
 import '../../../dto/app/auth/response/user_detail_dto.dart';

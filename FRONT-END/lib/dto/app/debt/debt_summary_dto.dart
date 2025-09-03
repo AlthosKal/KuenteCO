@@ -37,23 +37,29 @@ class DebtSummaryDTO {
 
   factory DebtSummaryDTO.fromJson(Map<String, dynamic> json) {
     return DebtSummaryDTO(
-      userId: json['userId'],
-      ownerUserId: json['ownerUserId'],
-      username: json['username'],
-      totalDebts: json['totalDebts'],
-      activeDebts: json['activeDebts'],
-      paidDebts: json['paidDebts'],
-      overdueDebts: json['overdueDebts'],
-      refinancedDebts: json['refinancedDebts'],
-      inMoratiumDebts: json['inMoratiumDebts'],
-      cancelledDebts: json['cancelledDebts'],
-      totalDebtAmount: Decimal.parse(json['totalDebtAmount'].toString()),
-      totalPendingAmount: Decimal.parse(json['totalPendingAmount'].toString()),
-      activePendingAmount: Decimal.parse(json['activePendingAmount'].toString()),
+      userId: json['userId'] ?? '',
+      ownerUserId: json['ownerUserId'] ?? '',
+      username: json['username'] ?? '',
+      totalDebts: (json['totalDebts'] as num?)?.toInt() ?? 0,
+      activeDebts: (json['activeDebts'] as num?)?.toInt() ?? 0,
+      paidDebts: (json['paidDebts'] as num?)?.toInt() ?? 0,
+      overdueDebts: (json['overdueDebts'] as num?)?.toInt() ?? 0,
+      refinancedDebts: (json['refinancedDebts'] as num?)?.toInt() ?? 0,
+      inMoratiumDebts: (json['inMoratiumDebts'] as num?)?.toInt() ?? 0,
+      cancelledDebts: (json['cancelledDebts'] as num?)?.toInt() ?? 0,
+      totalDebtAmount: json['totalDebtAmount'] != null 
+          ? Decimal.parse(json['totalDebtAmount'].toString()) 
+          : Decimal.zero,
+      totalPendingAmount: json['totalPendingAmount'] != null 
+          ? Decimal.parse(json['totalPendingAmount'].toString()) 
+          : Decimal.zero,
+      activePendingAmount: json['activePendingAmount'] != null 
+          ? Decimal.parse(json['activePendingAmount'].toString()) 
+          : Decimal.zero,
       nextDueDate: json['nextDueDate'] != null
           ? DateTime.parse(json['nextDueDate'])
           : null,
-      expiredActiveDebts: json['expiredActiveDebts'],
+      expiredActiveDebts: (json['expiredActiveDebts'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -72,7 +78,7 @@ class DebtSummaryDTO {
       'totalDebtAmount': totalDebtAmount.toString(),
       'totalPendingAmount': totalPendingAmount.toString(),
       'activePendingAmount': activePendingAmount.toString(),
-      'nextDueDate': nextDueDate?.toIso8601String(),
+      if (nextDueDate != null) 'nextDueDate': nextDueDate!.toIso8601String(),
       'expiredActiveDebts': expiredActiveDebts,
     };
   }

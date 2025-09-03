@@ -1,8 +1,10 @@
 import 'dart:typed_data';
-import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:image_picker/image_picker.dart';
+
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
 import '../../../controllers/profile_controller.dart';
 import '../../../dto/app/image/image_dto.dart';
 import '../../../dto/app/profile/profile_detail_dto.dart';

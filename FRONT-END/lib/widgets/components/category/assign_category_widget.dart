@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../../controllers/category_controller.dart';
 import '../../../core/services/app/profile_service.dart';
 import '../../../dto/app/category/category_dto.dart';

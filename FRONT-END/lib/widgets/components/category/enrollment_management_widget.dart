@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../../controllers/category_controller.dart';
-import '../../../dto/app/category/category_enrollment_dto.dart';
 import 'batch_assign_category_widget.dart';
-import 'delete_enrollment_widget.dart' as ComponentEnrollmentDelete;
 
 class EnrollmentManagementWidget extends StatelessWidget {
   final VoidCallback? onEnrollmentChanged;

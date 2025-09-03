@@ -1,6 +1,8 @@
 import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+
 import '../core/services/app/profile_service.dart';
 import '../dto/app/image/image_dto.dart';
 import '../dto/app/profile/new_profile_dto.dart';
