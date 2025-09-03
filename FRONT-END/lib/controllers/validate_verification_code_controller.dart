@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import '../core/exceptions/global_exception_handler.dart';
 import '../core/services/app/auth_service.dart';
 import '../dto/app/auth/request/validate_verification_code_dto.dart';

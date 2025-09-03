@@ -1,21 +1,21 @@
+import 'package:KuenteCO/controllers/budget_controller.dart';
+import 'package:KuenteCO/controllers/category_controller.dart';
+import 'package:KuenteCO/controllers/profile_controller.dart';
+import 'package:KuenteCO/controllers/subscription_controller.dart';
+import 'package:KuenteCO/controllers/user_controller.dart';
+import 'package:KuenteCO/core/config/is_autenticated.dart';
+import 'package:KuenteCO/core/services/api_client.dart';
+import 'package:KuenteCO/core/services/app/budget_service.dart';
+import 'package:KuenteCO/core/services/app/category_service.dart';
+import 'package:KuenteCO/core/services/app/profile_service.dart';
+import 'package:KuenteCO/core/services/app/subscription_service.dart';
+import 'package:KuenteCO/core/services/app/user_service.dart';
+import 'package:KuenteCO/routes/app_routes.dart';
+import 'package:KuenteCO/routes/route_generator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
-import 'package:KuenteCO/routes/app_routes.dart';
-import 'package:KuenteCO/routes/route_generator.dart';
-import 'package:KuenteCO/core/config/is_autenticated.dart';
-import 'package:KuenteCO/controllers/user_controller.dart';
-import 'package:KuenteCO/core/services/app/user_service.dart';
-import 'package:KuenteCO/core/services/api_client.dart';
-import 'package:KuenteCO/controllers/subscription_controller.dart';
-import 'package:KuenteCO/core/services/app/subscription_service.dart';
-import 'package:KuenteCO/controllers/category_controller.dart';
-import 'package:KuenteCO/core/services/app/category_service.dart';
-import 'package:KuenteCO/controllers/budget_controller.dart';
-import 'package:KuenteCO/core/services/app/budget_service.dart';
-import 'package:KuenteCO/controllers/profile_controller.dart';
-import 'package:KuenteCO/core/services/app/profile_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

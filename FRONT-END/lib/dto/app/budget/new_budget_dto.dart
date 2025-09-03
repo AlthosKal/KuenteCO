@@ -1,5 +1,3 @@
-import 'package:decimal/decimal.dart';
-
 class NewBudgetDTO {
   final String name;
   final double totalBudget;

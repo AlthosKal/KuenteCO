@@ -22,11 +22,9 @@ public class UpdateTransactionDTO {
     @Positive(message = "El ID de la transacción debe ser un número positivo")
     private Integer id;
 
-    @NotNull(message = "El ID de categoría es requerido")
     @Positive(message = "El ID de categoría debe ser un número positivo")
     private Integer categoryId;
 
-    @NotNull(message = "El ID de presupuesto es requerido")
     @Positive(message = "El ID de presupuesto debe ser un número positivo")
     private Integer budgetId;
 

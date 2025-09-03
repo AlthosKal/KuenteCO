@@ -28,7 +28,7 @@ services:
       - kuenteco-network
     restart: unless-stopped
 
-#BASE DE DATOS POSTGRESQL MAESTRA
+#BASE DE DATOS POSTGRESQL MAESTRA :D
   postgres-master-database:
     image: yefff/image-master-kuenteco:1.1.1
     container_name: DatabaseMasterKuenteCO
@@ -38,9 +38,15 @@ services:
       - "5432:5432"
     networks:
       - kuenteco-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U master -d KuenteCO"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 250s
     restart: unless-stopped
 
-#BASE DE DATOS POSTGRESQL REPLICA
+#BASE DE DATOS POSTGRESQL REPLICA :D
   postgres-replica-database:
     image: yefff/image-slave-kuenteco:1.1.1
     container_name: DatabaseSlaveKuenteCO
@@ -53,9 +59,15 @@ services:
     depends_on:
       postgres-master-database:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U master || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 250s
     restart: unless-stopped
 
-# API KUENTECO-CHAT DEL BACKEND DE LA APLICACION
+# API KUENTECO-CHAT DEL BACKEND DE LA APLICACION :D
   kuenteco-chat:
     image: yefff/image-backend-kuenteco-chat:1.0.2
     container_name: KuentecoChat
@@ -68,7 +80,7 @@ services:
       - kuenteco-network
     restart: unless-stopped
 
-# BASE DE DATOS MONGODB
+# BASE DE DATOS MONGODB :D
   mongo-database:
     image: yefff/image-mongo-kuenteco:1.0.0
     container_name: MongoDatabase

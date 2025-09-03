@@ -39,10 +39,6 @@ RUN echo '#!/bin/bash' > /docker-entrypoint-custom.sh && \
     echo 'exec /usr/local/bin/docker-entrypoint.sh "$@"' >> /docker-entrypoint-custom.sh && \
     chmod +x /docker-entrypoint-custom.sh
 
-
-HEALTHCHECK --interval=10s --timeout=5s --retries=5 --start-period=250s \
-  CMD pg_isready -U master -d KuenteCO
-
 # Exponer puerto de PostgreSQL
 EXPOSE 5432
 

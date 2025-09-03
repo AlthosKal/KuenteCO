@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+
 import '../../core/services/app/auth_service.dart';
 import '../../widgets/common/background/background_widget.dart';
 import '../../widgets/common/blurred_card_widget.dart';
 import '../../widgets/common/footer/footer_logged_widget.dart';
 import '../../widgets/common/navbar/navbar_logged_widget.dart';
-import '../../widgets/components/category/category_card_widget.dart';
 import '../../widgets/components/budget/budget_card_widget.dart';
+import '../../widgets/components/category/category_card_widget.dart';
 import '../../widgets/components/transaction/transaction_card_widget.dart';
 
 class LoggedHomePersonalView extends StatelessWidget {

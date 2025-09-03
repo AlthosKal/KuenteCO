@@ -1,4 +1,5 @@
 import 'package:decimal/decimal.dart';
+
 import '../../../utils/enum/subscription_type_enum.dart';
 
 class SubscriptionPriceConfigDTO {

@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 import '../core/services/app/user_service.dart';
 import '../dto/app/auth/response/user_detail_dto.dart';

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
-import '../../../dto/app/extra/description_transaction_extra.dart';
-import '../../../utils/enum/transaction_type_enum.dart';
+
 import '../../../controllers/category_controller.dart';
 import '../../../dto/app/category/category_enrollment_dto.dart';
+import '../../../dto/app/extra/description_transaction_extra.dart';
+import '../../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
+import '../../../utils/enum/transaction_type_enum.dart';
 
 class CreateTransactionWidget extends StatefulWidget {
   final Function(NewTransactionDTO) onCreateTransaction;

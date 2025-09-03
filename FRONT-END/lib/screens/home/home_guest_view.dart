@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../widgets/common/background/background_widget.dart';
 import '../../widgets/common/footer/footer_guest_widget.dart';
 import '../../widgets/common/navbar/navbar_guest_widget.dart';

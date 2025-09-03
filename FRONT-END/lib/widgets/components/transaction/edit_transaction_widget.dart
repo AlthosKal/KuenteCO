@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
-import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
-import '../../../dto/app/extra/description_transaction_extra.dart';
-import '../../../utils/enum/transaction_type_enum.dart';
+import 'package:provider/provider.dart';
+
 import '../../../controllers/category_controller.dart';
 import '../../../dto/app/category/category_dto.dart';
 import '../../../dto/app/category/category_enrollment_dto.dart';
 import '../../../dto/app/extra/description_category_extra.dart';
+import '../../../dto/app/extra/description_transaction_extra.dart';
+import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
+import '../../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
 import '../../../utils/enum/state_enum.dart' as state_enum;
+import '../../../utils/enum/transaction_type_enum.dart';
 
 class EditTransactionWidget extends StatefulWidget {
   final TransactionDetailDTO transaction;

@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import '../../../dto/app/auth/request/change_password_dto.dart';
 import '../../../dto/app/auth/request/login_user_dto.dart';
 import '../../../dto/app/auth/request/new_user_dto.dart';
@@ -11,7 +14,6 @@ import '../../../dto/app/auth/response/user_detail_dto.dart';
 import '../../../dto/app/image/image_dto.dart';
 import '../../exceptions/api_response.dart';
 import '../api_client.dart';
-import 'dart:convert';
 
 class AuthService {
   final _api = ApiClient();

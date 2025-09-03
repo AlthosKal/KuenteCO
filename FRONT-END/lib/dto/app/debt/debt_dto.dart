@@ -1,16 +1,5 @@
 import 'package:decimal/decimal.dart';
-
-enum StateDebt {
-  PENDING,
-  PAID,
-  OVERDUE;
-
-  static StateDebt fromString(String value) {
-    return StateDebt.values.firstWhere((e) => e.name == value.toUpperCase());
-  }
-
-  String toJson() => name;
-}
+import '../../../utils/enum/state_debt_enum.dart';
 
 class DebtDTO {
   final int id;

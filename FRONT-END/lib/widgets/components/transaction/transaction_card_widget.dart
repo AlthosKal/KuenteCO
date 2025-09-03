@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
+
 import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
-import '../../../utils/formatters.dart';
 import '../../../utils/enum/transaction_type_enum.dart';
+import '../../../utils/formatters.dart';
 
 class TransactionCardWidget extends StatelessWidget {
   final TransactionDetailDTO? transaction; // Opcional para el home

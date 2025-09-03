@@ -1,4 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import '../exceptions/global_exception_handler.dart';
 import '../services/app/auth_service.dart';
 import '../services/app/profile_service.dart';

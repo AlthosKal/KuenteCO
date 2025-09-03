@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+
 import '../../utils/parser/api_error_parse.dart';
 
 typedef AsyncTask<T> = Future<T> Function();
