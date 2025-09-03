@@ -2,7 +2,6 @@ package org.kuenteco.backend.dto.logic.debt;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -15,10 +14,6 @@ import org.kuenteco.backend.validation.ValidCurrency;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NewDebtDTO {
-
-    @Positive(message = "El ID de la transacción debe ser un número positivo")
-    private Integer transactionId;
-
     @NotBlank(message = "El nombre de la deuda es obligatorio")
     private String name;
 
