@@ -138,7 +138,7 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
                             ),
                           ),
 
-                          const SizedBox(height: 40),
+                          const SizedBox(height: 15),
 
                           /// ✅ FOOTER
                           const FooterLoggedWidget(),

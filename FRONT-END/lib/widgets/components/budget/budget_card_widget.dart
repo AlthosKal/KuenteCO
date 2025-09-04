@@ -130,8 +130,8 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
           ),
           borderGradient: LinearGradient(
             colors: [
-              Colors.white.withOpacity(0.5),
-              Colors.white.withOpacity(0.5),
+              Colors.transparent,
+              Colors.transparent,
             ],
           ),
             child: Padding(
