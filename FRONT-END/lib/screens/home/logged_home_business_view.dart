@@ -8,6 +8,7 @@ import '../../widgets/common/footer/footer_logged_widget.dart';
 import '../../widgets/common/navbar/navbar_logged_widget.dart';
 import '../../widgets/components/budget/budget_card_widget.dart';
 import '../../widgets/components/category/category_card_widget.dart';
+import '../../widgets/components/report/report_card.dart';
 
 class LoggedHomeBusinessView extends StatefulWidget {
   final String userName;
@@ -114,17 +115,7 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                                     showActions: false,
                                   );
                                 case 3:
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: _buildCardItem(
-                                      icon: Icons.settings_outlined,
-                                      title: "Reporte",
-                                      onTap: () {},
-                                    ),
-                                  );
+                                  return const ReportCard();
                                 default:
                                   return Container();
                               }
