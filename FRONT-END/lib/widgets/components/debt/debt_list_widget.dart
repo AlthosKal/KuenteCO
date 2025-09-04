@@ -62,7 +62,6 @@ class _DebtListWidgetState extends State<DebtListWidget> {
         final filteredDebts = _searchQuery.isEmpty
             ? controller.debts
             : controller.debts.where((debt) =>
-                debt.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
                 debt.name.toLowerCase().contains(_searchQuery.toLowerCase())
               ).toList();
 
@@ -86,11 +85,35 @@ class _DebtListWidgetState extends State<DebtListWidget> {
               ),
             ],
           ),
-          floatingActionButton: widget.showFab && widget.onAddDebt != null
-              ? FloatingActionButton(
-                  onPressed: widget.onAddDebt,
-                  backgroundColor: Colors.red,
-                  child: const Icon(Icons.add, color: Colors.white),
+          bottomNavigationBar: widget.showFab && widget.onAddDebt != null
+              ? SafeArea(
+                  top: false,
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: widget.onAddDebt,
+                        icon: const Icon(Icons.account_balance_wallet, color: Colors.white),
+                        label: const Text(
+                          'Nueva Deuda',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 3,
+                        ),
+                      ),
+                    ),
+                  ),
                 )
               : null,
         );
@@ -189,17 +212,32 @@ class _DebtListWidgetState extends State<DebtListWidget> {
   }
 
   Widget _buildDebtsList(List<DebtDTO> debts) {
-    return RefreshIndicator(
-      onRefresh: () async {
-        _loadDebts();
-      },
-      child: ListView.builder(
-        padding: const EdgeInsets.only(bottom: 80),
-        itemCount: debts.length,
-        itemBuilder: (context, index) {
-          final debt = debts[index];
-          return _buildDebtCard(debt);
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: RefreshIndicator(
+        onRefresh: () async {
+          _loadDebts();
         },
+        child: ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: debts.length,
+          itemBuilder: (context, index) {
+            final debt = debts[index];
+            return _buildDebtCard(debt);
+          },
+        ),
       ),
     );
   }
@@ -316,48 +354,74 @@ class _DebtListWidgetState extends State<DebtListWidget> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.account_balance_wallet_outlined,
-            size: 80,
-            color: Colors.grey[300],
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
           ),
-          const SizedBox(height: 16),
-          Text(
-            _searchQuery.isNotEmpty
-                ? 'No se encontraron deudas'
-                : 'No tienes deudas registradas',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: Colors.grey[600],
+        ],
+      ),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.account_balance_wallet_outlined,
+              size: 80,
+              color: Colors.grey[300],
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            _searchQuery.isNotEmpty
-                ? 'Intenta con otros términos de búsqueda'
-                : 'Comienza agregando tu primera deuda',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[500],
-            ),
-            textAlign: TextAlign.center,
-          ),
-          if (widget.showFab && widget.onAddDebt != null && _searchQuery.isEmpty) ...[
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: widget.onAddDebt,
-              icon: const Icon(Icons.add),
-              label: const Text('Agregar Deuda'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            const SizedBox(height: 16),
+            Text(
+              _searchQuery.isNotEmpty
+                  ? 'No se encontraron deudas'
+                  : 'No tienes deudas registradas',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: Colors.grey[600],
               ),
             ),
+            const SizedBox(height: 8),
+            Text(
+              _searchQuery.isNotEmpty
+                  ? 'Intenta con otros términos de búsqueda'
+                  : 'Comienza agregando tu primera deuda',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.grey[500],
+              ),
+              textAlign: TextAlign.center,
+            ),
+            if (_searchQuery.isEmpty && widget.onAddDebt != null) ...[
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: widget.onAddDebt,
+                icon: const Icon(Icons.account_balance_wallet, color: Colors.white),
+                label: const Text(
+                  'Crear Deuda',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 3,
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

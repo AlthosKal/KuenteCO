@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
 import 'package:decimal/decimal.dart';
-import '../../../controllers/category_controller.dart';
-import '../../../controllers/debt_controller.dart';
+import 'package:flutter/material.dart';
+
 import '../../../dto/app/debt/new_debt_dto.dart';
 import '../../../utils/enum/state_debt_enum.dart';
 
@@ -24,18 +21,17 @@ class CreateDebtWidget extends StatefulWidget {
 class _CreateDebtWidgetState extends State<CreateDebtWidget> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _amountController = TextEditingController();
+  final _totalAmountController = TextEditingController();
+  final _pendingAmountController = TextEditingController();
   
-  int? _selectedCategoryId;
   DateTime _selectedStartDate = DateTime.now();
-  DateTime _selectedExpirationDate = DateTime.now().add(Duration(days: 30));
+  DateTime _selectedExpirationDate = DateTime.now().add(const Duration(days: 30));
 
   @override
   void dispose() {
     _nameController.dispose();
-    _descriptionController.dispose();
-    _amountController.dispose();
+    _totalAmountController.dispose();
+    _pendingAmountController.dispose();
     super.dispose();
   }
 
@@ -141,12 +137,12 @@ class _CreateDebtWidgetState extends State<CreateDebtWidget> {
         
         const SizedBox(height: 16),
 
-        /// MONTO
+        /// MONTO TOTAL
         TextFormField(
-          controller: _amountController,
+          controller: _totalAmountController,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
-            labelText: 'Monto *',
+            labelText: 'Monto Total *',
             hintText: '0.00',
             prefixIcon: const Icon(Icons.monetization_on, color: Colors.red),
             prefixText: '\$ ',
@@ -158,9 +154,15 @@ class _CreateDebtWidgetState extends State<CreateDebtWidget> {
               borderSide: const BorderSide(color: Colors.red),
             ),
           ),
+          onChanged: (value) {
+            // Auto-llenar el monto pendiente si está vacío
+            if (_pendingAmountController.text.isEmpty) {
+              _pendingAmountController.text = value;
+            }
+          },
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'Por favor ingresa el monto';
+              return 'Por favor ingresa el monto total';
             }
             final amount = double.tryParse(value.trim());
             if (amount == null || amount <= 0) {
@@ -172,14 +174,15 @@ class _CreateDebtWidgetState extends State<CreateDebtWidget> {
 
         const SizedBox(height: 16),
 
-        /// DESCRIPCIÓN
+        /// MONTO PENDIENTE
         TextFormField(
-          controller: _descriptionController,
-          maxLines: 3,
+          controller: _pendingAmountController,
+          keyboardType: TextInputType.number,
           decoration: InputDecoration(
-            labelText: 'Descripción (opcional)',
-            hintText: 'Detalles adicionales sobre la deuda...',
-            prefixIcon: const Icon(Icons.description, color: Colors.red),
+            labelText: 'Monto Pendiente *',
+            hintText: '0.00',
+            prefixIcon: const Icon(Icons.account_balance, color: Colors.red),
+            prefixText: '\$ ',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -188,30 +191,57 @@ class _CreateDebtWidgetState extends State<CreateDebtWidget> {
               borderSide: const BorderSide(color: Colors.red),
             ),
           ),
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Por favor ingresa el monto pendiente';
+            }
+            final pendingAmount = double.tryParse(value.trim());
+            if (pendingAmount == null || pendingAmount < 0) {
+              return 'Por favor ingresa un monto válido';
+            }
+            
+            final totalAmount = double.tryParse(_totalAmountController.text.trim());
+            if (totalAmount != null && pendingAmount > totalAmount) {
+              return 'El monto pendiente no puede ser mayor al total';
+            }
+            return null;
+          },
         ),
 
         const SizedBox(height: 16),
 
-        /// FECHA
-        InkWell(
-          onTap: () => _selectDate(context),
+        /// FECHA DE INICIO
+        GestureDetector(
+          onTap: () => _selectStartDate(context),
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[300]!),
+              border: Border.all(color: Colors.grey.shade300),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               children: [
                 const Icon(Icons.calendar_today, color: Colors.red),
                 const SizedBox(width: 12),
-                Text(
-                  'Fecha inicio: ${_selectedStartDate.day}/${_selectedStartDate.month}/${_selectedStartDate.year}',
-                  // TODO: Agregar selector para fecha de vencimiento
-                  style: Theme.of(context).textTheme.bodyMedium,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Fecha de Inicio *',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    Text(
+                      '${_selectedStartDate.day}/${_selectedStartDate.month}/${_selectedStartDate.year}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
-                const Spacer(),
-                Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
               ],
             ),
           ),
@@ -219,61 +249,43 @@ class _CreateDebtWidgetState extends State<CreateDebtWidget> {
 
         const SizedBox(height: 16),
 
-        /// CATEGORÍA
-        Consumer<CategoryController>(
-          builder: (context, categoryController, child) {
-            final categories = categoryController.categories;
-            
-            if (categories.isEmpty) {
-              return Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
-                ),
-                child: Row(
+        /// FECHA DE VENCIMIENTO
+        GestureDetector(
+          onTap: () => _selectExpirationDate(context),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.schedule, color: Colors.red),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.info, color: Colors.orange),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'No hay categorías disponibles',
-                        style: TextStyle(color: Colors.orange[700]),
+                    const Text(
+                      'Fecha de Vencimiento *',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    Text(
+                      '${_selectedExpirationDate.day}/${_selectedExpirationDate.month}/${_selectedExpirationDate.year}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
-              );
-            }
-
-            return DropdownButtonFormField<int>(
-              value: _selectedCategoryId,
-              decoration: InputDecoration(
-                labelText: 'Categoría (opcional)',
-                prefixIcon: const Icon(Icons.category, color: Colors.red),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.red),
-                ),
-              ),
-              items: categories.map((category) {
-                return DropdownMenuItem<int>(
-                  value: category.id,
-                  child: Text(category.name),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedCategoryId = value;
-                });
-              },
-            );
-          },
+              ],
+            ),
+          ),
         ),
+
       ],
     );
   }
@@ -312,7 +324,7 @@ class _CreateDebtWidgetState extends State<CreateDebtWidget> {
     );
   }
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectStartDate(BuildContext context) async {
     final picked = await showDatePicker(
       context: context,
       initialDate: _selectedStartDate,
@@ -333,6 +345,35 @@ class _CreateDebtWidgetState extends State<CreateDebtWidget> {
     if (picked != null) {
       setState(() {
         _selectedStartDate = picked;
+        // Si la fecha de vencimiento es anterior a la de inicio, ajustarla
+        if (_selectedExpirationDate.isBefore(picked)) {
+          _selectedExpirationDate = picked.add(const Duration(days: 30));
+        }
+      });
+    }
+  }
+
+  Future<void> _selectExpirationDate(BuildContext context) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedExpirationDate,
+      firstDate: _selectedStartDate,
+      lastDate: DateTime.now().add(const Duration(days: 3650)), // 10 años
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: Colors.red,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedExpirationDate = picked;
       });
     }
   }
@@ -342,13 +383,13 @@ class _CreateDebtWidgetState extends State<CreateDebtWidget> {
       return;
     }
 
-    final amount = Decimal.parse(_amountController.text.trim());
+    final totalAmount = Decimal.parse(_totalAmountController.text.trim());
+    final pendingAmount = Decimal.parse(_pendingAmountController.text.trim());
     
     final dto = NewDebtDTO(
-      transactionId: 1, // TODO: Obtener el ID de transacción real
       name: _nameController.text.trim(),
-      totalAmount: amount,
-      pendingAmount: amount, // Inicialmente, todo el monto está pendiente
+      totalAmount: totalAmount,
+      pendingAmount: pendingAmount,
       startDate: _selectedStartDate,
       expirationDate: _selectedExpirationDate,
       state: StateDebt.ACTIVE,

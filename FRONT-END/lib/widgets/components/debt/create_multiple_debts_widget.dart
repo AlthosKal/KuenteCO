@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'package:decimal/decimal.dart';
 import '../../../controllers/debt_controller.dart';
-import '../../../controllers/category_controller.dart';
 import '../../../dto/app/debt/new_debt_dto.dart';
 import '../../../utils/enum/state_debt_enum.dart';
 
 class CreateMultipleDebtsWidget extends StatefulWidget {
-  const CreateMultipleDebtsWidget({Key? key}) : super(key: key);
+  final DebtController controller;
+  
+  const CreateMultipleDebtsWidget({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
 
   @override
   State<CreateMultipleDebtsWidget> createState() => _CreateMultipleDebtsWidgetState();
@@ -94,7 +97,7 @@ class _CreateMultipleDebtsWidgetState extends State<CreateMultipleDebtsWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Crear M�ltiples Deudas',
+                  'Crear Múltiples Deudas',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.red[700],
@@ -218,19 +221,26 @@ class _CreateMultipleDebtsWidgetState extends State<CreateMultipleDebtsWidget> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: TextFormField(
-                    controller: debt.amountController,
+                    controller: debt.totalAmountController,
                     decoration: const InputDecoration(
-                      labelText: 'Monto',
+                      labelText: 'Monto Total',
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.attach_money),
+                      prefixIcon: Icon(Icons.monetization_on),
+                      prefixText: '\$ ',
                     ),
                     keyboardType: TextInputType.number,
+                    onChanged: (value) {
+                      // Auto-llenar el monto pendiente si está vacío
+                      if (debt.pendingAmountController.text.isEmpty) {
+                        debt.pendingAmountController.text = value;
+                      }
+                    },
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'El monto es requerido';
+                        return 'El monto total es requerido';
                       }
                       if (double.tryParse(value) == null) {
-                        return 'Monto inv�lido';
+                        return 'Monto inválido';
                       }
                       if (double.parse(value) <= 0) {
                         return 'El monto debe ser mayor a 0';
@@ -243,65 +253,111 @@ class _CreateMultipleDebtsWidgetState extends State<CreateMultipleDebtsWidget> {
             ),
             const SizedBox(height: 16),
             TextFormField(
-              controller: debt.descriptionController,
+              controller: debt.pendingAmountController,
               decoration: const InputDecoration(
-                labelText: 'Descripci�n (opcional)',
+                labelText: 'Monto Pendiente',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.description),
+                prefixIcon: Icon(Icons.account_balance),
+                prefixText: '\$ ',
               ),
-              maxLines: 2,
-            ),
-            const SizedBox(height: 16),
-            Consumer<CategoryController>(
-              builder: (context, categoryController, child) {
-                final categories = categoryController.categories;
-                
-                if (categories.isEmpty) {
-                  return Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.info, color: Colors.orange),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'No hay categor�as disponibles',
-                            style: TextStyle(color: Colors.orange),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'El monto pendiente es requerido';
                 }
-
-                return DropdownButtonFormField<int>(
-                  value: debt.selectedCategoryId,
-                  decoration: const InputDecoration(
-                    labelText: 'Categor�a (opcional)',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.category),
-                  ),
-                  items: [
-                    const DropdownMenuItem<int>(
-                      value: null,
-                      child: Text('Sin categor�a'),
-                    ),
-                    ...categories.map((category) => DropdownMenuItem<int>(
-                      value: category.id,
-                      child: Text(category.name),
-                    )),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      debt.selectedCategoryId = value;
-                    });
-                  },
-                );
+                final pendingAmount = double.tryParse(value);
+                if (pendingAmount == null) {
+                  return 'Monto inválido';
+                }
+                if (pendingAmount < 0) {
+                  return 'El monto no puede ser negativo';
+                }
+                
+                final totalAmount = double.tryParse(debt.totalAmountController.text);
+                if (totalAmount != null && pendingAmount > totalAmount) {
+                  return 'No puede ser mayor al total';
+                }
+                return null;
               },
+            ),
+            
+            const SizedBox(height: 16),
+            
+            /// FECHAS
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _selectStartDate(context, debt),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Fecha de Inicio',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(Icons.calendar_today, size: 16, color: Colors.red),
+                              const SizedBox(width: 8),
+                              Text(
+                                '${debt.startDate.day}/${debt.startDate.month}/${debt.startDate.year}',
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _selectExpirationDate(context, debt),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Fecha de Vencimiento',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(Icons.schedule, size: 16, color: Colors.red),
+                              const SizedBox(width: 8),
+                              Text(
+                                '${debt.expirationDate.day}/${debt.expirationDate.month}/${debt.expirationDate.year}',
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -364,7 +420,10 @@ class _CreateMultipleDebtsWidgetState extends State<CreateMultipleDebtsWidget> {
   }
 
   Future<void> _createDebts() async {
+    print('🔄 CreateMultipleDebtsWidget: Starting validation...');
+    
     if (!_formKey.currentState!.validate()) {
+      print('❌ CreateMultipleDebtsWidget: Form validation failed');
       return;
     }
 
@@ -373,25 +432,43 @@ class _CreateMultipleDebtsWidgetState extends State<CreateMultipleDebtsWidget> {
     });
 
     try {
-      final debtController = Provider.of<DebtController>(context, listen: false);
+      print('📌 CreateMultipleDebtsWidget: Creating ${_debts.length} debts...');
       final List<NewDebtDTO> debtDTOs = [];
 
-      for (final debt in _debts) {
-        final amount = Decimal.parse(debt.amountController.text.trim());
+      for (int i = 0; i < _debts.length; i++) {
+        final debt = _debts[i];
+        final totalAmountText = debt.totalAmountController.text.trim();
+        final pendingAmountText = debt.pendingAmountController.text.trim();
+        
+        print('   Processing debt ${i + 1}: "${debt.nameController.text.trim()}"');
+        print('   Total: "$totalAmountText", Pending: "$pendingAmountText"');
+        
+        if (totalAmountText.isEmpty || pendingAmountText.isEmpty) {
+          throw Exception('Debt ${i + 1}: Los campos de monto no pueden estar vacíos');
+        }
+        
+        final totalAmount = Decimal.tryParse(totalAmountText);
+        final pendingAmount = Decimal.tryParse(pendingAmountText);
+        
+        if (totalAmount == null || pendingAmount == null) {
+          throw Exception('Debt ${i + 1}: Los montos deben ser números válidos');
+        }
         
         final dto = NewDebtDTO(
-          transactionId: 1, // TODO: Obtener el ID de transacción real
           name: debt.nameController.text.trim(),
-          totalAmount: amount,
-          pendingAmount: amount, // Inicialmente, todo el monto está pendiente
+          totalAmount: totalAmount,
+          pendingAmount: pendingAmount,
           startDate: debt.startDate,
           expirationDate: debt.expirationDate,
           state: StateDebt.ACTIVE,
         );
         debtDTOs.add(dto);
+        print('   DTO created for debt ${i + 1}');
       }
 
-      await debtController.addMultipleDebts(debtDTOs);
+      print('✅ CreateMultipleDebtsWidget: All DTOs created, calling controller...');
+      await widget.controller.addMultipleDebts(debtDTOs);
+      print('✅ CreateMultipleDebtsWidget: Controller call completed successfully');
 
       if (mounted) {
         Navigator.pop(context, true);
@@ -403,6 +480,7 @@ class _CreateMultipleDebtsWidgetState extends State<CreateMultipleDebtsWidget> {
         );
       }
     } catch (e) {
+      print('❌ CreateMultipleDebtsWidget: Error creating debts: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -417,19 +495,81 @@ class _CreateMultipleDebtsWidgetState extends State<CreateMultipleDebtsWidget> {
       });
     }
   }
+
+  Future<void> _selectStartDate(BuildContext context, DebtFormData debt) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: debt.startDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: Colors.red,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        debt.startDate = picked;
+        // Si la fecha de vencimiento es anterior a la de inicio, ajustarla
+        if (debt.expirationDate.isBefore(picked)) {
+          debt.expirationDate = picked.add(const Duration(days: 30));
+        }
+      });
+    }
+  }
+
+  Future<void> _selectExpirationDate(BuildContext context, DebtFormData debt) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: debt.expirationDate,
+      firstDate: debt.startDate,
+      lastDate: DateTime.now().add(const Duration(days: 3650)), // 10 años
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: Colors.red,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        debt.expirationDate = picked;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    print('🧹 CreateMultipleDebtsWidget: Disposing ${_debts.length} debts...');
+    for (final debt in _debts) {
+      debt.dispose();
+    }
+    super.dispose();
+  }
 }
 
 class DebtFormData {
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController amountController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
-  int? selectedCategoryId;
+  final TextEditingController totalAmountController = TextEditingController();
+  final TextEditingController pendingAmountController = TextEditingController();
   DateTime startDate = DateTime.now();
-  DateTime expirationDate = DateTime.now().add(Duration(days: 30));
+  DateTime expirationDate = DateTime.now().add(const Duration(days: 30));
 
   void dispose() {
     nameController.dispose();
-    amountController.dispose();
-    descriptionController.dispose();
+    totalAmountController.dispose();
+    pendingAmountController.dispose();
   }
 }

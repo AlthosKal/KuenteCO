@@ -11,6 +11,10 @@ class ChatDTO {
     required this.prompt,
   });
 
+  bool needsConversationId() {
+    return conversationId == null || conversationId!.trim().isEmpty;
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'model': model.name,

@@ -57,10 +57,6 @@ class TransactionHeaderWidget extends StatelessWidget {
                         text: 'Mis Transacciones',
                       ),
                       Tab(
-                        icon: Icon(Icons.account_balance_wallet, size: 20),
-                        text: 'Deudas',
-                      ),
-                      Tab(
                         icon: Icon(Icons.bar_chart, size: 20),
                         text: 'Estadísticas',
                       ),
