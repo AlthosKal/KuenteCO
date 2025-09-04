@@ -231,3 +231,46 @@ GROUP BY
     p.username
 ORDER BY
     total_enrollments DESC;
+
+-- Vista de deudas con información de enrollments
+CREATE OR REPLACE VIEW vw_debt_enrollments AS
+SELECT
+    ARRAY_AGG(de.id) AS debt_enrollment_ids,
+    d.id_user AS owner_user_id,
+    d.name AS debt_name,
+    p.username AS profile_name,
+    COUNT(DISTINCT de.id) AS total_enrollments,
+    d.total_amount,
+    d.pending_amount,
+    d.start_date,
+    d.expiration_date,
+    d.state AS debt_state,
+    MIN(de.enrollment_date) AS first_enrollment_date,
+    MAX(de.enrollment_date) AS last_enrollment_date,
+    -- Campos calculados adicionales
+    CASE 
+        WHEN d.pending_amount > 0 AND d.expiration_date < NOW() THEN true
+        ELSE false
+    END AS is_overdue,
+    CASE 
+        WHEN d.total_amount > 0 THEN 
+            ROUND(((d.total_amount - d.pending_amount) / d.total_amount * 100), 2)
+        ELSE 0
+    END AS payment_percentage,
+    EXTRACT(DAYS FROM (d.expiration_date - NOW())) AS days_until_expiration
+FROM
+    debt d
+        INNER JOIN debt_enrollment de ON d.id = de.id_debt
+        LEFT JOIN profile p ON de.id_profile = p.id
+WHERE de.id IS NOT NULL
+GROUP BY
+    d.name,
+    d.id_user,
+    d.total_amount,
+    d.pending_amount,
+    d.start_date,
+    d.expiration_date,
+    d.state,
+    p.username
+ORDER BY
+    total_enrollments DESC, d.expiration_date ASC;
