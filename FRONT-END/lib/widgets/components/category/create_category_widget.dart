@@ -69,8 +69,8 @@ class _CreateCategoryWidgetState extends State<CreateCategoryWidget> {
       // Verificar si hay errores después de la operación
       if (mounted) {
         if (controller.errorMessage == null) {
-          // Éxito - cerrar diálogo y mostrar mensaje
-          Navigator.pop(context);
+          // Éxito - cerrar diálogo devolviendo true para indicar éxito
+          Navigator.pop(context, true);
           _showSnackBar(
             'Categoría creada exitosamente',
             backgroundColor: Colors.green,
@@ -216,7 +216,7 @@ class _CreateCategoryWidgetState extends State<CreateCategoryWidget> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton.icon(
-                      onPressed: _isLoading ? null : () => Navigator.pop(context),
+                      onPressed: _isLoading ? null : () => Navigator.pop(context, false),
                       icon: const Icon(Icons.close_outlined, size: 18),
                       label: const Text('Cancelar'),
                       style: TextButton.styleFrom(

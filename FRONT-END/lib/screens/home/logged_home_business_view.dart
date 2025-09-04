@@ -133,7 +133,7 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                         ),
                       ),
 
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 15),
 
                       /// ✅ FOOTER
                       const FooterLoggedWidget(),

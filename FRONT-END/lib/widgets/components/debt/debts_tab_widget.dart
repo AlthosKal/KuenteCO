@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../controllers/debt_controller.dart';
-import '../../../dto/app/debt/new_debt_dto.dart';
 import '../../../dto/app/debt/debt_dto.dart';
+import '../../../dto/app/debt/new_debt_dto.dart';
 import '../common/detail_modal_widget.dart';
 import '../transaction/multiple_operations_widget.dart';
 import 'create_debt_widget.dart';
@@ -29,28 +29,30 @@ class DebtsTabWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
-          if (userRole == 'ROLE_PROFILE')
+          // Solo mostrar operaciones múltiples para usuarios (NO perfiles)
+          if (userRole != 'ROLE_PROFILE')
             MultipleOperationsWidget(
-              title: 'Operaciones de Deudas',
+              title: 'Operaciones Múltiples de Deudas',
               color: Colors.red,
-              onSingleOperation: () => _showCreateDebtModal(context),
-              singleOperationLabel: 'Nueva Deuda',
               onCreateMultiple: () => _showCreateMultipleDebtsModal(context),
               onEditMultiple: () => _showEditMultipleDebtsModal(context),
               onDeleteMultiple: () => _showDeleteMultipleDebtsModal(context),
             ),
           
           Expanded(
-            child: userRole == 'ROLE_PROFILE'
-                ? _buildProfileDebtsView(context)
-                : _buildBusinessUserDebtsView(context),
+            // Los usuarios normales (NO perfiles) tienen acceso completo a deudas
+            // Los perfiles (ROLE_PROFILE) tienen acceso limitado o nulo
+            child: userRole != 'ROLE_PROFILE'
+                ? _buildUserDebtsView(context)
+                : _buildProfileDebtsView(context),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildProfileDebtsView(BuildContext context) {
+  // Vista para usuarios normales (CON acceso completo a deudas)
+  Widget _buildUserDebtsView(BuildContext context) {
     return DebtListWidget(
       onDebtTap: (debt) => _showDebtActions(context, debt),
       onDebtEdit: (debt) => _editDebt(context, debt),
@@ -58,21 +60,57 @@ class DebtsTabWidget extends StatelessWidget {
       onMarkAsPaid: (debtId) => _markDebtAsPaid(context, debtId),
       onAddDebt: () => _showCreateDebtModal(context),
       showFilters: true,
-      showFab: false,
+      showFab: true,  // ← Habilitado FloatingActionButton como en transacciones
       compact: false,
     );
   }
 
-  Widget _buildBusinessUserDebtsView(BuildContext context) {
-    return DebtListWidget(
-      onDebtTap: (debt) => _showDebtActions(context, debt),
-      onDebtEdit: null,
-      onDebtDelete: null,
-      onMarkAsPaid: null,
-      onAddDebt: null,
-      showFilters: true,
-      showFab: false,
-      compact: false,
+  // Vista para perfiles (SIN acceso a deudas)
+  Widget _buildProfileDebtsView(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.block,
+              size: 80,
+              color: Colors.grey,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Acceso Restringido',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Los perfiles no tienen acceso a la funcionalidad de deudas.',
+              style: TextStyle(
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -215,7 +253,9 @@ class DebtsTabWidget extends StatelessWidget {
   void _showCreateMultipleDebtsModal(BuildContext context) async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => const CreateMultipleDebtsWidget(),
+      builder: (context) => CreateMultipleDebtsWidget(
+        controller: debtController,
+      ),
     );
 
     if (result == true) {

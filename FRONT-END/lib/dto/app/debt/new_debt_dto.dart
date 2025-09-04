@@ -2,7 +2,6 @@ import 'package:decimal/decimal.dart';
 import '../../../utils/enum/state_debt_enum.dart';
 
 class NewDebtDTO {
-  final int transactionId;
   final String name;
   final Decimal totalAmount;
   final Decimal pendingAmount;
@@ -11,7 +10,6 @@ class NewDebtDTO {
   final StateDebt? state;
 
   NewDebtDTO({
-    required this.transactionId,
     required this.name,
     required this.totalAmount,
     required this.pendingAmount,
@@ -22,7 +20,6 @@ class NewDebtDTO {
 
   factory NewDebtDTO.fromJson(Map<String, dynamic> json) {
     return NewDebtDTO(
-      transactionId: json['transactionId'],
       name: json['name'],
       totalAmount: Decimal.parse(json['totalAmount'].toString()),
       pendingAmount: Decimal.parse(json['pendingAmount'].toString()),
@@ -34,7 +31,6 @@ class NewDebtDTO {
 
   Map<String, dynamic> toJson() {
     return {
-      'transactionId': transactionId,
       'name': name,
       'totalAmount': totalAmount.toString(),
       'pendingAmount': pendingAmount.toString(),

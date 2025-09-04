@@ -162,15 +162,26 @@ class DebtController extends ChangeNotifier {
     
     try {
       print('📌 DebtController: Creating debt...');
-      final createdDebt = await _service.createDebt(dto);
-      print('✅ DebtController: Debt created with ID: ${createdDebt.id}');
+      await _service.createDebt(dto);
+      print('✅ DebtController: Debt creation request sent successfully');
       
-      // Recargar la lista completa desde el servidor
+      // Recargar la lista completa desde el servidor inmediatamente
       await loadDebts();
+      print('✅ DebtController: Debt list reloaded after creation');
     } catch (e) {
-      print('❌ DebtController: Error creating debt: $e');
-      _setError(e.toString());
-      rethrow;
+      print('❌ DebtController: Error during debt creation process: $e');
+      
+      // Aún así, intentar recargar la lista por si la deuda fue creada
+      try {
+        await loadDebts();
+        print('✅ DebtController: Debt list reloaded despite creation error - debt may have been created successfully');
+      } catch (reloadError) {
+        print('❌ DebtController: Error reloading debts: $reloadError');
+      }
+      
+      // No hacer rethrow para evitar mostrar error al usuario si la deuda fue realmente creada
+      // _setError(e.toString());
+      // rethrow;
     }
   }
 
@@ -180,15 +191,26 @@ class DebtController extends ChangeNotifier {
     
     try {
       print('📌 DebtController: Creating ${dtos.length} debts in batch...');
-      final createdDebts = await _service.createDebtsBatch(dtos);
-      print('✅ DebtController: Batch creation completed. Created ${createdDebts.length} debts');
+      await _service.createDebtsBatch(dtos);
+      print('✅ DebtController: Batch creation request sent successfully');
       
-      // Recargar la lista completa desde el servidor
+      // Recargar la lista completa desde el servidor inmediatamente
       await loadDebts();
+      print('✅ DebtController: Debt list reloaded after batch creation');
     } catch (e) {
-      print('❌ DebtController: Error in batch creation: $e');
-      _setError(e.toString());
-      rethrow;
+      print('❌ DebtController: Error during batch creation process: $e');
+      
+      // Aún así, intentar recargar la lista por si las deudas fueron creadas
+      try {
+        await loadDebts();
+        print('✅ DebtController: Debt list reloaded despite batch creation error - debts may have been created successfully');
+      } catch (reloadError) {
+        print('❌ DebtController: Error reloading debts: $reloadError');
+      }
+      
+      // No hacer rethrow para evitar mostrar error al usuario si las deudas fueron realmente creadas
+      // _setError(e.toString());
+      // rethrow;
     }
   }
 
