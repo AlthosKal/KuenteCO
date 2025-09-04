@@ -35,9 +35,10 @@ dependencies:
   decimal: ^3.0.2
   url_launcher: ^6.3.0
   
-  # Media
+  # Media & Files
   image_picker: ^1.0.4
   image_picker_web: ^3.0.4
+  file_picker: ^8.0.0+1
 
 dev_dependencies:
   flutter_test:

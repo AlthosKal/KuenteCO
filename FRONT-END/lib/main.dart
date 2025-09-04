@@ -3,6 +3,9 @@ import 'package:KuenteCO/controllers/category_controller.dart';
 import 'package:KuenteCO/controllers/profile_controller.dart';
 import 'package:KuenteCO/controllers/subscription_controller.dart';
 import 'package:KuenteCO/controllers/user_controller.dart';
+import 'package:KuenteCO/controllers/chat_controller.dart';
+import 'package:KuenteCO/controllers/excel_controller.dart';
+import 'package:KuenteCO/controllers/debt_controller.dart';
 import 'package:KuenteCO/core/config/is_autenticated.dart';
 import 'package:KuenteCO/core/services/api_client.dart';
 import 'package:KuenteCO/core/services/app/budget_service.dart';
@@ -10,6 +13,10 @@ import 'package:KuenteCO/core/services/app/category_service.dart';
 import 'package:KuenteCO/core/services/app/profile_service.dart';
 import 'package:KuenteCO/core/services/app/subscription_service.dart';
 import 'package:KuenteCO/core/services/app/user_service.dart';
+import 'package:KuenteCO/core/services/app/excel_service.dart';
+import 'package:KuenteCO/core/services/chat/chat_service.dart';
+import 'package:KuenteCO/core/services/chat/chat_history_service.dart' as history;
+import 'package:KuenteCO/core/services/app/debt_service.dart';
 import 'package:KuenteCO/routes/app_routes.dart';
 import 'package:KuenteCO/routes/route_generator.dart';
 import 'package:flutter/material.dart';
@@ -63,6 +70,18 @@ List<SingleChildWidget> _createProviders() {
     ),
     Provider<ProfileController>(
       create: (_) => ProfileController(profileService: ProfileService()),
+    ),
+    ChangeNotifierProvider<ChatController>(
+      create: (_) => ChatController(
+        ChatService(),
+        history.ChatService(),
+      ),
+    ),
+    ChangeNotifierProvider<ExcelController>(
+      create: (_) => ExcelController(ExcelService(apiClient)),
+    ),
+    ChangeNotifierProvider<DebtController>(
+      create: (_) => DebtController(DebtService(apiClient)),
     ),
   ];
 }
