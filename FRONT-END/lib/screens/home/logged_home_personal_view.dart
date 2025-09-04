@@ -8,6 +8,7 @@ import '../../widgets/common/navbar/navbar_logged_widget.dart';
 import '../../widgets/components/budget/budget_card_widget.dart';
 import '../../widgets/components/category/category_card_widget.dart';
 import '../../widgets/components/transaction/transaction_card_widget.dart';
+import '../../widgets/components/report/report_card.dart';
 
 class LoggedHomePersonalView extends StatelessWidget {
   final String userName;
@@ -109,17 +110,7 @@ class LoggedHomePersonalView extends StatelessWidget {
                                 showActions: false,
                               );
                             case 3:
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: _buildCardItem(
-                                  icon: Icons.settings_outlined,
-                                  title: "Configuración",
-                                  onTap: () {},
-                                ),
-                              );
+                              return const ReportCard();
                             default:
                               return Container();
                           }
