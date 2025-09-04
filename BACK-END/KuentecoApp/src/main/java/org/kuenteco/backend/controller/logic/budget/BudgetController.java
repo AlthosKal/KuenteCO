@@ -55,7 +55,7 @@ public class BudgetController implements BudgetResource {
     }
 
     @GetMapping("/enroll/user")
-    public ResponseEntity<?> getBusinessUserCategoryEnrollments(
+    public ResponseEntity<?> getBusinessUserBudgetEnrollments(
             HttpServletRequest request,
             @RequestParam(required = false) String from,
             @RequestParam(required = false) String to,

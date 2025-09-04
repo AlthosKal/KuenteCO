@@ -391,7 +391,7 @@ public interface BudgetResource {
                         name = "Bearer Authentication")
             })
     @GetMapping("/enroll/user")
-    ResponseEntity<?> getBusinessUserCategoryEnrollments(
+    ResponseEntity<?> getBusinessUserBudgetEnrollments(
             @Parameter(hidden = true) HttpServletRequest request,
             @RequestParam(required = false) String from,
             @RequestParam(required = false) String to,
