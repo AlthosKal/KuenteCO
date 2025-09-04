@@ -38,7 +38,7 @@ dependencies:
   # Media & Files
   image_picker: ^1.0.4
   image_picker_web: ^3.0.4
-  file_picker: ^8.0.0+1
+  file_selector: ^1.0.3
 
 dev_dependencies:
   flutter_test:

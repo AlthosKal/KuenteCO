@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../controllers/transaction_controller.dart';
+import '../../../controllers/transactions/transaction_controller.dart';
 import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 import '../../../utils/enum/transaction_type_enum.dart';
 
