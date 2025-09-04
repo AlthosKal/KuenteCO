@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../controllers/income_controller.dart';
+import '../../../../controllers/transactions/income_controller.dart';
 import '../../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 import '../../../../utils/formatters.dart';
 import '../transaction_card_widget.dart';

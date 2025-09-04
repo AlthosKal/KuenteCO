@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../core/services/app/income_service.dart';
-import '../dto/app/transaction/kuenteco/new_transaction_dto.dart';
-import '../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
-import '../dto/app/transaction/kuenteco/transaction_summary_dto.dart';
-import '../dto/app/transaction/kuenteco/update_transaction_dto.dart';
+import '../../core/services/app/income_service.dart';
+import '../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
+import '../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
+import '../../dto/app/transaction/kuenteco/transaction_summary_dto.dart';
+import '../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
 
 class IncomeController extends ChangeNotifier {
   final IncomeService _service;

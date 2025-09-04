@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../controllers/category_controller.dart';
 import '../../controllers/debt_controller.dart';
-import '../../controllers/transaction_controller.dart';
+import '../../controllers/transactions/transaction_controller.dart';
 import '../../core/services/api_client.dart';
 import '../../core/services/app/category_service.dart';
 import '../../core/services/app/debt_service.dart';
