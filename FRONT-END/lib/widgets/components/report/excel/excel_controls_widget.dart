@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import '../../../../controllers/excel_controller.dart';
 
 class ExcelControlsWidget extends StatelessWidget {
@@ -354,15 +354,17 @@ class ExcelControlsWidget extends StatelessWidget {
 
   Future<void> _handleImport(BuildContext context) async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['xlsx', 'xls'],
-        allowMultiple: false,
-        dialogTitle: 'Seleccionar archivo Excel para importar',
+      const XTypeGroup typeGroup = XTypeGroup(
+        label: 'Excel files',
+        extensions: <String>['xlsx', 'xls'],
+      );
+      
+      final XFile? result = await openFile(
+        acceptedTypeGroups: <XTypeGroup>[typeGroup],
       );
 
-      if (result != null && result.files.single.path != null) {
-        final file = File(result.files.single.path!);
+      if (result != null) {
+        final file = File(result.path);
         
         // Mostrar diálogo de confirmación
         final confirmed = await _showImportConfirmationDialog(context, file);

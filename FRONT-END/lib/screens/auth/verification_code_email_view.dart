@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../controllers/send_verification_code_controller.dart';
+import '../../controllers/auth/send_verification_code_controller.dart';
 import '../../widgets/common/background/animated_background_scaffold_widget.dart';
 import '../../widgets/common/blurred_card_widget.dart';
 import '../../widgets/common/buttoms/primary_buttom_widget.dart';

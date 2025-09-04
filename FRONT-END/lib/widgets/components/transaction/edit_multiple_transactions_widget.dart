@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../controllers/category_controller.dart';
-import '../../../controllers/transaction_controller.dart';
+import '../../../controllers/transactions/transaction_controller.dart';
 import '../../../dto/app/category/category_enrollment_dto.dart';
 import '../../../dto/app/extra/description_transaction_extra.dart';
 import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../core/services/app/transaction_service.dart';
-import '../dto/app/category/transactions_by_category_dto.dart';
-import '../dto/app/transaction/bancolombia/bancolombia_transaction_request_dto.dart';
-import '../dto/app/transaction/kuenteco/new_transaction_dto.dart';
-import '../dto/app/transaction/kuenteco/profile_with_transactions_dto.dart';
-import '../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
-import '../dto/app/transaction/kuenteco/transaction_summary_dto.dart';
-import '../dto/app/transaction/kuenteco/update_transaction_dto.dart';
-import '../dto/app/transaction/kuenteco/user_profiles_with_transactions_dto.dart';
+import '../../core/services/app/transaction_service.dart';
+import '../../dto/app/category/transactions_by_category_dto.dart';
+import '../../dto/app/transaction/bancolombia/bancolombia_transaction_request_dto.dart';
+import '../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
+import '../../dto/app/transaction/kuenteco/profile_with_transactions_dto.dart';
+import '../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
+import '../../dto/app/transaction/kuenteco/transaction_summary_dto.dart';
+import '../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
+import '../../dto/app/transaction/kuenteco/user_profiles_with_transactions_dto.dart';
 
 class TransactionController extends ChangeNotifier {
   final TransactionService _service;
