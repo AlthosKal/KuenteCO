@@ -1,4 +1,4 @@
-package org.kuenteco.backend.dto.logic.budget;
+package org.kuenteco.backend.dto.logic.debt;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BudgetEnrollmentDTO {
+public class DebtEnrollmentDTO {
     @NotBlank private String userEmail;
     @NotBlank private String profileEmail;
-    private Integer budgetId;
-    @NotBlank private String budgetName;
+    private Integer debtId;
+    @NotBlank private String debtName;
 }

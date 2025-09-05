@@ -5,11 +5,14 @@ import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.kuenteco.backend.dto.logic.debt.BatchEnrollmentRequestDTO;
 import org.kuenteco.backend.dto.logic.debt.DebtDTO;
+import org.kuenteco.backend.dto.logic.debt.DebtEnrollmentDTO;
 import org.kuenteco.backend.dto.logic.debt.DebtPaymentDTO;
 import org.kuenteco.backend.dto.logic.debt.NewDebtDTO;
 import org.kuenteco.backend.enums.StateDebt;
 import org.kuenteco.backend.exception.ApiResponse;
+import org.kuenteco.backend.service.logic.debt.DebtEnrollmentService;
 import org.kuenteco.backend.service.logic.debt.DebtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class DebtController implements DebtResource {
 
     private DebtService debtService;
+    private DebtEnrollmentService debtEnrollmentService;
 
     @GetMapping
     public ResponseEntity<?> getAllDebts(
@@ -31,6 +35,34 @@ public class DebtController implements DebtResource {
         Object debts = debtService.getDebts();
         return new ResponseEntity<>(
                 ApiResponse.ok("Deudas obtenidas correctamente", debts, request.getRequestURI()),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/enroll")
+    public ResponseEntity<?> getAllDebtEnrollments(
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
+        Object result = debtEnrollmentService.getAllDebtEnrollments();
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Presupuestos obtenidos correctamente", result, request.getRequestURI()),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/enroll/user")
+    public ResponseEntity<?> getBusinessUserDebtEnrollments(
+            HttpServletRequest request,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String kind) {
+        Object result = debtEnrollmentService.getBusinessUserDebtEnrollments();
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Resumen de transacciones por presupuesto obtenido correctamente",
+                        result,
+                        request.getRequestURI()),
                 HttpStatus.OK);
     }
 
@@ -145,6 +177,33 @@ public class DebtController implements DebtResource {
                 HttpStatus.OK);
     }
 
+    @PostMapping("/enroll/add")
+    public ResponseEntity<?> enrollProfileToDebt(
+            @RequestParam Integer profileId,
+            @RequestParam Integer debtId,
+            HttpServletRequest request) {
+        DebtEnrollmentDTO dto = debtEnrollmentService.enrollProfileToDebt(profileId, debtId);
+        return new ResponseEntity<>(
+                ApiResponse.ok("Presupuesto asignado correctamente", dto, request.getRequestURI()),
+                HttpStatus.CREATED);
+    }
+
+    @PostMapping("/enroll/add/batch")
+    public ResponseEntity<?> enrollProfileToDebts(
+            @RequestBody List<BatchEnrollmentRequestDTO> dto, HttpServletRequest request) {
+        List<DebtEnrollmentDTO> results =
+                dto.stream()
+                        .map(
+                                e ->
+                                        debtEnrollmentService.enrollProfileToDebt(
+                                                e.profileId(), e.debtId()))
+                        .toList();
+        return new ResponseEntity<>(
+                ApiResponse.ok(
+                        "Presupuesto asignado correctamente", results, request.getRequestURI()),
+                HttpStatus.CREATED);
+    }
+
     @PostMapping("/payment")
     public ResponseEntity<?> makePayment(
             @Valid @RequestBody DebtPaymentDTO dto, HttpServletRequest request) {
@@ -183,6 +242,24 @@ public class DebtController implements DebtResource {
                         String.format("%d deudas eliminadas correctamente", id.size()),
                         null,
                         request.getRequestURI()),
+                HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/enroll/{id}")
+    public ResponseEntity<?> removeDebtEnrollment(
+            @PathVariable Integer id, HttpServletRequest request) {
+        debtEnrollmentService.removeDebtEnrollment(id);
+        return new ResponseEntity<>(
+                ApiResponse.ok("Asignación eliminada correctamente", null, request.getRequestURI()),
+                HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/enroll/batch")
+    public ResponseEntity<?> removeBudgetEnrollments(
+            @RequestParam List<Integer> id, HttpServletRequest request) {
+        id.forEach(debtEnrollmentService::removeDebtEnrollment);
+        return new ResponseEntity<>(
+                ApiResponse.ok("Asignación eliminada correctamente", null, request.getRequestURI()),
                 HttpStatus.NO_CONTENT);
     }
 }
