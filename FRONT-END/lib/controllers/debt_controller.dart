@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/services/app/debt_service.dart';
 import '../dto/app/debt/new_debt_dto.dart';
 import '../dto/app/debt/debt_dto.dart';
+import '../dto/app/debt/debt_enrollment_dto.dart';
 import '../dto/app/debt/debt_payment_dto.dart';
 import '../dto/app/debt/debt_summary_dto.dart';
 import '../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
@@ -15,6 +16,7 @@ class DebtController extends ChangeNotifier {
   String? errorMessage;
 
   List<DebtDTO> debts = [];
+  List<DebtEnrollmentDTO> enrollments = [];
   DebtSummaryDTO? debtSummary;
   DebtDTO? currentDebt;
   
@@ -51,9 +53,23 @@ class DebtController extends ChangeNotifier {
   Future<void> loadDebts({String? from, String? to, String? kind}) async {
     _setLoading(true);
     try {
-      print('🔄 DebtController: Loading all debts from server...');
-      debts = await _service.getAllDebts(from: from, to: to, kind: kind);
-      print('✅ DebtController: Loaded ${debts.length} debts from server');
+      print('🔄 DebtController: Loading debts from server...');
+      
+      // Try to get all debts first (for USER role)
+      try {
+        debts = await _service.getAllDebts(from: from, to: to, kind: kind);
+        print('✅ DebtController: Loaded ${debts.length} debts from server (USER role)');
+      } catch (e) {
+        // If fails due to role restrictions, try assigned debts (for PROFILE role)
+        if (e.toString().contains('solo disponible para usuarios') || 
+            e.toString().contains('400')) {
+          print('📌 DebtController: Switching to assigned debts for PROFILE role');
+          debts = await _service.getAssignedDebts(from: from, to: to, kind: kind);
+          print('✅ DebtController: Loaded ${debts.length} assigned debts from enrollments (PROFILE role)');
+        } else {
+          rethrow;
+        }
+      }
       
       // Log de todas las deudas para debug
       for (int i = 0; i < debts.length; i++) {
@@ -555,5 +571,164 @@ class DebtController extends ChangeNotifier {
   // 📌 Eliminar múltiples deudas
   Future<void> deleteMultipleDebts(List<int> ids) async {
     await deleteDebtsBatch(ids);
+  }
+
+  // ============= DEBT ENROLLMENT METHODS =============
+
+  // 📌 Cargar enrollments de deudas
+  Future<void> loadEnrollments({String? from, String? to, String? kind}) async {
+    print('🔄 DebtController: Loading debt enrollments...');
+    _setLoading(true);
+    try {
+      // Use getEnrollmentsByUser for USER role (business accounts)
+      enrollments = await _service.getEnrollmentsByUser(from: from, to: to, kind: kind);
+      print('✅ DebtController: Loaded ${enrollments.length} debt enrollments');
+      _setError(null);
+    } catch (e) {
+      print('❌ DebtController: Error loading debt enrollments: $e');
+      // Si es un error de "no hay datos" o lista vacía, no es realmente un error
+      if (e.toString().toLowerCase().contains('empty') ||
+          e.toString().toLowerCase().contains('no data') ||
+          e.toString().toLowerCase().contains('not found') ||
+          e.toString().contains('404')) {
+        print('📝 DebtController: No debt enrollments found for profile - this is normal');
+        enrollments = []; // Asegurar lista vacía
+        _setError(null); // No mostrar como error
+      } else {
+        _setError('Error al cargar asignaciones de deudas: $e');
+      }
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // 📌 Cargar enrollments por usuario (para cuentas de negocio)
+  Future<void> loadEnrollmentsByUser({String? from, String? to, String? kind}) async {
+    print('🔄 DebtController: Loading debt enrollments by user...');
+    _setLoading(true);
+    try {
+      enrollments = await _service.getEnrollmentsByUser(from: from, to: to, kind: kind);
+      print('✅ DebtController: Loaded ${enrollments.length} user debt enrollments');
+      _setError(null);
+    } catch (e) {
+      print('❌ DebtController: Error loading user debt enrollments: $e');
+      if (e.toString().toLowerCase().contains('empty') ||
+          e.toString().toLowerCase().contains('no data') ||
+          e.toString().toLowerCase().contains('not found') ||
+          e.toString().contains('404')) {
+        print('📝 DebtController: No user debt enrollments found - this is normal');
+        enrollments = [];
+        _setError(null);
+      } else {
+        _setError('Error al cargar asignaciones de deudas de usuario: $e');
+      }
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // 📌 Asignar deuda a perfil
+  Future<void> enrollProfileToDebt(int profileId, int debtId) async {
+    print('🔄 DebtController: Enrolling profile $profileId to debt $debtId...');
+    _setError(null);
+    try {
+      final enrollment = await _service.enrollProfileToDebt(profileId, debtId);
+      print('✅ DebtController: Profile enrolled to debt successfully: ${enrollment.debtName}');
+      
+      // Agregar enrollment a la lista local
+      enrollments.add(enrollment);
+      
+      // Solo notificar cambios sin recargar desde servidor (ya está en local)
+      notifyListeners();
+    } catch (e) {
+      print('❌ DebtController: Error enrolling profile to debt: $e');
+      _setError('Error al asignar deuda al perfil: $e');
+      rethrow;
+    }
+  }
+
+  // 📌 Asignar múltiples deudas a perfil (batch)
+  Future<void> enrollProfileToDebtsBatch(List<Map<String, int>> enrollmentData) async {
+    print('🔄 DebtController: Batch enrolling profile to ${enrollmentData.length} debts...');
+    _setError(null);
+    try {
+      final newEnrollments = await _service.enrollProfileToDebtsBatch(enrollmentData);
+      print('✅ DebtController: Batch enrollment completed. Added ${newEnrollments.length} debt enrollments');
+      
+      // Agregar nuevos enrollments a la lista local
+      enrollments.addAll(newEnrollments);
+      
+      // Solo notificar cambios sin recargar desde servidor (ya está en local)
+      notifyListeners();
+    } catch (e) {
+      print('❌ DebtController: Error in batch debt enrollment: $e');
+      _setError('Error al asignar deudas al perfil: $e');
+      rethrow;
+    }
+  }
+
+  // 📌 Remover enrollment de deuda
+  Future<void> removeDebtEnrollment(int id) async {
+    print('🔄 DebtController: Removing debt enrollment ID: $id...');
+    _setError(null);
+    try {
+      await _service.removeDebtEnrollment(id);
+      print('✅ DebtController: Debt enrollment removed successfully');
+      
+      // Remove enrollment from local list using enrollment ID
+      enrollments.removeWhere((enrollment) => enrollment.enrollmentId == id);
+      
+      // Solo notificar cambios sin recargar desde servidor (ya se eliminó de local)
+      notifyListeners();
+    } catch (e) {
+      print('❌ DebtController: Error removing debt enrollment: $e');
+      _setError('Error al remover asignación de deuda: $e');
+      rethrow;
+    }
+  }
+
+  // 📌 Remover múltiples enrollments de deudas (batch)
+  Future<void> removeDebtEnrollmentsBatch(List<int> ids) async {
+    print('🔄 DebtController: Removing ${ids.length} debt enrollments in batch...');
+    _setError(null);
+    try {
+      await _service.removeDebtEnrollmentsBatch(ids);
+      print('✅ DebtController: Batch removal completed. Removed ${ids.length} debt enrollments');
+      
+      // Remove enrollments from local list using enrollment IDs
+      enrollments.removeWhere((enrollment) => ids.contains(enrollment.enrollmentId));
+      print('DebtController: Removed ${ids.length} enrollments from local list');
+      
+      // Solo notificar cambios sin recargar desde servidor (ya se eliminaron de local)
+      notifyListeners();
+    } catch (e) {
+      print('❌ DebtController: Error in batch debt enrollment removal: $e');
+      _setError('Error al remover asignaciones de deudas: $e');
+      rethrow;
+    }
+  }
+
+  // 📌 Limpiar enrollments
+  void clearEnrollments() {
+    enrollments.clear();
+    notifyListeners();
+  }
+
+  // 📌 Obtener enrollment por deuda ID
+  DebtEnrollmentDTO? getEnrollmentByDebtId(int debtId) {
+    try {
+      return enrollments.firstWhere((enrollment) => enrollment.debtId == debtId);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // 📌 Verificar si hay enrollments cargados
+  bool get hasEnrollments => enrollments.isNotEmpty;
+
+  // 📌 Obtener enrollments por nombre de deuda
+  List<DebtEnrollmentDTO> getEnrollmentsByDebtName(String debtName) {
+    return enrollments.where((enrollment) => 
+        enrollment.debtName.toLowerCase().contains(debtName.toLowerCase())).toList();
   }
 }

@@ -4,6 +4,7 @@ class TransactionDetailDTO {
   final int id;
   final int? categoryId;
   final int? budgetId;
+  final int? debtId;
   final String name;
   final double amount;
   final DateTime? transactionDate;
@@ -15,6 +16,7 @@ class TransactionDetailDTO {
     required this.id,
     this.categoryId,
     this.budgetId,
+    this.debtId,
     required this.name,
     required this.amount,
     this.transactionDate,
@@ -45,6 +47,7 @@ class TransactionDetailDTO {
       id: json['id'] ?? 0,
       categoryId: json['categoryId'],
       budgetId: json['budgetId'],
+      debtId: json['debtId'],
       name: json['name'] ?? '',
       amount: json['amount'] != null ? (json['amount'] as num).toDouble() : 0.0,
       transactionDate: timestampValue,
@@ -59,6 +62,7 @@ class TransactionDetailDTO {
       'id': id,
       'categoryId': categoryId,
       'budgetId': budgetId,
+      'debtId': debtId,
       'name': name,
       'amount': amount,
       'descriptionExtra': descriptionExtra?.toJson(),

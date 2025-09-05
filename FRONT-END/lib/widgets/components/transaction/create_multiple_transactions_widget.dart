@@ -3,8 +3,12 @@ import 'package:provider/provider.dart';
 import 'package:decimal/decimal.dart';
 
 import '../../../controllers/category_controller.dart';
+import '../../../controllers/budget_controller.dart';
+import '../../../controllers/debt_controller.dart';
 import '../../../controllers/transactions/transaction_controller.dart';
 import '../../../dto/app/category/category_enrollment_dto.dart';
+import '../../../dto/app/budget/budget_enrollment_dto.dart';
+import '../../../dto/app/debt/debt_dto.dart';
 import '../../../dto/app/extra/description_transaction_extra.dart';
 import '../../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
 import '../../../utils/enum/transaction_type_enum.dart';
@@ -16,6 +20,8 @@ class TransactionFormData {
   final TextEditingController amountController = TextEditingController();
   TransactionType type = TransactionType.EXPENSE;
   CategoryEnrollmentDTO? selectedEnrollment;
+  BudgetEnrollmentDTO? selectedBudget;
+  DebtDTO? selectedDebt;
   
   void dispose() {
     nameController.dispose();
@@ -63,7 +69,8 @@ class TransactionFormData {
         type: type,
       ),
       categoryId: selectedEnrollment?.categoryId,
-      budgetId: null, // Explicitly set to null as in individual widget
+      budgetId: selectedBudget?.budgetId, // Use selected budget
+      debtId: selectedDebt?.id, // Use selected debt
     );
   }
 }
@@ -100,6 +107,8 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadCategories();
+      _loadBudgets();
+      _loadDebts();
     });
   }
 
@@ -114,6 +123,20 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
   Future<void> _loadCategories() async {
     final categoryController = Provider.of<CategoryController>(context, listen: false);
     await categoryController.loadEnrollments();
+  }
+  
+  Future<void> _loadBudgets() async {
+    final budgetController = Provider.of<BudgetController>(context, listen: false);
+    if (budgetController.enrollments.isEmpty) {
+      await budgetController.loadEnrollments();
+    }
+  }
+  
+  Future<void> _loadDebts() async {
+    final debtController = Provider.of<DebtController>(context, listen: false);
+    if (debtController.debts.isEmpty) {
+      await debtController.loadDebts();
+    }
   }
 
   void _addTransaction() {
@@ -419,6 +442,80 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
                   onChanged: _isLoading ? null : (value) {
                     setState(() {
                       transaction.selectedEnrollment = value;
+                    });
+                  },
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+            
+            // Presupuesto
+            Consumer<BudgetController>(
+              builder: (context, budgetController, child) {
+                if (budgetController.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                return DropdownButtonFormField<BudgetEnrollmentDTO>(
+                  value: transaction.selectedBudget,
+                  decoration: const InputDecoration(
+                    labelText: 'Presupuesto (opcional)',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.account_balance_wallet),
+                    isDense: true,
+                  ),
+                  items: [
+                    const DropdownMenuItem(
+                      value: null,
+                      child: Text('Sin presupuesto'),
+                    ),
+                    ...budgetController.enrollments.map((budget) {
+                      return DropdownMenuItem(
+                        value: budget,
+                        child: Text(budget.budgetName),
+                      );
+                    }).toList(),
+                  ],
+                  onChanged: _isLoading ? null : (value) {
+                    setState(() {
+                      transaction.selectedBudget = value;
+                    });
+                  },
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+            
+            // Deuda
+            Consumer<DebtController>(
+              builder: (context, debtController, child) {
+                if (debtController.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                return DropdownButtonFormField<DebtDTO>(
+                  value: transaction.selectedDebt,
+                  decoration: const InputDecoration(
+                    labelText: 'Deuda (opcional)',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.credit_card),
+                    isDense: true,
+                  ),
+                  items: [
+                    const DropdownMenuItem(
+                      value: null,
+                      child: Text('Sin deuda'),
+                    ),
+                    ...debtController.debts.map((debt) {
+                      return DropdownMenuItem(
+                        value: debt,
+                        child: Text(debt.name),
+                      );
+                    }).toList(),
+                  ],
+                  onChanged: _isLoading ? null : (value) {
+                    setState(() {
+                      transaction.selectedDebt = value;
                     });
                   },
                 );

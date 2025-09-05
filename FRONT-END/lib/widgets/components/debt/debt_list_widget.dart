@@ -10,6 +10,7 @@ class DebtListWidget extends StatefulWidget {
   final Function(DebtDTO)? onDebtEdit;
   final Function(DebtDTO)? onDebtDelete;
   final Function(int)? onMarkAsPaid;
+  final Function(DebtDTO)? onDebtAssign;
   final bool showFilters;
   final bool showFab;
   final VoidCallback? onAddDebt;
@@ -21,6 +22,7 @@ class DebtListWidget extends StatefulWidget {
     this.onDebtEdit,
     this.onDebtDelete,
     this.onMarkAsPaid,
+    this.onDebtAssign,
     this.showFilters = true,
     this.showFab = true,
     this.onAddDebt,
@@ -294,7 +296,7 @@ class _DebtListWidgetState extends State<DebtListWidget> {
                 fontSize: 16,
               ),
             ),
-            if (widget.onDebtEdit != null || widget.onDebtDelete != null || widget.onMarkAsPaid != null)
+            if (widget.onDebtEdit != null || widget.onDebtDelete != null || widget.onMarkAsPaid != null || widget.onDebtAssign != null)
               PopupMenuButton(
                 icon: Icon(Icons.more_vert, size: 20, color: Colors.grey[600]),
                 itemBuilder: (context) => [
@@ -320,6 +322,17 @@ class _DebtListWidgetState extends State<DebtListWidget> {
                         ],
                       ),
                     ),
+                  if (widget.onDebtAssign != null)
+                    PopupMenuItem(
+                      value: 'assign',
+                      child: Row(
+                        children: [
+                          Icon(Icons.person_add, size: 18, color: Colors.orange[600]),
+                          const SizedBox(width: 12),
+                          const Text('Asignar al perfil'),
+                        ],
+                      ),
+                    ),
                   if (widget.onDebtDelete != null)
                     PopupMenuItem(
                       value: 'delete',
@@ -339,6 +352,9 @@ class _DebtListWidgetState extends State<DebtListWidget> {
                       break;
                     case 'pay':
                       widget.onMarkAsPaid?.call(debt.id);
+                      break;
+                    case 'assign':
+                      widget.onDebtAssign?.call(debt);
                       break;
                     case 'delete':
                       widget.onDebtDelete?.call(debt);

@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../controllers/category_controller.dart';
+import '../../../controllers/budget_controller.dart';
+import '../../../controllers/debt_controller.dart';
 import '../../../controllers/transactions/transaction_controller.dart';
 import '../../../dto/app/category/category_enrollment_dto.dart';
+import '../../../dto/app/budget/budget_enrollment_dto.dart';
+import '../../../dto/app/debt/debt_dto.dart';
 import '../../../dto/app/extra/description_transaction_extra.dart';
 import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 import '../../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
@@ -52,6 +56,8 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
           type: TransactionType.EXPENSE,
         ),
         categoryId: transaction.categoryId,
+        budgetId: transaction.budgetId,
+        debtId: transaction.debtId,
       );
     }).toList();
     
@@ -175,6 +181,8 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
                                   amount: editableTransactions[index].amount,
                                   description: editableTransactions[index].description,
                                   categoryId: editableTransactions[index].categoryId,
+                                  budgetId: editableTransactions[index].budgetId,
+                                  debtId: editableTransactions[index].debtId,
                                 );
                               },
                             ),
@@ -214,6 +222,8 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
                                   amount: amount,
                                   description: editableTransactions[index].description,
                                   categoryId: editableTransactions[index].categoryId,
+                                  budgetId: editableTransactions[index].budgetId,
+                                  debtId: editableTransactions[index].debtId,
                                 );
                               },
                             ),
@@ -241,6 +251,8 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
                                     type: editableTransactions[index].description.type,
                                   ),
                                   categoryId: editableTransactions[index].categoryId,
+                                  budgetId: editableTransactions[index].budgetId,
+                                  debtId: editableTransactions[index].debtId,
                                 );
                               },
                             ),
@@ -275,6 +287,8 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
                                         type: newValue,
                                       ),
                                       categoryId: editableTransactions[index].categoryId,
+                                      budgetId: editableTransactions[index].budgetId,
+                                      debtId: editableTransactions[index].debtId,
                                     );
                                   });
                                 }
@@ -318,6 +332,8 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
                                           amount: editableTransactions[index].amount,
                                           description: editableTransactions[index].description,
                                           categoryId: newValue.categoryId,
+                                          budgetId: editableTransactions[index].budgetId,
+                                          debtId: editableTransactions[index].debtId,
                                         );
                                       });
                                     }
