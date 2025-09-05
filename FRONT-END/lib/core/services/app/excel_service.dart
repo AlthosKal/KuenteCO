@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../../dto/app/excel/debt_excel_export_dto.dart';
 import '../../../dto/app/excel/debt_excel_import_dto.dart';
 import '../../../dto/app/excel/debt_excel_validation_result_dto.dart';
@@ -136,12 +138,25 @@ class ExcelService {
   }
 
   /// Descargar archivo Excel al dispositivo
-  Future<String> downloadExcelFile(List<int> bytes, String filename) async {
+  Future<String> downloadExcelFile(Uint8List bytes, String filename) async {
     print('🔄 ExcelService: Descargando archivo: $filename');
     
     try {
-      // En plataformas móviles, guardar en documentos del usuario
-      final directory = Directory('/storage/emulated/0/Download'); // Android
+      // Obtener directorio de descargas usando path_provider
+      Directory directory;
+      
+      if (Platform.isAndroid) {
+        // En Android, intentar usar el directorio de descargas público
+        directory = Directory('/storage/emulated/0/Download');
+        if (!await directory.exists()) {
+          // Si no existe, usar el directorio de la aplicación
+          directory = await getApplicationDocumentsDirectory();
+        }
+      } else {
+        // En otras plataformas, usar el directorio de descargas del usuario
+        directory = await getDownloadsDirectory() ?? await getApplicationDocumentsDirectory();
+      }
+      
       if (!await directory.exists()) {
         await directory.create(recursive: true);
       }

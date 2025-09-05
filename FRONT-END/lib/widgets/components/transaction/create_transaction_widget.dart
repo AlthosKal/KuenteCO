@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../controllers/category_controller.dart';
-import '../../../controllers/budget_controller.dart';
-import '../../../controllers/debt_controller.dart';
+import '../../../controllers/business_logic/category_controller.dart';
+import '../../../controllers/business_logic/budget_controller.dart';
+import '../../../controllers/business_logic/debt_controller.dart';
 import '../../../dto/app/category/category_enrollment_dto.dart';
 import '../../../dto/app/budget/budget_enrollment_dto.dart';
 import '../../../dto/app/debt/debt_dto.dart';

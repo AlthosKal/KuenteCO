@@ -3,7 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:provider/provider.dart';
 
-import '../../../controllers/budget_controller.dart';
+import '../../../controllers/business_logic/budget_controller.dart';
 import '../../../routes/app_routes.dart';
 
 class BudgetCardWidget extends StatefulWidget {

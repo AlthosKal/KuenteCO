@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../controllers/category_controller.dart';
+import '../../../controllers/business_logic/category_controller.dart';
 import 'batch_assign_category_widget.dart';
 
 class EnrollmentManagementWidget extends StatelessWidget {

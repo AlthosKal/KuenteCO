@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../controllers/category_controller.dart';
+import '../../../controllers/business_logic/category_controller.dart';
 import '../../../dto/app/category/category_dto.dart';
 
 class DeleteMultipleCategoriesWidget extends StatefulWidget {
