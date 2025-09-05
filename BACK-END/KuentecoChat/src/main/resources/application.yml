@@ -3,6 +3,9 @@ jwt:
   secret: ${JWT_SECRET}
   expiration: 86400
 
+front-end:
+  web-url: ${WEB_URL}
+  mobile-url: ${MOBILE_URL}
 # Configuración Spring
 spring:
   application:

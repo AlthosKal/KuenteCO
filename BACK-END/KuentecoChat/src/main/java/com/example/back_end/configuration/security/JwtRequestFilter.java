@@ -14,12 +14,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
@@ -27,7 +31,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Value("${jwt.secret}")
     private String secret;
-
     @Override
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -42,7 +45,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
-                // ✅ CORRECCIÓN: Usar la misma lógica que AiProfileApp
+                // ✅ CORRECCIÓN: Usar la misma lógica que KuentecoApp
                 SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 
                 Claims claims =
@@ -52,7 +55,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                                 .parseClaimsJws(jwt)
                                 .getBody();
 
-                // ✅ CORRECCIÓN: Extraer email del subject (como lo hace AiProfileApp)
+                // ✅ CORRECCIÓN: Extraer email del subject (como lo hace KuentecoApp)
                 String email = claims.getSubject();
 
                 // ✅ CORRECCIÓN: Validar que el email no sea null
