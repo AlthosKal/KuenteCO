@@ -27,6 +27,10 @@ public class KuentecoChatApplication {
 
         // Secret de Jwt
         System.setProperty("JWT_SECRET", dotenv.get("JWT_SECRET"));
+
+
+        System.setProperty("WEB_URL", dotenv.get("WEB_URL"));
+        System.setProperty("MOBILE_URL", dotenv.get("MOBILE_URL"));
         SpringApplication.run(KuentecoChatApplication.class, args);
     }
 }
