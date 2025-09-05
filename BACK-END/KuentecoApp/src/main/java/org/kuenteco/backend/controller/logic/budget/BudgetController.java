@@ -161,7 +161,7 @@ public class BudgetController implements BudgetResource {
                         .toList();
         return new ResponseEntity<>(
                 ApiResponse.ok(
-                        "Presupuesto asignado correctamente", results, request.getRequestURI()),
+                        "Presupuestos asignados correctamente", results, request.getRequestURI()),
                 HttpStatus.CREATED);
     }
 
@@ -200,7 +200,8 @@ public class BudgetController implements BudgetResource {
             @RequestParam List<Integer> id, HttpServletRequest request) {
         id.forEach(budgetEnrollmentService::removeBudgetEnrollment);
         return new ResponseEntity<>(
-                ApiResponse.ok("Asignación eliminada correctamente", null, request.getRequestURI()),
+                ApiResponse.ok(
+                        "Asignaciónes eliminadas correctamente", null, request.getRequestURI()),
                 HttpStatus.NO_CONTENT);
     }
 }

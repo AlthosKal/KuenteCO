@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 public interface TransactionDetailMapper {
     @Mapping(target = "categoryId", source = "category.id")
     @Mapping(target = "budgetId", source = "budget.id")
+    @Mapping(target = "debtId", source = "debt.id")
     TransactionDetailDTO toDto(Transaction transaction);
 
     List<TransactionDetailDTO> toDtoList(List<Transaction> transactions);
