@@ -1,7 +1,16 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import '../core/services/app/excel_service.dart';
 import '../dto/app/excel/debt_excel_validation_result_dto.dart';
+import 'dart:typed_data';
+
+// Import condicional para descarga de archivos
+import 'excel_download_stub.dart'
+    if (dart.library.html) 'excel_download_web.dart'
+    if (dart.library.io) 'excel_download_mobile.dart' as download;
 
 class ExcelController extends ChangeNotifier {
   final ExcelService _excelService;
@@ -77,12 +86,17 @@ class ExcelController extends ChangeNotifier {
   }
 
   /// Importar datos financieros desde archivo Excel
-  Future<void> importData(File file) async {
+  Future<void> importData(dynamic file) async {
     print('🔄 ExcelController: Iniciando importación...');
     _setLoading(true);
     
     try {
-      // Primero validar el archivo
+      if (kIsWeb) {
+        _setError('La importación de archivos no está disponible en la versión web. Por favor, usa la aplicación móvil o desktop.');
+        return;
+      }
+      
+      // Primero validar el archivo (solo en móvil/desktop)
       _validationResult = await _excelService.validateExcelFile(file);
       
       if (!_validationResult!.isValid) {
@@ -98,7 +112,8 @@ class ExcelController extends ChangeNotifier {
       // Proceder con la importación
       await _excelService.importData(file);
       
-      _setSuccess('Datos importados exitosamente desde ${file.path.split('/').last}');
+      final fileName = file.path?.split('/').last ?? 'archivo';
+      _setSuccess('Datos importados exitosamente desde $fileName');
       print('✅ ExcelController: Importación completada');
     } catch (e) {
       print('❌ ExcelController: Error en importación: $e');
@@ -109,11 +124,16 @@ class ExcelController extends ChangeNotifier {
   }
 
   /// Validar archivo Excel sin importar
-  Future<bool> validateFile(File file) async {
+  Future<bool> validateFile(dynamic file) async {
     print('🔄 ExcelController: Validando archivo...');
     _setLoading(true);
     
     try {
+      if (kIsWeb) {
+        _setError('La validación de archivos no está disponible en la versión web. Por favor, usa la aplicación móvil o desktop.');
+        return false;
+      }
+      
       _validationResult = await _excelService.validateExcelFile(file);
       
       if (_validationResult!.isValid) {
@@ -134,7 +154,34 @@ class ExcelController extends ChangeNotifier {
     }
   }
 
-  /// Descargar plantilla Excel vacía
+  /// Descargar plantilla Excel desde assets
+  Future<void> downloadTemplateFromAssets() async {
+    print('🔄 ExcelController: Descargando plantilla desde assets...');
+    _setLoading(true);
+    
+    try {
+      // Cargar el archivo desde assets
+      final byteData = await rootBundle.load('assets/templates/Finanzas.xlsx');
+      final bytes = byteData.buffer.asUint8List();
+      
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final filename = 'plantilla_finanzas_$timestamp.xlsx';
+      
+      // Usar la función de descarga específica de la plataforma
+      final result = await download.downloadFile(bytes, filename);
+      
+      _lastDownloadedFile = result ?? filename;
+      _setSuccess('Plantilla descargada: $filename');
+      print('✅ ExcelController: Plantilla descargada: $filename');
+    } catch (e) {
+      print('❌ ExcelController: Error descargando plantilla: $e');
+      _setError('Error al descargar plantilla: ${e.toString()}');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Descargar plantilla Excel vacía (método original - desde servidor)
   Future<void> downloadTemplate() async {
     print('🔄 ExcelController: Descargando plantilla...');
     _setLoading(true);
@@ -232,7 +279,7 @@ class ExcelController extends ChangeNotifier {
   }
 
   /// Alias para importData (para compatibilidad con ReportView)
-  Future<void> importFromExcel(File file) async {
+  Future<void> importFromExcel(dynamic file) async {
     await importData(file);
   }
 

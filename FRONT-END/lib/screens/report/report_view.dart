@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/chat_controller.dart';
 import '../../controllers/excel_controller.dart';
-import '../../controllers/debt_controller.dart';
+import '../../controllers/business_logic/debt_controller.dart';
 import '../../widgets/components/report/chat/ai_analysis_controls_widget.dart';
 import '../../widgets/components/report/chat/debt_analysis_results_widget.dart';
 import '../../widgets/components/report/excel/excel_controls_widget.dart';
@@ -513,7 +513,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
 
   Future<void> _downloadTemplate(BuildContext context, ExcelController excelController) async {
     try {
-      await excelController.downloadTemplate();
+      await excelController.downloadTemplateFromAssets();
       _showSuccessMessage(context, 'Plantilla descargada exitosamente');
     } catch (e) {
       _showErrorMessage(context, 'Error descargando plantilla: $e');

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:decimal/decimal.dart';
-import '../../../controllers/debt_controller.dart';
+import '../../../controllers/business_logic/debt_controller.dart';
 import '../../../dto/app/debt/new_debt_dto.dart';
 import '../../../utils/enum/state_debt_enum.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../controllers/register_controller.dart';
+import '../../controllers/auth/register_controller.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/enum/user_type_enum.dart';
 import '../../widgets/common/background/animated_background_scaffold_widget.dart';
