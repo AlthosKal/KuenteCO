@@ -4,7 +4,7 @@ entity "Usuario del Sistema" as User {
 id
 email
 password
-account_state
+state
 type
 username
 version
@@ -30,8 +30,8 @@ name
 
 entity "Imagen" as Image {
 id
-id_image
-url_image
+image_id
+image_url
 name
 }
 
@@ -90,6 +90,14 @@ enrollment_date
 id_user
 id_profile
 id_category
+}
+
+entity "Inscripción Deuda" as DebtEnrollment {
+id
+enrollment_date
+id_user
+id_profile
+id_debt
 }
 
 entity "Notificación" as Notification {
@@ -152,6 +160,26 @@ date_created
 date_approved
 date_last_updated
 id_preapproval
+}
+
+entity "Token Bancolombia" as BancolombiaToken {
+id
+access_token
+token_type
+expires_in
+scope
+refresh_token
+created_at
+expires_at
+is_active
+}
+
+entity "Tasa de Cambio" as ExchangeRate {
+id
+base_currency
+target_currency
+rate
+last_updated
 }
 
 relationship Tiene_Rol {
@@ -240,6 +268,15 @@ Inscrito -N- CategoryEnrollment
 
 Category -1- Inscrito
 Inscrito -N- CategoryEnrollment
+
+User -1- Inscrito
+Inscrito -N- DebtEnrollment
+
+Profile -1- Inscrito
+Inscrito -N- DebtEnrollment
+
+Debt -1- Inscrito
+Inscrito -N- DebtEnrollment
 
 User -1- Recibe
 Recibe -N- Notification
