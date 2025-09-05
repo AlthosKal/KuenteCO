@@ -11,7 +11,7 @@ entity "Usuario del Sistema" as KuentecoUser {
   --
   * email : string <<UNIQUE>>
   * password : string
-  * account_state : enum
+  * state : enum
   * type : enum  
   * username : string <<UNIQUE>>
   * version : integer
@@ -35,8 +35,8 @@ entity "Rol" as Role {
 entity "Imagen" as Image {
   * **id** : integer <<PK>>
   --
-  * id_image : string
-  * url_image : string
+  * image_id : string
+  * image_url : string
   * name : string
 }
 
@@ -55,27 +55,27 @@ entity "Presupuesto" as Budget {
 entity "Categoría" as Category {
   * **id** : integer <<PK>>
   --
-  * description : json
+  * description : jsonb
   * name : string
-  * register_date : timestamp
+  * register_date : LocalDateTime
 }
 
 entity "Transacción" as Transaction {
   * **id** : integer <<PK>>
   --
   * amount : decimal
-  * description : json
+  * description : jsonb
   * name : string
-  * transaction_date : timestamp
+  * transaction_date : LocalDateTime
 }
 
 entity "Deuda" as Debt {
   * **id** : integer <<PK>>
   --
-  * expiration_date : timestamp
+  * expiration_date : LocalDateTime
   * name : string
   * pending_amount : decimal
-  * start_date : timestamp
+  * start_date : LocalDateTime
   * state : enum
   * total_amount : decimal
 }
@@ -87,13 +87,19 @@ entity "Deuda" as Debt {
 entity "Inscripción a Presupuesto" as BudgetEnrollment {
   * **id** : integer <<PK>>
   --
-  * enrollment_date : timestamp
+  * enrollment_date : LocalDateTime
 }
 
 entity "Inscripción a Categoría" as CategoryEnrollment {
   * **id** : integer <<PK>>
   --
-  * enrollment_date : timestamp
+  * enrollment_date : LocalDateTime
+}
+
+entity "Inscripción a Deuda" as DebtEnrollment {
+  * **id** : integer <<PK>>
+  --
+  * enrollment_date : LocalDateTime
 }
 
 ' ===============================
@@ -103,8 +109,8 @@ entity "Inscripción a Categoría" as CategoryEnrollment {
 entity "Notificación" as Notification {
   * **id** : integer <<PK>>
   --
-  * content : json
-  * date_send : timestamp
+  * content : jsonb
+  * date_send : LocalDateTime
   * title : string
 }
 
@@ -142,11 +148,11 @@ entity "Pre-aprobación MercadoPago" as MercadoPagoPreapproval {
   * back_url : string
   * card_brand : string
   * card_last_four_digits : string
-  * date_created : timestamp
+  * date_created : LocalDateTime
   * external_reference : string
   * init_point : string
-  * last_modified : timestamp
-  * next_payment_date : timestamp
+  * last_modified : LocalDateTime
+  * next_payment_date : LocalDateTime
   * payer_email : string
   * payment_method_id : string
   * preapproval_id : string <<UNIQUE>>
@@ -159,9 +165,9 @@ entity "Pago MercadoPago" as MercadoPagoPayment {
   --
   * authorization_code : string
   * currency_id : string
-  * date_approved : timestamp
-  * date_created : timestamp
-  * date_last_updated : timestamp
+  * date_approved : LocalDateTime
+  * date_created : LocalDateTime
+  * date_last_updated : LocalDateTime
   * description : string
   * external_reference : string
   * payment_id : string <<UNIQUE>>
@@ -175,13 +181,13 @@ entity "Pago MercadoPago" as MercadoPagoPayment {
 entity "Suscripción" as Subscription {
   * **id** : integer <<PK>>
   --
-  * created_at : timestamp
-  * expiration_date : timestamp
+  * created_at : LocalDateTime
+  * expiration_date : LocalDateTime
   * is_auto_renewable : boolean
-  * start_date : timestamp
+  * start_date : LocalDateTime
   * state : enum
   * type : enum
-  * updated_at : timestamp
+  * updated_at : LocalDateTime
 }
 
 ' ===============================
@@ -192,8 +198,8 @@ entity "Token Bancolombia" as BancolombiaToken {
   * **id** : bigint <<PK>>
   --
   * access_token : text
-  * created_at : timestamp
-  * expires_at : timestamp
+  * created_at : LocalDateTime
+  * expires_at : LocalDateTime
   * expires_in : bigint
   * is_active : boolean
   * refresh_token : text
@@ -244,10 +250,13 @@ Profile ||--o{ Transaction : "ejecuta"
 ' Relaciones de Inscripción
 Budget ||--o{ BudgetEnrollment : "inscripciones"
 Category ||--o{ CategoryEnrollment : "inscripciones"
+Debt ||--o{ DebtEnrollment : "inscripciones"
 Profile ||--o{ BudgetEnrollment : "inscrito en"
 Profile ||--o{ CategoryEnrollment : "inscrito en"
+Profile ||--o{ DebtEnrollment : "inscrito en"
 KuentecoUser ||--o{ BudgetEnrollment : "gestiona"
 KuentecoUser ||--o{ CategoryEnrollment : "gestiona"
+KuentecoUser ||--o{ DebtEnrollment : "gestiona"
 
 ' Relaciones de Notificaciones
 KuentecoUser ||--o{ Notification : "recibe"
