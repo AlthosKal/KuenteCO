@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../controllers/category_controller.dart';
+import '../../../controllers/business_logic/category_controller.dart';
 import '../../../dto/app/category/category_dto.dart';
 
 class DeleteCategoryWidget extends StatefulWidget {

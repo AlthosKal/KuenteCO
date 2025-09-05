@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../core/exceptions/global_exception_handler.dart';
-import '../core/services/app/auth_service.dart';
-import '../dto/app/auth/request/new_user_dto.dart';
-import '../provider/toast_helper.dart';
-import '../routes/app_routes.dart';
-import '../utils/enum/user_type_enum.dart';
+import '../../core/exceptions/global_exception_handler.dart';
+import '../../core/services/app/auth_service.dart';
+import '../../dto/app/auth/request/new_user_dto.dart';
+import '../../provider/toast_helper.dart';
+import '../../routes/app_routes.dart';
+import '../../utils/enum/user_type_enum.dart';
 
 class RegisterController {
   final AuthService _authService;

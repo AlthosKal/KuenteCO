@@ -1,11 +1,11 @@
-import 'package:KuenteCO/controllers/budget_controller.dart';
-import 'package:KuenteCO/controllers/category_controller.dart';
+import 'package:KuenteCO/controllers/business_logic/budget_controller.dart';
+import 'package:KuenteCO/controllers/business_logic/category_controller.dart';
 import 'package:KuenteCO/controllers/profile_controller.dart';
 import 'package:KuenteCO/controllers/subscription_controller.dart';
 import 'package:KuenteCO/controllers/user_controller.dart';
 import 'package:KuenteCO/controllers/chat_controller.dart';
 import 'package:KuenteCO/controllers/excel_controller.dart';
-import 'package:KuenteCO/controllers/debt_controller.dart';
+import 'package:KuenteCO/controllers/business_logic/debt_controller.dart';
 import 'package:KuenteCO/core/config/is_autenticated.dart';
 import 'package:KuenteCO/core/services/api_client.dart';
 import 'package:KuenteCO/core/services/app/budget_service.dart';

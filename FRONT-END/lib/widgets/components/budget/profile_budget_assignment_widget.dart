@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../controllers/budget_controller.dart';
+import '../../../controllers/business_logic/budget_controller.dart';
 import '../../../controllers/profile_controller.dart';
 import '../../../dto/app/budget/budget_dto.dart';
 import '../../../dto/app/profile/profile_detail_dto.dart';

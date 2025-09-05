@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:decimal/decimal.dart';
-import '../../../controllers/debt_controller.dart';
+import '../../../controllers/business_logic/debt_controller.dart';
 import '../../../dto/app/debt/debt_dto.dart';
 
 class EditMultipleDebtsWidget extends StatefulWidget {

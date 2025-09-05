@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 
-import '../../controllers/category_controller.dart';
-import '../../controllers/debt_controller.dart';
+import '../../controllers/business_logic/category_controller.dart';
+import '../../controllers/business_logic/debt_controller.dart';
 import '../../controllers/transactions/transaction_controller.dart';
 import '../../core/services/api_client.dart';
 import '../../core/services/app/category_service.dart';
