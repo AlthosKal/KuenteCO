@@ -15,7 +15,7 @@ services:
 
 # API KUENTECO-APP DEL BACKEND DE LA APLICACION
   kuenteco-app:
-    image: yefff/image-backend-kuenteco-app:1.0.4
+    image: yefff/image-backend-kuenteco-app:1.0.5
     container_name: KuentecoApp
     ports:
       - "8080:8080"
