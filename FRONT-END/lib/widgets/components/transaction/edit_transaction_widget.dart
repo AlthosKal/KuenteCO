@@ -3,8 +3,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 
 import '../../../controllers/category_controller.dart';
+import '../../../controllers/budget_controller.dart';
+import '../../../controllers/debt_controller.dart';
 import '../../../dto/app/category/category_dto.dart';
 import '../../../dto/app/category/category_enrollment_dto.dart';
+import '../../../dto/app/budget/budget_enrollment_dto.dart';
+import '../../../dto/app/debt/debt_dto.dart';
 import '../../../dto/app/extra/description_category_extra.dart';
 import '../../../dto/app/extra/description_transaction_extra.dart';
 import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
@@ -38,6 +42,8 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
   
   CategoryDTO? _selectedCategory;
   CategoryEnrollmentDTO? _selectedEnrollment;
+  BudgetEnrollmentDTO? _selectedBudget;
+  DebtDTO? _selectedDebt;
   DateTime _selectedDate = DateTime.now();
   String? _userRole;
   TransactionType _selectedType = TransactionType.EXPENSE;
@@ -103,6 +109,8 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final categoryController = Provider.of<CategoryController>(context, listen: false);
+      final budgetController = Provider.of<BudgetController>(context, listen: false);
+      final debtController = Provider.of<DebtController>(context, listen: false);
       
       if (_userRole == 'ROLE_PROFILE') {
         // For profiles, always try to load enrollments to ensure fresh data
@@ -112,6 +120,21 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
           // Even if loading fails, try to find match with existing data
           _findMatchingEnrollment();
         });
+        
+        // Load budget enrollments for profiles
+        budgetController.loadEnrollments().then((_) {
+          _findMatchingBudget();
+        }).catchError((error) {
+          print('Error loading budget enrollments: $error');
+        });
+        
+        // Load debts for profiles
+        debtController.loadDebts().then((_) {
+          _findMatchingDebt();
+        }).catchError((error) {
+          print('Error loading debts: $error');
+        });
+        
       } else {
         // For business users, load categories if empty
         if (categoryController.categories.isEmpty) {
@@ -121,6 +144,20 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
         } else {
           _findMatchingCategory();
         }
+        
+        // Load budget enrollments for business users too
+        budgetController.loadEnrollments().then((_) {
+          _findMatchingBudget();
+        }).catchError((error) {
+          print('Error loading budget enrollments: $error');
+        });
+        
+        // Load debts for business users too
+        debtController.loadDebts().then((_) {
+          _findMatchingDebt();
+        }).catchError((error) {
+          print('Error loading debts: $error');
+        });
       }
     });
   }
@@ -163,6 +200,46 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
     
     // If no match or categoryId is null, default to "Sin categoría"
     _selectedEnrollment = _noCategoryOption;
+    setState(() {});
+  }
+  
+  void _findMatchingBudget() {
+    final budgetController = Provider.of<BudgetController>(context, listen: false);
+    
+    if (widget.transaction.budgetId != null && budgetController.enrollments.isNotEmpty) {
+      try {
+        _selectedBudget = budgetController.enrollments.firstWhere(
+          (enrollment) => enrollment.budgetId == widget.transaction.budgetId,
+        );
+        setState(() {});
+        return;
+      } catch (e) {
+        print('No matching budget enrollment found for ID: ${widget.transaction.budgetId}');
+      }
+    }
+    
+    // If no match or budgetId is null, leave as null (no budget selected)
+    _selectedBudget = null;
+    setState(() {});
+  }
+  
+  void _findMatchingDebt() {
+    final debtController = Provider.of<DebtController>(context, listen: false);
+    
+    if (widget.transaction.debtId != null && debtController.debts.isNotEmpty) {
+      try {
+        _selectedDebt = debtController.debts.firstWhere(
+          (debt) => debt.id == widget.transaction.debtId,
+        );
+        setState(() {});
+        return;
+      } catch (e) {
+        print('No matching debt found for ID: ${widget.transaction.debtId}');
+      }
+    }
+    
+    // If no match or debtId is null, leave as null (no debt selected)
+    _selectedDebt = null;
     setState(() {});
   }
 
@@ -526,6 +603,120 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                     ),
                     const SizedBox(height: 20),
 
+                    /// PRESUPUESTO
+                    _buildInputLabel('Presupuesto (opcional)'),
+                    const SizedBox(height: 8),
+                    Consumer<BudgetController>(
+                      builder: (context, budgetController, child) {
+                        if (budgetController.isLoading) {
+                          return Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.grey.withValues(alpha: 0.05),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.account_balance_wallet, color: Colors.grey),
+                                SizedBox(width: 12),
+                                SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                                SizedBox(width: 12),
+                                Text('Cargando presupuestos...'),
+                              ],
+                            ),
+                          );
+                        }
+
+                        return DropdownButtonFormField<BudgetEnrollmentDTO>(
+                          value: _selectedBudget,
+                          decoration: _buildInputDecoration(
+                            hint: 'Selecciona un presupuesto (opcional)',
+                            icon: Icons.account_balance_wallet,
+                          ),
+                          items: [
+                            const DropdownMenuItem(
+                              value: null,
+                              child: Text('Sin presupuesto'),
+                            ),
+                            ...budgetController.enrollments.map((budget) {
+                              return DropdownMenuItem(
+                                value: budget,
+                                child: Text(budget.budgetName),
+                              );
+                            }).toList(),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedBudget = value;
+                            });
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
+
+                    /// DEUDA
+                    _buildInputLabel('Deuda (opcional)'),
+                    const SizedBox(height: 8),
+                    Consumer<DebtController>(
+                      builder: (context, debtController, child) {
+                        if (debtController.isLoading) {
+                          return Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.grey.withValues(alpha: 0.05),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.credit_card, color: Colors.grey),
+                                SizedBox(width: 12),
+                                SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                                SizedBox(width: 12),
+                                Text('Cargando deudas...'),
+                              ],
+                            ),
+                          );
+                        }
+
+                        return DropdownButtonFormField<DebtDTO>(
+                          value: _selectedDebt,
+                          decoration: _buildInputDecoration(
+                            hint: 'Selecciona una deuda (opcional)',
+                            icon: Icons.credit_card,
+                          ),
+                          items: [
+                            const DropdownMenuItem(
+                              value: null,
+                              child: Text('Sin deuda'),
+                            ),
+                            ...debtController.debts.map((debt) {
+                              return DropdownMenuItem(
+                                value: debt,
+                                child: Text(debt.name),
+                              );
+                            }).toList(),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedDebt = value;
+                            });
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
+
                     /// BOTONES
                     Row(
                       children: [
@@ -679,6 +870,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
         amount: double.parse(_amountController.text),
         categoryId: categoryId,
         budgetId: budgetId,
+        debtId: _selectedDebt?.id ?? widget.transaction.debtId, // Use selected debt or keep current
       );
 
       widget.onUpdateTransaction(updateTransaction);

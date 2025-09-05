@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../controllers/category_controller.dart';
+import '../../../controllers/budget_controller.dart';
+import '../../../controllers/debt_controller.dart';
 import '../../../dto/app/category/category_enrollment_dto.dart';
+import '../../../dto/app/budget/budget_enrollment_dto.dart';
+import '../../../dto/app/debt/debt_dto.dart';
 import '../../../dto/app/extra/description_transaction_extra.dart';
 import '../../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
 import '../../../utils/enum/transaction_type_enum.dart';
@@ -29,6 +33,8 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
   final _dateController = TextEditingController();
   
   CategoryEnrollmentDTO? _selectedEnrollment;
+  BudgetEnrollmentDTO? _selectedBudget;
+  DebtDTO? _selectedDebt;
   DateTime _selectedDate = DateTime.now();
   TransactionType _selectedType = TransactionType.EXPENSE; // Default to Egreso
   
@@ -51,11 +57,19 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
     // Set "Sin categoría" as default selection
     _selectedEnrollment = _noCategoryOption;
     
-    // Load profile enrollments (assigned categories) when widget initializes
+    // Load profile enrollments (assigned categories, budgets, debts) when widget initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final categoryController = Provider.of<CategoryController>(context, listen: false);
-      if (categoryController.enrollments.isEmpty) {
-        categoryController.loadProfileEnrollments();
+      categoryController.loadProfileEnrollments(); // Always reload categories
+      
+      final budgetController = Provider.of<BudgetController>(context, listen: false);
+      if (budgetController.enrollments.isEmpty) {
+        budgetController.loadEnrollments();
+      }
+      
+      final debtController = Provider.of<DebtController>(context, listen: false);
+      if (debtController.debts.isEmpty) {
+        debtController.loadDebts();
       }
     });
   }
@@ -326,23 +340,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                           );
                         }
 
-                        if (categoryController.enrollments.isEmpty) {
-                          return Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
-                              borderRadius: BorderRadius.circular(12),
-                              color: Colors.grey.withValues(alpha: 0.05),
-                            ),
-                            child: const Row(
-                              children: [
-                                Icon(Icons.bookmarks, color: Colors.purpleAccent),
-                                SizedBox(width: 12),
-                                Text('No hay categorias disponibles'),
-                              ],
-                            ),
-                          );
-                        }
+                        // Always show dropdown even if no enrollments - user can select "Sin categoría"
 
                         return DropdownButtonFormField<CategoryEnrollmentDTO>(
                           value: _selectedEnrollment,
@@ -368,6 +366,116 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                             setState(() => _selectedEnrollment = value);
                           },
                           // Category is now optional - no validation needed
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
+
+                    /// PRESUPUESTO (OPCIONAL)
+                    _buildInputLabel('Presupuesto (opcional)'),
+                    const SizedBox(height: 8),
+                    Consumer<BudgetController>(
+                      builder: (context, budgetController, child) {
+                        if (budgetController.isLoading) {
+                          return Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.grey.withValues(alpha: 0.05),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.account_balance_wallet, color: Colors.blue),
+                                SizedBox(width: 12),
+                                SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                                SizedBox(width: 12),
+                                Text('Cargando presupuestos...'),
+                              ],
+                            ),
+                          );
+                        }
+
+                        return DropdownButtonFormField<BudgetEnrollmentDTO>(
+                          value: _selectedBudget,
+                          decoration: _buildInputDecoration(
+                            hint: 'Selecciona un presupuesto (opcional)',
+                            icon: Icons.account_balance_wallet,
+                          ),
+                          items: [
+                            const DropdownMenuItem(
+                              value: null,
+                              child: Text('Sin presupuesto'),
+                            ),
+                            ...budgetController.enrollments.map((budget) {
+                              return DropdownMenuItem(
+                                value: budget,
+                                child: Text(budget.budgetName),
+                              );
+                            }).toList(),
+                          ],
+                          onChanged: (value) {
+                            setState(() => _selectedBudget = value);
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
+
+                    /// DEUDA (OPCIONAL)
+                    _buildInputLabel('Deuda (opcional)'),
+                    const SizedBox(height: 8),
+                    Consumer<DebtController>(
+                      builder: (context, debtController, child) {
+                        if (debtController.isLoading) {
+                          return Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.grey.withValues(alpha: 0.05),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.credit_card, color: Colors.orange),
+                                SizedBox(width: 12),
+                                SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                                SizedBox(width: 12),
+                                Text('Cargando deudas...'),
+                              ],
+                            ),
+                          );
+                        }
+
+                        return DropdownButtonFormField<DebtDTO>(
+                          value: _selectedDebt,
+                          decoration: _buildInputDecoration(
+                            hint: 'Selecciona una deuda (opcional)',
+                            icon: Icons.credit_card,
+                          ),
+                          items: [
+                            const DropdownMenuItem(
+                              value: null,
+                              child: Text('Sin deuda'),
+                            ),
+                            ...debtController.debts.map((debt) {
+                              return DropdownMenuItem(
+                                value: debt,
+                                child: Text(debt.name),
+                              );
+                            }).toList(),
+                          ],
+                          onChanged: (value) {
+                            setState(() => _selectedDebt = value);
+                          },
                         );
                       },
                     ),
@@ -488,7 +596,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
 
   void _submitForm() {
     if (_formKey.currentState?.validate() ?? false) {
-      // Category is now optional - no need to validate
+      // Category, budget, and debt are all optional
       final newTransaction = NewTransactionDTO(
         name: _nameController.text,
         description: DescriptionTransaction(
@@ -497,7 +605,8 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
         ),
         amount: double.parse(_amountController.text),
         categoryId: _selectedEnrollment?.categoryId, // Can be null - category is optional
-        budgetId: null, // Can be null - budget is optional
+        budgetId: _selectedBudget?.budgetId, // Can be null - budget is optional
+        debtId: _selectedDebt?.id, // Can be null - debt is optional
       );
 
       widget.onCreateTransaction(newTransaction);

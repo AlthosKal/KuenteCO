@@ -1,5 +1,7 @@
+import 'package:decimal/decimal.dart';
 import '../../../dto/app/debt/new_debt_dto.dart';
 import '../../../dto/app/debt/debt_dto.dart';
+import '../../../dto/app/debt/debt_enrollment_dto.dart';
 import '../../../dto/app/debt/debt_payment_dto.dart';
 import '../../../dto/app/debt/debt_summary_dto.dart';
 import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
@@ -287,6 +289,155 @@ class DebtService {
     // Note: ApiClient doesn't support query params in DELETE, need to adapt
     await _apiClient.deleteApp(
       '$_baseEndpoint/batch?id=${ids.join(',')}',
+    );
+  }
+
+  // ============= DEBT ENROLLMENT METHODS =============
+  
+  // ✅ Get all debt enrollments  
+  Future<List<DebtEnrollmentDTO>> getEnrollments({
+    String? from,
+    String? to,
+    String? kind,
+  }) async {
+    print('📌 DebtService: Getting all debt enrollments');
+    
+    final queryParams = <String, String>{};
+    if (from != null) queryParams['from'] = from;
+    if (to != null) queryParams['to'] = to;
+    if (kind != null) queryParams['kind'] = kind;
+
+    final response = await _apiClient.getApp(
+      '$_baseEndpoint/enroll',
+      queryParameters: queryParams.isNotEmpty ? queryParams : null,
+    );
+
+    if (response.data != null && response.data['data'] is List) {
+      return (response.data['data'] as List)
+          .map((json) => DebtEnrollmentDTO.fromJson(json))
+          .toList();
+    }
+    return [];
+  }
+  
+  // ✅ Get assigned debts for profile (from enrollments) - for creating transactions
+  Future<List<DebtDTO>> getAssignedDebts({
+    String? from,
+    String? to,
+    String? kind,
+  }) async {
+    print('📌 DebtService: Getting assigned debts for profile');
+    
+    try {
+      // Get enrollments which contain debt information
+      final enrollments = await getEnrollments(from: from, to: to, kind: kind);
+      
+      // Convert enrollments to DebtDTO objects with available information
+      return enrollments.where((enrollment) => enrollment.debtId != null)
+          .map((enrollment) => DebtDTO(
+            id: enrollment.debtId!,
+            name: enrollment.debtName,
+            totalAmount: Decimal.fromInt(0), // Not available from enrollment
+            pendingAmount: Decimal.fromInt(0), // Not available from enrollment
+            startDate: DateTime.now(), // Default
+            expirationDate: DateTime.now().add(Duration(days: 30)), // Default expiration
+            state: StateDebt.ACTIVE, // Assume active
+          )).toList();
+    } catch (e) {
+      print('❌ DebtService: Error getting assigned debts: $e');
+      return [];
+    }
+  }
+
+  // ✅ Get debt enrollments by user (for business accounts)
+  Future<List<DebtEnrollmentDTO>> getEnrollmentsByUser({
+    String? from,
+    String? to,
+    String? kind,
+  }) async {
+    print('📌 DebtService: Getting debt enrollments by user');
+    
+    final queryParams = <String, String>{};
+    if (from != null) queryParams['from'] = from;
+    if (to != null) queryParams['to'] = to;
+    if (kind != null) queryParams['kind'] = kind;
+
+    final response = await _apiClient.getApp(
+      '$_baseEndpoint/enroll/user',
+      queryParameters: queryParams.isNotEmpty ? queryParams : null,
+    );
+
+    if (response.data != null && response.data['data'] is List) {
+      return (response.data['data'] as List)
+          .map((json) => DebtEnrollmentDTO.fromJson(json))
+          .toList();
+    }
+    return [];
+  }
+
+  // ✅ Enroll profile to debt
+  Future<DebtEnrollmentDTO> enrollProfileToDebt(int profileId, int debtId) async {
+    print('📌 DebtService: Enrolling profile $profileId to debt $debtId');
+    print('📌 DebtService: Endpoint: $_baseEndpoint/enroll/add?profileId=$profileId&debtId=$debtId');
+    
+    try {
+      final response = await _apiClient.postApp(
+        '$_baseEndpoint/enroll/add?profileId=$profileId&debtId=$debtId',
+        null, // No body needed since parameters are in query string
+      );
+
+      if (response.data != null && response.data['data'] != null) {
+        return DebtEnrollmentDTO.fromJson(response.data['data']);
+      }
+      throw Exception('Error: No data returned from server');
+    } catch (e) {
+      print('❌ DebtService: Detailed error enrolling profile to debt: $e');
+      
+      // Try to extract more specific error information
+      if (e.toString().contains('404')) {
+        throw Exception('Error: Perfil o deuda no encontrados (profileId: $profileId, debtId: $debtId)');
+      } else if (e.toString().contains('400')) {
+        throw Exception('Error: Datos inválidos para asignación');
+      } else if (e.toString().contains('409')) {
+        throw Exception('Error: Esta deuda ya está asignada a este perfil');
+      } else if (e.toString().contains('500')) {
+        throw Exception('Error del servidor: Verifica que el perfil y la deuda existan');
+      }
+      
+      rethrow;
+    }
+  }
+
+  // ✅ Enroll profile to multiple debts (batch)
+  Future<List<DebtEnrollmentDTO>> enrollProfileToDebtsBatch(List<Map<String, int>> enrollments) async {
+    print('📌 DebtService: Batch enrolling profile to ${enrollments.length} debts');
+    
+    final response = await _apiClient.postApp(
+      '$_baseEndpoint/enroll/add/batch',
+      enrollments,
+    );
+
+    if (response.data != null && response.data['data'] is List) {
+      return (response.data['data'] as List)
+          .map((json) => DebtEnrollmentDTO.fromJson(json))
+          .toList();
+    }
+    throw Exception('Error batch enrolling profile to debts');
+  }
+
+  // ✅ Remove debt enrollment
+  Future<void> removeDebtEnrollment(int id) async {
+    print('📌 DebtService: Removing debt enrollment ID: $id');
+    
+    await _apiClient.deleteApp('$_baseEndpoint/enroll/$id');
+  }
+
+  // ✅ Remove multiple debt enrollments (batch)
+  Future<void> removeDebtEnrollmentsBatch(List<int> ids) async {
+    print('📌 DebtService: Removing ${ids.length} debt enrollments in batch');
+    
+    await _apiClient.deleteApp(
+      '$_baseEndpoint/enroll/batch?id=${ids.join(',')}',
     );
   }
 

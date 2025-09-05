@@ -2,12 +2,14 @@ class BudgetEnrollmentDTO {
   final int id;
   final String userEmail;
   final String profileEmail;
+  final int? budgetId;
   final String budgetName;
 
   BudgetEnrollmentDTO({
     required this.id,
     required this.userEmail,
     required this.profileEmail,
+    this.budgetId,
     required this.budgetName,
   });
 
@@ -16,12 +18,14 @@ class BudgetEnrollmentDTO {
     final id = _parseId(json['id']);
     final userEmail = json['userEmail'] ?? json['email'] ?? '';
     final profileEmail = json['profileEmail'] ?? json['profileName'] ?? '';
+    final budgetId = json['budgetId'] as int?;
     final budgetName = json['budgetName'] ?? json['budget_name'] ?? '';
                       
     return BudgetEnrollmentDTO(
       id: id,
       userEmail: userEmail,
       profileEmail: profileEmail,
+      budgetId: budgetId,
       budgetName: budgetName,
     );
   }
@@ -42,6 +46,7 @@ class BudgetEnrollmentDTO {
         id: id,
         userEmail: '', // No disponible en la respuesta agrupada
         profileEmail: profileName,
+        budgetId: null, // No disponible en la respuesta agrupada
         budgetName: budgetName,
       );
     }).toList();
@@ -78,6 +83,7 @@ class BudgetEnrollmentDTO {
       'id': id,
       'userEmail': userEmail,
       'profileEmail': profileEmail,
+      'budgetId': budgetId,
       'budgetName': budgetName,
     };
   }
