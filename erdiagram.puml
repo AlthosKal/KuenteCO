@@ -1,0 +1,262 @@
+@startchen
+
+entity "Usuario del Sistema" as User {
+id
+email
+password
+account_state
+type
+username
+version
+id_role
+id_image
+}
+
+entity "Perfil de Usuario" as Profile {
+id
+email
+password
+username
+start_date
+id_user
+id_role
+id_image
+}
+
+entity "Rol" as Role {
+id
+name
+}
+
+entity "Imagen" as Image {
+id
+id_image
+url_image
+name
+}
+
+entity "Presupuesto" as Budget {
+id
+name
+total_budget
+remaining_budget
+id_user
+}
+
+entity "Categoría" as Category {
+id
+name
+description
+register_date
+id_user
+id_budget
+}
+
+entity "Transacción" as Transaction {
+id
+name
+amount
+description
+transaction_date
+id_user
+id_profile
+id_budget
+id_category
+id_debt
+}
+
+entity "Deuda" as Debt {
+id
+name
+total_amount
+pending_amount
+start_date
+expiration_date
+state
+id_user
+}
+
+entity "Inscripción Presupuesto" as BudgetEnrollment {
+id
+enrollment_date
+id_user
+id_profile
+id_budget
+}
+
+entity "Inscripción Categoría" as CategoryEnrollment {
+id
+enrollment_date
+id_user
+id_profile
+id_category
+}
+
+entity "Notificación" as Notification {
+id
+title
+content
+date_send
+id_user
+id_profile
+}
+
+entity "Suscripción" as Subscription {
+id
+type
+state
+start_date
+expiration_date
+is_auto_renewable
+created_at
+updated_at
+id_user
+id_mercadopago_preapproval
+}
+
+entity "MercadoPago Preaprobación" as MercadoPagoPreapproval {
+id
+preapproval_id
+reason
+external_reference
+back_url
+init_point
+auto_recurring_currency_id
+auto_recurring_frequency
+auto_recurring_frequency_type
+auto_recurring_transaction_amount
+status
+date_created
+last_modified
+next_payment_date
+payer_email
+payment_method_id
+card_brand
+card_last_four_digits
+id_user
+}
+
+entity "MercadoPago Pago" as MercadoPagoPayment {
+id
+payment_id
+status
+status_detail
+description
+external_reference
+transaction_amount
+currency_id
+payment_method_id
+payment_type_id
+authorization_code
+date_created
+date_approved
+date_last_updated
+id_preapproval
+}
+
+relationship Tiene_Rol {
+}
+
+relationship Tiene_Imagen {
+}
+
+relationship Pertenece {
+}
+
+relationship Posee {
+}
+
+relationship Crea {
+}
+
+relationship Asociado {
+}
+
+relationship Inscrito {
+}
+
+relationship Recibe {
+}
+
+relationship Relacionado {
+}
+
+relationship Paga {
+}
+
+User -1- Tiene_Rol
+Tiene_Rol -N- Role
+
+User -1- Tiene_Imagen
+Tiene_Imagen -1- Image
+
+User -1- Pertenece
+Pertenece -N- Profile
+
+Profile -1- Tiene_Rol
+Profile -1- Tiene_Imagen
+
+User -1- Posee
+Posee -N- Budget
+
+User -1- Crea
+Crea -N- Category
+
+User -1- Crea
+Crea -N- Transaction
+
+User -1- Crea
+Crea -N- Debt
+
+Budget -1- Asociado
+Asociado -N- Category
+
+Budget -1- Asociado
+Asociado -N- Transaction
+
+Category -1- Asociado
+Asociado -N- Transaction
+
+Debt -1- Asociado
+Asociado -N- Transaction
+
+Profile -1- Relacionado
+Relacionado -N- Transaction
+
+User -1- Inscrito
+Inscrito -N- BudgetEnrollment
+
+Profile -1- Inscrito
+Inscrito -N- BudgetEnrollment
+
+Budget -1- Inscrito
+Inscrito -N- BudgetEnrollment
+
+User -1- Inscrito
+Inscrito -N- CategoryEnrollment
+
+Profile -1- Inscrito
+Inscrito -N- CategoryEnrollment
+
+Category -1- Inscrito
+Inscrito -N- CategoryEnrollment
+
+User -1- Recibe
+Recibe -N- Notification
+
+Profile -1- Recibe
+Recibe -N- Notification
+
+User -1- Posee
+Posee -N- Subscription
+
+User -1- Posee
+Posee -N- MercadoPagoPreapproval
+
+MercadoPagoPreapproval -1- Paga
+Paga -N- MercadoPagoPayment
+
+Subscription -1- Relacionado
+Relacionado -1- MercadoPagoPreapproval
+
+@endchen

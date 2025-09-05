@@ -44,7 +44,7 @@ public class DebtEnrollment {
             referencedColumnName = "id",
             foreignKey =
                     @ForeignKey(
-                            name = "fk_budget",
+                            name = "fk_debt",
                             foreignKeyDefinition =
                                     "FOREIGN KEY (id_debt) REFERENCES debt(id) ON UPDATE RESTRICT ON DELETE CASCADE"))
     private Debt debt;
