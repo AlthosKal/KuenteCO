@@ -12,7 +12,6 @@ import org.kuenteco.backend.dto.logic.budget.BudgetEnrollmentProjection;
 import org.kuenteco.backend.entity.*;
 import org.kuenteco.backend.enums.RoleList;
 import org.kuenteco.backend.exception.exceptions.BudgetException;
-import org.kuenteco.backend.exception.exceptions.CategoryException;
 import org.kuenteco.backend.mapper.logic.budget.BudgetEnrollmentMapper;
 import org.kuenteco.backend.repository.master.MasterBudgetEnrollmentRepository;
 import org.kuenteco.backend.repository.slave.*;
@@ -61,7 +60,7 @@ public class BudgetEnrollmentServiceImpl implements BudgetEnrollmentService {
         RoleList role = credentials.role();
 
         if (role == RoleList.ROLE_PROFILE) {
-            throw new CategoryException("Endpoint solo disponible para usuarios");
+            throw new BudgetException("Endpoint solo disponible para usuarios");
         }
         List<BudgetEnrollmentProjection> dto =
                 slaveBudgetEnrollmentRepository.findBudgetEnrollmentsByUserEmail(email);

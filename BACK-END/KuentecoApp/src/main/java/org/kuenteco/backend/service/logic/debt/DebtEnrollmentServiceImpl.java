@@ -11,7 +11,6 @@ import org.kuenteco.backend.dto.logic.debt.DebtEnrollmentDTO;
 import org.kuenteco.backend.dto.logic.debt.DebtEnrollmentProjection;
 import org.kuenteco.backend.entity.*;
 import org.kuenteco.backend.enums.RoleList;
-import org.kuenteco.backend.exception.exceptions.CategoryException;
 import org.kuenteco.backend.exception.exceptions.DebtException;
 import org.kuenteco.backend.mapper.logic.debt.DebtEnrollmentMapper;
 import org.kuenteco.backend.repository.master.MasterDebtEnrollmentRepository;
@@ -39,7 +38,7 @@ public class DebtEnrollmentServiceImpl implements DebtEnrollmentService {
             throw new DebtException("Endpoint solo disponible para perfiles");
         }
 
-        log.info("Obteniendo los presupuestos asociados de {}", email);
+        log.info("Obteniendo las deudas asociados de {}", email);
         Profile profile =
                 slaveProfileRepository
                         .findByEmail(email)
@@ -48,7 +47,7 @@ public class DebtEnrollmentServiceImpl implements DebtEnrollmentService {
         List<DebtEnrollment> debtEnrollments = slaveDebtEnrollmentRepository.findByProfile(profile);
 
         if (debtEnrollments.isEmpty()) {
-            return "No tienes presupuesto asignados";
+            return "No tienes deudas asignadas";
         }
         return debtEnrollmentMapper.toDTOList(debtEnrollments);
     }
@@ -60,12 +59,12 @@ public class DebtEnrollmentServiceImpl implements DebtEnrollmentService {
         RoleList role = credentials.role();
 
         if (role == RoleList.ROLE_PROFILE) {
-            throw new CategoryException("Endpoint solo disponible para usuarios");
+            throw new DebtException("Endpoint solo disponible para usuarios");
         }
         List<DebtEnrollmentProjection> dto =
                 slaveDebtEnrollmentRepository.findDebtEnrollmentsByUserEmail(email);
         if (dto.isEmpty()) {
-            return "No tienes Perfiles con Presupuestos asociados";
+            return "No tienes Perfiles con Deudas asociadas";
         }
         return dto;
     }
@@ -83,7 +82,7 @@ public class DebtEnrollmentServiceImpl implements DebtEnrollmentService {
                 slaveUserRepository
                         .findByEmail(email)
                         .orElseThrow(() -> new DebtException("Perfil no encontrado" + email));
-        log.info("Asignando un presupuesto");
+        log.info("Asignando una deuda");
         Profile profile =
                 slaveProfileRepository
                         .findById(profileId)
@@ -97,12 +96,12 @@ public class DebtEnrollmentServiceImpl implements DebtEnrollmentService {
                         .orElseThrow(
                                 () ->
                                         new DebtException(
-                                                "Presupuesto no encontrado por el Id: " + debtId));
+                                                "Deuda no encontrado por el Id: " + debtId));
 
         boolean alreadyEnrolled =
                 slaveDebtEnrollmentRepository.existsByDebt_IdAndProfile_Id(debtId, profileId);
         if (alreadyEnrolled) {
-            throw new DebtException("El perfil ya tiene asignado este presupuesto");
+            throw new DebtException("El perfil ya tiene asignado esta deuda");
         }
 
         DebtEnrollment debtEnrollment =
