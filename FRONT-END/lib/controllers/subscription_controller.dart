@@ -22,7 +22,7 @@ class SubscriptionController extends ChangeNotifier {
   List<PaymentHistoryResponseDTO> paymentHistory = [];
   List<SubscriptionPriceConfigDTO> subscriptionPrices = [];
 
-  /// Crear una nueva suscripción
+  /// Crear una nueva suscripciÃ³n
   Future<CreateSubscriptionResponseDTO?> createSubscription(CreateSubscriptionRequestDTO request) async {
     _setLoading(true);
     try {
@@ -38,11 +38,11 @@ class SubscriptionController extends ChangeNotifier {
     }
   }
 
-  /// Los precios son estéticos, no se cargan del backend
+  /// Los precios son estÃ©ticos, no se cargan del backend
   Future<void> loadSubscriptionPrices() async {
-    // Los precios están hardcodeados, MercadoPago maneja los precios reales
+    // Los precios estÃ¡n hardcodeados, MercadoPago maneja los precios reales
     subscriptionPrices = <SubscriptionPriceConfigDTO>[];
-    print('💰 Usando precios estéticos - MercadoPago maneja los precios reales');
+    print('ð° Usando precios estÃ©ticos - MercadoPago maneja los precios reales');
   }
 
   Future<void> loadSubscriptionById(int id) async {

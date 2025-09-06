@@ -10,13 +10,13 @@ Future<String?> getRoleIfAuthenticated() async {
 
   if (token == null || token.isEmpty) return null;
 
-  // ✅ Obtener el rol para determinar qué servicio usar
+  // â Obtener el rol para determinar quÃ© servicio usar
   final role = await storage.read(key: 'role');
   bool valid = false;
 
   await GlobalExceptionHandler.run(
         () async {
-      // ✅ Usar el servicio apropiado según el rol
+      // â Usar el servicio apropiado segÃºn el rol
       if (role == 'ROLE_PROFILE') {
         final profileService = ProfileService();
         await profileService.getAuthenticatedProfile();
@@ -28,13 +28,13 @@ Future<String?> getRoleIfAuthenticated() async {
     },
     onError: (_) async {
       await storage.delete(key: 'Authorization');
-      await storage.delete(key: 'role'); // ✅ Borramos también el rol si falla
+      await storage.delete(key: 'role'); // â Borramos tambiÃ©n el rol si falla
       valid = false;
     },
   );
 
   if (!valid) return null;
 
-  // ✅ devolvemos el rol guardado
+  // â devolvemos el rol guardado
   return role;
 }

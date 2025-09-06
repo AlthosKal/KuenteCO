@@ -17,7 +17,7 @@ class MultipleOperationsWidget extends StatelessWidget {
     this.onEditMultiple,
     this.onDeleteMultiple,
     this.onSingleOperation,
-    this.singleOperationLabel = 'Nueva Operación',
+    this.singleOperationLabel = 'Nueva OperaciÃ³n',
   }) : super(key: key);
 
   @override
@@ -49,7 +49,7 @@ class MultipleOperationsWidget extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           
-          // Si hay una sola operación, mostrar solo ese botón
+          // Si hay una sola operaciÃ³n, mostrar solo ese botÃ³n
           if (onSingleOperation != null && onCreateMultiple == null) ...[
             Row(
               children: [
@@ -68,7 +68,7 @@ class MultipleOperationsWidget extends StatelessWidget {
               ],
             ),
           ]
-          // Si hay operaciones múltiples, mostrar todos los botones
+          // Si hay operaciones mÃºltiples, mostrar todos los botones
           else if (onCreateMultiple != null || onEditMultiple != null || onDeleteMultiple != null) ...[
             Row(
               children: [
@@ -77,7 +77,7 @@ class MultipleOperationsWidget extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: onCreateMultiple,
                       icon: const Icon(Icons.add_box, size: 20),
-                      label: const Text('Crear Múltiples'),
+                      label: const Text('Crear MÃºltiples'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,
@@ -92,7 +92,7 @@ class MultipleOperationsWidget extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: onEditMultiple,
                       icon: const Icon(Icons.edit_note, size: 20),
-                      label: const Text('Editar Múltiples'),
+                      label: const Text('Editar MÃºltiples'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
@@ -107,7 +107,7 @@ class MultipleOperationsWidget extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: onDeleteMultiple,
                       icon: const Icon(Icons.delete_sweep, size: 20),
-                      label: const Text('Eliminar Múltiples'),
+                      label: const Text('Eliminar MÃºltiples'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red[700]!,
                         foregroundColor: Colors.white,

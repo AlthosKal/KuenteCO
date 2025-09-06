@@ -43,7 +43,7 @@ class Formatters {
     }
   }
 
-  // Formatear fecha para mostrar (más amigable)
+  // Formatear fecha para mostrar (mÃ¡s amigable)
   static String formatDateForDisplay(String dateString) {
     try {
       final date = DateTime.parse(dateString);
@@ -55,7 +55,7 @@ class Formatters {
       } else if (difference.inDays == 1) {
         return 'Ayer';
       } else if (difference.inDays < 7) {
-        return '${difference.inDays} días atrás';
+        return '${difference.inDays} dÃ­as atrÃ¡s';
       } else {
         final formatter = DateFormat('dd/MM/yyyy');
         return formatter.format(date);
@@ -65,7 +65,7 @@ class Formatters {
     }
   }
 
-  // Formatear números
+  // Formatear nÃºmeros
   static String formatNumber(double number) {
     final formatter = NumberFormat('#,##0', 'es_CO');
     return formatter.format(number);

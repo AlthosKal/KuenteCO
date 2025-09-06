@@ -138,7 +138,7 @@ class _EditDebtWidgetState extends State<EditDebtWidget> {
           controller: _nameController,
           decoration: InputDecoration(
             labelText: 'Nombre de la deuda *',
-            hintText: 'Ej: Préstamo bancario, Tarjeta de crédito...',
+            hintText: 'Ej: PrÃ©stamo bancario, Tarjeta de crÃ©dito...',
             prefixIcon: const Icon(Icons.title, color: Colors.blue),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -181,7 +181,7 @@ class _EditDebtWidgetState extends State<EditDebtWidget> {
             }
             final amount = double.tryParse(value.trim());
             if (amount == null || amount <= 0) {
-              return 'Por favor ingresa un monto válido';
+              return 'Por favor ingresa un monto vÃ¡lido';
             }
             return null;
           },
@@ -212,7 +212,7 @@ class _EditDebtWidgetState extends State<EditDebtWidget> {
             }
             final amount = double.tryParse(value.trim());
             if (amount == null || amount < 0) {
-              return 'Por favor ingresa un monto válido';
+              return 'Por favor ingresa un monto vÃ¡lido';
             }
             return null;
           },

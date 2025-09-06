@@ -83,12 +83,12 @@ class _CreateProfileWidgetState extends State<CreateProfileWidget> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Correo electrónico'),
+                decoration: const InputDecoration(labelText: 'Correo electrÃ³nico'),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Este campo es obligatorio';
                   if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                    return 'Correo inválido';
+                    return 'Correo invÃ¡lido';
                   }
                   return null;
                 },
@@ -97,10 +97,10 @@ class _CreateProfileWidgetState extends State<CreateProfileWidget> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Contraseña'),
+                decoration: const InputDecoration(labelText: 'ContraseÃ±a'),
                 obscureText: true,
                 validator: (value) =>
-                value == null || value.length < 6 ? 'Mínimo 6 caracteres' : null,
+                value == null || value.length < 6 ? 'MÃ­nimo 6 caracteres' : null,
               ),
 
               const SizedBox(height: 32),

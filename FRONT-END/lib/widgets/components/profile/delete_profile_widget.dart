@@ -23,8 +23,8 @@ class _DeleteProfileButtonState extends State<DeleteProfileButton> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirmar eliminación'),
-        content: const Text('¿Estás seguro de que deseas eliminar este perfil? Esta acción no se puede deshacer.'),
+        title: const Text('Confirmar eliminaciÃ³n'),
+        content: const Text('Â¿EstÃ¡s seguro de que deseas eliminar este perfil? Esta acciÃ³n no se puede deshacer.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),

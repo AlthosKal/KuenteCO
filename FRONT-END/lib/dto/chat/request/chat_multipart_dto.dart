@@ -16,7 +16,7 @@ class ChatMultipartDTO extends ChatDTO {
   Map<String, dynamic> toJson() {
     return {
       ...super.toJson(), // incluye model, conversationId, prompt
-      'files': file, // añade la lista de archivos
+      'files': file, // aÃ±ade la lista de archivos
     };
   }
 }

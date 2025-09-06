@@ -32,10 +32,10 @@ class DebtsTabWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
-          // Solo mostrar operaciones múltiples para usuarios (NO perfiles)
+          // Solo mostrar operaciones mÃºltiples para usuarios (NO perfiles)
           if (userRole != 'ROLE_PROFILE')
             MultipleOperationsWidget(
-              title: 'Operaciones Múltiples de Deudas',
+              title: 'Operaciones MÃºltiples de Deudas',
               color: Colors.red,
               onCreateMultiple: () => _showCreateMultipleDebtsModal(context),
               onEditMultiple: () => _showEditMultipleDebtsModal(context),
@@ -64,7 +64,7 @@ class DebtsTabWidget extends StatelessWidget {
       onDebtAssign: (debt) => _assignDebtToProfile(context, debt),
       onAddDebt: () => _showCreateDebtModal(context),
       showFilters: true,
-      showFab: true,  // ← Habilitado FloatingActionButton como en transacciones
+      showFab: true,  // â Habilitado FloatingActionButton como en transacciones
       compact: false,
     );
   }
@@ -558,7 +558,7 @@ class _ProfileSelectionDialogState extends State<_ProfileSelectionDialog> {
                                 const SizedBox(width: 8),
                                 const Expanded(
                                   child: Text(
-                                    'Selecciona el perfil que podrá gestionar esta deuda',
+                                    'Selecciona el perfil que podrÃ¡ gestionar esta deuda',
                                     style: TextStyle(fontSize: 12),
                                   ),
                                 ),

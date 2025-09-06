@@ -12,7 +12,7 @@ class CategoryEnrollmentSummaryDTO {
   final DateTime? categoryFinishDate;
   final String? categoryStatus;
   final List<int>? categoryEnrollmentIds; // IDs de los enrollments individuales
-  final List<EnrolledProfileSummaryDTO>? enrolledProfiles; // Información detallada de cada perfil
+  final List<EnrolledProfileSummaryDTO>? enrolledProfiles; // InformaciÃ³n detallada de cada perfil
 
   CategoryEnrollmentSummaryDTO({
     this.categoryId,
@@ -40,7 +40,7 @@ class CategoryEnrollmentSummaryDTO {
           .toList();
     }
     
-    // Crear perfiles básicos usando los IDs disponibles
+    // Crear perfiles bÃ¡sicos usando los IDs disponibles
     List<EnrolledProfileSummaryDTO>? profiles;
     if (enrollmentIds != null && enrollmentIds.isNotEmpty) {
       profiles = enrollmentIds.map((id) {
@@ -57,11 +57,11 @@ class CategoryEnrollmentSummaryDTO {
     }
     
     return CategoryEnrollmentSummaryDTO(
-      categoryId: null, // El backend no envía categoryId en la proyección
+      categoryId: null, // El backend no envÃ­a categoryId en la proyecciÃ³n
       categoryName: json['categoryName'],
       categoryOwnerId: json['ownerUserId']?.toString(),
       ownerUserId: json['ownerUserId']?.toString(),
-      enrolledUsersCount: null, // No disponible en la proyección
+      enrolledUsersCount: null, // No disponible en la proyecciÃ³n
       enrolledProfilesCount: json['totalEnrollments']?.toInt(),
       totalEnrollments: json['totalEnrollments']?.toInt(),
       firstEnrollmentDate: json['firstEnrollmentDate'] != null
@@ -73,14 +73,14 @@ class CategoryEnrollmentSummaryDTO {
       categoryStartDate: json['categoryRegisterDate'] != null
           ? DateTime.parse(json['categoryRegisterDate'])
           : null,
-      categoryFinishDate: null, // No disponible en la proyección
+      categoryFinishDate: null, // No disponible en la proyecciÃ³n
       categoryStatus: _mapCategoryState(json['categoryState']),
       categoryEnrollmentIds: enrollmentIds,
       enrolledProfiles: profiles,
     );
   }
   
-  // Método auxiliar para mapear el estado de la categoría
+  // MÃ©todo auxiliar para mapear el estado de la categorÃ­a
   static String? _mapCategoryState(dynamic state) {
     if (state == null) return null;
     switch (state.toString().toUpperCase()) {
@@ -113,12 +113,12 @@ class CategoryEnrollmentSummaryDTO {
     };
   }
 
-  // Método auxiliar para crear desde enrollments existentes
+  // MÃ©todo auxiliar para crear desde enrollments existentes
   factory CategoryEnrollmentSummaryDTO.fromSummaryAndEnrollments(
     Map<String, dynamic> summaryJson,
     List<Map<String, dynamic>> enrollmentsJson,
   ) {
-    // Filtrar enrollments por categoría
+    // Filtrar enrollments por categorÃ­a
     final categoryName = summaryJson['categoryName'];
     final relevantEnrollments = enrollmentsJson
         .where((e) => e['categoryName'] == categoryName)

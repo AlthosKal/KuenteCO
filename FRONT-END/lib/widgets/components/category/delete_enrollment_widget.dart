@@ -15,7 +15,7 @@ class EnrollmentDeleteWidget extends StatefulWidget {
     this.isSingleMode = false,
   }) : super(key: key);
 
-  // Método estático para eliminación individual
+  // MÃ©todo estÃ¡tico para eliminaciÃ³n individual
   static Future<bool?> showDeleteSingleDialog(
       BuildContext context,
       CategoryController controller,
@@ -31,7 +31,7 @@ class EnrollmentDeleteWidget extends StatefulWidget {
     );
   }
 
-  // Método estático para eliminación masiva
+  // MÃ©todo estÃ¡tico para eliminaciÃ³n masiva
   static Future<bool?> showDeleteMultipleDialog(
       BuildContext context,
       CategoryController controller,
@@ -77,7 +77,7 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // Header con título y botón eliminar todas
+            // Header con tÃ­tulo y botÃ³n eliminar todas
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -124,7 +124,7 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Esta acción eliminará las asignaciones seleccionadas. Los perfiles ya no tendrán acceso a estas categorías.',
+                      'Esta acciÃ³n eliminarÃ¡ las asignaciones seleccionadas. Los perfiles ya no tendrÃ¡n acceso a estas categorÃ­as.',
                       style: TextStyle(color: Colors.orange[800]),
                     ),
                   ),
@@ -169,7 +169,7 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
             ),
             const SizedBox(height: 10),
 
-            // Selección rápida
+            // SelecciÃ³n rÃ¡pida
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -213,10 +213,10 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text(
-            'Confirmar eliminación',
+            'Confirmar eliminaciÃ³n',
             style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
           ),
-          content: Text('¿Está seguro de que desea eliminar $selectedCount asignaciones?'),
+          content: Text('Â¿EstÃ¡ seguro de que desea eliminar $selectedCount asignaciones?'),
           actions: [
             TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancelar')),
             ElevatedButton(
@@ -249,7 +249,7 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
       return;
     }
 
-    // Validar que las asignaciones tengan IDs válidos
+    // Validar que las asignaciones tengan IDs vÃ¡lidos
     final validEnrollments = selectedEnrollments
         .where((enrollment) => enrollment.id != null && enrollment.id! > 0)
         .toList();
@@ -257,7 +257,7 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
     if (validEnrollments.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Las asignaciones seleccionadas no tienen IDs válidos para eliminación'),
+          content: Text('Las asignaciones seleccionadas no tienen IDs vÃ¡lidos para eliminaciÃ³n'),
           backgroundColor: Colors.orange,
         ),
       );
@@ -280,9 +280,9 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
     );
 
     try {
-      // Usar eliminación por lotes para mejor rendimiento
+      // Usar eliminaciÃ³n por lotes para mejor rendimiento
       final enrollmentIds = validEnrollments.map((e) => e.id!).toList();
-      print('📌 EnrollmentDeleteWidget: Using batch deletion for ${enrollmentIds.length} enrollments');
+      print('ð EnrollmentDeleteWidget: Using batch deletion for ${enrollmentIds.length} enrollments');
       
       await widget.controller.deleteEnrollmentsByIds(enrollmentIds);
       
@@ -296,17 +296,17 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
         ),
       );
     } catch (e) {
-      print('❌ EnrollmentDeleteWidget: Batch deletion failed: $e');
+      print('â EnrollmentDeleteWidget: Batch deletion failed: $e');
       Navigator.of(context).pop(); // Cierra loading
       
-      // Intentar eliminación individual como fallback
+      // Intentar eliminaciÃ³n individual como fallback
       await _fallbackIndividualDeletion(validEnrollments);
     }
   }
   
-  // Método de respaldo para eliminación individual
+  // MÃ©todo de respaldo para eliminaciÃ³n individual
   Future<void> _fallbackIndividualDeletion(List<CategoryEnrollmentDTO> enrollments) async {
-    print('📌 EnrollmentDeleteWidget: Attempting fallback individual deletion');
+    print('ð EnrollmentDeleteWidget: Attempting fallback individual deletion');
     
     showDialog(
       context: context,
@@ -324,7 +324,7 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
           deletedCount++;
         } catch (individualError) {
           errors.add('Error eliminando ${enrollment.categoryName}: ${individualError.toString()}');
-          print('❌ EnrollmentDeleteWidget: Individual delete failed for ${enrollment.categoryName}: $individualError');
+          print('â EnrollmentDeleteWidget: Individual delete failed for ${enrollment.categoryName}: $individualError');
         }
       }
       
@@ -368,8 +368,8 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
     final enrollment = widget.enrollmentsToDelete.first;
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: const Text('Eliminar Asignación', style: TextStyle(color: Colors.orange)),
-      content: Text('¿Está seguro de eliminar la asignación "${enrollment.categoryName}"?'),
+      title: const Text('Eliminar AsignaciÃ³n', style: TextStyle(color: Colors.orange)),
+      content: Text('Â¿EstÃ¡ seguro de eliminar la asignaciÃ³n "${enrollment.categoryName}"?'),
       actions: [
         TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancelar')),
         ElevatedButton(
@@ -382,18 +382,18 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
   }
 
   Future<void> _deleteSingleEnrollment(CategoryEnrollmentDTO enrollment) async {
-    print('📌 EnrollmentDeleteWidget: Starting single enrollment deletion');
-    print('📌 EnrollmentDeleteWidget: Enrollment ID: ${enrollment.id}');
-    print('📌 EnrollmentDeleteWidget: Category: ${enrollment.categoryName}');
-    print('📌 EnrollmentDeleteWidget: Profile: ${enrollment.profileEmail}');
+    print('ð EnrollmentDeleteWidget: Starting single enrollment deletion');
+    print('ð EnrollmentDeleteWidget: Enrollment ID: ${enrollment.id}');
+    print('ð EnrollmentDeleteWidget: Category: ${enrollment.categoryName}');
+    print('ð EnrollmentDeleteWidget: Profile: ${enrollment.profileEmail}');
     
-    // Validar que la asignación tenga un ID válido
+    // Validar que la asignaciÃ³n tenga un ID vÃ¡lido
     if (enrollment.id == null || enrollment.id! <= 0) {
-      print('❌ EnrollmentDeleteWidget: Invalid enrollment ID detected: ${enrollment.id}');
+      print('â EnrollmentDeleteWidget: Invalid enrollment ID detected: ${enrollment.id}');
       Navigator.of(context).pop(false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('La asignación no tiene un ID válido para eliminación (ID: ${enrollment.id})'),
+          content: Text('La asignaciÃ³n no tiene un ID vÃ¡lido para eliminaciÃ³n (ID: ${enrollment.id})'),
           backgroundColor: Colors.orange,
           duration: const Duration(seconds: 3),
         ),
@@ -408,28 +408,28 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
     );
     
     try {
-      print('✅ EnrollmentDeleteWidget: Enrollment ID is valid, proceeding with deletion');
+      print('â EnrollmentDeleteWidget: Enrollment ID is valid, proceeding with deletion');
       await widget.controller.deleteEnrollment(enrollment.id!);
       
       Navigator.of(context).pop(); // Cierra loading
-      Navigator.of(context).pop(true); // Cierra dialog con éxito
+      Navigator.of(context).pop(true); // Cierra dialog con Ã©xito
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Asignación de "${enrollment.categoryName}" eliminada exitosamente'),
+          content: Text('AsignaciÃ³n de "${enrollment.categoryName}" eliminada exitosamente'),
           backgroundColor: Colors.green,
           duration: const Duration(seconds: 2),
         ),
       );
-      print('✅ EnrollmentDeleteWidget: Single enrollment deleted successfully');
+      print('â EnrollmentDeleteWidget: Single enrollment deleted successfully');
     } catch (e) {
-      print('❌ EnrollmentDeleteWidget: Error deleting single enrollment: $e');
+      print('â EnrollmentDeleteWidget: Error deleting single enrollment: $e');
       Navigator.of(context).pop(); // Cierra loading
       Navigator.of(context).pop(false); // Cierra dialog con fallo
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error al eliminar la asignación: ${e.toString()}'),
+          content: Text('Error al eliminar la asignaciÃ³n: ${e.toString()}'),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 3),
         ),

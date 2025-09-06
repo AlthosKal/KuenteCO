@@ -56,7 +56,7 @@ class ExcelController extends ChangeNotifier {
 
   /// Exportar datos financieros a Excel
   Future<void> exportData() async {
-    print('🔄 ExcelController: Iniciando exportación...');
+    print('🔄 ExcelController: Iniciando exportación...');
     _setLoading(true);
     
     try {
@@ -73,12 +73,12 @@ class ExcelController extends ChangeNotifier {
         
         _lastDownloadedFile = filePath;
         _setSuccess('Datos exportados exitosamente a: $filename');
-        print('✅ ExcelController: Exportación completada');
+        print('✅ ExcelController: Exportación completada');
       } else {
         throw Exception('No se recibieron datos del servidor');
       }
     } catch (e) {
-      print('❌ ExcelController: Error en exportación: $e');
+      print('✅ ExcelController: Error en exportación: $e');
       _setError('Error al exportar datos: ${e.toString()}');
     } finally {
       _setLoading(false);
@@ -87,16 +87,11 @@ class ExcelController extends ChangeNotifier {
 
   /// Importar datos financieros desde archivo Excel
   Future<void> importData(dynamic file) async {
-    print('🔄 ExcelController: Iniciando importación...');
+    print('🔄 ExcelController: Iniciando importación...');
     _setLoading(true);
     
     try {
-      if (kIsWeb) {
-        _setError('La importación de archivos no está disponible en la versión web. Por favor, usa la aplicación móvil o desktop.');
-        return;
-      }
-      
-      // Primero validar el archivo (solo en móvil/desktop)
+      // Primero validar el archivo
       _validationResult = await _excelService.validateExcelFile(file);
       
       if (!_validationResult!.isValid) {
@@ -106,7 +101,7 @@ class ExcelController extends ChangeNotifier {
 
       // Si hay advertencias, mostrarlas pero continuar
       if (_validationResult!.warnings.isNotEmpty) {
-        print('⚠️ ExcelController: Advertencias: ${_validationResult!.warnings.join(', ')}');
+        print('✅ ï¸ ExcelController: Advertencias: ${_validationResult!.warnings.join(', ')}');
       }
 
       // Proceder con la importación
@@ -114,9 +109,9 @@ class ExcelController extends ChangeNotifier {
       
       final fileName = file.path?.split('/').last ?? 'archivo';
       _setSuccess('Datos importados exitosamente desde $fileName');
-      print('✅ ExcelController: Importación completada');
+      print('✅ ExcelController: Importación completada');
     } catch (e) {
-      print('❌ ExcelController: Error en importación: $e');
+      print('✅ ExcelController: Error en importación: $e');
       _setError('Error al importar datos: ${e.toString()}');
     } finally {
       _setLoading(false);
@@ -125,28 +120,23 @@ class ExcelController extends ChangeNotifier {
 
   /// Validar archivo Excel sin importar
   Future<bool> validateFile(dynamic file) async {
-    print('🔄 ExcelController: Validando archivo...');
+    print('🔄 ExcelController: Validando archivo...');
     _setLoading(true);
     
     try {
-      if (kIsWeb) {
-        _setError('La validación de archivos no está disponible en la versión web. Por favor, usa la aplicación móvil o desktop.');
-        return false;
-      }
-      
       _validationResult = await _excelService.validateExcelFile(file);
       
       if (_validationResult!.isValid) {
         _setSuccess(_validationResult!.summaryMessage);
-        print('✅ ExcelController: Validación exitosa');
+        print('✅ ExcelController: Validación exitosa');
         return true;
       } else {
         _setError(_validationResult!.summaryMessage);
-        print('❌ ExcelController: Validación falló');
+        print('✅ ExcelController: Validación falló');
         return false;
       }
     } catch (e) {
-      print('❌ ExcelController: Error en validación: $e');
+      print('✅ ExcelController: Error en validación: $e');
       _setError('Error al validar archivo: ${e.toString()}');
       return false;
     } finally {
@@ -156,7 +146,7 @@ class ExcelController extends ChangeNotifier {
 
   /// Descargar plantilla Excel desde assets
   Future<void> downloadTemplateFromAssets() async {
-    print('🔄 ExcelController: Descargando plantilla desde assets...');
+    print('🔄 ExcelController: Descargando plantilla desde assets...');
     _setLoading(true);
     
     try {
@@ -172,9 +162,9 @@ class ExcelController extends ChangeNotifier {
       
       _lastDownloadedFile = result ?? filename;
       _setSuccess('Plantilla descargada: $filename');
-      print('✅ ExcelController: Plantilla descargada: $filename');
+      print('✅ ExcelController: Plantilla descargada: $filename');
     } catch (e) {
-      print('❌ ExcelController: Error descargando plantilla: $e');
+      print('✅ ExcelController: Error descargando plantilla: $e');
       _setError('Error al descargar plantilla: ${e.toString()}');
     } finally {
       _setLoading(false);
@@ -183,7 +173,7 @@ class ExcelController extends ChangeNotifier {
 
   /// Descargar plantilla Excel vacía (método original - desde servidor)
   Future<void> downloadTemplate() async {
-    print('🔄 ExcelController: Descargando plantilla...');
+    print('🔄 ExcelController: Descargando plantilla...');
     _setLoading(true);
     
     try {
@@ -200,12 +190,12 @@ class ExcelController extends ChangeNotifier {
         
         _lastDownloadedFile = filePath;
         _setSuccess('Plantilla descargada: $filename');
-        print('✅ ExcelController: Plantilla descargada');
+        print('✅ ExcelController: Plantilla descargada');
       } else {
         throw Exception('No se pudo obtener la plantilla del servidor');
       }
     } catch (e) {
-      print('❌ ExcelController: Error descargando plantilla: $e');
+      print('✅ ExcelController: Error descargando plantilla: $e');
       _setError('Error al descargar plantilla: ${e.toString()}');
     } finally {
       _setLoading(false);
@@ -215,12 +205,12 @@ class ExcelController extends ChangeNotifier {
   /// Convertir datos de deudas a formato Excel (para preview)
   List<Map<String, dynamic>> previewExcelData(List<dynamic> debts) {
     try {
-      print('🔄 ExcelController: Generando preview de ${debts.length} registros');
+      print('🔄 ExcelController: Generando preview de ${debts.length} registros');
       final excelData = _excelService.convertDebtsToExcelFormat(debts);
-      print('✅ ExcelController: Preview generado');
+      print('✅ ExcelController: Preview generado');
       return excelData;
     } catch (e) {
-      print('❌ ExcelController: Error generando preview: $e');
+      print('✅ ExcelController: Error generando preview: $e');
       _setError('Error al generar preview: ${e.toString()}');
       return [];
     }
@@ -248,7 +238,7 @@ class ExcelController extends ChangeNotifier {
   String get downloadInfo {
     if (_lastDownloadedFile == null) return 'No hay descargas recientes';
     final filename = _lastDownloadedFile!.split('/').last;
-    return 'Último archivo: $filename';
+    return 'Ãltimo archivo: $filename';
   }
 
   /// Verificar si la última validación tuvo advertencias

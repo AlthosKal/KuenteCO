@@ -12,78 +12,78 @@ import '../api_client.dart';
 class ChatService {
   final _api = ApiClient();
 
-  /// Chat básico con AI
+  /// Chat bÃ¡sico con AI
   Future<ChatResponseDTO> askAi(ChatDTO dto) async {
-    print('🔄 ChatService: Enviando consulta básica al chat AI');
+    print('ð ChatService: Enviando consulta bÃ¡sica al chat AI');
     try {
       final response = await _api.postChat('/chat', dto.toJson());
-      print('✅ ChatService: Respuesta recibida del chat básico');
+      print('â ChatService: Respuesta recibida del chat bÃ¡sico');
       return ChatResponseDTO.fromJson(response.data);
     } catch (e) {
-      print('❌ ChatService: Error en chat básico: $e');
+      print('â ChatService: Error en chat bÃ¡sico: $e');
       rethrow;
     }
   }
 
   /// Chat con URLs/archivos
   Future<StringChatResponseDTO> askAiWithUrl(ChatFilesDTO dto) async {
-    print('🔄 ChatService: Enviando consulta con URLs al chat AI');
+    print('ð ChatService: Enviando consulta con URLs al chat AI');
     try {
       final response = await _api.postChat('/chat-with-url', dto.toJson());
-      print('✅ ChatService: Respuesta recibida del chat con URLs');
+      print('â ChatService: Respuesta recibida del chat con URLs');
       return StringChatResponseDTO.fromJson(response.data);
     } catch (e) {
-      print('❌ ChatService: Error en chat con URLs: $e');
+      print('â ChatService: Error en chat con URLs: $e');
       rethrow;
     }
   }
 
   /// Chat con archivo
   Future<StringChatResponseDTO> askAiWithFile(ChatMultipartDTO dto) async {
-    print('🔄 ChatService: Enviando consulta con archivo al chat AI');
+    print('ð ChatService: Enviando consulta con archivo al chat AI');
     try {
       final response = await _api.postChat('/chat-with-file', dto.toJson());
-      print('✅ ChatService: Respuesta recibida del chat con archivo');
+      print('â ChatService: Respuesta recibida del chat con archivo');
       return StringChatResponseDTO.fromJson(response.data);
     } catch (e) {
-      print('❌ ChatService: Error en chat con archivo: $e');
+      print('â ChatService: Error en chat con archivo: $e');
       rethrow;
     }
   }
 
-  /// Análisis específico de deudas
+  /// AnÃ¡lisis especÃ­fico de deudas
   Future<DebtAnalysisResponseDTO> analyzeDebts(DebtChatRequestDTO dto) async {
-    print('🔄 ChatService: Iniciando análisis de deudas');
+    print('ð ChatService: Iniciando anÃ¡lisis de deudas');
     try {
       final response = await _api.postChat('/chat', dto.toJson());
-      print('✅ ChatService: Análisis de deudas completado');
+      print('â ChatService: AnÃ¡lisis de deudas completado');
       return DebtAnalysisResponseDTO.fromJson(response.data);
     } catch (e) {
-      print('❌ ChatService: Error en análisis de deudas: $e');
+      print('â ChatService: Error en anÃ¡lisis de deudas: $e');
       rethrow;
     }
   }
 
-  /// Análisis dinámico (respuesta flexible basada en tipo)
+  /// AnÃ¡lisis dinÃ¡mico (respuesta flexible basada en tipo)
   Future<DynamicAnalysisResponseDTO> getDynamicAnalysis(ChatDTO dto) async {
-    print('🔄 ChatService: Solicitando análisis dinámico');
+    print('ð ChatService: Solicitando anÃ¡lisis dinÃ¡mico');
     try {
       final response = await _api.postChat('/chat', dto.toJson());
-      print('✅ ChatService: Análisis dinámico recibido');
+      print('â ChatService: AnÃ¡lisis dinÃ¡mico recibido');
       return DynamicAnalysisResponseDTO.fromJson(response.data);
     } catch (e) {
-      print('❌ ChatService: Error en análisis dinámico: $e');
+      print('â ChatService: Error en anÃ¡lisis dinÃ¡mico: $e');
       rethrow;
     }
   }
 
-  /// Análisis de riesgo de deudas
+  /// AnÃ¡lisis de riesgo de deudas
   Future<DebtAnalysisResponseDTO> getDebtRiskAnalysis({
     required String userId,
     required double monthlyIncome,
     List<int>? debtIds,
   }) async {
-    print('🔄 ChatService: Iniciando análisis de riesgo de deudas');
+    print('ð ChatService: Iniciando anÃ¡lisis de riesgo de deudas');
     try {
       final dto = DebtChatRequestDTO.riskAnalysis(
         userId: userId,
@@ -92,10 +92,10 @@ class ChatService {
       );
       
       final response = await _api.postChat('/chat', dto.toJson());
-      print('✅ ChatService: Análisis de riesgo completado');
+      print('â ChatService: AnÃ¡lisis de riesgo completado');
       return DebtAnalysisResponseDTO.fromJson(response.data);
     } catch (e) {
-      print('❌ ChatService: Error en análisis de riesgo: $e');
+      print('â ChatService: Error en anÃ¡lisis de riesgo: $e');
       rethrow;
     }
   }
@@ -106,7 +106,7 @@ class ChatService {
     required double availableBudget,
     List<int>? priorityDebtIds,
   }) async {
-    print('🔄 ChatService: Generando estrategia de pago');
+    print('ð ChatService: Generando estrategia de pago');
     try {
       final dto = DebtChatRequestDTO.paymentStrategy(
         userId: userId,
@@ -115,21 +115,21 @@ class ChatService {
       );
       
       final response = await _api.postChat('/chat', dto.toJson());
-      print('✅ ChatService: Estrategia de pago generada');
+      print('â ChatService: Estrategia de pago generada');
       return DebtAnalysisResponseDTO.fromJson(response.data);
     } catch (e) {
-      print('❌ ChatService: Error generando estrategia de pago: $e');
+      print('â ChatService: Error generando estrategia de pago: $e');
       rethrow;
     }
   }
 
-  /// Análisis general de deudas
+  /// AnÃ¡lisis general de deudas
   Future<DebtAnalysisResponseDTO> getGeneralDebtAnalysis({
     required String userId,
     List<int>? specificDebtIds,
     String? customMessage,
   }) async {
-    print('🔄 ChatService: Iniciando análisis general de deudas');
+    print('ð ChatService: Iniciando anÃ¡lisis general de deudas');
     try {
       final dto = DebtChatRequestDTO.analyzeDebts(
         userId: userId,
@@ -138,23 +138,23 @@ class ChatService {
       );
       
       final response = await _api.postChat('/chat', dto.toJson());
-      print('✅ ChatService: Análisis general completado');
+      print('â ChatService: AnÃ¡lisis general completado');
       return DebtAnalysisResponseDTO.fromJson(response.data);
     } catch (e) {
-      print('❌ ChatService: Error en análisis general: $e');
+      print('â ChatService: Error en anÃ¡lisis general: $e');
       rethrow;
     }
   }
 
-  /// Procesar respuesta dinámica basada en tipo
+  /// Procesar respuesta dinÃ¡mica basada en tipo
   Future<BaseDynamicResponseDTO> processResponse(Map<String, dynamic> responseData) async {
-    print('🔄 ChatService: Procesando respuesta dinámica');
+    print('ð ChatService: Procesando respuesta dinÃ¡mica');
     try {
       final dynamicResponse = BaseDynamicResponseDTO.fromJson(responseData);
-      print('✅ ChatService: Respuesta dinámica procesada: ${dynamicResponse.type}');
+      print('â ChatService: Respuesta dinÃ¡mica procesada: ${dynamicResponse.type}');
       return dynamicResponse;
     } catch (e) {
-      print('❌ ChatService: Error procesando respuesta dinámica: $e');
+      print('â ChatService: Error procesando respuesta dinÃ¡mica: $e');
       rethrow;
     }
   }

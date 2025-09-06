@@ -19,10 +19,10 @@ class AuthService {
   final _api = ApiClient();
   final _storage = const FlutterSecureStorage();
 
-  // ✅ Verificar si el servicio puede funcionar correctamente
+  // â Verificar si el servicio puede funcionar correctamente
   bool get isReady => _api.isInitialized;
 
-  /// 🔑 LOGIN
+  /// ð LOGIN
   Future<TokenResponseDTO> login(LoginUserDTO dto) async {
     final response = await _api.postApp('/auth/login', dto.toJson());
     final json = response.data;
@@ -36,7 +36,7 @@ class AuthService {
             if (decoded is Map<String, dynamic>) {
               return TokenResponseDTO.fromJson(decoded);
             } else {
-              throw Exception('Cadena no contenía un Map<String, dynamic>: $data');
+              throw Exception('Cadena no contenÃ­a un Map<String, dynamic>: $data');
             }
           } catch (_) {
             throw Exception('No se pudo decodificar JSON del string: $data');
@@ -51,7 +51,7 @@ class AuthService {
       },
     );
 
-    // ✅ Guardamos token y rol
+    // â Guardamos token y rol
     await _storage.write(key: 'Authorization', value: apiResponse.data.token);
     await _storage.write(key: 'role', value: apiResponse.data.type);
 
@@ -59,12 +59,12 @@ class AuthService {
   }
 
 
-  /// 🆕 REGISTRO
+  /// ð REGISTRO
   Future<void> register(NewUserDTO dto) async {
     await _api.postApp('/auth/register', dto.toJson());
   }
 
-  /// 📩 ENVIAR CÓDIGO DE VERIFICACIÓN
+  /// ð© ENVIAR CÃDIGO DE VERIFICACIÃN
   Future<void> sendVerificationCode({
     required bool isRegistration,
     required SendVerificationCodeDTO dto,
@@ -75,34 +75,34 @@ class AuthService {
     );
   }
 
-  /// ✅ VALIDAR CÓDIGO DE VERIFICACIÓN
+  /// â VALIDAR CÃDIGO DE VERIFICACIÃN
   Future<void> validateVerificationCode(ValidateVerificationCodeDTO dto) async {
     await _api.postApp('/auth/validate-verification-code', dto.toJson());
   }
 
-  /// 🔓 CAMBIAR CONTRASEÑA CON CÓDIGO
+  /// ð CAMBIAR CONTRASEÃA CON CÃDIGO
   Future<void> changePasswordWithCode(ChangePasswordDTO dto) async {
     await _api.patchApp('/auth/change-password', dto.toJson());
   }
 
-  /// ✅ ACTIVAR USUARIO (DESPUÉS DE VERIFICAR CÓDIGO)
+  /// â ACTIVAR USUARIO (DESPUÃS DE VERIFICAR CÃDIGO)
   Future<void> activateUser(ValidateVerificationCodeDTO dto) async {
     await _api.postApp('/auth/activate-user', dto.toJson());
   }
 
-  /// 🚪 LOGOUT
+  /// ðª LOGOUT
   Future<void> logout() async {
     await _api.postApp('/auth/logout', {});
     await _storage.delete(key: 'Authorization');
-    await _storage.delete(key: 'role'); // ✅ Borramos el rol también
+    await _storage.delete(key: 'role'); // â Borramos el rol tambiÃ©n
   }
 
-  /// ❌ ELIMINAR USUARIO
+  /// â ELIMINAR USUARIO
   Future<void> deleteUser(String userId) async {
     await _api.deleteApp('/auth/$userId');
   }
 
-  /// 📤 SUBIR IMAGEN DE PERFIL
+  /// ð¤ SUBIR IMAGEN DE PERFIL
   Future<ImageDTO> uploadProfileImage(File imageFile) async {
     final formData = FormData.fromMap({
       'image': await MultipartFile.fromFile(imageFile.path),
@@ -119,7 +119,7 @@ class AuthService {
     return apiResponse.data;
   }
 
-  /// 👤 OBTENER USUARIO AUTENTICADO
+  /// ð¤ OBTENER USUARIO AUTENTICADO
   Future<UserDetailDTO> getAuthenticatedUser() async {
     final response = await _api.getApp('/auth/user/details');
     final json = response.data;

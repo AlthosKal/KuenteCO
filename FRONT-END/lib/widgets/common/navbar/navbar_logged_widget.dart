@@ -52,7 +52,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     _loadAuthenticatedData();
   }
 
-  /// ✅ Detecta automáticamente el tipo de autenticación y carga los datos correspondientes
+  /// â Detecta automÃ¡ticamente el tipo de autenticaciÃ³n y carga los datos correspondientes
   Future<void> _loadAuthenticatedData() async {
     try {
       // Obtener el rol guardado en storage
@@ -80,7 +80,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
         }
       }
     } catch (e) {
-      print('Error cargando datos de autenticación: $e');
+      print('Error cargando datos de autenticaciÃ³n: $e');
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -108,7 +108,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     );
   }
 
-  /// ✅ LAYOUT MOBILE
+  /// â LAYOUT MOBILE
   Widget _buildMobileLayout(BuildContext context) => Column(
     children: [
       Center(child: _buildLogo(context, true)),
@@ -124,7 +124,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     ],
   );
 
-  /// ✅ LAYOUT DESKTOP
+  /// â LAYOUT DESKTOP
   Widget _buildDesktopLayout(BuildContext context) => Row(
     children: [
       _buildLogo(context, false),
@@ -137,7 +137,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     ],
   );
 
-  /// ✅ Logo con navegación dinámica según tipo de autenticación
+  /// â Logo con navegaciÃ³n dinÃ¡mica segÃºn tipo de autenticaciÃ³n
   
   Widget _buildLogo(BuildContext context, bool isSmallScreen) {
     final double defaultWidth = isSmallScreen ? 220.0 : 250.0;
@@ -170,7 +170,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     );
   }
 
-  /// ✅ Botón de perfil que detecta automáticamente el tipo de autenticación
+  /// â BotÃ³n de perfil que detecta automÃ¡ticamente el tipo de autenticaciÃ³n
   Widget _buildProfileButton(BuildContext context) {
     if (_currentRole == 'ROLE_PROFILE' && _authenticatedProfile != null) {
       // Es un perfil autenticado - usar ProfileButtonWidget
@@ -179,7 +179,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
         profile: _authenticatedProfile,
       );
     } else if (_authenticatedUser != null) {
-      // Es un usuario autenticado - usar widget según su tipo
+      // Es un usuario autenticado - usar widget segÃºn su tipo
       if (_authenticatedUser!.userType.toLowerCase() == 'personal') {
         return UserButtomPersonalWidget(
           profileImageUrl: _authenticatedUser!.image?.imageUrl ?? '',
@@ -191,12 +191,12 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
       }
     }
     
-    // Fallback si no hay autenticación
+    // Fallback si no hay autenticaciÃ³n
     return const SizedBox.shrink();
   }
 
 
-  /// ✅ Navegación dinámica al home según el tipo de autenticación
+  /// â NavegaciÃ³n dinÃ¡mica al home segÃºn el tipo de autenticaciÃ³n
   Future<void> _navigateToHome(BuildContext context) async {
     if (!mounted) return;
 
@@ -213,7 +213,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
           ),
         );
       } else if (_authenticatedUser != null) {
-        // Navegar según el tipo de usuario
+        // Navegar segÃºn el tipo de usuario
         if (_authenticatedUser!.userType.toLowerCase() == 'personal') {
           Navigator.pushReplacement(
             context,
@@ -244,7 +244,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     }
   }
 
-  /// ✅ Navegación manteniendo historial (excepto logout)
+  /// â NavegaciÃ³n manteniendo historial (excepto logout)
   void _navigateToRoute(BuildContext context, String route) {
     if (route == widget.currentRoute) return;
     Navigator.pushNamed(context, route);

@@ -210,7 +210,7 @@ class _ContactoPageState extends State<ContactView> {
           ),
           _buildContactInfoItem(
             icon: Icons.phone,
-            text: '+52 (123) 456-7890',
+            text: '+57 (123) 456-7890',
           ),
           _buildContactInfoItem(
             icon: Icons.access_time,

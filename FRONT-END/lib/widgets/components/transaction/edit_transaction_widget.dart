@@ -48,21 +48,21 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
   String? _userRole;
   TransactionType _selectedType = TransactionType.EXPENSE;
   
-  // Special enrollment object to represent "Sin categoría" for profiles
+  // Special enrollment object to represent "Sin categorÃ­a" for profiles
   static final CategoryEnrollmentDTO _noCategoryOption = CategoryEnrollmentDTO(
     id: -1, // Use -1 as a special ID for "no category"
     profileId: -1,
     categoryId: null, // null means no category
-    categoryName: 'Sin categoría',
+    categoryName: 'Sin categorÃ­a',
     userEmail: '',
     profileEmail: '',
     enrollmentDate: DateTime.now().toIso8601String(),
   );
   
-  // Special category object to represent "Sin categoría" for business users
+  // Special category object to represent "Sin categorÃ­a" for business users
   static final CategoryDTO _noCategoryBusinessOption = CategoryDTO(
     id: -1, // Use -1 as a special ID for "no category"
-    name: 'Sin categoría',
+    name: 'Sin categorÃ­a',
     description: DescriptionCategory(
       assignedBudget: 0.0,
       state: state_enum.State.ACTIVE,
@@ -172,12 +172,12 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
         setState(() {});
         return;
       } catch (e) {
-        // If no matching category found, use "Sin categoría"
+        // If no matching category found, use "Sin categorÃ­a"
         print('No matching category found for ID: ${widget.transaction.categoryId}');
       }
     }
     
-    // If no match or categoryId is null, default to "Sin categoría"
+    // If no match or categoryId is null, default to "Sin categorÃ­a"
     _selectedCategory = _noCategoryBusinessOption;
     setState(() {});
   }
@@ -198,7 +198,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
       }
     }
     
-    // If no match or categoryId is null, default to "Sin categoría"
+    // If no match or categoryId is null, default to "Sin categorÃ­a"
     _selectedEnrollment = _noCategoryOption;
     setState(() {});
   }
@@ -324,7 +324,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Editar Transacción',
+                        'Editar TransacciÃ³n',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -332,7 +332,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Modifica los detalles de tu transacción',
+                        'Modifica los detalles de tu transacciÃ³n',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Colors.white.withValues(alpha: 0.9),
                         ),
@@ -361,7 +361,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     /// NOMBRE
-                    _buildInputLabel('Nombre de la transacción'),
+                    _buildInputLabel('Nombre de la transacciÃ³n'),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _nameController,
@@ -378,8 +378,8 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                     ),
                     const SizedBox(height: 20),
 
-                    /// DESCRIPCIÓN
-                    _buildInputLabel('Descripción (opcional)'),
+                    /// DESCRIPCIÃN
+                    _buildInputLabel('DescripciÃ³n (opcional)'),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _descriptionController,
@@ -391,8 +391,8 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                     ),
                     const SizedBox(height: 20),
 
-                    /// TIPO DE TRANSACCIÓN
-                    _buildInputLabel('Tipo de transacción'),
+                    /// TIPO DE TRANSACCIÃN
+                    _buildInputLabel('Tipo de transacciÃ³n'),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<TransactionType>(
                       key: ValueKey(_selectedType), // Force rebuild when type changes
@@ -452,7 +452,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                       },
                       validator: (value) {
                         if (value == null) {
-                          return 'Selecciona el tipo de transacción';
+                          return 'Selecciona el tipo de transacciÃ³n';
                         }
                         return null;
                       },
@@ -475,15 +475,15 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                           return 'El monto es obligatorio';
                         }
                         if (double.tryParse(value!) == null) {
-                          return 'Ingresa un monto válido';
+                          return 'Ingresa un monto vÃ¡lido';
                         }
                         return null;
                       },
                     ),
                     const SizedBox(height: 20),
 
-                    /// CATEGORÍA
-                    _buildInputLabel('Categoría'),
+                    /// CATEGORÃA
+                    _buildInputLabel('CategorÃ­a'),
                     const SizedBox(height: 8),
                     Consumer<CategoryController>(
                       builder: (context, categoryController, child) {
@@ -505,7 +505,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 ),
                                 SizedBox(width: 12),
-                                Text('Cargando categorías...'),
+                                Text('Cargando categorÃ­as...'),
                               ],
                             ),
                           );
@@ -531,7 +531,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                               children: [
                                 Icon(Icons.category, color: Colors.grey),
                                 SizedBox(width: 12),
-                                Text('No hay categorías disponibles'),
+                                Text('No hay categorÃ­as disponibles'),
                               ],
                             ),
                           );
@@ -543,11 +543,11 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                           return DropdownButtonFormField<CategoryEnrollmentDTO>(
                             value: _selectedEnrollment,
                             decoration: _buildInputDecoration(
-                              hint: 'Selecciona una categoría',
+                              hint: 'Selecciona una categorÃ­a',
                               icon: Icons.category,
                             ),
                             items: [
-                              // Add "Sin categoría" option at the top
+                              // Add "Sin categorÃ­a" option at the top
                               DropdownMenuItem(
                                 value: _noCategoryOption,
                                 child: Text(_noCategoryOption.categoryName),
@@ -573,11 +573,11 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                           return DropdownButtonFormField<CategoryDTO>(
                             value: _selectedCategory,
                             decoration: _buildInputDecoration(
-                              hint: 'Selecciona una categoría',
+                              hint: 'Selecciona una categorÃ­a',
                               icon: Icons.category,
                             ),
                             items: [
-                              // Add "Sin categoría" option at the top
+                              // Add "Sin categorÃ­a" option at the top
                               DropdownMenuItem(
                                 value: _noCategoryBusinessOption,
                                 child: Text(_noCategoryBusinessOption.name),
@@ -742,7 +742,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                                     ),
                                   )
                                 : const Text(
-                                    'Actualizar Transacción',
+                                    'Actualizar TransacciÃ³n',
                                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                   ),
                           ),
@@ -838,7 +838,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
       
       if (_userRole == 'ROLE_PROFILE') {
         // For profiles, use enrollment data
-        // If "Sin categoría" is selected (id == -1), use null for categoryId
+        // If "Sin categorÃ­a" is selected (id == -1), use null for categoryId
         if (_selectedEnrollment?.id == -1) {
           categoryId = null;
         } else {
@@ -847,7 +847,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
         budgetId = widget.transaction.budgetId;
       } else {
         // For business users, use category data
-        // If "Sin categoría" is selected (id == -1), use null for categoryId and budgetId
+        // If "Sin categorÃ­a" is selected (id == -1), use null for categoryId and budgetId
         if (_selectedCategory?.id == -1) {
           categoryId = null;
           budgetId = null;

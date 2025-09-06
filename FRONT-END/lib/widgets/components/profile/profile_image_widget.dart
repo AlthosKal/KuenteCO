@@ -34,16 +34,16 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
   String? _selectedImageName;
   bool _isPickingImage = false;
 
-  // ✅ MÉTODO COMPATIBLE WEB + MÓVIL
+  // â MÃTODO COMPATIBLE WEB + MÃVIL
   Future<void> _pickImage() async {
-    if (_isPickingImage) return; // Prevenir múltiples clicks
+    if (_isPickingImage) return; // Prevenir mÃºltiples clicks
 
     setState(() => _isPickingImage = true);
 
     try {
       final picker = ImagePicker();
 
-      // ✅ Configuración que funciona en ambas plataformas
+      // â ConfiguraciÃ³n que funciona en ambas plataformas
       final pickedFile = await picker.pickImage(
         source: ImageSource.gallery,
         maxWidth: kIsWeb ? null : 800, // Web no soporta bien maxWidth
@@ -52,22 +52,22 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
       );
 
       if (pickedFile == null) {
-        debugPrint('📷 Image selection cancelled by user');
+        debugPrint('ð· Image selection cancelled by user');
         return;
       }
 
-      debugPrint('📷 Image picked: ${pickedFile.name} (${pickedFile.path})');
+      debugPrint('ð· Image picked: ${pickedFile.name} (${pickedFile.path})');
 
-      // ✅ Leer bytes - funciona tanto en web como móvil
+      // â Leer bytes - funciona tanto en web como mÃ³vil
       final bytes = await pickedFile.readAsBytes();
 
       if (bytes.isEmpty) {
-        debugPrint('❌ Image bytes are empty');
-        _showError('Error: imagen vacía');
+        debugPrint('â Image bytes are empty');
+        _showError('Error: imagen vacÃ­a');
         return;
       }
 
-      // ✅ Crear MultipartFile con nombre apropiado
+      // â Crear MultipartFile con nombre apropiado
       final fileName = pickedFile.name.isNotEmpty
           ? pickedFile.name
           : 'profile_image_${DateTime.now().millisecondsSinceEpoch}.jpg';
@@ -86,18 +86,18 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
       widget.selectedImageNotifier?.value = multipartFile;
       widget.removeImageNotifier?.value = false;
 
-      debugPrint('✅ Image selected successfully: $fileName (${bytes.length} bytes)');
+      debugPrint('â Image selected successfully: $fileName (${bytes.length} bytes)');
 
     } catch (e, stackTrace) {
-      debugPrint('❌ Error picking image: $e');
+      debugPrint('â Error picking image: $e');
       debugPrint('Stack trace: $stackTrace');
 
-      // ✅ Manejo específico de errores por plataforma
+      // â Manejo especÃ­fico de errores por plataforma
       if (kIsWeb) {
         if (e.toString().contains('User cancelled') ||
             e.toString().contains('AbortError')) {
-          debugPrint('🚫 User cancelled image selection on web');
-          return; // No mostrar error si usuario canceló
+          debugPrint('ð« User cancelled image selection on web');
+          return; // No mostrar error si usuario cancelÃ³
         }
       }
 
@@ -111,9 +111,9 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('¿Eliminar imagen de perfil?'),
+        title: const Text('Â¿Eliminar imagen de perfil?'),
         content: const Text(
-          '¿Estás seguro de que deseas eliminar tu imagen de perfil? Este cambio se aplicará al guardar.',
+          'Â¿EstÃ¡s seguro de que deseas eliminar tu imagen de perfil? Este cambio se aplicarÃ¡ al guardar.',
         ),
         actions: [
           TextButton(
@@ -123,7 +123,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: const Text(
-              'Sí, eliminar',
+              'SÃ­, eliminar',
               style: TextStyle(color: Colors.red),
             ),
           ),
@@ -141,7 +141,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
     widget.selectedImageNotifier?.value = null;
     widget.removeImageNotifier?.value = true;
 
-    debugPrint('🗑️ Image marked for removal');
+    debugPrint('ðï¸ Image marked for removal');
   }
 
   void _showError(String message) {
@@ -181,7 +181,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
         final currentImage = currentProfile?.image;
         final shouldRemoveImage = widget.removeImageNotifier?.value ?? false;
 
-        debugPrint('🔍 ProfileImageWidget - Building with state:');
+        debugPrint('ð ProfileImageWidget - Building with state:');
         debugPrint('  - Has profile: ${currentProfile != null}');
         debugPrint('  - Has image: ${currentImage?.imageUrl?.isNotEmpty == true}');
         debugPrint('  - Should remove: $shouldRemoveImage');
@@ -206,7 +206,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
   }
 
   Widget _buildImageContent(ImageDTO? currentImage, bool shouldRemoveImage) {
-    // ✅ Mostrar loading si está seleccionando imagen
+    // â Mostrar loading si estÃ¡ seleccionando imagen
     if (_isPickingImage) {
       return Container(
         color: Colors.grey[200],
@@ -235,7 +235,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
             _selectedImageBytes!,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
-              debugPrint('❌ Error displaying selected image: $error');
+              debugPrint('â Error displaying selected image: $error');
               return const Center(
                 child: Icon(Icons.error, size: 40, color: Colors.red),
               );
@@ -259,7 +259,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
       );
     }
 
-    // Si se marcó para eliminar
+    // Si se marcÃ³ para eliminar
     if (shouldRemoveImage) {
       return const Center(
         child: Column(
@@ -268,7 +268,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
             Icon(Icons.person_off, size: 40, color: Colors.grey),
             SizedBox(height: 4),
             Text(
-              'Se eliminará',
+              'Se eliminarÃ¡',
               style: TextStyle(fontSize: 10, color: Colors.grey),
             ),
           ],
@@ -287,7 +287,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
           return const Center(child: CircularProgressIndicator());
         },
         errorBuilder: (context, error, stackTrace) {
-          debugPrint('❌ Error loading profile image: $error');
+          debugPrint('â Error loading profile image: $error');
           return const Center(
             child: Icon(Icons.person, size: 60, color: Colors.grey),
           );

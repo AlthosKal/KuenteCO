@@ -40,19 +40,19 @@
 //           _buildHeader(),
 //           const SizedBox(height: 20),
 //
-//           // Estado de sincronización
+//           // Estado de sincronizaciÃ³n
 //           _buildSyncStatus(),
 //           const SizedBox(height: 20),
 //
-//           // Formulario de configuración
+//           // Formulario de configuraciÃ³n
 //           _buildSyncForm(),
 //           const SizedBox(height: 20),
 //
-//           // Botón de sincronización
+//           // BotÃ³n de sincronizaciÃ³n
 //           _buildSyncButton(),
 //           const SizedBox(height: 20),
 //
-//           // Información sobre la sincronización
+//           // InformaciÃ³n sobre la sincronizaciÃ³n
 //           _buildSyncInfo(),
 //         ],
 //       ),
@@ -97,7 +97,7 @@
 //                   crossAxisAlignment: CrossAxisAlignment.start,
 //                   children: [
 //                     const Text(
-//                       'Sincronización Bancolombia',
+//                       'SincronizaciÃ³n Bancolombia',
 //                       style: TextStyle(
 //                         color: Colors.white,
 //                         fontSize: 18,
@@ -106,7 +106,7 @@
 //                     ),
 //                     const SizedBox(height: 4),
 //                     Text(
-//                       'Importa tus transacciones automáticamente',
+//                       'Importa tus transacciones automÃ¡ticamente',
 //                       style: TextStyle(
 //                         color: Colors.white.withOpacity(0.9),
 //                         fontSize: 14,
@@ -131,7 +131,7 @@
 //                   const Icon(Icons.check_circle, color: Colors.white, size: 16),
 //                   const SizedBox(width: 6),
 //                   Text(
-//                     'Última sincronización: $_lastSyncDate',
+//                     'Ãltima sincronizaciÃ³n: $_lastSyncDate',
 //                     style: const TextStyle(color: Colors.white, fontSize: 12),
 //                   ),
 //                 ],
@@ -176,7 +176,7 @@
 //                     Text(
 //                       controller.isLoading
 //                         ? 'Por favor espera mientras importamos tus transacciones'
-//                         : 'Configura los parámetros y presiona sincronizar',
+//                         : 'Configura los parÃ¡metros y presiona sincronizar',
 //                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
 //                         color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
 //                       ),
@@ -204,28 +204,28 @@
 //         crossAxisAlignment: CrossAxisAlignment.start,
 //         children: [
 //           Text(
-//             'Configuración de Sincronización',
+//             'ConfiguraciÃ³n de SincronizaciÃ³n',
 //             style: Theme.of(context).textTheme.titleMedium?.copyWith(
 //               fontWeight: FontWeight.w600,
 //             ),
 //           ),
 //           const SizedBox(height: 16),
 //
-//           // Campo número de cuenta
+//           // Campo nÃºmero de cuenta
 //           TextFormField(
 //             controller: _accountNumberController,
 //             decoration: const InputDecoration(
-//               labelText: 'Número de Cuenta',
-//               hintText: 'Ingresa tu número de cuenta de Bancolombia',
+//               labelText: 'NÃºmero de Cuenta',
+//               hintText: 'Ingresa tu nÃºmero de cuenta de Bancolombia',
 //               prefixIcon: Icon(Icons.account_balance),
 //               border: OutlineInputBorder(),
 //             ),
 //             validator: (value) {
 //               if (value == null || value.trim().isEmpty) {
-//                 return 'El número de cuenta es requerido';
+//                 return 'El nÃºmero de cuenta es requerido';
 //               }
 //               if (value.trim().length < 8) {
-//                 return 'Número de cuenta inválido';
+//                 return 'NÃºmero de cuenta invÃ¡lido';
 //               }
 //               return null;
 //             },
@@ -237,7 +237,7 @@
 //             controller: _userIdController,
 //             decoration: const InputDecoration(
 //               labelText: 'ID de Usuario',
-//               hintText: 'Tu identificación en Bancolombia',
+//               hintText: 'Tu identificaciÃ³n en Bancolombia',
 //               prefixIcon: Icon(Icons.person),
 //               border: OutlineInputBorder(),
 //             ),
@@ -334,7 +334,7 @@
 //               Icon(Icons.info_outline, color: Colors.blue.shade600),
 //               const SizedBox(width: 8),
 //               Text(
-//                 'Información Importante',
+//                 'InformaciÃ³n Importante',
 //                 style: TextStyle(
 //                   fontWeight: FontWeight.w600,
 //                   color: Colors.blue.shade600,
@@ -345,30 +345,30 @@
 //           const SizedBox(height: 12),
 //
 //           _buildInfoItem(
-//             '🔒',
+//             'ð',
 //             'Seguridad',
-//             'Tu información bancaria se maneja de forma segura y encriptada.',
+//             'Tu informaciÃ³n bancaria se maneja de forma segura y encriptada.',
 //           ),
 //           const SizedBox(height: 8),
 //
 //           _buildInfoItem(
-//             '📊',
+//             'ð',
 //             'Datos Importados',
-//             'Se importarán movimientos de débitos, créditos y transferencias.',
+//             'Se importarÃ¡n movimientos de dÃ©bitos, crÃ©ditos y transferencias.',
 //           ),
 //           const SizedBox(height: 8),
 //
 //           _buildInfoItem(
-//             '⏱️',
+//             'â±ï¸',
 //             'Frecuencia',
-//             'Recomendamos sincronizar semanalmente para mantener actualizada la información.',
+//             'Recomendamos sincronizar semanalmente para mantener actualizada la informaciÃ³n.',
 //           ),
 //           const SizedBox(height: 8),
 //
 //           _buildInfoItem(
-//             '🔄',
+//             'ð',
 //             'Duplicados',
-//             'El sistema detecta automáticamente transacciones duplicadas.',
+//             'El sistema detecta automÃ¡ticamente transacciones duplicadas.',
 //           ),
 //         ],
 //       ),
@@ -436,12 +436,12 @@
 //         _isLoading = false;
 //       });
 //
-//       // Mostrar dialog de éxito
-//       _showSyncResultDialog(true, 'Sincronización completada exitosamente');
+//       // Mostrar dialog de Ã©xito
+//       _showSyncResultDialog(true, 'SincronizaciÃ³n completada exitosamente');
 //
 //     } catch (e) {
 //       setState(() => _isLoading = false);
-//       _showSyncResultDialog(false, 'Error en la sincronización: $e');
+//       _showSyncResultDialog(false, 'Error en la sincronizaciÃ³n: $e');
 //     }
 //   }
 //
@@ -456,7 +456,7 @@
 //               color: success ? Colors.green : Colors.red,
 //             ),
 //             const SizedBox(width: 8),
-//             Text(success ? 'Éxito' : 'Error'),
+//             Text(success ? 'Ãxito' : 'Error'),
 //           ],
 //         ),
 //         content: Text(message),
@@ -477,7 +477,7 @@
 //   }
 // }
 //
-// // Widget compacto para mostrar el estado de sincronización
+// // Widget compacto para mostrar el estado de sincronizaciÃ³n
 // class BancolombiaSyncStatusWidget extends StatelessWidget {
 //   final VoidCallback onTap;
 //
@@ -518,7 +518,7 @@
 //                 crossAxisAlignment: CrossAxisAlignment.start,
 //                 children: [
 //                   Text(
-//                     'Sincronización Bancolombia',
+//                     'SincronizaciÃ³n Bancolombia',
 //                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
 //                       fontWeight: FontWeight.w600,
 //                       color: Colors.blue.shade600,
@@ -526,7 +526,7 @@
 //                   ),
 //                   const SizedBox(height: 2),
 //                   Text(
-//                     'Importar transacciones automáticamente',
+//                     'Importar transacciones automÃ¡ticamente',
 //                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
 //                       color: Colors.blue.shade600.withOpacity(0.8),
 //                     ),
@@ -555,7 +555,7 @@
 // }
 //
 // class _BancolombiaSyncHistoryWidgetState extends State<BancolombiaSyncHistoryWidget> {
-//   // Mock data - en implementación real vendría del servicio
+//   // Mock data - en implementaciÃ³n real vendrÃ­a del servicio
 //   final List<Map<String, dynamic>> _syncHistory = [
 //     {
 //       'date': '2024-03-15T10:30:00Z',
@@ -574,7 +574,7 @@
 //       'status': 'error',
 //       'transactionsImported': 0,
 //       'accountNumber': '****1234',
-//       'error': 'Error de conexión',
+//       'error': 'Error de conexiÃ³n',
 //     },
 //   ];
 //
@@ -616,7 +616,7 @@
 //           ),
 //           const SizedBox(height: 8),
 //           Text(
-//             'Las sincronizaciones aparecerán aquí',
+//             'Las sincronizaciones aparecerÃ¡n aquÃ­',
 //             style: Theme.of(context).textTheme.bodySmall?.copyWith(
 //               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
 //             ),
@@ -660,7 +660,7 @@
 //                 Row(
 //                   children: [
 //                     Text(
-//                       isSuccess ? 'Sincronización exitosa' : 'Error en sincronización',
+//                       isSuccess ? 'SincronizaciÃ³n exitosa' : 'Error en sincronizaciÃ³n',
 //                       style: TextStyle(
 //                         fontWeight: FontWeight.w600,
 //                         color: color,
@@ -678,7 +678,7 @@
 //                 const SizedBox(height: 4),
 //                 if (isSuccess)
 //                   Text(
-//                     '${sync['transactionsImported']} transacciones importadas • ${sync['accountNumber']}',
+//                     '${sync['transactionsImported']} transacciones importadas â¢ ${sync['accountNumber']}',
 //                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
 //                       color: color.withOpacity(0.8),
 //                     ),

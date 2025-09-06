@@ -37,27 +37,27 @@ class ChangePasswordController {
       if (context.mounted) {
         Navigator.pushReplacementNamed(context, AppRoutes.login);
 
-        ToastHelper.showSuccess(context, title: 'Cambio de contraseña exitoso');
+        ToastHelper.showSuccess(context, title: 'Cambio de contraseÃ±a exitoso');
       }
     }, onError: (error){
-      ToastHelper.showError(context, title: 'Error al cambiar la contraseña', description: error.toString());
+      ToastHelper.showError(context, title: 'Error al cambiar la contraseÃ±a', description: error.toString());
       isLoading.value = false;
     }
     );
     isLoading.value = false;
   }
 
-  // Toggle para mostrar/ocultar contraseña
+  // Toggle para mostrar/ocultar contraseÃ±a
   void togglePasswordVisibility() {
     obscurePassword.value = !obscurePassword.value;
   }
 
-  // Toggle para mostrar/ocultar confirmar contraseña
+  // Toggle para mostrar/ocultar confirmar contraseÃ±a
   void toggleConfirmPasswordVisibility() {
     obscureConfirmPassword.value = !obscureConfirmPassword.value;
   }
 
-  // Cambiar recordar contraseña
+  // Cambiar recordar contraseÃ±a
   void toggleRememberPassword(bool? value) {
     rememberPassword.value = value ?? false;
   }

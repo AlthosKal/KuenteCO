@@ -34,7 +34,7 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
     });
   }
   
-  /// Cargar datos según el rol del usuario
+  /// Cargar datos segÃºn el rol del usuario
   Future<void> _loadDataBasedOnRole() async {
     print('BudgetView: _loadDataBasedOnRole() called');
     final budgetController = Provider.of<BudgetController>(context, listen: false);
@@ -97,21 +97,21 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
   Future<void> _handleDeleteBudget(budget) async {
     final result = await DeleteBudgetWidget.showDeleteDialog(context, budget);
     if (result == true) {
-      // La eliminación fue exitosa, la lista se actualizará automáticamente
+      // La eliminaciÃ³n fue exitosa, la lista se actualizarÃ¡ automÃ¡ticamente
     }
   }
 
   Future<void> _handleEditBudget(budget) async {
     final result = await EditBudgetWidget.showEditDialog(context, budget);
     if (result == true) {
-      // La edición fue exitosa, la lista se actualizará automáticamente
+      // La ediciÃ³n fue exitosa, la lista se actualizarÃ¡ automÃ¡ticamente
     }
   }
 
   Future<void> _handleAssignBudget(budget) async {
     final result = await AssignBudgetToProfilesWidget.showAssignDialog(context, budget);
     if (result == true) {
-      // La asignación fue exitosa
+      // La asignaciÃ³n fue exitosa
     }
   }
 
@@ -148,16 +148,16 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
                 ),
               ),
               const Divider(),
-              Text("📅 Fecha de creación: $registerDateStr"),
-              Text("💰 Monto total: \$${budget.totalAmount}"),
-              Text("📊 Estado: ${budget.status}"),
+              Text("Fecha de creación: $registerDateStr"),
+              Text("Monto total: \$${budget.totalAmount}"),
+              Text("Estado: ${budget.status}"),
               if (budget.description != null)
-                Text("📝 Descripción: ${budget.description}"),
+                Text("Descripción: ${budget.description}"),
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 onPressed: () {
                   Navigator.pop(context);
-                  // Aquí podrías navegar a un reporte detallado si lo deseas
+                  // AquÃ­ podrÃ­as navegar a un reporte detallado si lo deseas
                 },
                 icon: const Icon(Icons.bar_chart),
                 label: const Text("Ver reporte completo"),
@@ -202,7 +202,6 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
     
     if (result == true) {
       clearSelection();
-      // La actualización se refleja automáticamente a través del Provider
     }
   }
   
@@ -220,7 +219,6 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
     
     if (result == true) {
       clearSelection();
-      // La eliminación se refleja automáticamente a través del Provider
     }
   }
   
@@ -236,7 +234,7 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
   // ============= APP BAR BUILDER =============
   
   PreferredSizeWidget _buildAppBar(BudgetController controller, bool isProfile) {
-    // Los perfiles nunca entran en modo selección, solo tienen AppBar simple
+    // Los perfiles nunca entran en modo selecciÃ³n, solo tienen AppBar simple
     if (isSelectionMode && !isProfile) {
       // Selection mode AppBar with batch operations (solo para usuarios regulares)
       return AppBar(
@@ -360,7 +358,7 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
     );
   }
   
-  /// Construir botón reutilizable para crear presupuesto
+  /// Construir botÃ³n reutilizable para crear presupuesto
   Widget _buildCreateBudgetButton(String title, String subtitle) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -435,7 +433,7 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
     );
   }
   
-  /// Mostrar diálogo para crear presupuesto
+  /// Mostrar diÃ¡logo para crear presupuesto
   Future<void> _showCreateBudgetDialog() async {
     final result = await showDialog<bool>(
       context: context,
@@ -454,7 +452,7 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
     
     return ListView.builder(
       padding: const EdgeInsets.all(8),
-      itemCount: controller.budgets.length + 1, // +1 para el botón de agregar
+      itemCount: controller.budgets.length + 1, // +1 para el botÃ³n de agregar
       itemBuilder: (context, index) => _buildUserViewItem(context, controller, index),
     );
   }
@@ -505,7 +503,7 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
   }
   
   Widget _buildUserViewItem(BuildContext context, BudgetController controller, int index) {
-    // Si es el último item, mostrar el botón de agregar
+    // Si es el Ãºltimo item, mostrar el botÃ³n de agregar
     if (index == controller.budgets.length) {
       return _buildCreateBudgetButton(
         'Crear nuevo presupuesto',

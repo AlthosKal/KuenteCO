@@ -62,14 +62,14 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
             await categoryController.loadEnrollments();
           } catch (enrollmentError) {
             if (mounted) {
-              debugPrint('⚠️ CategoryView: Error loading enrollment summaries: $enrollmentError');
+              debugPrint('â ï¸ CategoryView: Error loading enrollment summaries: $enrollmentError');
             }
           }
         }
       }
     } catch (e) {
       if (mounted) {
-        debugPrint('❌ Error loading data in CategoryView: $e');
+        debugPrint('â Error loading data in CategoryView: $e');
       }
       
       final String? role = await _storage.read(key: 'role');
@@ -78,7 +78,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
           await categoryController.loadCategories();
         } catch (fallbackError) {
           if (mounted) {
-            debugPrint('❌ CategoryView: Fallback also failed: $fallbackError');
+            debugPrint('â CategoryView: Fallback also failed: $fallbackError');
           }
         }
       }
@@ -105,7 +105,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
       }
     } catch (e) {
       if (mounted) {
-        debugPrint('❌ Error checking user type: $e');
+        debugPrint('â Error checking user type: $e');
         setState(() => _isBusinessUser = false);
       }
     }
@@ -114,7 +114,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
   Future<void> _handleDeleteCategory(category) async {
     final result = await DeleteCategoryWidget.showDeleteDialog(context, category);
     if (result == true) {
-      // Forzar recarga después de eliminación exitosa
+      // Forzar recarga despuÃ©s de eliminaciÃ³n exitosa
       await _loadDataBasedOnRole();
     }
   }
@@ -122,7 +122,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
   Future<void> _handleEditCategory(category) async {
     final result = await EditCategoryWidget.showEditDialog(context, category);
     if (result == true) {
-      // La edición fue exitosa, la lista se actualizará automáticamente
+      // La ediciÃ³n fue exitosa, la lista se actualizarÃ¡ automÃ¡ticamente
       // gracias al Provider y el controlador
     }
   }
@@ -130,7 +130,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
   Future<void> _handleAssignCategory(category) async {
     final result = await AssignCategoryWidget.showAssignDialog(context, category);
     if (result == true) {
-      // La asignación fue exitosa - para usuarios business necesitamos
+      // La asignaciÃ³n fue exitosa - para usuarios business necesitamos
       // recargar los enrollment summaries para actualizar los contadores
       if (_isBusinessUser) {
         final categoryController = Provider.of<CategoryController>(context, listen: false);
@@ -139,7 +139,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     }
   }
   
-  // Método para manejar eliminación individual de asignaciones
+  // MÃ©todo para manejar eliminaciÃ³n individual de asignaciones
   Future<void> _handleDeleteSingleEnrollment(enrollment) async {
     final categoryController = Provider.of<CategoryController>(context, listen: false);
     
@@ -150,7 +150,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     );
     
     if (result == true) {
-      // La eliminación fue exitosa, recargar los datos
+      // La eliminaciÃ³n fue exitosa, recargar los datos
       await _loadDataBasedOnRole();
     }
   }
@@ -188,15 +188,15 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                 ),
               ),
               const Divider(),
-              Text("📅 Fecha de registro: $registerDateStr"),
-              Text("💰 Presupuesto asignado: \$${category.description.assignedBudget}"),
-              Text("💰 Presupuesto ID: ${category.budgetId ?? 'Sin asignar'}"),
-              Text("🔄 Estado: ${category.description.state}"),
+              Text("Fecha de registro: $registerDateStr"),
+              Text("Presupuesto asignado: \$${category.description.assignedBudget}"),
+              Text("Presupuesto ID: ${category.budgetId ?? 'Sin asignar'}"),
+              Text("Estado: ${category.description.state}"),
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 onPressed: () {
                   Navigator.pop(context);
-                  // Aquí podrías navegar a un reporte detallado si lo deseas
+                  // AquÃ­ podrÃ­as navegar a un reporte detallado si lo deseas
                 },
                 icon: const Icon(Icons.bar_chart),
                 label: const Text("Ver reporte completo"),
@@ -208,7 +208,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     );
   }
   
-  /// Obtener elementos a mostrar según el rol
+  /// Obtener elementos a mostrar segÃºn el rol
   List<dynamic> _getItemsToDisplay(CategoryController controller) {
     return controller.categories;
   }
@@ -228,7 +228,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
       builder: (context) => const CreateMultipleCategoriesWidget(),
     );
     
-    // Si se crearon categorías exitosamente, recargar la lista
+    // Si se crearon categorÃ­as exitosamente, recargar la lista
     if (result == true) {
       await _loadDataBasedOnRole();
     }
@@ -254,7 +254,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     
     clearSelection();
     
-    // Si se editaron categorías exitosamente, recargar la lista
+    // Si se editaron categorÃ­as exitosamente, recargar la lista
     if (result == true) {
       await _loadDataBasedOnRole();
     }
@@ -280,7 +280,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     
     clearSelection();
     
-    // Si se eliminaron categorías exitosamente, recargar la lista
+    // Si se eliminaron categorÃ­as exitosamente, recargar la lista
     if (result == true) {
       await _loadDataBasedOnRole();
     }
@@ -421,7 +421,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     );
   }
   
-  /// Construir botón reutilizable para crear categoría
+  /// Construir botÃ³n reutilizable para crear categorÃ­a
   Widget _buildCreateCategoryButton(String title, String subtitle) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -496,7 +496,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     );
   }
   
-  /// Mostrar diálogo para crear categoría
+  /// Mostrar diÃ¡logo para crear categorÃ­a
   Future<void> _showCreateCategoryDialog() async {
     final result = await showDialog<bool>(
       context: context,
@@ -507,7 +507,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     }
   }
   
-  /// Vista para usuarios regulares (pueden crear/editar categorías)
+  /// Vista para usuarios regulares (pueden crear/editar categorÃ­as)
   Widget _buildUserView(CategoryController controller) {
     if (controller.categories.isEmpty) {
       return _buildEmptyState();
@@ -515,7 +515,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     
     return ListView.builder(
       padding: const EdgeInsets.all(8),
-      itemCount: controller.categories.length + 1, // +1 para el botón de agregar
+      itemCount: controller.categories.length + 1, // +1 para el botÃ³n de agregar
       itemBuilder: (context, index) => _buildUserViewItem(context, controller, index),
     );
   }
@@ -546,7 +546,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Crea tu primera categoría usando el botón de abajo',
+                    'Crea tu primera categorÃ­a usando el botÃ³n de abajo',
                     style: TextStyle(
                       color: Colors.grey[500],
                     ),
@@ -566,7 +566,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
   }
   
   Widget _buildUserViewItem(BuildContext context, CategoryController controller, int index) {
-    // Si es el último item, mostrar el botón de agregar
+    // Si es el Ãºltimo item, mostrar el botÃ³n de agregar
     if (index == controller.categories.length) {
       return _buildCreateCategoryButton(
         'Crear nueva categoría',
@@ -574,7 +574,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
       );
     }
     
-    // Items normales de categorías
+    // Items normales de categorÃ­as
     final category = controller.categories[index];
     return CategoryListWidget(
       key: ValueKey(category.id),
@@ -592,7 +592,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     );
   }
   
-  /// Vista para perfiles (solo pueden ver categorías asignadas)
+  /// Vista para perfiles (solo pueden ver categorÃ­as asignadas)
   Widget _buildProfileView(CategoryController controller) {
     return controller.enrollments.isEmpty
         ? Padding(
@@ -689,7 +689,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                               ],
                             ),
                           ),
-                          // Botón para eliminar la asignación individual
+                          // BotÃ³n para eliminar la asignaciÃ³n individual
                           IconButton(
                             onPressed: () => _handleDeleteSingleEnrollment(enrollment),
                             icon: const Icon(

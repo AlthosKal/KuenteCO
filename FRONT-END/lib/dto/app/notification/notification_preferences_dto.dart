@@ -15,7 +15,7 @@ class NotificationPreferencesDTO {
   final bool transactionAlertEnabled;
   final bool unusualActivityEnabled;
 
-  // Canales de notificación
+  // Canales de notificaciÃ³n
   final bool emailEnabled;
   final bool pushEnabled;
   final bool smsEnabled;

@@ -50,7 +50,7 @@ class _BatchAssignCategoryWidgetState extends State<BatchAssignCategoryWidget> {
     try {
       final categoryController = Provider.of<CategoryController>(context, listen: false);
 
-      // Cargar categorías y perfiles en paralelo
+      // Cargar categorÃ­as y perfiles en paralelo
       await Future.wait([
         categoryController.loadCategories(),
         _loadProfiles(),
@@ -60,12 +60,12 @@ class _BatchAssignCategoryWidgetState extends State<BatchAssignCategoryWidget> {
         _availableCategories = categoryController.categories;
       });
 
-      print('📌 BatchAssignCategoryWidget: Loaded ${_availableCategories.length} categories and ${_availableProfiles.length} profiles');
+      print('ð BatchAssignCategoryWidget: Loaded ${_availableCategories.length} categories and ${_availableProfiles.length} profiles');
     } catch (e) {
       setState(() {
         _errorMessage = 'Error al cargar datos: $e';
       });
-      print('❌ BatchAssignCategoryWidget: Error loading data: $e');
+      print('â BatchAssignCategoryWidget: Error loading data: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -122,7 +122,7 @@ class _BatchAssignCategoryWidgetState extends State<BatchAssignCategoryWidget> {
     if (_selectedCategoryIds.isEmpty || _selectedProfileIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Selecciona al menos una categoría y un perfil'),
+          content: Text('Selecciona al menos una categorÃ­a y un perfil'),
           backgroundColor: Colors.orange,
         ),
       );
@@ -141,9 +141,9 @@ class _BatchAssignCategoryWidgetState extends State<BatchAssignCategoryWidget> {
     }
 
     final totalAssignments = enrollments.length;
-    print('📌 BatchAssignCategoryWidget: Creating $totalAssignments assignments');
+    print('ð BatchAssignCategoryWidget: Creating $totalAssignments assignments');
 
-    // Mostrar confirmación
+    // Mostrar confirmaciÃ³n
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -152,10 +152,10 @@ class _BatchAssignCategoryWidgetState extends State<BatchAssignCategoryWidget> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Se crearán $totalAssignments asignaciones:'),
+            Text('Se crearÃ¡n $totalAssignments asignaciones:'),
             const SizedBox(height: 8),
-            Text('• ${_selectedCategoryIds.length} categorías seleccionadas'),
-            Text('• ${_selectedProfileIds.length} perfiles seleccionados'),
+            Text('â¢ ${_selectedCategoryIds.length} categorÃ­as seleccionadas'),
+            Text('â¢ ${_selectedProfileIds.length} perfiles seleccionados'),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
@@ -170,7 +170,7 @@ class _BatchAssignCategoryWidgetState extends State<BatchAssignCategoryWidget> {
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Las asignaciones duplicadas serán ignoradas automáticamente.',
+                      'Las asignaciones duplicadas serÃ¡n ignoradas automÃ¡ticamente.',
                       style: TextStyle(fontSize: 13),
                     ),
                   ),
@@ -207,21 +207,21 @@ class _BatchAssignCategoryWidgetState extends State<BatchAssignCategoryWidget> {
       final categoryController = Provider.of<CategoryController>(context, listen: false);
       await categoryController.enrollProfilesToCategoriesBatch(enrollments);
 
-      // Mostrar éxito
+      // Mostrar Ã©xito
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('✅ Se crearon $totalAssignments asignaciones exitosamente'),
+          content: Text('â Se crearon $totalAssignments asignaciones exitosamente'),
           backgroundColor: Colors.green,
         ),
       );
 
-      // Cerrar el diálogo
+      // Cerrar el diÃ¡logo
       Navigator.pop(context, true);
     } catch (e) {
       setState(() {
         _errorMessage = 'Error al crear asignaciones: $e';
       });
-      print('❌ BatchAssignCategoryWidget: Error creating batch assignments: $e');
+      print('â BatchAssignCategoryWidget: Error creating batch assignments: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -246,7 +246,7 @@ class _BatchAssignCategoryWidgetState extends State<BatchAssignCategoryWidget> {
                 const SizedBox(width: 12),
                 const Expanded(
                   child: Text(
-                    'Asignación Masiva de Categorías',
+                    'AsignaciÃ³n Masiva de CategorÃ­as',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -296,7 +296,7 @@ class _BatchAssignCategoryWidgetState extends State<BatchAssignCategoryWidget> {
               Expanded(
                 child: Row(
                   children: [
-                    // Categorías
+                    // CategorÃ­as
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,7 +304,7 @@ class _BatchAssignCategoryWidgetState extends State<BatchAssignCategoryWidget> {
                           Row(
                             children: [
                               Text(
-                                'Categorías (${_selectedCategoryIds.length}/${_availableCategories.length})',
+                                'CategorÃ­as (${_selectedCategoryIds.length}/${_availableCategories.length})',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -474,7 +474,7 @@ class _BatchAssignCategoryWidgetState extends State<BatchAssignCategoryWidget> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Se crearán ${_selectedCategoryIds.length * _selectedProfileIds.length} asignaciones',
+                        'Se crearÃ¡n ${_selectedCategoryIds.length * _selectedProfileIds.length} asignaciones',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -489,7 +489,7 @@ class _BatchAssignCategoryWidgetState extends State<BatchAssignCategoryWidget> {
                 children: [
                   TextButton(
                     onPressed: _clearSelections,
-                    child: const Text('Limpiar selección'),
+                    child: const Text('Limpiar selecciÃ³n'),
                   ),
                   const Spacer(),
                   TextButton(

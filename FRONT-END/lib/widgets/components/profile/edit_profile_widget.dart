@@ -43,7 +43,7 @@ class _EditProfileState extends State<EditProfile> {
     _emailController = TextEditingController(text: widget.profile.email);
     
     // Debug: verificar si el profile ya tiene imagen
-    debugPrint('🔍 EditProfile - profile.image: ${widget.profile.image?.imageUrl ?? "NO_IMAGE"}');
+    debugPrint('ð EditProfile - profile.image: ${widget.profile.image?.imageUrl ?? "NO_IMAGE"}');
   }
 
   @override
@@ -64,13 +64,13 @@ class _EditProfileState extends State<EditProfile> {
         id: widget.profile.id,
         username: _usernameController.text.trim(),
         email: _emailController.text.trim(),
-        removeImage: _removeImageNotifier.value, // 🎯 Sincronizado con widget
+        removeImage: _removeImageNotifier.value, // ð¯ Sincronizado con widget
       );
 
-      debugPrint('🔍 Profile update - removeImage: ${_removeImageNotifier.value}');
-      debugPrint('🔍 Profile update - selectedImage: ${_selectedImageNotifier.value != null ? "YES" : "NO"}');
+      debugPrint('ð Profile update - removeImage: ${_removeImageNotifier.value}');
+      debugPrint('ð Profile update - selectedImage: ${_selectedImageNotifier.value != null ? "YES" : "NO"}');
 
-      // 🎯 Pasar imagen al update_profile del backend
+      // ð¯ Pasar imagen al update_profile del backend
       await widget.profileController.updateProfile(
         dto, 
         imageFile: _selectedImageNotifier.value,
@@ -79,10 +79,10 @@ class _EditProfileState extends State<EditProfile> {
       widget.onSuccess?.call();
 
       if (mounted) {
-        Navigator.of(context).pop(); // Cerrar el diálogo
+        Navigator.of(context).pop(); // Cerrar el diÃ¡logo
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('✅ Perfil actualizado con éxito'),
+            content: Text('â Perfil actualizado con Ã©xito'),
             backgroundColor: Colors.green,
           ),
         );
@@ -91,7 +91,7 @@ class _EditProfileState extends State<EditProfile> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('❌ Error al actualizar perfil: $e'),
+            content: Text('â Error al actualizar perfil: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -135,7 +135,7 @@ class _EditProfileState extends State<EditProfile> {
               ),
               const Divider(),
 
-              /// --- Formulario de edición de perfil ---
+              /// --- Formulario de ediciÃ³n de perfil ---
               Form(
                 key: _formKey,
                 child: Column(
@@ -145,7 +145,7 @@ class _EditProfileState extends State<EditProfile> {
                         profileController: widget.profileController,
                         selectedImageNotifier: _selectedImageNotifier,
                         removeImageNotifier: _removeImageNotifier,
-                        profile: widget.profile, // 🎯 Pasar el profile con la imagen
+                        profile: widget.profile, // ð¯ Pasar el profile con la imagen
                         size: 120,
                       ),
                     ),
@@ -165,14 +165,14 @@ class _EditProfileState extends State<EditProfile> {
                     TextFormField(
                       controller: _emailController,
                       decoration: const InputDecoration(
-                        labelText: 'Correo electrónico',
+                        labelText: 'Correo electrÃ³nico',
                         prefixIcon: Icon(Icons.email),
                       ),
                       enabled: !_isLoading,
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) =>
                       value == null || !value.contains('@')
-                          ? 'Correo inválido'
+                          ? 'Correo invÃ¡lido'
                           : null,
                     ),
                     const SizedBox(height: 16),
@@ -191,11 +191,11 @@ class _EditProfileState extends State<EditProfile> {
 
               const SizedBox(height: 12),
 
-              /// --- Botón cambiar contraseña ---
+              /// --- BotÃ³n cambiar contraseÃ±a ---
               SizedBox(
                 width: double.infinity,
                 child: PrimaryButton(
-                  label: "Cambiar contraseña",
+                  label: "Cambiar contraseÃ±a",
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(

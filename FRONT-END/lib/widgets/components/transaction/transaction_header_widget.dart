@@ -17,7 +17,7 @@ class TransactionHeaderWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// TÍTULO
+          /// TÃTULO
           Text(
             'Transacciones',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -58,7 +58,7 @@ class TransactionHeaderWidget extends StatelessWidget {
                       ),
                       Tab(
                         icon: Icon(Icons.bar_chart, size: 20),
-                        text: 'Estadísticas',
+                        text: 'EstadÃ­sticas',
                       ),
                     ]
                   : const [
@@ -72,7 +72,7 @@ class TransactionHeaderWidget extends StatelessWidget {
                       ),
                       Tab(
                         icon: Icon(Icons.analytics, size: 20),
-                        text: 'Análisis',
+                        text: 'AnÃ¡lisis',
                       ),
                     ],
             ),

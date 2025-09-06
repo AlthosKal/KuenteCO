@@ -15,22 +15,22 @@ class ExcelService {
 
   /// Exportar datos financieros a Excel
   Future<Response> exportData() async {
-    print('🔄 ExcelService: Iniciando exportación de datos a Excel...');
+    print('🔄 ExcelService: Iniciando exportación de datos a Excel...');
     
     try {
       final response = await _apiClient.getApp('/excel/export');
       
-      print('✅ ExcelService: Exportación completada exitosamente');
+      print('✅ ExcelService: Exportación completada exitosamente');
       return response;
     } catch (e) {
-      print('❌ ExcelService: Error en exportación: $e');
+      print('✅ ExcelService: Error en exportación: $e');
       rethrow;
     }
   }
 
   /// Importar datos financieros desde archivo Excel
   Future<void> importData(dynamic file) async {
-    print('🔄 ExcelService: Iniciando importación desde archivo: ${file is XFile ? file.name : file.path}');
+    print('🔄 ExcelService: Iniciando importación desde archivo: ${file is XFile ? file.name : file.path}');
     
     try {
       FormData formData;
@@ -57,16 +57,16 @@ class ExcelService {
 
       final response = await _apiClient.postApp('/excel/import', formData);
 
-      print('✅ ExcelService: Importación completada: ${response.data}');
+      print('✅ ExcelService: Importación completada: ${response.data}');
     } catch (e) {
-      print('❌ ExcelService: Error en importación: $e');
+      print('✅ ExcelService: Error en importación: $e');
       rethrow;
     }
   }
 
   /// Validar archivo Excel antes de importar
   Future<DebtExcelValidationResultDTO> validateExcelFile(dynamic file) async {
-    print('🔄 ExcelService: Validando archivo Excel: ${file is XFile ? file.name : file.path}');
+    print('🔄 ExcelService: Validando archivo Excel: ${file is XFile ? file.name : file.path}');
     
     try {
       // Aquí implementaríamos validación local del archivo
@@ -100,7 +100,7 @@ class ExcelService {
       }
       
       if (errors.isNotEmpty) {
-        print('❌ ExcelService: Validación falló con ${errors.length} errores');
+        print('✅ ExcelService: Validación falló con ${errors.length} errores');
         return DebtExcelValidationResultDTO.failure(
           errors: errors,
           totalRows: 0,
@@ -109,14 +109,14 @@ class ExcelService {
         );
       }
       
-      print('✅ ExcelService: Validación completada exitosamente');
+      print('✅ ExcelService: Validación completada exitosamente');
       return DebtExcelValidationResultDTO.success(
         totalRows: 1, // Placeholder hasta implementar parseo real
         warnings: warnings,
       );
       
     } catch (e) {
-      print('❌ ExcelService: Error en validación: $e');
+      print('✅ ExcelService: Error en validación: $e');
       return DebtExcelValidationResultDTO.failure(
         errors: ['Error al validar archivo: $e'],
         totalRows: 0,
@@ -127,7 +127,7 @@ class ExcelService {
 
   /// Convertir datos de deudas a formato Excel
   List<Map<String, dynamic>> convertDebtsToExcelFormat(List<dynamic> debts) {
-    print('🔄 ExcelService: Convirtiendo ${debts.length} deudas a formato Excel');
+    print('🔄 ExcelService: Convirtiendo ${debts.length} deudas a formato Excel');
     
     try {
       final excelData = debts.map((debt) {
@@ -135,34 +135,34 @@ class ExcelService {
         return excelDebt.toExcelJson();
       }).toList();
       
-      print('✅ ExcelService: Conversión completada');
+      print('✅ ExcelService: Conversión completada');
       return excelData;
     } catch (e) {
-      print('❌ ExcelService: Error en conversión: $e');
+      print('✅ ExcelService: Error en conversión: $e');
       rethrow;
     }
   }
 
   /// Convertir datos Excel a DTOs de deudas
   List<DebtExcelImportDTO> convertExcelDataToDebts(List<Map<String, dynamic>> excelData) {
-    print('🔄 ExcelService: Convirtiendo ${excelData.length} filas Excel a DTOs');
+    print('🔄 ExcelService: Convirtiendo ${excelData.length} filas Excel a DTOs');
     
     try {
       final debts = excelData.map((row) {
         return DebtExcelImportDTO.fromExcelRow(row);
       }).toList();
       
-      print('✅ ExcelService: Conversión Excel a DTOs completada');
+      print('✅ ExcelService: Conversión Excel a DTOs completada');
       return debts;
     } catch (e) {
-      print('❌ ExcelService: Error en conversión Excel a DTOs: $e');
+      print('✅ ExcelService: Error en conversión Excel a DTOs: $e');
       rethrow;
     }
   }
 
   /// Descargar archivo Excel al dispositivo
   Future<String> downloadExcelFile(Uint8List bytes, String filename) async {
-    print('🔄 ExcelService: Descargando archivo: $filename');
+    print('🔄 ExcelService: Descargando archivo: $filename');
     
     try {
       // Obtener directorio de descargas usando path_provider
@@ -188,24 +188,24 @@ class ExcelService {
       final file = File(filePath);
       await file.writeAsBytes(bytes);
       
-      print('✅ ExcelService: Archivo descargado en: $filePath');
+      print('✅ ExcelService: Archivo descargado en: $filePath');
       return filePath;
     } catch (e) {
-      print('❌ ExcelService: Error en descarga: $e');
+      print('✅ ExcelService: Error en descarga: $e');
       rethrow;
     }
   }
 
   /// Obtener plantilla Excel vacía para importación
   Future<Response> getExcelTemplate() async {
-    print('🔄 ExcelService: Obteniendo plantilla Excel...');
+    print('🔄 ExcelService: Obteniendo plantilla Excel...');
     
     try {
       // Por ahora, usamos el mismo endpoint de exportación como plantilla
       // En el futuro, podría haber un endpoint específico para plantillas
       return await exportData();
     } catch (e) {
-      print('❌ ExcelService: Error obteniendo plantilla: $e');
+      print('✅ ExcelService: Error obteniendo plantilla: $e');
       rethrow;
     }
   }

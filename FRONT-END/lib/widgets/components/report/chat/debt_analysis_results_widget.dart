@@ -62,14 +62,14 @@ class DebtAnalysisResultsWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Resultados del Análisis',
+                'Resultados del AnÃ¡lisis',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.grey[800],
                 ),
               ),
               Text(
-                'Análisis generado por Inteligencia Artificial',
+                'AnÃ¡lisis generado por Inteligencia Artificial',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Colors.grey[600],
                 ),
@@ -132,7 +132,7 @@ class DebtAnalysisResultsWidget extends StatelessWidget {
             Icon(Icons.warning_amber, color: Colors.orange[600], size: 18),
             const SizedBox(width: 8),
             Text(
-              'Análisis de Riesgo',
+              'AnÃ¡lisis de Riesgo',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Colors.grey[800],
@@ -142,7 +142,7 @@ class DebtAnalysisResultsWidget extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         
-        // Métricas de riesgo
+        // MÃ©tricas de riesgo
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -425,7 +425,7 @@ class DebtAnalysisResultsWidget extends StatelessWidget {
     // Implementar funcionalidad de compartir
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Función de compartir próximamente disponible'),
+        content: Text('FunciÃ³n de compartir prÃ³ximamente disponible'),
         backgroundColor: Colors.blue,
       ),
     );

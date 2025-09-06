@@ -5,7 +5,7 @@ import '../../widgets/common/background/background_widget.dart';
 import '../../widgets/common/footer/footer_logged_widget.dart';
 import '../../widgets/common/navbar/navbar_logged_widget.dart';
 
-// 🎨 Colores principales
+// ð¨ Colores principales
 const kPrimaryPurple = Color(0xFF890cac);
 const kLightPurple = Color(0xFFEDE7F6);
 
@@ -22,7 +22,7 @@ class ContactLoggedView extends StatefulWidget {
 }
 
 class _ContactLoggedViewState extends State<ContactLoggedView> {
-  // 🎯 Controladores de formulario
+  // ð¯ Controladores de formulario
   final _nombreController = TextEditingController();
   final _emailController = TextEditingController();
   final _asuntoController = TextEditingController();
@@ -47,13 +47,13 @@ class _ContactLoggedViewState extends State<ContactLoggedView> {
       body: Background(
         child: Column(
           children: [
-            /// ✅ Navbar de usuario logueado
+            /// â Navbar de usuario logueado
             KuentecoLoggedNavbar(
               currentRoute: AppRoutes.contactLogged,
               onLogout: () {},
             ),
 
-            /// ✅ Contenido scrollable
+            /// â Contenido scrollable
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -92,7 +92,7 @@ class _ContactLoggedViewState extends State<ContactLoggedView> {
               ),
             ),
 
-            /// ✅ Footer
+            /// â Footer
             const FooterLoggedWidget(),
           ],
         ),
@@ -100,7 +100,7 @@ class _ContactLoggedViewState extends State<ContactLoggedView> {
     );
   }
 
-  /// 🏷️ Encabezado
+  /// ð·ï¸ Encabezado
   Widget _buildHeaderSection(ThemeData theme) {
     return Column(
       children: [
@@ -123,7 +123,7 @@ class _ContactLoggedViewState extends State<ContactLoggedView> {
     );
   }
 
-  /// 📩 Formulario de contacto
+  /// ð© Formulario de contacto
   Widget _buildContactForm(ThemeData theme) {
     return Form(
       key: _formKey,
@@ -148,7 +148,7 @@ class _ContactLoggedViewState extends State<ContactLoggedView> {
     );
   }
 
-  /// 📬 Campos del formulario
+  /// ð¬ Campos del formulario
   Widget _buildTextField(
       TextEditingController controller,
       String label,
@@ -185,7 +185,7 @@ class _ContactLoggedViewState extends State<ContactLoggedView> {
     );
   }
 
-  /// 📤 Botón para enviar el mensaje
+  /// ð¤ BotÃ³n para enviar el mensaje
   Widget _buildSubmitButton() {
     return ElevatedButton(
       onPressed: _submitForm,
@@ -203,7 +203,7 @@ class _ContactLoggedViewState extends State<ContactLoggedView> {
     );
   }
 
-  /// 📞 Información de contacto
+  /// ð InformaciÃ³n de contacto
   Widget _buildContactInfoSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -211,7 +211,7 @@ class _ContactLoggedViewState extends State<ContactLoggedView> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildContactInfoItem(Icons.email, 'soporte@kuenteco.com'),
-          _buildContactInfoItem(Icons.phone, '+52 (123) 456-7890'),
+          _buildContactInfoItem(Icons.phone, '+57 (123) 456-7890'),
           _buildContactInfoItem(Icons.access_time, 'Lun-Vie: 9:00 AM - 6:00 PM'),
         ],
       ),
@@ -238,7 +238,7 @@ class _ContactLoggedViewState extends State<ContactLoggedView> {
     );
   }
 
-  /// 📥 Enviar formulario
+  /// ð¥ Enviar formulario
   void _submitForm() {
     if (_formKey.currentState?.validate() ?? false) {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -37,7 +37,7 @@ class ErrorDTO {
     required List<String> validationErrors,
   }) {
     return ErrorDTO(
-      description: 'Error de validación en el campo: $field',
+      description: 'Error de validaciÃ³n en el campo: $field',
       reasons: validationErrors,
     );
   }

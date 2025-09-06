@@ -43,7 +43,7 @@ class _RegisterFormState extends State<RegisterForm> {
   final _passwordFocusNode = FocusNode();
   final _confirmPasswordFocusNode = FocusNode();
 
-  /// ✅ Estado del tipo de cuenta usando enum
+  /// â Estado del tipo de cuenta usando enum
   final ValueNotifier<UserType> _selectedUserType =
   ValueNotifier<UserType>(UserType.PERSONAL);
 
@@ -70,7 +70,7 @@ class _RegisterFormState extends State<RegisterForm> {
       username: _usernameController.text,
       email: _emailController.text,
       password: _passwordController.text,
-      type: _selectedUserType.value, // ✅ Se envía el enum al controller
+      type: _selectedUserType.value, // â Se envÃ­a el enum al controller
     );
   }
 
@@ -87,7 +87,7 @@ class _RegisterFormState extends State<RegisterForm> {
             FormTitleText(text: 'Registro'),
             const SizedBox(height: 20),
 
-            /// 📌 Nombre Completo
+            /// ð Nombre Completo
             CustomFormField(
               controller: _usernameController,
               focusNode: _usernameFocusNode,
@@ -102,7 +102,7 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             const SizedBox(height: 12),
 
-            /// 📌 Email
+            /// ð Email
             EmailFormField(
               controller: _emailController,
               focusNode: _emailFocusNode,
@@ -112,7 +112,7 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             const SizedBox(height: 12),
 
-            /// 📌 Contraseña
+            /// ð ContraseÃ±a
             ValueListenableBuilder<bool>(
               valueListenable: _registerController.obscurePassword,
               builder: (context, obscure, _) {
@@ -127,20 +127,20 @@ class _RegisterFormState extends State<RegisterForm> {
               },
             ),
 
-            /// 📌 Confirmar Contraseña
+            /// ð Confirmar ContraseÃ±a
             ValueListenableBuilder<bool>(
               valueListenable: _registerController.obscurePassword,
               builder: (context, obscure, _) {
                 return PasswordFormField(
                   controller: _confirmPasswordController,
                   focusNode: _confirmPasswordFocusNode,
-                  labelText: 'Confirmar Contraseña',
+                  labelText: 'Confirmar ContraseÃ±a',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Campo requerido';
                     }
                     if (value != _passwordController.text) {
-                      return 'Las contraseñas no coinciden';
+                      return 'Las contraseÃ±as no coinciden';
                     }
                     return null;
                   },
@@ -149,7 +149,7 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             const SizedBox(height: 20),
 
-            /// 🔥 Selector de tipo de cuenta
+            /// ð¥ Selector de tipo de cuenta
             const Text(
               'Tipo de cuenta',
               style: TextStyle(
@@ -186,7 +186,7 @@ class _RegisterFormState extends State<RegisterForm> {
 
             const SizedBox(height: 20),
 
-            /// 📌 Botón de registrar
+            /// ð BotÃ³n de registrar
             ValueListenableBuilder(
               valueListenable: _registerController.isLoading,
               builder: (context, isLoading, _) {
@@ -200,7 +200,7 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             const SizedBox(height: 12),
 
-            /// 📌 Botón para volver a login
+            /// ð BotÃ³n para volver a login
             TextButton(
               onPressed: () => Navigator.pushNamed(context, AppRoutes.login),
               child: const Text.rich(
@@ -222,7 +222,7 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 
-  /// 🎨 Botón custom para Personal / Negocio
+  /// ð¨ BotÃ³n custom para Personal / Negocio
   Widget _buildAccountTypeButton({
     required String label,
     required IconData icon,

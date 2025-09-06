@@ -26,7 +26,7 @@ class _DeleteMultipleTransactionsWidgetState
   @override
   void initState() {
     super.initState();
-    // Inicialmente todas están seleccionadas para eliminar
+    // Inicialmente todas estÃ¡n seleccionadas para eliminar
     selectedForDeletion = List.generate(widget.transactionsToDelete.length, (index) => true);
   }
 
@@ -48,7 +48,7 @@ class _DeleteMultipleTransactionsWidgetState
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Eliminar Múltiples Transacciones',
+                  'Eliminar MÃºltiples Transacciones',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -78,7 +78,7 @@ class _DeleteMultipleTransactionsWidgetState
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Esta acción eliminará permanentemente las transacciones seleccionadas. Esta operación no se puede deshacer.',
+                      'Esta acciÃ³n eliminarÃ¡ permanentemente las transacciones seleccionadas. Esta operaciÃ³n no se puede deshacer.',
                       style: TextStyle(
                         color: Colors.red[800],
                         fontWeight: FontWeight.w500,
@@ -133,7 +133,7 @@ class _DeleteMultipleTransactionsWidgetState
                           Text('Tipo: ${(transaction.descriptionExtra?.type ?? TransactionType.EXPENSE).name}'),
                           Text('Fecha: ${transaction.date}'),
                           if (transaction.descriptionExtra?.description != null)
-                            Text('Descripción: ${transaction.descriptionExtra!.description}'),
+                            Text('DescripciÃ³n: ${transaction.descriptionExtra!.description}'),
                         ],
                       ),
                       secondary: const Icon(
@@ -236,11 +236,11 @@ class _DeleteMultipleTransactionsWidgetState
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text(
-            'Confirmar eliminación',
+            'Confirmar eliminaciÃ³n',
             style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
           ),
           content: Text(
-            '¿Está seguro de que desea eliminar $selectedCount transacciones?\n\nEsta acción es irreversible y eliminará todas las transacciones seleccionadas de forma permanente.',
+            'Â¿EstÃ¡ seguro de que desea eliminar $selectedCount transacciones?\n\nEsta acciÃ³n es irreversible y eliminarÃ¡ todas las transacciones seleccionadas de forma permanente.',
           ),
           actions: [
             TextButton(

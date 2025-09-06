@@ -406,7 +406,7 @@ class _DebtListWidgetState extends State<DebtListWidget> {
             const SizedBox(height: 8),
             Text(
               _searchQuery.isNotEmpty
-                  ? 'Intenta con otros términos de búsqueda'
+                  ? 'Intenta con otros tÃ©rminos de bÃºsqueda'
                   : 'Comienza agregando tu primera deuda',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Colors.grey[500],
@@ -446,7 +446,7 @@ class _DebtListWidgetState extends State<DebtListWidget> {
     final now = DateTime.now();
     final expirationDate = debt.expirationDate;
     
-    // Una deuda está vencida si su fecha de vencimiento ya pasó o está marcada como DEFEATED
+    // Una deuda estÃ¡ vencida si su fecha de vencimiento ya pasÃ³ o estÃ¡ marcada como DEFEATED
     return now.isAfter(expirationDate) || debt.state == StateDebt.DEFEATED;
   }
 }

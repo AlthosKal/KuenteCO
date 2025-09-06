@@ -7,16 +7,16 @@ class ChangePasswordProfileDto {
     required this.confirmPassword,
   }) {
     if (newPassword.isEmpty) {
-      throw ArgumentError('La nueva contraseña no puede estar vacía');
+      throw ArgumentError('La nueva contraseÃ±a no puede estar vacÃ­a');
     }
     if (confirmPassword.isEmpty) {
-      throw ArgumentError('La confirmación de contraseña no puede estar vacía');
+      throw ArgumentError('La confirmaciÃ³n de contraseÃ±a no puede estar vacÃ­a');
     }
     if (newPassword.length < 8) {
-      throw ArgumentError('La contraseña debe tener mínimo 8 caracteres');
+      throw ArgumentError('La contraseÃ±a debe tener mÃ­nimo 8 caracteres');
     }
     if (confirmPassword.length < 8) {
-      throw ArgumentError('La confirmación debe tener mínimo 8 caracteres');
+      throw ArgumentError('La confirmaciÃ³n debe tener mÃ­nimo 8 caracteres');
     }
   }
 

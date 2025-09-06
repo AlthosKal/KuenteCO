@@ -33,7 +33,7 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header con selector de período
+        // Header con selector de perÃ­odo
         _buildPeriodSelector(),
         const SizedBox(height: 16),
         
@@ -41,7 +41,7 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
         _buildSummaryCards(),
         const SizedBox(height: 20),
         
-        // Gráfico de distribución por tipo
+        // GrÃ¡fico de distribuciÃ³n por tipo
         _buildTypeDistribution(),
         const SizedBox(height: 20),
         
@@ -55,7 +55,7 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
     return Row(
       children: [
         Text(
-          'Estadísticas',
+          'EstadÃ­sticas',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -72,7 +72,7 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
           items: const [
             DropdownMenuItem(value: 'week', child: Text('Esta semana')),
             DropdownMenuItem(value: 'month', child: Text('Este mes')),
-            DropdownMenuItem(value: 'year', child: Text('Este año')),
+            DropdownMenuItem(value: 'year', child: Text('Este aÃ±o')),
             DropdownMenuItem(value: 'all', child: Text('Todo el tiempo')),
           ],
         ),
@@ -85,7 +85,7 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
       builder: (context, controller, child) {
         final transactions = controller.transactions;
         
-        // Calcular estadísticas
+        // Calcular estadÃ­sticas
         final incomes = transactions.where((t) => 
             t.name.toLowerCase().contains('ingreso') || 
             t.name.toLowerCase().contains('income')).toList();
@@ -228,7 +228,7 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
           return const SizedBox.shrink();
         }
 
-        // Calcular distribución por tipo
+        // Calcular distribuciÃ³n por tipo
         final incomes = transactions.where((t) => 
             t.name.toLowerCase().contains('ingreso') || 
             t.name.toLowerCase().contains('income')).length;
@@ -252,7 +252,7 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Distribución por Tipo',
+                'DistribuciÃ³n por Tipo',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -350,7 +350,7 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
           return const SizedBox.shrink();
         }
 
-        // Obtener las 5 transacciones más recientes
+        // Obtener las 5 transacciones mÃ¡s recientes
         final recentTransactions = List.from(controller.transactions)
           ..sort((a, b) => DateTime.parse(b.date).compareTo(DateTime.parse(a.date)))
           ..take(5);
@@ -459,7 +459,7 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
   }
 }
 
-// Widget compacto para mostrar estadísticas en dashboard
+// Widget compacto para mostrar estadÃ­sticas en dashboard
 class TransactionStatsCompactWidget extends StatelessWidget {
   const TransactionStatsCompactWidget({Key? key}) : super(key: key);
 
@@ -484,12 +484,12 @@ class TransactionStatsCompactWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Sin estadísticas disponibles',
+                  'Sin estadÃ­sticas disponibles',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Agrega transacciones para ver estadísticas',
+                  'Agrega transacciones para ver estadÃ­sticas',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   ),

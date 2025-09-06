@@ -242,10 +242,10 @@ class ExcelControlsWidget extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          _buildInfoItem('• Formatos soportados: .xlsx, .xls'),
-          _buildInfoItem('• Tamaño máximo: 10MB'),
-          _buildInfoItem('• Incluye: Transacciones, Deudas, Categorías, Presupuestos'),
-          _buildInfoItem('• La plantilla muestra la estructura requerida'),
+          _buildInfoItem('â¢ Formatos soportados: .xlsx, .xls'),
+          _buildInfoItem('â¢ Tamaño máximo: 10MB'),
+          _buildInfoItem('â¢ Incluye: Transacciones, Deudas, Categorías, Presupuestos'),
+          _buildInfoItem('â¢ La plantilla muestra la estructura requerida'),
         ],
       ),
     );
@@ -326,7 +326,7 @@ class ExcelControlsWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Última descarga exitosa',
+                  'Ãltima descarga exitosa',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.green[800],
@@ -405,7 +405,7 @@ class ExcelControlsWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('¿Deseas importar el siguiente archivo?'),
+            Text('Â¿Deseas importar el siguiente archivo?'),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),

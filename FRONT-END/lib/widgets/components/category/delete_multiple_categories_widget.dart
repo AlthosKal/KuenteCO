@@ -23,7 +23,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
   @override
   void initState() {
     super.initState();
-    // Inicialmente todas están seleccionadas para eliminar
+    // Inicialmente todas estÃ¡n seleccionadas para eliminar
     selectedForDeletion = List.generate(widget.categoriesToDelete.length, (index) => true);
   }
 
@@ -45,7 +45,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Eliminar Múltiples Categorías',
+                  'Eliminar MÃºltiples CategorÃ­as',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -75,7 +75,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Esta acción eliminará permanentemente las categorías seleccionadas. Esta operación no se puede deshacer.',
+                      'Esta acciÃ³n eliminarÃ¡ permanentemente las categorÃ­as seleccionadas. Esta operaciÃ³n no se puede deshacer.',
                       style: TextStyle(
                         color: Colors.red[800],
                         fontWeight: FontWeight.w500,
@@ -89,7 +89,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
             const SizedBox(height: 20),
             
             Text(
-              'Seleccione las categorías que desea eliminar:',
+              'Seleccione las categorÃ­as que desea eliminar:',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[700],
@@ -155,7 +155,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Categorías seleccionadas: ${selectedForDeletion.where((selected) => selected).length}',
+                    'CategorÃ­as seleccionadas: ${selectedForDeletion.where((selected) => selected).length}',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -212,7 +212,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
                     ),
                   ),
                   child: Text(
-                    'Eliminar ${selectedForDeletion.where((selected) => selected).length} Categorías',
+                    'Eliminar ${selectedForDeletion.where((selected) => selected).length} CategorÃ­as',
                   ),
                 ),
               ],
@@ -231,11 +231,11 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text(
-            'Confirmar eliminación',
+            'Confirmar eliminaciÃ³n',
             style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
           ),
           content: Text(
-            '¿Está seguro de que desea eliminar $selectedCount categorías?\n\nEsta acción es irreversible y eliminará todas las categorías seleccionadas de forma permanente.',
+            'Â¿EstÃ¡ seguro de que desea eliminar $selectedCount categorÃ­as?\n\nEsta acciÃ³n es irreversible y eliminarÃ¡ todas las categorÃ­as seleccionadas de forma permanente.',
           ),
           actions: [
             TextButton(
@@ -271,7 +271,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
     if (selectedIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('No hay categorías seleccionadas para eliminar'),
+          content: Text('No hay categorÃ­as seleccionadas para eliminar'),
           backgroundColor: Colors.orange,
         ),
       );
@@ -302,7 +302,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${selectedIds.length} categorías eliminadas exitosamente'),
+          content: Text('${selectedIds.length} categorÃ­as eliminadas exitosamente'),
           backgroundColor: Colors.green,
           duration: const Duration(seconds: 3),
         ),
@@ -314,7 +314,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error al eliminar las categorías: ${e.toString()}'),
+          content: Text('Error al eliminar las categorÃ­as: ${e.toString()}'),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 5),
         ),

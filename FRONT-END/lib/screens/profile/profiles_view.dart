@@ -188,7 +188,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
 
-              // 🔹 Lista de perfiles usando ProfileButtonWidget
+              // ð¹ Lista de perfiles usando ProfileButtonWidget
               ...profiles.map((profile) {
                 return Card(
                   shape: RoundedRectangleBorder(

@@ -1,4 +1,4 @@
-/// DTO para análisis de salud financiera relacionada con deudas
+/// DTO para anÃ¡lisis de salud financiera relacionada con deudas
 class DebtFinancialHealthDTO {
   final double healthScore;
   final String healthLevel;
@@ -50,7 +50,7 @@ class DebtFinancialHealthDTO {
     if (healthScore >= 60) return '#8BC34A'; // Verde claro - Bueno
     if (healthScore >= 40) return '#FF9800'; // Naranja - Regular
     if (healthScore >= 20) return '#FF5722'; // Rojo naranja - Malo
-    return '#F44336'; // Rojo - Crítico
+    return '#F44336'; // Rojo - CrÃ­tico
   }
 
   /// Icono sugerido basado en el nivel
@@ -72,7 +72,7 @@ class DebtFinancialHealthDTO {
   }
 }
 
-/// DTO para métricas específicas de salud de deudas
+/// DTO para mÃ©tricas especÃ­ficas de salud de deudas
 class DebtHealthMetricsDTO {
   final double debtToIncomeRatio;
   final double debtUtilizationRatio;
@@ -113,7 +113,7 @@ class DebtHealthMetricsDTO {
   }
 }
 
-/// DTO para recomendaciones financieras específicas
+/// DTO para recomendaciones financieras especÃ­ficas
 class FinancialRecommendationDTO {
   final String id;
   final String title;

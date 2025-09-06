@@ -30,11 +30,11 @@ class UserButtomPersonalWidget extends StatelessWidget {
         ),
         PopupMenuItem<String>(
           value: 'subscription',
-          child: Text('Suscripción'),
+          child: Text('SuscripciÃ³n'),
         ),
         PopupMenuItem<String>(
           value: 'logout',
-          child: Text('Cerrar sesión'),
+          child: Text('Cerrar sesiÃ³n'),
         ),
       ],
       onSelected: (value) {
@@ -59,9 +59,9 @@ class UserButtomPersonalWidget extends StatelessWidget {
       await authService.logout();
       Navigator.pushReplacementNamed(context, AppRoutes.homeGuest);
     } catch (e) {
-      print("❌ Error al cerrar sesión: $e");
+      print("â Error al cerrar sesiÃ³n: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al cerrar sesión: $e')),
+        SnackBar(content: Text('Error al cerrar sesiÃ³n: $e')),
       );
     }
   }

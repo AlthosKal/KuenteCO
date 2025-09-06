@@ -31,6 +31,6 @@ class DescriptionTransaction {
 
   @override
   String toString() {
-    return description; // Solo devolver el texto de la descripción, no toda la estructura
+    return description; // Solo devolver el texto de la descripciÃ³n, no toda la estructura
   }
 }

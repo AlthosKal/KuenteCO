@@ -39,7 +39,7 @@ class TransactionsTabWidget extends StatelessWidget {
         children: [
           if (userRole == 'ROLE_PROFILE')
             MultipleOperationsWidget(
-              title: 'Operaciones Múltiples',
+              title: 'Operaciones MÃºltiples',
               color: Theme.of(context).primaryColor,
               onCreateMultiple: () => _navigateToCreateMultiple(context),
               onEditMultiple: () => _navigateToEditMultiple(context),
@@ -118,13 +118,13 @@ class TransactionsTabWidget extends StatelessWidget {
     List<DetailItem> details = [];
     
     if (_getTransactionDescription(transaction).isNotEmpty) {
-      details.add(DetailItem(label: 'Descripción', value: _getTransactionDescription(transaction)));
+      details.add(DetailItem(label: 'DescripciÃ³n', value: _getTransactionDescription(transaction)));
     }
     
     details.add(DetailItem(label: 'Fecha', value: transaction.date));
     
     if (transaction.categoryId != null) {
-      details.add(DetailItem(label: 'Categoría ID', value: transaction.categoryId.toString()));
+      details.add(DetailItem(label: 'CategorÃ­a ID', value: transaction.categoryId.toString()));
     }
     
     if (transaction.budgetId != null) {
@@ -241,7 +241,7 @@ class TransactionsTabWidget extends StatelessWidget {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Transacción creada exitosamente'),
+            content: Text('TransacciÃ³n creada exitosamente'),
             backgroundColor: Colors.green,
           ),
         );
@@ -251,7 +251,7 @@ class TransactionsTabWidget extends StatelessWidget {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error al crear la transacción: ${e.toString()}'),
+            content: Text('Error al crear la transacciÃ³n: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -267,7 +267,7 @@ class TransactionsTabWidget extends StatelessWidget {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Transacción actualizada exitosamente'),
+            content: Text('TransacciÃ³n actualizada exitosamente'),
             backgroundColor: Colors.green,
           ),
         );
@@ -277,7 +277,7 @@ class TransactionsTabWidget extends StatelessWidget {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error al actualizar la transacción: ${e.toString()}'),
+            content: Text('Error al actualizar la transacciÃ³n: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -292,7 +292,7 @@ class TransactionsTabWidget extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Transacción eliminada exitosamente'),
+            content: Text('TransacciÃ³n eliminada exitosamente'),
             backgroundColor: Colors.green,
           ),
         );
@@ -301,7 +301,7 @@ class TransactionsTabWidget extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error al eliminar la transacción: ${e.toString()}'),
+            content: Text('Error al eliminar la transacciÃ³n: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );

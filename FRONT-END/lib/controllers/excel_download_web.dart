@@ -1,7 +1,7 @@
 import 'dart:html' as html;
 import 'dart:typed_data';
 
-/// Implementación de descarga para web
+/// ImplementaciÃ³n de descarga para web
 Future<String?> downloadFile(Uint8List bytes, String filename) async {
   final blob = html.Blob([bytes]);
   final url = html.Url.createObjectUrlFromBlob(blob);

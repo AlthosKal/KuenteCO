@@ -75,7 +75,7 @@ class ApiClient {
           if (e.response?.statusCode == 401) {
             // TODO: Implement proper navigation to login
             if (kDebugMode) {
-              print('🔐 Unauthorized access - redirect to ${AppRoutes.login}');
+              print('ð Unauthorized access - redirect to ${AppRoutes.login}');
             }
           }
           return handler.next(e);
@@ -88,7 +88,7 @@ class ApiClient {
 
   bool get isInitialized => _isInitialized;
 
-  // Métodos API con manejo de errores
+  // MÃ©todos API con manejo de errores
   Future<Response> getApp(
       String path, {
         Map<String, dynamic>? queryParameters,
@@ -126,7 +126,7 @@ class ApiClient {
 
   Future<Response> patchApp(String path, [dynamic data]) async {
     try {
-      // Si es FormData, permitir que Dio maneje el Content-Type automáticamente
+      // Si es FormData, permitir que Dio maneje el Content-Type automÃ¡ticamente
       final options = data is FormData 
           ? Options(headers: {'Accept': 'application/json'}) 
           : null;
@@ -159,7 +159,7 @@ class ApiClient {
     }
   }
 
-  // Métodos para la API del chat
+  // MÃ©todos para la API del chat
   Future<Response> getChat(String path) async {
     try {
       return await _dioChat.get(path);

@@ -10,8 +10,8 @@ class GlobalExceptionHandler {
     try {
       return await task();
     } catch (e, stack) {
-      print('🛑 Error global: $e');
-      print('📍 Stack trace: $stack');
+      print('ð Error global: $e');
+      print('ð Stack trace: $stack');
 
       // Resuelve mensaje amigable
       String userMessage = _resolveMessage(e);
@@ -29,12 +29,12 @@ class GlobalExceptionHandler {
       return ApiErrorParser.extractMessage(error.response?.data);
     }
 
-    // Si es una excepción personalizada con mensaje, respétalo
+    // Si es una excepciÃ³n personalizada con mensaje, respÃ©talo
     if (error is Exception) {
       final message = error.toString();
       if (message.isNotEmpty &&
           message != 'Exception' &&
-          !message.contains('Ocurrió un error inesperado')) {
+          !message.contains('OcurriÃ³ un error inesperado')) {
         return message.replaceFirst('Exception: ', '');
       }
     }
@@ -42,15 +42,15 @@ class GlobalExceptionHandler {
     // Otros errores comunes
     final errorString = error.toString().toLowerCase();
     if (errorString.contains('unauthorized') || errorString.contains('401')) {
-      return 'Sesión expirada. Inicia sesión nuevamente.';
+      return 'SesiÃ³n expirada. Inicia sesiÃ³n nuevamente.';
     }
     if (errorString.contains('403')) {
-      return 'No tienes permisos para esta acción.';
+      return 'No tienes permisos para esta acciÃ³n.';
     }
     if (errorString.contains('404')) {
       return 'Recurso no encontrado.';
     }
 
-    return 'Ocurrió un error inesperado. Intenta de nuevo.';
+    return 'OcurriÃ³ un error inesperado. Intenta de nuevo.';
   }
 }

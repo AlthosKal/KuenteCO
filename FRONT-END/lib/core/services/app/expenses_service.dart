@@ -11,21 +11,21 @@ class ExpensesService {
 
   // ============= EXPENSES SPECIFIC METHODS =============
 
-  // ✅ Get all expense transactions
+  // â Get all expense transactions
   Future<List<TransactionDetailDTO>> getAllExpenses() async {
     return await _transactionService.getTransactionsWithFilters(
       type: 'EXPENSE',
     );
   }
 
-  // ✅ Get expense by ID
+  // â Get expense by ID
   Future<TransactionDetailDTO> getExpenseById(int id) async {
     final transaction = await _transactionService.getTransactionById(id);
     // Note: In backend, we would validate that this is actually an expense
     return transaction;
   }
 
-  // ✅ Get expense summary
+  // â Get expense summary
   Future<List<TransactionSummaryDTO>> getExpenseSummary() async {
     // Get all summaries and filter by expense type if needed
     final summaries = await _transactionService.getTransactionSummary();
@@ -33,7 +33,7 @@ class ExpensesService {
     return summaries;
   }
 
-  // ✅ Get expenses by category
+  // â Get expenses by category
   Future<List<TransactionDetailDTO>> getExpensesByCategory(int categoryId) async {
     return await _transactionService.getTransactionsWithFilters(
       categoryId: categoryId,
@@ -41,7 +41,7 @@ class ExpensesService {
     );
   }
 
-  // ✅ Get expenses by budget
+  // â Get expenses by budget
   Future<List<TransactionDetailDTO>> getExpensesByBudget(int budgetId) async {
     return await _transactionService.getTransactionsWithFilters(
       budgetId: budgetId,
@@ -49,7 +49,7 @@ class ExpensesService {
     );
   }
 
-  // ✅ Get expenses by profile
+  // â Get expenses by profile
   Future<List<TransactionDetailDTO>> getExpensesByProfile(int profileId) async {
     return await _transactionService.getTransactionsWithFilters(
       profileId: profileId,
@@ -57,7 +57,7 @@ class ExpensesService {
     );
   }
 
-  // ✅ Get expenses by date range
+  // â Get expenses by date range
   Future<List<TransactionDetailDTO>> getExpensesByDateRange({
     required String from,
     required String to,
@@ -69,7 +69,7 @@ class ExpensesService {
     );
   }
 
-  // ✅ Get expenses by amount range
+  // â Get expenses by amount range
   Future<List<TransactionDetailDTO>> getExpensesByAmountRange({
     double? minAmount,
     double? maxAmount,
@@ -83,45 +83,45 @@ class ExpensesService {
 
   // ============= EXPENSES CRUD OPERATIONS =============
 
-  // ✅ Create new expense
+  // â Create new expense
   Future<TransactionDetailDTO> createExpense(NewTransactionDTO dto) async {
-    print('📌 ExpensesService: Creating expense transaction');
+    print('ð ExpensesService: Creating expense transaction');
     return await _transactionService.addTransaction(dto);
   }
 
-  // ✅ Create multiple expenses
+  // â Create multiple expenses
   Future<List<TransactionDetailDTO>> createExpensesBatch(List<NewTransactionDTO> dtos) async {
-    print('📌 ExpensesService: Creating ${dtos.length} expense transactions in batch');
+    print('ð ExpensesService: Creating ${dtos.length} expense transactions in batch');
     return await _transactionService.addTransactionsBatch(dtos);
   }
 
-  // ✅ Update expense
+  // â Update expense
   Future<TransactionDetailDTO> updateExpense(UpdateTransactionDTO dto) async {
-    print('📌 ExpensesService: Updating expense transaction ID: ${dto.id}');
+    print('ð ExpensesService: Updating expense transaction ID: ${dto.id}');
     return await _transactionService.updateTransaction(dto);
   }
 
-  // ✅ Update multiple expenses
+  // â Update multiple expenses
   Future<List<TransactionDetailDTO>> updateExpensesBatch(List<UpdateTransactionDTO> dtos) async {
-    print('📌 ExpensesService: Updating ${dtos.length} expense transactions in batch');
+    print('ð ExpensesService: Updating ${dtos.length} expense transactions in batch');
     return await _transactionService.updateTransactionsBatch(dtos);
   }
 
-  // ✅ Delete expense
+  // â Delete expense
   Future<void> deleteExpense(int id) async {
-    print('📌 ExpensesService: Deleting expense transaction ID: $id');
+    print('ð ExpensesService: Deleting expense transaction ID: $id');
     await _transactionService.deleteTransaction(id);
   }
 
-  // ✅ Delete multiple expenses
+  // â Delete multiple expenses
   Future<void> deleteExpensesBatch(List<int> ids) async {
-    print('📌 ExpensesService: Deleting ${ids.length} expense transactions in batch');
+    print('ð ExpensesService: Deleting ${ids.length} expense transactions in batch');
     await _transactionService.deleteTransactionsBatch(ids);
   }
 
   // ============= EXPENSES ANALYTICS =============
 
-  // ✅ Get total expense amount
+  // â Get total expense amount
   Future<double> getTotalExpenseAmount() async {
     final expenses = await getAllExpenses();
     double total = 0.0;
@@ -131,7 +131,7 @@ class ExpensesService {
     return total;
   }
 
-  // ✅ Get average expense amount
+  // â Get average expense amount
   Future<double> getAverageExpenseAmount() async {
     final expenses = await getAllExpenses();
     if (expenses.isEmpty) return 0.0;
@@ -142,13 +142,13 @@ class ExpensesService {
     return total / expenses.length;
   }
 
-  // ✅ Get expense count
+  // â Get expense count
   Future<int> getExpenseCount() async {
     final expenses = await getAllExpenses();
     return expenses.length;
   }
 
-  // ✅ Get monthly expense totals
+  // â Get monthly expense totals
   Future<Map<String, double>> getMonthlyExpenseTotals(int year) async {
     final from = '$year-01-01';
     final to = '$year-12-31';
@@ -169,7 +169,7 @@ class ExpensesService {
 
   // ============= EXPENSES CATEGORIZATION =============
 
-  // ✅ Get top spending categories
+  // â Get top spending categories
   Future<Map<String, double>> getTopSpendingCategories({int limit = 10}) async {
     final expenses = await getAllExpenses();
     final categoryTotals = <String, double>{};
@@ -194,7 +194,7 @@ class ExpensesService {
     return result;
   }
 
-  // ✅ Get expenses by category breakdown
+  // â Get expenses by category breakdown
   Future<Map<String, List<TransactionDetailDTO>>> getExpensesByCategoryBreakdown() async {
     final expenses = await getAllExpenses();
     final categoryBreakdown = <String, List<TransactionDetailDTO>>{};
@@ -208,7 +208,7 @@ class ExpensesService {
     return categoryBreakdown;
   }
 
-  // ✅ Get largest single expenses
+  // â Get largest single expenses
   Future<List<TransactionDetailDTO>> getLargestExpenses({int limit = 10}) async {
     final expenses = await getAllExpenses();
     expenses.sort((a, b) => b.amount.compareTo(a.amount));
@@ -216,11 +216,11 @@ class ExpensesService {
     return expenses.take(limit).toList();
   }
 
-  // ✅ Check budget limit (placeholder implementation)
+  // â Check budget limit (placeholder implementation)
   Future<bool> checkBudgetLimit(int budgetId, double amount) async {
     // This is a placeholder implementation
     // In a real app, this would check against actual budget limits from the backend
-    print('📌 ExpensesService: Checking budget limit for budget ID: $budgetId, amount: $amount');
+    print('ð ExpensesService: Checking budget limit for budget ID: $budgetId, amount: $amount');
     
     // For now, we'll assume a basic check: if the current expenses + new amount exceed a threshold
     final budgetExpenses = await getExpensesByBudget(budgetId);

@@ -79,7 +79,7 @@ class ExcelValidationResultsWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                isValid ? 'Validación Exitosa' : 'Errores de Validación',
+                isValid ? 'ValidaciÃ³n Exitosa' : 'Errores de ValidaciÃ³n',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.grey[800],
@@ -107,7 +107,7 @@ class ExcelValidationResultsWidget extends StatelessWidget {
                 const Icon(Icons.verified, color: Colors.white, size: 16),
                 const SizedBox(width: 4),
                 const Text(
-                  'VÁLIDO',
+                  'VÃLIDO',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 12,
@@ -141,7 +141,7 @@ class ExcelValidationResultsWidget extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: _buildStatCard(
-              'Filas Válidas',
+              'Filas VÃ¡lidas',
               '${validationResult.validRows}',
               Icons.check,
               Colors.green,
@@ -150,7 +150,7 @@ class ExcelValidationResultsWidget extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: _buildStatCard(
-              'Filas Inválidas',
+              'Filas InvÃ¡lidas',
               '${validationResult.invalidRows}',
               Icons.error,
               Colors.red,
@@ -395,7 +395,7 @@ class ExcelValidationResultsWidget extends StatelessWidget {
           children: [
             Icon(Icons.help, color: Colors.blue),
             SizedBox(width: 8),
-            Text('Ayuda con Validación'),
+            Text('Ayuda con ValidaciÃ³n'),
           ],
         ),
         content: const SingleChildScrollView(
@@ -408,15 +408,15 @@ class ExcelValidationResultsWidget extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 12),
-              Text('• Formato incorrecto: Asegúrate de usar archivos .xlsx o .xls'),
+              Text('â¢ Formato incorrecto: AsegÃºrate de usar archivos .xlsx o .xls'),
               SizedBox(height: 6),
-              Text('• Archivo muy grande: El límite es de 10MB'),
+              Text('â¢ Archivo muy grande: El lÃ­mite es de 10MB'),
               SizedBox(height: 6),
-              Text('• Columnas faltantes: Descarga la plantilla para ver la estructura correcta'),
+              Text('â¢ Columnas faltantes: Descarga la plantilla para ver la estructura correcta'),
               SizedBox(height: 6),
-              Text('• Fechas incorrectas: Usa el formato dd/MM/yyyy'),
+              Text('â¢ Fechas incorrectas: Usa el formato dd/MM/yyyy'),
               SizedBox(height: 6),
-              Text('• Valores vacíos: Completa todos los campos obligatorios'),
+              Text('â¢ Valores vacÃ­os: Completa todos los campos obligatorios'),
               SizedBox(height: 12),
               Text(
                 'Si el problema persiste, descarga una nueva plantilla y verifica que tus datos siguen el formato requerido.',

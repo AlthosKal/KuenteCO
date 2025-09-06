@@ -39,7 +39,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
     await _loadDataBasedOnRole();
   }
   
-  /// Cargar datos seg�n el rol del usuario
+  /// Cargar datos segï¿½n el rol del usuario
   Future<void> _loadDataBasedOnRole() async {
     final budgetController = Provider.of<BudgetController>(context, listen: false);
     
@@ -82,7 +82,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
       );
     }
 
-    // � Estado de error
+    // ï¿½ Estado de error
     if (budgetController.errorMessage != null) {
       return _buildErrorCard(
         errorMessage: budgetController.errorMessage!,
@@ -108,7 +108,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
   
   /// Widget para mostrar presupuestos de usuarios
   Widget _buildBudgetCard(BudgetController budgetController) {
-    // =9 Si no hay presupuestos � mostrar bot�n para crear
+    // =9 Si no hay presupuestos ï¿½ mostrar botï¿½n para crear
     if (budgetController.budgets.isEmpty) {
       return InkWell(
         onTap: () => Navigator.pushNamed(context, AppRoutes.budgetView),
@@ -322,7 +322,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                   ),
                   const SizedBox(height: 4),
                   const Text(
-                    'El administrador aún no te ha asignado presupuestos',
+                    'El administrador aÃºn no te ha asignado presupuestos',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.purple,
@@ -423,7 +423,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
     );
   }
 
-  /// � Helper para mostrar card de error
+  /// ï¿½ Helper para mostrar card de error
   Widget _buildErrorCard({
     required String errorMessage,
     required VoidCallback onRetry,

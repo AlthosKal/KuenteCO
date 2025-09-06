@@ -41,7 +41,7 @@ abstract class BaseDynamicResponseDTO {
   }
 }
 
-/// Implementaciones específicas que necesitamos crear
+/// Implementaciones especÃ­ficas que necesitamos crear
 class SimpleTextResponseDTO extends BaseDynamicResponseDTO {
   final String message;
 

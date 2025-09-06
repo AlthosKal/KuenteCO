@@ -44,7 +44,7 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
     });
   }
   
-  /// Cargar datos según el rol del usuario
+  /// Cargar datos segÃºn el rol del usuario
   Future<void> _loadDataBasedOnRole() async {
     try {
       print('TransactionView: Starting _loadDataBasedOnRole()');
@@ -52,7 +52,7 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
       _userRole = role;
       print('TransactionView: User role detected: $role');
       
-      // Inicializar TabController según el rol del usuario
+      // Inicializar TabController segÃºn el rol del usuario
       // Los perfiles solo tienen 2 tabs (sin deudas), los usuarios tienen 3 tabs
       final tabCount = (role == 'ROLE_PROFILE') ? 2 : 3;
       _tabController = TabController(length: tabCount, vsync: this);
@@ -78,7 +78,7 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
       }
       
       print('TransactionView: About to call setState()');
-      setState(() {}); // Actualizar UI después de detectar el rol
+      setState(() {}); // Actualizar UI despuÃ©s de detectar el rol
       print('TransactionView: setState() completed');
     } catch (e) {
       print('TransactionView: Error loading data: $e');
@@ -97,7 +97,7 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
-    // Mostrar loading si aún no se ha inicializado el TabController
+    // Mostrar loading si aÃºn no se ha inicializado el TabController
     if (_tabController == null) {
       return Background(
         child: Scaffold(
@@ -164,7 +164,7 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
     );
   }
 
-  /// Construye las vistas de tabs según el rol del usuario
+  /// Construye las vistas de tabs segÃºn el rol del usuario
   List<Widget> _buildTabViews() {
     final List<Widget> tabs = [
       /// TAB 1: LISTA DE TRANSACCIONES
@@ -187,7 +187,7 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
       );
     }
 
-    // TAB FINAL: ESTADÍSTICAS
+    // TAB FINAL: ESTADÃSTICAS
     tabs.add(
       StatisticsTabWidget(
         userRole: _userRole,
@@ -197,7 +197,7 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
     return tabs;
   }
 
-  /// Callback para refrescar la vista después de operaciones múltiples
+  /// Callback para refrescar la vista despuÃ©s de operaciones mÃºltiples
   void _refreshTransactions() {
     if (mounted) {
       _loadDataBasedOnRole();

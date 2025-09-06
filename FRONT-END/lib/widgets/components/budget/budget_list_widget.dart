@@ -49,7 +49,7 @@ class BudgetListWidget extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               child: Row(
                 children: [
-                  // Icono o checkbox de selección
+                  // Icono o checkbox de selecciÃ³n
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -68,7 +68,7 @@ class BudgetListWidget extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   
-                  // Información del presupuesto
+                  // InformaciÃ³n del presupuesto
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,7 +109,7 @@ class BudgetListWidget extends StatelessWidget {
                     ),
                   ),
                   
-                  // Botones de acción (solo si no está en modo selección)
+                  // Botones de acciÃ³n (solo si no estÃ¡ en modo selecciÃ³n)
                   if (!isSelectionMode) ...[
                     IconButton(
                       onPressed: onAssign,

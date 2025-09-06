@@ -17,7 +17,7 @@ class RegisterController {
   RegisterController({AuthService? authService})
       : _authService = authService ?? AuthService();
 
-  /// Método para registrar al usuario
+  /// MÃ©todo para registrar al usuario
   Future<void> register({
     required BuildContext context,
     required String username,
@@ -39,18 +39,18 @@ class RegisterController {
         await _authService.register(dto);
 
         if (context.mounted) {
-          /// ✅ Mostramos mensaje de éxito
+          /// â Mostramos mensaje de Ã©xito
           ToastHelper.showSuccess(
             context,
             title: 'Registro exitoso',
             description: 'Verifica tu correo para activar tu cuenta',
           );
 
-          /// ✅ Redirigimos a la vista de verificación de registro
+          /// â Redirigimos a la vista de verificaciÃ³n de registro
           Navigator.pushReplacementNamed(
             context,
             AppRoutes.verificationRegister,
-            arguments: email, // 🔥 enviamos el email a la pantalla de verificación
+            arguments: email, // ð¥ enviamos el email a la pantalla de verificaciÃ³n
           );
         }
       },
@@ -67,7 +67,7 @@ class RegisterController {
     isLoading.value = false;
   }
 
-  /// Cambiar visibilidad de contraseña
+  /// Cambiar visibilidad de contraseÃ±a
   void togglePasswordVisibility() {
     obscurePassword.value = !obscurePassword.value;
   }

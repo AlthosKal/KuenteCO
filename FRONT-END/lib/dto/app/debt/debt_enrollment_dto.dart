@@ -1,5 +1,5 @@
 class DebtEnrollmentDTO {
-  final int? enrollmentId; // ID del enrollment para eliminación
+  final int? enrollmentId; // ID del enrollment para eliminaciÃ³n
   final String userEmail;
   final String profileEmail;
   final int? debtId;

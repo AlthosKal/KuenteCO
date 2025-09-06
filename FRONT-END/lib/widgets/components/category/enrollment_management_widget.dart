@@ -79,7 +79,7 @@ class EnrollmentManagementWidget extends StatelessWidget {
         IconButton(
           onPressed: () => _showBatchAssignDialog(context),
           icon: const Icon(Icons.assignment_add, color: Colors.green),
-          tooltip: 'Asignación masiva',
+          tooltip: 'AsignaciÃ³n masiva',
         ),
         IconButton(
           onPressed: () => Navigator.pop(context),
@@ -105,7 +105,7 @@ class EnrollmentManagementWidget extends StatelessWidget {
           SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Usa el botón de asignación masiva (➕) para asignar múltiples categorías a múltiples perfiles de una vez.',
+              'Usa el botÃ³n de asignaciÃ³n masiva (â) para asignar mÃºltiples categorÃ­as a mÃºltiples perfiles de una vez.',
               style: TextStyle(fontSize: 12),
             ),
           ),
@@ -120,7 +120,7 @@ class EnrollmentManagementWidget extends StatelessWidget {
       builder: (context, snapshot) {
         if (controller.enrollmentSummaries.isEmpty) {
           return const Center(
-            child: Text('No hay asignaciones de categorías para gestionar'),
+            child: Text('No hay asignaciones de categorÃ­as para gestionar'),
           );
         }
         
@@ -164,7 +164,7 @@ class EnrollmentManagementWidget extends StatelessWidget {
             Text('Estado: ${enrollmentSummary.categoryStatus ?? 'Desconocido'}'),
             const SizedBox(height: 4),
             Text(
-              'Toca el ícono de personas para intentar ver asignaciones individuales',
+              'Toca el Ã­cono de personas para intentar ver asignaciones individuales',
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.blue[600],
@@ -191,10 +191,10 @@ class EnrollmentManagementWidget extends StatelessWidget {
               context,
               controller, 
               enrollmentSummary.categoryEnrollmentIds![0],
-              enrollmentSummary.categoryName ?? 'Categoría'
+              enrollmentSummary.categoryName ?? 'CategorÃ­a'
             ),
             icon: const Icon(Icons.delete, color: Colors.orange),
-            tooltip: 'Eliminar única asignación',
+            tooltip: 'Eliminar Ãºnica asignaciÃ³n',
           ),
         if (enrollmentSummary.totalEnrollments! > 1)
           IconButton(
@@ -239,9 +239,9 @@ class EnrollmentManagementWidget extends StatelessWidget {
   Future<void> _deleteIndividualEnrollment(BuildContext context, CategoryController controller, int enrollmentId, String categoryName) async {
     final confirmed = await _showDeleteConfirmDialog(
       context, 
-      'Eliminar Asignación',
-      'Se eliminará la asignación de la categoría:\n"$categoryName"',
-      'Esta acción no se puede deshacer.',
+      'Eliminar AsignaciÃ³n',
+      'Se eliminarÃ¡ la asignaciÃ³n de la categorÃ­a:\n"$categoryName"',
+      'Esta acciÃ³n no se puede deshacer.',
       Colors.orange,
     );
     
@@ -250,7 +250,7 @@ class EnrollmentManagementWidget extends StatelessWidget {
     await _performEnrollmentDeletion(
       context,
       () => controller.deleteEnrollment(enrollmentId),
-      'Asignación eliminada de "$categoryName"',
+      'AsignaciÃ³n eliminada de "$categoryName"',
     );
   }
 
@@ -258,8 +258,8 @@ class EnrollmentManagementWidget extends StatelessWidget {
     final confirmed = await _showDeleteConfirmDialog(
       context,
       'Eliminar Todas las Asignaciones',
-      'Se eliminarán TODAS las asignaciones de la categoría:\n"${enrollmentSummary.categoryName}"',
-      'Esta acción eliminará ${enrollmentSummary.totalEnrollments} asignaciones y no se puede deshacer.',
+      'Se eliminarÃ¡n TODAS las asignaciones de la categorÃ­a:\n"${enrollmentSummary.categoryName}"',
+      'Esta acciÃ³n eliminarÃ¡ ${enrollmentSummary.totalEnrollments} asignaciones y no se puede deshacer.',
       Colors.red,
     );
     
@@ -268,7 +268,7 @@ class EnrollmentManagementWidget extends StatelessWidget {
     await _performEnrollmentDeletion(
       context,
       () => controller.deleteEnrollmentsByCategorySummary(enrollmentSummary),
-      'Eliminadas todas las asignaciones de "${enrollmentSummary.categoryName ?? 'Categoría sin nombre'}"',
+      'Eliminadas todas las asignaciones de "${enrollmentSummary.categoryName ?? 'CategorÃ­a sin nombre'}"',
     );
   }
 
@@ -332,7 +332,7 @@ class EnrollmentManagementWidget extends StatelessWidget {
     try {
       await deleteAction();
       Navigator.pop(context); // Cerrar loading
-      Navigator.pop(context); // Cerrar diálogo de gestión
+      Navigator.pop(context); // Cerrar diÃ¡logo de gestiÃ³n
       
       if (onEnrollmentChanged != null) {
         onEnrollmentChanged!();
@@ -349,7 +349,7 @@ class EnrollmentManagementWidget extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Error al eliminar asignación', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text('Error al eliminar asignaciÃ³n', style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
               Text('$e'),
             ],

@@ -31,7 +31,7 @@ class BudgetEnrollmentSummaryDTO {
     }).toList();
   }
 
-  // Obtener clave para selección (similar a categories)
+  // Obtener clave para selecciÃ³n (similar a categories)
   String get selectionKey => budgetName;
 }
 
@@ -57,6 +57,6 @@ class EnrolledProfileBudgetSummaryDTO {
     );
   }
 
-  // Obtener clave para selección individual
+  // Obtener clave para selecciÃ³n individual
   String get selectionKey => '$budgetName-$profileEmail-$userEmail';
 }

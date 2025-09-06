@@ -269,7 +269,7 @@ class _IncomeViewState extends State<IncomeView> {
         child: Consumer<IncomeController>(
           builder: (context, controller, child) => TransactionFormWidget(
             transaction: income,
-            onCreateTransaction: (dto) {}, // No usado en modo edición
+            onCreateTransaction: (dto) {}, // No usado en modo ediciÃ³n
             onUpdateTransaction: (dto) async {
               try {
                 await controller.updateIncome(dto);
@@ -295,7 +295,7 @@ class _IncomeViewState extends State<IncomeView> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Eliminar Ingreso'),
-        content: Text('¿Estás seguro de que deseas eliminar "${income.name}"?'),
+        content: Text('Â¿EstÃ¡s seguro de que deseas eliminar "${income.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -345,9 +345,9 @@ class _IncomeViewState extends State<IncomeView> {
             _buildDetailRow('Monto', Formatters.formatCurrency(income.amount)),
             _buildDetailRow('Fecha', Formatters.formatDate(income.date)),
             if (income.description?.isNotEmpty == true)
-              _buildDetailRow('Descripción', income.description!),
+              _buildDetailRow('DescripciÃ³n', income.description!),
             if (income.categoryId != null)
-              _buildDetailRow('Categoría', 'ID: ${income.categoryId}'),
+              _buildDetailRow('CategorÃ­a', 'ID: ${income.categoryId}'),
           ],
         ),
         actions: [
@@ -404,7 +404,7 @@ class _IncomeViewState extends State<IncomeView> {
   }
 }
 
-// Widget para mostrar análisis de ingresos
+// Widget para mostrar anÃ¡lisis de ingresos
 class IncomeAnalyticsWidget extends StatelessWidget {
   const IncomeAnalyticsWidget({Key? key}) : super(key: key);
 
@@ -416,14 +416,14 @@ class IncomeAnalyticsWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Análisis de Ingresos',
+              'AnÃ¡lisis de Ingresos',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 20),
             
-            // Tarjetas de estadísticas
+            // Tarjetas de estadÃ­sticas
             Row(
               children: [
                 Expanded(
@@ -473,7 +473,7 @@ class IncomeAnalyticsWidget extends StatelessWidget {
             // Lista de ingresos recientes
             if (controller.recentIncomes.isNotEmpty) ...[
               Text(
-                'Ingresos Recientes (últimos 30 días)',
+                'Ingresos Recientes (Ãºltimos 30 dÃ­as)',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),

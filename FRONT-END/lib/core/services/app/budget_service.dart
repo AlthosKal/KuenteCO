@@ -11,7 +11,7 @@ class BudgetService {
 
   BudgetService(this._apiClient);
 
-  // ✅ Obtener todos los presupuestos
+  // â Obtener todos los presupuestos
   Future<List<BudgetDTO>> getBudgets() async {
     print('BudgetService: Sending GET to /budget');
     final response = await _apiClient.getApp('/budget');
@@ -46,7 +46,7 @@ class BudgetService {
       print('BudgetService: Response is direct list');
       dataList = responseData;
     } else {
-      // Si es cualquier otro formato, asumir lista vacía
+      // Si es cualquier otro formato, asumir lista vacÃ­a
       print('BudgetService: Unknown response format, returning empty list');
       return [];
     }
@@ -56,7 +56,7 @@ class BudgetService {
     return dataList.map((json) => BudgetDTO.fromJson(json)).toList();
   }
 
-  // ✅ Reporte comparación presupuesto vs real
+  // â Reporte comparaciÃ³n presupuesto vs real
   Future<List<BudgetVsActualDTO>> getBudgetComparison() async {
     final response = await _apiClient.getApp('/budget/report/comparison');
     return (response.data as List)
@@ -64,13 +64,13 @@ class BudgetService {
         .toList();
   }
 
-  // ✅ Reporte resumen presupuestos
+  // â Reporte resumen presupuestos
   Future<BudgetSummaryDTO> getBudgetSummary() async {
     final response = await _apiClient.getApp('/budget/report/summary');
     return BudgetSummaryDTO.fromJson(response.data);
   }
 
-  // ✅ Obtener enrollments
+  // â Obtener enrollments
   Future<List<BudgetEnrollmentDTO>> getEnrollments() async {
     final response = await _apiClient.getApp('/budget/enroll');
     
@@ -103,7 +103,7 @@ class BudgetService {
       print('BudgetService: Response is direct list');
       dataList = responseData;
     } else {
-      // Si es cualquier otro formato, asumir lista vacía
+      // Si es cualquier otro formato, asumir lista vacÃ­a
       print('BudgetService: Unknown response format, returning empty list');
       return [];
     }
@@ -114,7 +114,7 @@ class BudgetService {
         .toList();
   }
 
-  // ✅ Agregar un presupuesto
+  // â Agregar un presupuesto
   Future<BudgetDTO> addBudget(NewBudgetDTO dto) async {
     print('BudgetService: Sending POST to /budget/add with data: ${dto.toJson()}');
     final response = await _apiClient.postApp('/budget/add', dto.toJson());
@@ -130,13 +130,13 @@ class BudgetService {
     return BudgetDTO.fromJson(data);
   }
 
-  // ✅ Agregar múltiples presupuestos
+  // â Agregar mÃºltiples presupuestos
   Future<void> addBudgetsBatch(List<NewBudgetDTO> dtos) async {
     final data = dtos.map((e) => e.toJson()).toList();
     await _apiClient.postApp('/budget/batch/add', data);
   }
 
-  // ✅ Actualizar presupuesto individual
+  // â Actualizar presupuesto individual
   Future<BudgetDTO> updateBudget(UpdateBudgetDTO dto) async {
     print('BudgetService: Updating budget with data: ${dto.toJson()}');
     final jsonData = dto.toJson();
@@ -152,7 +152,7 @@ class BudgetService {
     return BudgetDTO.fromJson(data);
   }
 
-  // ✅ Actualizar múltiples presupuestos
+  // â Actualizar mÃºltiples presupuestos
   Future<void> updateBudgetsBatch(List<UpdateBudgetDTO> dtos) async {
     print('BudgetService: Batch updating ${dtos.length} budgets');
     final data = dtos.map((e) => e.toJson()).toList();
@@ -162,28 +162,28 @@ class BudgetService {
     print('BudgetService: Batch update completed successfully');
   }
 
-  // ✅ Enrolar perfil a presupuesto
+  // â Enrolar perfil a presupuesto
   Future<void> enrollProfileToBudget(int profileId, int budgetId) async {
     await _apiClient.postApp('/budget/enroll/add?profileId=$profileId&budgetId=$budgetId', null);
   }
 
-  // ✅ Eliminar un presupuesto por id
+  // â Eliminar un presupuesto por id
   Future<void> deleteBudget(int id) async {
     await _apiClient.deleteApp('/budget/$id');
   }
 
-  // ✅ Eliminar múltiples presupuestos
+  // â Eliminar mÃºltiples presupuestos
   Future<void> deleteBudgetsBatch(List<int> ids) async {
     final queryParams = ids.map((id) => 'id=$id').join('&');
     await _apiClient.deleteApp('/budget/batch?$queryParams');
   }
 
-  // ✅ Eliminar enrollment
+  // â Eliminar enrollment
   Future<void> deleteEnrollment(int id) async {
     await _apiClient.deleteApp('/budget/enroll/$id');
   }
 
-  // ✅ Eliminar múltiples enrollments
+  // â Eliminar mÃºltiples enrollments
   Future<void> deleteEnrollmentsBatch(List<int> ids) async {
     print('BudgetService: deleteEnrollmentsBatch called with IDs: $ids');
     
@@ -198,7 +198,7 @@ class BudgetService {
     
     if (validIds.isEmpty) {
       print('BudgetService: No valid IDs found after filtering');
-      throw Exception('No se encontraron IDs válidos para eliminar');
+      throw Exception('No se encontraron IDs vÃ¡lidos para eliminar');
     }
     
     final queryParams = validIds.map((id) => 'id=$id').join('&');
@@ -221,12 +221,12 @@ class BudgetService {
     }
   }
 
-  // ✅ Enrolar múltiples perfiles a presupuestos
+  // â Enrolar mÃºltiples perfiles a presupuestos
   Future<void> enrollProfileToBudgetBatch(List<Map<String, int>> enrollments) async {
     await _apiClient.postApp('/budget/enroll/add/batch', enrollments);
   }
 
-  // ✅ Obtener enrollments por usuario
+  // â Obtener enrollments por usuario
   Future<List<BudgetEnrollmentDTO>> getEnrollmentsByUser() async {
     print('BudgetService: Sending GET to /budget/enroll/user');
     final response = await _apiClient.getApp('/budget/enroll/user');

@@ -28,7 +28,7 @@ class ProfileController {
       final result = await _profileService.getAllProfiles();
       profiles.value = result;
     } catch (e) {
-      debugPrint('🔴 Error loading profiles: $e');
+      debugPrint('ð´ Error loading profiles: $e');
       rethrow;
     } finally {
       isLoading.value = false;
@@ -42,20 +42,20 @@ class ProfileController {
       final result = await _profileService.getAuthenticatedProfile();
       authenticatedProfile.value = result;
     } catch (e) {
-      debugPrint('🔴 Error loading authenticated profile: $e');
+      debugPrint('ð´ Error loading authenticated profile: $e');
       rethrow;
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// ✅ Obtener perfil por ID
+  /// â Obtener perfil por ID
   Future<ProfileDetailDTO> getProfileById(int id) async {
     try {
       final result = await _profileService.getProfileById(id);
       return result;
     } catch (e) {
-      debugPrint('🔴 Error loading profile by ID: $e');
+      debugPrint('ð´ Error loading profile by ID: $e');
       rethrow;
     }
   }
@@ -67,7 +67,7 @@ class ProfileController {
       await _profileService.createProfile(dto);
       await loadAllProfiles();
     } catch (e) {
-      debugPrint('🔴 Error creating profile: $e');
+      debugPrint('ð´ Error creating profile: $e');
       rethrow;
     } finally {
       isLoading.value = false;
@@ -81,7 +81,7 @@ class ProfileController {
       await _profileService.updateProfile(dto, imageFile: imageFile);
       await loadAuthenticatedProfile();
     } catch (e) {
-      debugPrint('🔴 Error updating profile: $e');
+      debugPrint('ð´ Error updating profile: $e');
       rethrow;
     } finally {
       isLoading.value = false;
@@ -95,60 +95,60 @@ class ProfileController {
       await _profileService.deleteProfile(id);
       await loadAllProfiles();
     } catch (e) {
-      debugPrint('🔴 Error deleting profile: $e');
+      debugPrint('ð´ Error deleting profile: $e');
       rethrow;
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Iniciar sesión con un perfil usando ID (método legacy)
+  /// Iniciar sesiÃ³n con un perfil usando ID (mÃ©todo legacy)
   Future<void> profileLogin(int profileId, String password) async {
     if (isLoading.value) return;
     isLoading.value = true;
     try {
-      // Este método mantendremos para compatibilidad, pero realmente necesitaríamos 
-      // implementar la lógica para obtener las credenciales por profileId
+      // Este mÃ©todo mantendremos para compatibilidad, pero realmente necesitarÃ­amos 
+      // implementar la lÃ³gica para obtener las credenciales por profileId
       throw UnimplementedError('Use profileLoginDirect instead');
     } catch (e) {
-      debugPrint('🔴 Error logging in with profile: $e');
+      debugPrint('ð´ Error logging in with profile: $e');
       rethrow;
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Iniciar sesión con un perfil usando credenciales directas
+  /// Iniciar sesiÃ³n con un perfil usando credenciales directas
   Future<void> profileLoginDirect(String nameOrEmail, String password) async {
     if (isLoading.value) return;
     isLoading.value = true;
     try {
       final tokenResponse = await _profileService.profileLogin(nameOrEmail, password);
-      // Actualizar el perfil autenticado después del login
+      // Actualizar el perfil autenticado despuÃ©s del login
       await loadAuthenticatedProfile();
     } catch (e) {
-      debugPrint('🔴 Error logging in with profile: $e');
+      debugPrint('ð´ Error logging in with profile: $e');
       rethrow;
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Cambiar contraseña del perfil
+  /// Cambiar contraseÃ±a del perfil
   Future<void> changeProfilePassword(String currentPassword, String newPassword) async {
     if (isLoading.value) return;
     isLoading.value = true;
     try {
       await _profileService.changeProfilePassword(currentPassword, newPassword);
     } catch (e) {
-      debugPrint('🔴 Error changing profile password: $e');
+      debugPrint('ð´ Error changing profile password: $e');
       rethrow;
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// ✅ Subir imagen de perfil (cuando aún no tiene)
+  /// â Subir imagen de perfil (cuando aÃºn no tiene)
   Future<ImageDTO?> uploadProfileImage(Uint8List bytes, String fileName) async {
     if (isLoading.value) return null;
     isLoading.value = true;
@@ -162,14 +162,14 @@ class ProfileController {
       await loadAuthenticatedProfile();
       return result;
     } catch (e) {
-      debugPrint('🔴 Error uploading profile image: $e');
+      debugPrint('ð´ Error uploading profile image: $e');
       rethrow;
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// ✅ Actualizar imagen de perfil (cuando ya tiene una)
+  /// â Actualizar imagen de perfil (cuando ya tiene una)
   Future<ImageDTO?> updateProfileImage(Uint8List bytes, String fileName) async {
     if (isLoading.value) return null;
     isLoading.value = true;
@@ -183,14 +183,14 @@ class ProfileController {
       await loadAuthenticatedProfile();
       return result;
     } catch (e) {
-      debugPrint('🔴 Error updating profile image: $e');
+      debugPrint('ð´ Error updating profile image: $e');
       rethrow;
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// ✅ Eliminar imagen de perfil
+  /// â Eliminar imagen de perfil
   Future<void> deleteProfileImage() async {
     if (isLoading.value) return;
     isLoading.value = true;
@@ -198,7 +198,7 @@ class ProfileController {
       await _profileService.deleteProfileImage();
       await loadAuthenticatedProfile();
     } catch (e) {
-      debugPrint('🔴 Error deleting profile image: $e');
+      debugPrint('ð´ Error deleting profile image: $e');
       rethrow;
     } finally {
       isLoading.value = false;

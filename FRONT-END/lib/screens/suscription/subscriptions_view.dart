@@ -28,11 +28,11 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
   }
 
   Future<void> _subscribe(SubscriptionType type) async {
-    print('🎯 Intentando suscribirse al plan: ${type.name}');
+    print('ð¯ Intentando suscribirse al plan: ${type.name}');
 
     // No permitir suscripción al Plan Básico (es gratuito y por defecto)
     if (type == SubscriptionType.BASIC) {
-      print('🚫 Bloqueando suscripción al Plan Básico');
+      print('ð« Bloqueando suscripción al Plan Básico');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('El Plan Básico es gratuito e incluido por defecto'),
@@ -49,7 +49,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
     );
 
     if (controller.errorMessage == null && response != null && response.initPoint.isNotEmpty) {
-      print('🔗 Abriendo URL de MercadoPago: ${response.initPoint}');
+      print('ð Abriendo URL de MercadoPago: ${response.initPoint}');
 
       try {
         // Usar url_launcher para todas las plataformas
@@ -62,14 +62,14 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('✅ Redirigiendo a MercadoPago para completar el pago...'),
+              content: Text('â Redirigiendo a MercadoPago para completar el pago...'),
               backgroundColor: Colors.green,
               duration: Duration(seconds: 3),
             ),
           );
         }
       } catch (e) {
-        print('❌ Error en redirección: $e');
+        print('â Error en redirecciÃ³n: $e');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -107,7 +107,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Planes de Suscripción'),
+        title: const Text('Planes de SuscripciÃ³n'),
         backgroundColor: Colors.purple,
         foregroundColor: Colors.white,
       ),
@@ -155,7 +155,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
 
                 const SizedBox(height: 24),
 
-                // Título de planes disponibles
+                // TÃ­tulo de planes disponibles
                 Text(
                   'Planes Disponibles',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -207,7 +207,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
                   Icon(Icons.check_circle, color: Colors.green.shade600),
                   const SizedBox(width: 8),
                   Text(
-                    'Suscripción Actual',
+                    'SuscripciÃ³n Actual',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -219,8 +219,8 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
               const SizedBox(height: 8),
               Text('Plan: ${_getPlanTitle(activeSub.subscriptionType)}'),
               Text('Estado: ${activeSub.subscriptionState.name}'),
-              Text('Próximo pago: ${_formatDate(activeSub.nextPaymentDate)}'),
-              Text('Renovación automática: ${activeSub.isAutoRenewable ? "Sí" : "No"}'),
+              Text('PrÃ³ximo pago: ${_formatDate(activeSub.nextPaymentDate)}'),
+              Text('RenovaciÃ³n automÃ¡tica: ${activeSub.isAutoRenewable ? "SÃ­" : "No"}'),
               if (activeSub.cardLastFourDigits != null)
                 Text('Tarjeta: **** ${activeSub.cardLastFourDigits}'),
               if (activeSub.cardBrand != null)
@@ -238,13 +238,13 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
       {
         'type': SubscriptionType.BASIC,
         'title': 'Plan Básico',
-        'description': 'Funcionalidades básicas\nIncluido por defecto',
+        'description': 'Funcionalidades bÃ¡sicas\nIncluido por defecto',
         'price': 'Gratis',
         'isDefault': true, // Plan por defecto
       },
       {
         'type': SubscriptionType.STANDARD,
-        'title': 'Plan Estándar',
+        'title': 'Plan EstÃ¡ndar',
         'description': 'Acceso completo\nSin anuncios',
         'price': '\$20.000 COP',
         'isDefault': false,
@@ -281,7 +281,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
       case SubscriptionType.BASIC:
         return 'Plan Básico';
       case SubscriptionType.STANDARD:
-        return 'Plan Estándar';
+        return 'Plan EstÃ¡ndar';
       case SubscriptionType.PREMIUM:
         return 'Plan Premium';
     }

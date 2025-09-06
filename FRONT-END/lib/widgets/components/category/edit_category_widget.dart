@@ -17,7 +17,7 @@ class EditCategoryWidget extends StatefulWidget {
   @override
   State<EditCategoryWidget> createState() => _EditCategoryWidgetState();
 
-  /// Método estático para mostrar el diálogo de edición
+  /// MÃ©todo estÃ¡tico para mostrar el diÃ¡logo de ediciÃ³n
   static Future<bool?> showEditDialog(
       BuildContext context,
       CategoryDTO category,
@@ -97,8 +97,8 @@ class _EditCategoryWidgetState extends State<EditCategoryWidget> {
         registerDate: widget.category.registerDate,
       );
 
-      print('✏️ Original category: ${widget.category.toJson()}');
-      print('✏️ Updated category: ${updatedCategory.toJson()}');
+      print('âï¸ Original category: ${widget.category.toJson()}');
+      print('âï¸ Updated category: ${updatedCategory.toJson()}');
 
       await controller.updateCategory(updatedCategory);
 
@@ -106,7 +106,7 @@ class _EditCategoryWidgetState extends State<EditCategoryWidget> {
         if (controller.errorMessage == null) {
           Navigator.pop(context, true);
           _showSnackBar(
-            'Categoría "${nameController.text}" actualizada exitosamente',
+            'CategorÃ­a "${nameController.text}" actualizada exitosamente',
             backgroundColor: Colors.green,
           );
         } else {
@@ -118,7 +118,7 @@ class _EditCategoryWidgetState extends State<EditCategoryWidget> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = 'Error al actualizar la categoría: $e';
+          _errorMessage = 'Error al actualizar la categorÃ­a: $e';
         });
       }
     } finally {
@@ -142,7 +142,7 @@ class _EditCategoryWidgetState extends State<EditCategoryWidget> {
           ),
           const SizedBox(width: 12),
           const Text(
-            'Editar Categoría',
+            'Editar CategorÃ­a',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -158,7 +158,7 @@ class _EditCategoryWidgetState extends State<EditCategoryWidget> {
             TextField(
               controller: nameController,
               decoration: const InputDecoration(
-                labelText: 'Nombre de la categoría',
+                labelText: 'Nombre de la categorÃ­a',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.category_outlined),
               ),

@@ -1,7 +1,7 @@
 import 'base_dynamic_response_dto.dart';
 import 'string_chat_response_dto.dart';
 
-/// DTO para respuestas de análisis dinámico que combina respuesta de texto y análisis AI
+/// DTO para respuestas de anÃ¡lisis dinÃ¡mico que combina respuesta de texto y anÃ¡lisis AI
 class DynamicAnalysisResponseDTO {
   final StringChatResponseDTO body;
   final BaseDynamicResponseDTO response;
@@ -25,10 +25,10 @@ class DynamicAnalysisResponseDTO {
     };
   }
 
-  /// Getter para obtener el tipo de análisis
+  /// Getter para obtener el tipo de anÃ¡lisis
   String get analysisType => response.type;
 
-  /// Getter para verificar si incluye datos de gráfico
+  /// Getter para verificar si incluye datos de grÃ¡fico
   bool get hasChartData => body.chartData != null;
 
   /// Getter para obtener resumen combinado

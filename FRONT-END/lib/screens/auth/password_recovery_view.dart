@@ -57,7 +57,7 @@ class _RecoverPasswordFormState extends State<RecoverPasswordForm> {
     super.dispose();
   }
 
-  /// 📌 Envía la solicitud para cambiar la contraseña
+  /// ð EnvÃ­a la solicitud para cambiar la contraseÃ±a
   void _submitChangePassword() {
     if (!_formKey.currentState!.validate()) return;
 
@@ -79,10 +79,10 @@ class _RecoverPasswordFormState extends State<RecoverPasswordForm> {
         key: _formKey,
         child: Column(
           children: [
-            FormTitleText(text: 'Ingresa tu nueva contraseña'),
+            FormTitleText(text: 'Ingresa tu nueva contraseÃ±a'),
             const SizedBox(height: 30),
 
-            /// 🔑 Campo nueva contraseña
+            /// ð Campo nueva contraseÃ±a
             ValueListenableBuilder<bool>(
               valueListenable: _changePasswordController.obscurePassword,
               builder: (context, obscure, _) {
@@ -94,20 +94,20 @@ class _RecoverPasswordFormState extends State<RecoverPasswordForm> {
               },
             ),
 
-            /// 🔑 Campo confirmar contraseña
+            /// ð Campo confirmar contraseÃ±a
             ValueListenableBuilder<bool>(
               valueListenable: _changePasswordController.obscurePassword,
               builder: (context, obscure, _) {
                 return PasswordFormField(
                   controller: _confirmPasswordController,
                   focusNode: _confirmPasswordFocusNode,
-                  labelText: 'Confirmar Contraseña',
+                  labelText: 'Confirmar ContraseÃ±a',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Campo requerido';
                     }
                     if (value != _newPasswordController.text) {
-                      return 'Las contraseñas no coinciden';
+                      return 'Las contraseÃ±as no coinciden';
                     }
                     return null;
                   },
@@ -117,7 +117,7 @@ class _RecoverPasswordFormState extends State<RecoverPasswordForm> {
 
             const SizedBox(height: 30),
 
-            /// 🔄 Botón para enviar nueva contraseña
+            /// ð BotÃ³n para enviar nueva contraseÃ±a
             ValueListenableBuilder(
               valueListenable: _changePasswordController.isLoading,
               builder: (context, isLoading, _) {
@@ -125,7 +125,7 @@ class _RecoverPasswordFormState extends State<RecoverPasswordForm> {
                     ? const CircularProgressIndicator(color: Colors.white)
                     : PrimaryButton(
                   onPressed: _submitChangePassword,
-                  label: 'Cambiar Contraseña',
+                  label: 'Cambiar ContraseÃ±a',
                 );
               },
             ),

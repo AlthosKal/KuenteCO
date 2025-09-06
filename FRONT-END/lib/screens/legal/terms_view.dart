@@ -79,7 +79,7 @@ class TermsView extends StatelessWidget {
                                 Column(
                                   children: [
                                     Text(
-                                      'Términos y Condiciones de Uso',
+                                      'TÃ©rminos y Condiciones de Uso',
                                       style: theme.textTheme.headlineMedium?.copyWith(
                                         color: kPrimaryPurple,
                                         fontWeight: FontWeight.bold,
@@ -88,7 +88,7 @@ class TermsView extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 12),
                                     Text(
-                                      'Última actualización: Marzo 5, 2025',
+                                      'Ãltima actualizaciÃ³n: Marzo 5, 2025',
                                       style: theme.textTheme.bodyMedium?.copyWith(
                                         color: kPrimaryPurple.withOpacity(0.9),
                                       ),
@@ -104,28 +104,28 @@ class TermsView extends StatelessWidget {
                                     physics: const NeverScrollableScrollPhysics(),
                                     children: [
                                       _buildSection(
-                                        'Aceptación de los Términos',
-                                        'Al acceder y utilizar Kuenteco, usted acepta estar sujeto a estos Términos y Condiciones de Uso. Si no está de acuerdo con alguno de los términos, no podrá acceder ni utilizar nuestros servicios.',
+                                        'AceptaciÃ³n de los TÃ©rminos',
+                                        'Al acceder y utilizar Kuenteco, usted acepta estar sujeto a estos TÃ©rminos y Condiciones de Uso. Si no estÃ¡ de acuerdo con alguno de los tÃ©rminos, no podrÃ¡ acceder ni utilizar nuestros servicios.',
                                         theme,
                                       ),
                                       _buildSection(
                                         'Uso del Servicio',
-                                        'Nuestros servicios están diseñados para ser utilizados de manera legal y de acuerdo con estas condiciones. Usted se compromete a no utilizar nuestros servicios para fines ilegales o prohibidos por estas condiciones.',
+                                        'Nuestros servicios estÃ¡n diseÃ±ados para ser utilizados de manera legal y de acuerdo con estas condiciones. Usted se compromete a no utilizar nuestros servicios para fines ilegales o prohibidos por estas condiciones.',
                                         theme,
                                       ),
                                       _buildSection(
                                         'Cuentas de Usuario',
-                                        'Al registrarse en Kuenteco, es responsable de mantener la confidencialidad de su cuenta y contraseña. Usted es responsable de todas las actividades que ocurran bajo su cuenta.',
+                                        'Al registrarse en Kuenteco, es responsable de mantener la confidencialidad de su cuenta y contraseÃ±a. Usted es responsable de todas las actividades que ocurran bajo su cuenta.',
                                         theme,
                                       ),
                                       _buildSection(
-                                        'Cambios en los Términos',
-                                        'Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios entrarán en vigor inmediatamente después de su publicación. El uso continuado de nuestros servicios después de cualquier cambio constituye su aceptación de los nuevos términos.',
+                                        'Cambios en los TÃ©rminos',
+                                        'Nos reservamos el derecho de modificar estos tÃ©rminos en cualquier momento. Los cambios entrarÃ¡n en vigor inmediatamente despuÃ©s de su publicaciÃ³n. El uso continuado de nuestros servicios despuÃ©s de cualquier cambio constituye su aceptaciÃ³n de los nuevos tÃ©rminos.',
                                         theme,
                                       ),
                                       _buildSection(
                                         'Ley Aplicable',
-                                        'Estos términos y condiciones se regirán e interpretarán de acuerdo con las leyes vigentes, sin tener en cuenta sus disposiciones sobre conflicto de leyes.',
+                                        'Estos tÃ©rminos y condiciones se regirÃ¡n e interpretarÃ¡n de acuerdo con las leyes vigentes, sin tener en cuenta sus disposiciones sobre conflicto de leyes.',
                                         theme,
                                       ),
                                     ],

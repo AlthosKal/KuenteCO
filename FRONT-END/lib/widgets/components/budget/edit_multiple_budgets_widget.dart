@@ -135,7 +135,7 @@ class _EditMultipleBudgetsWidgetState extends State<EditMultipleBudgetsWidget> {
                                 }
                                 final amount = double.tryParse(value);
                                 if (amount == null || amount <= 0) {
-                                  return 'Ingresa un monto válido';
+                                  return 'Ingresa un monto vÃ¡lido';
                                 }
                                 return null;
                               },
@@ -199,7 +199,7 @@ class _EditMultipleBudgetsWidgetState extends State<EditMultipleBudgetsWidget> {
         
         final double totalBudget = double.parse(item.amountController.text);
         
-        // Calcular el presupuesto restante manteniendo la proporción
+        // Calcular el presupuesto restante manteniendo la proporciÃ³n
         final double currentTotal = originalBudget.totalBudget.toDouble();
         final double currentRemaining = originalBudget.remainingBudget.toDouble();
         final double remainingPercentage = currentTotal > 0 ? currentRemaining / currentTotal : 1.0;
