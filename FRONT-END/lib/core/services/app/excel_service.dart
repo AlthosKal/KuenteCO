@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../../dto/app/excel/debt_excel_export_dto.dart';
 import '../../../dto/app/excel/debt_excel_import_dto.dart';
@@ -28,17 +29,31 @@ class ExcelService {
   }
 
   /// Importar datos financieros desde archivo Excel
-  Future<void> importData(File file) async {
-    print('🔄 ExcelService: Iniciando importación desde archivo: ${file.path}');
+  Future<void> importData(dynamic file) async {
+    print('🔄 ExcelService: Iniciando importación desde archivo: ${file is XFile ? file.name : file.path}');
     
     try {
-      String fileName = file.path.split('/').last;
-      FormData formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(
-          file.path,
-          filename: fileName,
-        ),
-      });
+      FormData formData;
+      
+      if (file is XFile) {
+        // Manejar XFile (multiplataforma)
+        final bytes = await file.readAsBytes();
+        formData = FormData.fromMap({
+          'file': MultipartFile.fromBytes(
+            bytes,
+            filename: file.name,
+          ),
+        });
+      } else {
+        // Manejar File (legacy)
+        String fileName = file.path.split('/').last;
+        formData = FormData.fromMap({
+          'file': await MultipartFile.fromFile(
+            file.path,
+            filename: fileName,
+          ),
+        });
+      }
 
       final response = await _apiClient.postApp('/excel/import', formData);
 
@@ -50,15 +65,23 @@ class ExcelService {
   }
 
   /// Validar archivo Excel antes de importar
-  Future<DebtExcelValidationResultDTO> validateExcelFile(File file) async {
-    print('🔄 ExcelService: Validando archivo Excel: ${file.path}');
+  Future<DebtExcelValidationResultDTO> validateExcelFile(dynamic file) async {
+    print('🔄 ExcelService: Validando archivo Excel: ${file is XFile ? file.name : file.path}');
     
     try {
       // Aquí implementaríamos validación local del archivo
       // Por ahora, simulamos una validación básica
       
-      final fileName = file.path.split('/').last.toLowerCase();
-      final fileSize = await file.length();
+      String fileName;
+      int fileSize;
+      
+      if (file is XFile) {
+        fileName = file.name.toLowerCase();
+        fileSize = await file.length();
+      } else {
+        fileName = file.path.split('/').last.toLowerCase();
+        fileSize = await file.length();
+      }
       
       List<String> errors = [];
       List<String> warnings = [];

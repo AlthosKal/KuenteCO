@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:file_selector/file_selector.dart';
 import '../../../../controllers/excel_controller.dart';
@@ -7,7 +7,7 @@ import '../../../../controllers/excel_controller.dart';
 class ExcelControlsWidget extends StatelessWidget {
   final VoidCallback? onExport;
   final VoidCallback? onDownloadTemplate;
-  final Function(File)? onImport;
+  final Function(XFile)? onImport;
 
   const ExcelControlsWidget({
     Key? key,
@@ -364,13 +364,11 @@ class ExcelControlsWidget extends StatelessWidget {
       );
 
       if (result != null) {
-        final file = File(result.path);
-        
         // Mostrar diálogo de confirmación
-        final confirmed = await _showImportConfirmationDialog(context, file);
+        final confirmed = await _showImportConfirmationDialog(context, result);
         
         if (confirmed && onImport != null) {
-          onImport!(file);
+          onImport!(result);
         }
       }
     } catch (e) {
@@ -388,8 +386,8 @@ class ExcelControlsWidget extends StatelessWidget {
     }
   }
 
-  Future<bool> _showImportConfirmationDialog(BuildContext context, File file) async {
-    final fileName = file.path.split('/').last;
+  Future<bool> _showImportConfirmationDialog(BuildContext context, XFile file) async {
+    final fileName = file.name;
     final fileSize = await file.length();
     final fileSizeKB = (fileSize / 1024).toStringAsFixed(1);
     

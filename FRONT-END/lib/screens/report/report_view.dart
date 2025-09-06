@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/chat_controller.dart';
@@ -523,7 +522,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
   Future<void> _importFromExcel(
     BuildContext context,
     ExcelController excelController,
-    File file,
+    dynamic file,
   ) async {
     try {
       await excelController.importFromExcel(file);

@@ -1,5 +1,3 @@
-import 'dart:html' as html;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -54,27 +52,21 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
       print('🔗 Abriendo URL de MercadoPago: ${response.initPoint}');
 
       try {
-        if (kIsWeb) {
-          // ✅ MÉTODO DIRECTO CON DART:HTML - BYPASA CSP Y POLÍTICAS DE NAVEGADOR
-          html.window.open(response.initPoint, '_blank');
-          print('✅ Redirección exitosa con dart:html window.open()');
-
-          // Mostrar mensaje de confirmación
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('✅ Redirigiendo a MercadoPago para completar el pago...'),
-                backgroundColor: Colors.green,
-                duration: Duration(seconds: 3),
-              ),
-            );
-          }
-        } else {
-          // Fallback para móvil (mantener url_launcher)
-          final uri = Uri.parse(response.initPoint);
-          if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-            throw Exception('No se pudo abrir con url_launcher');
-          }
+        // Usar url_launcher para todas las plataformas
+        final uri = Uri.parse(response.initPoint);
+        if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+          throw Exception('No se pudo abrir la URL de pago');
+        }
+        
+        // Mostrar mensaje de confirmación
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✅ Redirigiendo a MercadoPago para completar el pago...'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 3),
+            ),
+          );
         }
       } catch (e) {
         print('❌ Error en redirección: $e');
@@ -85,10 +77,13 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
               backgroundColor: Colors.red,
               action: SnackBarAction(
                 label: 'Copiar URL',
-                onPressed: () {
-                  // Como fallback, copiar URL al clipboard
-                  if (kIsWeb) {
-                    html.window.navigator.clipboard?.writeText(response.initPoint);
+                onPressed: () async {
+                  // Como fallback, abrir URL de nuevo
+                  try {
+                    final uri = Uri.parse(response.initPoint);
+                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  } catch (e) {
+                    print('Error al abrir URL: $e');
                   }
                 },
               ),
