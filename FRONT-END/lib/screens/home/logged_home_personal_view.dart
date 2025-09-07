@@ -20,7 +20,7 @@ class LoggedHomePersonalView extends StatelessWidget {
     required this.profileImageUrl,
   });
 
-  /// ✅ Factory que carga el usuario autenticado antes de mostrar la vista
+  /// â Factory que carga el usuario autenticado antes de mostrar la vista
   static Future<Widget> create() async {
     final user = await AuthService().getAuthenticatedUser();
     return LoggedHomePersonalView(
@@ -37,7 +37,7 @@ class LoggedHomePersonalView extends StatelessWidget {
         body: SafeArea(
           child: Column(
             children: [
-              /// ✅ NAVBAR ARRIBA
+              /// â NAVBAR ARRIBA
               KuentecoLoggedNavbar(
                 currentRoute: '/homePersonal',
                 onLogout: () {
@@ -45,14 +45,14 @@ class LoggedHomePersonalView extends StatelessWidget {
                 },
               ),
 
-              /// ✅ CONTENIDO PRINCIPAL
+              /// â CONTENIDO PRINCIPAL
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      /// 🏷️ HEADER
+                      /// ð·ï¸ HEADER
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -83,11 +83,11 @@ class LoggedHomePersonalView extends StatelessWidget {
                       ),
                       const SizedBox(height: 20),
 
-                      /// 🔲 CARD CONTENEDOR GRANDE
+                      /// ð² CARD CONTENEDOR GRANDE
                       BlurredCard(
                         child: Padding(
                           padding: const EdgeInsets.all(16),
-                          child: /// ✅ GRID DE 4 CARDS AJUSTADOS
+                          child: /// â GRID DE 4 CARDS AJUSTADOS
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -121,7 +121,7 @@ class LoggedHomePersonalView extends StatelessWidget {
 
                       const SizedBox(height: 15),
 
-                      /// ✅ FOOTER
+                      /// â FOOTER
                       const FooterLoggedWidget(),
                     ],
                   ),
@@ -134,7 +134,7 @@ class LoggedHomePersonalView extends StatelessWidget {
     );
   }
 
-  /// 🏗️ CARD PEQUEÑO
+  /// ðï¸ CARD PEQUEÃO
   Widget _buildCardItem({
     required IconData icon,
     required String title,

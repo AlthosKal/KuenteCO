@@ -20,7 +20,7 @@ class LoggedHomeProfileView extends StatefulWidget {
     required this.profileImageUrl,
   });
 
-  /// ✅ Factory que carga el perfil autenticado antes de mostrar la vista
+  /// â Factory que carga el perfil autenticado antes de mostrar la vista
   static Future<Widget> create() async {
     final profile = await ProfileService().getAuthenticatedProfile();
     return LoggedHomeProfileView(
@@ -105,7 +105,7 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
                           const SizedBox(height: 20),
 
 
-                          /// 🔲 CARD CONTENEDOR GRANDE
+                          /// ð² CARD CONTENEDOR GRANDE
                           BlurredCard(
                             child: Padding(
                               padding: const EdgeInsets.all(16),
@@ -139,7 +139,7 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
 
                           const SizedBox(height: 15),
 
-                          /// ✅ FOOTER
+                          /// â FOOTER
                           const FooterLoggedWidget(),
                         ],
                       );

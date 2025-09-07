@@ -88,7 +88,7 @@ class _AccountScreenState extends State<AccountScreen> {
                           builder: (context) => AlertDialog(
                             title: const Text('Confirmar eliminación'),
                             content: const Text(
-                                '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.'),
+                                'Â¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.'),
                             actions: [
                               TextButton(
                                 onPressed: () =>

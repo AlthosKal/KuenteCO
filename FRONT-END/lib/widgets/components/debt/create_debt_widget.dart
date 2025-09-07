@@ -117,7 +117,7 @@ class _CreateDebtWidgetState extends State<CreateDebtWidget> {
           controller: _nameController,
           decoration: InputDecoration(
             labelText: 'Nombre de la deuda *',
-            hintText: 'Ej: Préstamo bancario, Tarjeta de crédito...',
+            hintText: 'Ej: Préstamo bancario',
             prefixIcon: const Icon(Icons.title, color: Colors.red),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),

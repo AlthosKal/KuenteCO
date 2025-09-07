@@ -378,7 +378,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                     ),
                     const SizedBox(height: 20),
 
-                    /// DESCRIPCIÓN
+                    /// DESCRIPCIÃN
                     _buildInputLabel('Descripción (opcional)'),
                     const SizedBox(height: 8),
                     TextFormField(
@@ -391,7 +391,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                     ),
                     const SizedBox(height: 20),
 
-                    /// TIPO DE TRANSACCIÓN
+                    /// TIPO DE TRANSACCIÃN
                     _buildInputLabel('Tipo de transacción'),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<TransactionType>(
@@ -482,7 +482,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                     ),
                     const SizedBox(height: 20),
 
-                    /// CATEGORÍA
+                    /// CATEGORÃA
                     _buildInputLabel('Categoría'),
                     const SizedBox(height: 8),
                     Consumer<CategoryController>(

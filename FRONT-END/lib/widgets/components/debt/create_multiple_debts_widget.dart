@@ -132,7 +132,7 @@ class _CreateMultipleDebtsWidgetState extends State<CreateMultipleDebtsWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${_debts.length} deuda(s) a crear',
+                  '${_debts.length} deudas a crear',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -420,10 +420,10 @@ class _CreateMultipleDebtsWidgetState extends State<CreateMultipleDebtsWidget> {
   }
 
   Future<void> _createDebts() async {
-    print('🔄 CreateMultipleDebtsWidget: Starting validation...');
+    print('CreateMultipleDebtsWidget: Starting validation...');
     
     if (!_formKey.currentState!.validate()) {
-      print('❌ CreateMultipleDebtsWidget: Form validation failed');
+      print('CreateMultipleDebtsWidget: Form validation failed');
       return;
     }
 
@@ -432,7 +432,7 @@ class _CreateMultipleDebtsWidgetState extends State<CreateMultipleDebtsWidget> {
     });
 
     try {
-      print('📌 CreateMultipleDebtsWidget: Creating ${_debts.length} debts...');
+      print('CreateMultipleDebtsWidget: Creating ${_debts.length} debts...');
       final List<NewDebtDTO> debtDTOs = [];
 
       for (int i = 0; i < _debts.length; i++) {
@@ -466,9 +466,9 @@ class _CreateMultipleDebtsWidgetState extends State<CreateMultipleDebtsWidget> {
         print('   DTO created for debt ${i + 1}');
       }
 
-      print('✅ CreateMultipleDebtsWidget: All DTOs created, calling controller...');
+      print('CreateMultipleDebtsWidget: All DTOs created, calling controller...');
       await widget.controller.addMultipleDebts(debtDTOs);
-      print('✅ CreateMultipleDebtsWidget: Controller call completed successfully');
+      print('CreateMultipleDebtsWidget: Controller call completed successfully');
 
       if (mounted) {
         Navigator.pop(context, true);
@@ -480,7 +480,7 @@ class _CreateMultipleDebtsWidgetState extends State<CreateMultipleDebtsWidget> {
         );
       }
     } catch (e) {
-      print('❌ CreateMultipleDebtsWidget: Error creating debts: $e');
+      print(' CreateMultipleDebtsWidget: Error creating debts: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -552,7 +552,7 @@ class _CreateMultipleDebtsWidgetState extends State<CreateMultipleDebtsWidget> {
 
   @override
   void dispose() {
-    print('🧹 CreateMultipleDebtsWidget: Disposing ${_debts.length} debts...');
+    print('CreateMultipleDebtsWidget: Disposing ${_debts.length} debts...');
     for (final debt in _debts) {
       debt.dispose();
     }

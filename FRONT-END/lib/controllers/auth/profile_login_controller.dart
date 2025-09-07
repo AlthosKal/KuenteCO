@@ -30,23 +30,23 @@ class ProfileLoginController {
 
     await GlobalExceptionHandler.run(
           () async {
-        /// ✅ 1️⃣ Hacer login directo con el perfil usando /profile/login
+        /// â 1ï¸â£ Hacer login directo con el perfil usando /profile/login
         await _profileService.profileLogin(dto.nameOrEmail, dto.password);
 
         if (context.mounted) {
-          /// ✅ 2️⃣ Mostrar mensaje de éxito
+          /// â 2ï¸â£ Mostrar mensaje de éxito
           ToastHelper.showSuccess(
             context,
             title: 'Inicio de Sesión de Perfil Exitoso',
             description: 'Has iniciado sesión como perfil',
           );
 
-          /// ✅ 3️⃣ Navegar a la vista de perfil
+          /// â 3ï¸â£ Navegar a la vista de perfil
           Navigator.pushReplacementNamed(context, AppRoutes.homeProfile);
         }
       },
       onError: (error) {
-        /// ❌ Mostrar mensaje de error
+        /// â Mostrar mensaje de error
         ToastHelper.showError(
           context,
           title: 'Error al iniciar Sesión de Perfil',
@@ -59,7 +59,7 @@ class ProfileLoginController {
     isLoading.value = false;
   }
 
-  /// ♻️ Liberar recursos
+  /// â»ï¸ Liberar recursos
   void dispose() {
     isLoading.dispose();
   }

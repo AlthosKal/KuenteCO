@@ -40,7 +40,7 @@ class CategoryController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 📌 Cargar todas las categorías
+  // ð Cargar todas las categorías
   Future<void> loadCategories() async {
     _setLoading(true);
     try {
@@ -52,7 +52,6 @@ class CategoryController extends ChangeNotifier {
           e.toString().toLowerCase().contains('no data') ||
           e.toString().toLowerCase().contains('not found') ||
           e.toString().contains('404')) {
-        print('📝 CategoryController: No categories found for user - this is normal');
         categories = []; // Asegurar lista vacía
         _setError(null); // No mostrar como error
       } else {
@@ -63,7 +62,7 @@ class CategoryController extends ChangeNotifier {
     }
   }
 
-  // 📌 Cargar resumen de reportes
+  // ð Cargar resumen de reportes
   Future<void> loadSummaryReports() async {
     _setLoading(true);
     try {
@@ -76,7 +75,7 @@ class CategoryController extends ChangeNotifier {
     }
   }
 
-  // 📌 Cargar reporte por ID
+  // ð Cargar reporte por ID
   Future<void> loadReportById(int id) async {
     _setLoading(true);
     try {
@@ -89,13 +88,11 @@ class CategoryController extends ChangeNotifier {
     }
   }
 
-  // 📌 Cargar inscripciones (para usuarios de negocios - gestionar asignaciones)
+  // ð Cargar inscripciones (para usuarios de negocios - gestionar asignaciones)
   Future<void> loadEnrollments() async {
     _setLoading(true);
     try {
-      print('🔄 CategoryController: Loading enrollment summaries for business user management...');
       enrollmentSummaries = await _service.getEnrollmentSummariesByUser();
-      print('✅ CategoryController: Loaded ${enrollmentSummaries.length} enrollment summaries for business user');
       
       // Log de las inscripciones para debug
       for (int i = 0; i < enrollmentSummaries.length; i++) {
@@ -112,14 +109,13 @@ class CategoryController extends ChangeNotifier {
       
       _setError(null);
     } catch (e) {
-      print('❌ CategoryController: Error loading enrollment summaries for business user: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // 📌 Cargar inscripciones del perfil autenticado (solo sus asignaciones)
+  // ð Cargar inscripciones del perfil autenticado (solo sus asignaciones)
   Future<void> loadProfileEnrollments() async {
     _setLoading(true);
     try {
@@ -127,7 +123,6 @@ class CategoryController extends ChangeNotifier {
       
       _setError(null);
     } catch (e) {
-      print('❌ CategoryController: Error loading profile enrollments: $e');
       
       // Si es un error de "no hay datos" o lista vacía, no es realmente un error
       if (e.toString().toLowerCase().contains('empty') ||
@@ -135,7 +130,6 @@ class CategoryController extends ChangeNotifier {
           e.toString().toLowerCase().contains('not found') ||
           e.toString().toLowerCase().contains('no tienes categorías') ||
           e.toString().contains('404')) {
-        print('📝 CategoryController: No enrollments found for profile - this is normal');
         enrollments = []; // Asegurar lista vacía
         _setError(null); // No mostrar como error
       } else {
@@ -146,16 +140,14 @@ class CategoryController extends ChangeNotifier {
     }
   }
 
-  // 📌 Cargar enrollments detallados para gestión (usuarios de negocios)
+  // ð Cargar enrollments detallados para gestión (usuarios de negocios)
   Future<void> loadDetailedEnrollments() async {
     _setLoading(true);
     try {
-      print('🔄 CategoryController: Loading detailed enrollments for business user management...');
       
       // Usar el método correcto del servicio para cargar enrollments detallados
       detailedEnrollments = await _service.getDetailedEnrollments();
       
-      print('✅ CategoryController: Loaded ${detailedEnrollments.length} detailed enrollments');
       
       // Log de los enrollments para debug
       for (int i = 0; i < detailedEnrollments.length; i++) {
@@ -165,7 +157,6 @@ class CategoryController extends ChangeNotifier {
       
       _setError(null);
     } catch (e) {
-      print('❌ CategoryController: Error loading detailed enrollments: $e');
       _setError(e.toString());
       // En caso de error, mantener la lista vacía para evitar crashes
       detailedEnrollments = [];
@@ -174,7 +165,7 @@ class CategoryController extends ChangeNotifier {
     }
   }
 
-  // 📌 Agregar categoría
+  // ð Agregar categoría
   Future<void> addCategory(NewCategoryDTO dto) async {
     _setError(null); // Limpiar cualquier error previo
     
@@ -189,40 +180,31 @@ class CategoryController extends ChangeNotifier {
     }
   }
   
-  // 📌 Agregar múltiples categorías (batch)
+  // ð Agregar múltiples categorías (batch)
   Future<void> addCategoriesBatch(List<NewCategoryDTO> dtos) async {
     _setError(null);
     
     try {
-      print('📌 CategoryController: Creating ${dtos.length} categories in batch...');
       await _service.addCategoriesBatch(dtos);
-      print('✅ CategoryController: Batch creation completed successfully');
       
       // Recargar la lista completa desde el servidor
       await loadCategories();
     } catch (e) {
-      print('❌ CategoryController: Error in batch creation: $e');
       _setError(e.toString());
     }
   }
 
-  // 📌 Actualizar categoría
+  // ð Actualizar categoría
   Future<void> updateCategory(CategoryDTO dto) async {
-    print('🔄 CategoryController: Starting update for category ID: ${dto.id}');
-    print('🔄 CategoryController: Category data: ${dto.toJson()}');
     
     _setError(null); // Limpiar cualquier error previo
     
     try {
       // Actualizar la categoría en el servidor
-      print('🔄 CategoryController: Calling service.updateCategory...');
       await _service.updateCategory(dto);
-      print('✅ CategoryController: Service call completed successfully');
       
       // Recargar la lista completa desde el servidor
-      print('🔄 CategoryController: Reloading categories from server...');
       await loadCategories();
-      print('✅ CategoryController: Categories reloaded. Total categories: ${categories.length}');
       
       // Verificar si la categoría actualizada está en la lista
       final updatedCategory = categories.firstWhere(
@@ -240,19 +222,15 @@ class CategoryController extends ChangeNotifier {
       );
       
       if (updatedCategory.id != -1) {
-        print('✅ CategoryController: Updated category found in list: ${updatedCategory.toJson()}');
       } else {
-        print('❌ CategoryController: Updated category NOT found in reloaded list!');
       }
     } catch (e) {
-      print('❌ CategoryController: Error during update: $e');
       _setError(e.toString());
     }
   }
 
-  // 📌 Asignar presupuesto a categoría
+  // ð Asignar presupuesto a categoría
   Future<void> assignBudgetToCategory(int categoryId, int budgetId) async {
-    print('🔄 CategoryController: Assigning budget $budgetId to category $categoryId');
     _setError(null);
     
     try {
@@ -275,33 +253,28 @@ class CategoryController extends ChangeNotifier {
       
       // Usar el método updateCategory existente
       await updateCategory(updatedCategory);
-      print('✅ CategoryController: Budget assigned successfully');
       
     } catch (e) {
-      print('❌ CategoryController: Error assigning budget to category: $e');
       _setError(e.toString());
       rethrow;
     }
   }
   
-  // 📌 Actualizar múltiples categorías (batch)
+  // ð Actualizar múltiples categorías (batch)
   Future<void> updateCategoriesBatch(List<CategoryDTO> dtos) async {
     _setError(null);
     
     try {
-      print('📌 CategoryController: Updating ${dtos.length} categories in batch...');
       await _service.updateCategoriesBatch(dtos);
-      print('✅ CategoryController: Batch update completed successfully');
       
       // Recargar la lista completa desde el servidor
       await loadCategories();
     } catch (e) {
-      print('❌ CategoryController: Error in batch update: $e');
       _setError(e.toString());
     }
   }
 
-  // 📌 Eliminar categoría
+  // ð Eliminar categoría
   Future<void> deleteCategory(int id) async {
     _setLoading(true);
     try {
@@ -322,79 +295,63 @@ class CategoryController extends ChangeNotifier {
     }
   }
   
-  // 📌 Eliminar múltiples categorías (batch)
+  // ð Eliminar múltiples categorías (batch)
   Future<void> deleteCategoriesBatch(List<int> ids) async {
     _setError(null);
     
     try {
-      print('📌 CategoryController: Deleting ${ids.length} categories in batch...');
       await _service.deleteCategoriesBatch(ids);
-      print('✅ CategoryController: Batch deletion completed successfully');
       
       // Recargar la lista completa desde el servidor
       await loadCategories();
     } catch (e) {
-      print('❌ CategoryController: Error in batch deletion: $e');
       _setError(e.toString());
     }
   }
 
-  // 📌 Asignar categoría a perfil (solo para usuarios Business)
+  // ð Asignar categoría a perfil (solo para usuarios Business)
   Future<void> assignCategoryToProfile(int categoryId, int profileId) async {
-    print('👥 CategoryController: Assigning category $categoryId to profile $profileId');
     
     _setError(null); // Limpiar cualquier error previo
     
     try {
       // Asignar la categoría al perfil en el servidor
-      print('👥 CategoryController: Calling service.enrollProfileToCategory...');
       await _service.enrollProfileToCategory(profileId, categoryId);
-      print('✅ CategoryController: Category assigned successfully');
       
       // Recargar los resúmenes de enrollments para actualizar la UI
-      print('🔄 CategoryController: Reloading enrollment summaries after assignment...');
       await loadEnrollments();
-      print('✅ CategoryController: Enrollment summaries reloaded');
       
     } catch (e) {
-      print('❌ CategoryController: Error assigning category: $e');
       _setError(e.toString());
     }
   }
   
-  // 📌 Eliminar asignación de categoría (enrollment)
+  // ð Eliminar asignación de categoría (enrollment)
   Future<void> deleteEnrollment(int enrollmentId) async {
     _setError(null);
     
     try {
-      print('📌 CategoryController: Deleting enrollment with ID: $enrollmentId');
       await _service.deleteEnrollment(enrollmentId);
-      print('✅ CategoryController: Enrollment deleted successfully');
       
       // Recargar tanto los enrollments detallados como los resúmenes
       await loadDetailedEnrollments();
       await loadEnrollments();
     } catch (e) {
-      print('❌ CategoryController: Error deleting enrollment: $e');
       _setError(e.toString());
       rethrow; // Re-lanzar el error para que la UI pueda manejarlo
     }
   }
   
-  // 📌 Eliminar TODAS las asignaciones de una categoría (solo para usuarios Business)
+  // ð Eliminar TODAS las asignaciones de una categoría (solo para usuarios Business)
   Future<void> deleteAllEnrollmentsByCategory(int categoryId) async {
     _setError(null);
     
     try {
-      print('📌 CategoryController: Deleting ALL enrollments for category ID: $categoryId');
       await _service.deleteAllEnrollmentsByCategory(categoryId);
-      print('✅ CategoryController: All enrollments for category deleted successfully');
       
       // Recargar los resúmenes de enrollments para actualizar la UI
       await loadEnrollments();
     } catch (e) {
-      print('❌ CategoryController: Bulk delete failed: $e');
-      print('📌 CategoryController: Attempting alternative approach...');
       
       // Alternative approach: Delete enrollments individually
       // This requires getting the detailed enrollments for this category first
@@ -422,7 +379,6 @@ class CategoryController extends ChangeNotifier {
             .toList();
         
         if (categoryEnrollments.isEmpty) {
-          print('📌 CategoryController: No detailed enrollments found for category');
           await loadEnrollments(); // Still reload to refresh UI
           return;
         }
@@ -431,46 +387,39 @@ class CategoryController extends ChangeNotifier {
             .map((e) => e.id!)
             .toList();
         
-        print('📌 CategoryController: Attempting to delete ${enrollmentIds.length} enrollments individually');
         await _service.deleteEnrollmentsByIds(enrollmentIds);
-        print('✅ CategoryController: All enrollments deleted successfully via alternative method');
         
         // Reload data
         await loadEnrollments();
         
       } catch (alternativeError) {
-        print('❌ CategoryController: Alternative approach also failed: $alternativeError');
         _setError('Error al eliminar asignaciones: $alternativeError');
         rethrow;
       }
     }
   }
   
-  // 🔧 Eliminar asignaciones por IDs usando batch endpoint (método auxiliar)
+  // ð§ Eliminar asignaciones por IDs usando batch endpoint (método auxiliar)
   Future<void> deleteEnrollmentsByIds(List<int> enrollmentIds) async {
     _setError(null);
     
     try {
-      print('📌 CategoryController: Deleting ${enrollmentIds.length} enrollments by IDs using batch endpoint');
       await _service.deleteEnrollmentsBatch(enrollmentIds);
-      print('✅ CategoryController: All enrollments deleted successfully by batch IDs');
       
       // Recargar tanto los enrollments detallados como los resúmenes
       try {
         await loadDetailedEnrollments();
       } catch (detailedError) {
-        print('⚠️ CategoryController: Could not reload detailed enrollments: $detailedError');
         // No es crítico si no se pueden recargar los enrollments detallados
       }
       await loadEnrollments();
     } catch (e) {
-      print('❌ CategoryController: Error deleting enrollments by batch IDs: $e');
       _setError(e.toString());
       rethrow;
     }
   }
   
-  // 🆕 Nuevo método: Eliminar asignaciones usando categoryEnrollmentIds del resumen
+  // ð Nuevo método: Eliminar asignaciones usando categoryEnrollmentIds del resumen
   Future<void> deleteEnrollmentsByCategorySummary(CategoryEnrollmentSummaryDTO enrollmentSummary) async {
     _setError(null);
     
@@ -480,29 +429,23 @@ class CategoryController extends ChangeNotifier {
       }
       
       final enrollmentIds = enrollmentSummary.categoryEnrollmentIds!;
-      print('📌 CategoryController: Deleting ${enrollmentIds.length} enrollments for category "${enrollmentSummary.categoryName}"');
-      print('📌 CategoryController: Enrollment IDs to delete: $enrollmentIds');
       
       await _service.deleteEnrollmentsBatch(enrollmentIds);
-      print('✅ CategoryController: All enrollments for category deleted successfully using batch endpoint');
       
       // Recargar los resúmenes de enrollments para actualizar la UI
       await loadEnrollments();
     } catch (e) {
-      print('❌ CategoryController: Error deleting enrollments by category summary: $e');
       _setError(e.toString());
       rethrow;
     }
   }
   
-  // 🆕 Asignar múltiples perfiles a categorías (NUEVO)
+  // ð Asignar múltiples perfiles a categorías (NUEVO)
   Future<List<CategoryEnrollmentDTO>> enrollProfilesToCategoriesBatch(List<BatchEnrollmentRequestDTO> enrollments) async {
     _setError(null);
     
     try {
-      print('📌 CategoryController: Creating ${enrollments.length} enrollments in batch');
       final results = await _service.enrollProfilesToCategoriesBatch(enrollments);
-      print('✅ CategoryController: Batch enrollments created successfully');
       
       // Recargar tanto los enrollments detallados como los resúmenes
       await loadDetailedEnrollments();
@@ -510,7 +453,6 @@ class CategoryController extends ChangeNotifier {
       
       return results;
     } catch (e) {
-      print('❌ CategoryController: Error creating batch enrollments: $e');
       _setError(e.toString());
       rethrow;
     }

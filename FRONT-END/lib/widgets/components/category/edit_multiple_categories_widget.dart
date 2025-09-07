@@ -201,7 +201,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
                               items: state_enum.State.values.map((state) {
                                 return DropdownMenuItem<state_enum.State>(
                                   value: state,
-                                  child: Text(_getStateDisplayName(state)), // ✅ ARREGLADO: Usar método helper
+                                  child: Text(_getStateDisplayName(state)), // â ARREGLADO: Usar método helper
                                 );
                               }).toList(),
                               onChanged: (state_enum.State? newValue) {

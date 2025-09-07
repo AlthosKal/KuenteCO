@@ -235,32 +235,32 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
         return trans.toNewTransactionDTO();
       }).toList();
       
-      print('📌 Creating ${newTransactions.length} transactions:');
+      print('ð Creating ${newTransactions.length} transactions:');
       for (int i = 0; i < newTransactions.length; i++) {
         final json = newTransactions[i].toJson();
         print('   Transaction $i: $json');
-        print('   → Amount type: ${json['amount'].runtimeType}');
-        print('   → Amount value: ${json['amount']}');
-        print('   → Name: "${json['name']}"');
-        print('   → CategoryId: ${json['categoryId']}');
-        print('   → BudgetId: ${json['budgetId']}');
-        print('   → DebtId: ${json['debtId']}');
-        print('   → Description: ${json['description']}');
+        print('   â Amount type: ${json['amount'].runtimeType}');
+        print('   â Amount value: ${json['amount']}');
+        print('   â Name: "${json['name']}"');
+        print('   â CategoryId: ${json['categoryId']}');
+        print('   â BudgetId: ${json['budgetId']}');
+        print('   â DebtId: ${json['debtId']}');
+        print('   â Description: ${json['description']}');
       }
       
       // Log final JSON array que se enviará
       final finalJson = newTransactions.map((e) => e.toJson()).toList();
-      print('📡 Final JSON to send:');
-      print('📡 JSON Array Length: ${finalJson.length}');
-      print('📡 Full JSON: $finalJson');
+      print('ð¡ Final JSON to send:');
+      print('ð¡ JSON Array Length: ${finalJson.length}');
+      print('ð¡ Full JSON: $finalJson');
       
       // Comparar con el JSON que funciona en Postman
-      print('📡 First transaction comparison with Postman format:');
+      print('ð¡ First transaction comparison with Postman format:');
       if (finalJson.isNotEmpty) {
         final first = finalJson[0];
-        print('📡   Our format: $first');
-        print('📡   Expected format from Postman should be:');
-        print('📡   {categoryId: null, budgetId: null, debtId: null, name: "...", description: {...}, amount: X.X}');
+        print('ð¡   Our format: $first');
+        print('ð¡   Expected format from Postman should be:');
+        print('ð¡   {categoryId: null, budgetId: null, debtId: null, name: "...", description: {...}, amount: X.X}');
       }
       
       await controller.addTransactionsBatch(newTransactions);

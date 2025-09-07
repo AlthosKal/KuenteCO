@@ -41,13 +41,13 @@ class IncomeController extends ChangeNotifier {
 
   // ============= LOAD OPERATIONS =============
 
-  // 📌 Cargar todos los ingresos
+  // ð Cargar todos los ingresos
   Future<void> loadIncomes() async {
     _setLoading(true);
     try {
-      print('🔄 IncomeController: Loading all incomes from server...');
+      print('ð IncomeController: Loading all incomes from server...');
       incomes = await _service.getAllIncomes();
-      print('✅ IncomeController: Loaded ${incomes.length} incomes from server');
+      print('â IncomeController: Loaded ${incomes.length} incomes from server');
       
       // Log de todos los ingresos para debug
       for (int i = 0; i < incomes.length; i++) {
@@ -57,46 +57,46 @@ class IncomeController extends ChangeNotifier {
       _updateStatistics();
       _setError(null);
     } catch (e) {
-      print('❌ IncomeController: Error loading incomes: $e');
+      print('â IncomeController: Error loading incomes: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // 📌 Cargar ingreso por ID
+  // ð Cargar ingreso por ID
   Future<void> loadIncomeById(int id) async {
     _setLoading(true);
     try {
-      print('🔄 IncomeController: Loading income ID: $id');
+      print('ð IncomeController: Loading income ID: $id');
       currentIncome = await _service.getIncomeById(id);
-      print('✅ IncomeController: Loaded income: ${currentIncome?.name}');
+      print('â IncomeController: Loaded income: ${currentIncome?.name}');
       _setError(null);
     } catch (e) {
-      print('❌ IncomeController: Error loading income: $e');
+      print('â IncomeController: Error loading income: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // 📌 Cargar resumen de ingresos
+  // ð Cargar resumen de ingresos
   Future<void> loadIncomeSummaries() async {
     _setLoading(true);
     try {
-      print('🔄 IncomeController: Loading income summaries...');
+      print('ð IncomeController: Loading income summaries...');
       incomeSummaries = await _service.getIncomeSummary();
-      print('✅ IncomeController: Loaded ${incomeSummaries.length} income summaries');
+      print('â IncomeController: Loaded ${incomeSummaries.length} income summaries');
       _setError(null);
     } catch (e) {
-      print('❌ IncomeController: Error loading income summaries: $e');
+      print('â IncomeController: Error loading income summaries: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // 📌 Cargar ingresos filtrados
+  // ð Cargar ingresos filtrados
   Future<void> loadFilteredIncomes({
     int? categoryId,
     int? budgetId,
@@ -108,7 +108,7 @@ class IncomeController extends ChangeNotifier {
   }) async {
     _setLoading(true);
     try {
-      print('🔄 IncomeController: Loading filtered incomes...');
+      print('ð IncomeController: Loading filtered incomes...');
       incomes = await _service.getFilteredIncomes(
         categoryId: categoryId,
         budgetId: budgetId,
@@ -118,12 +118,12 @@ class IncomeController extends ChangeNotifier {
         minAmount: minAmount,
         maxAmount: maxAmount,
       );
-      print('✅ IncomeController: Loaded ${incomes.length} filtered incomes');
+      print('â IncomeController: Loaded ${incomes.length} filtered incomes');
       
       _updateStatistics();
       _setError(null);
     } catch (e) {
-      print('❌ IncomeController: Error loading filtered incomes: $e');
+      print('â IncomeController: Error loading filtered incomes: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
@@ -132,93 +132,93 @@ class IncomeController extends ChangeNotifier {
 
   // ============= CRUD OPERATIONS =============
 
-  // 📌 Crear ingreso
+  // ð Crear ingreso
   Future<void> addIncome(NewTransactionDTO dto) async {
     _setError(null);
     
     try {
-      print('📌 IncomeController: Creating income...');
+      print('ð IncomeController: Creating income...');
       final createdIncome = await _service.addIncome(dto);
-      print('✅ IncomeController: Income created with ID: ${createdIncome.id}');
+      print('â IncomeController: Income created with ID: ${createdIncome.id}');
       
       // Recargar la lista completa desde el servidor
       await loadIncomes();
     } catch (e) {
-      print('❌ IncomeController: Error creating income: $e');
+      print('â IncomeController: Error creating income: $e');
       _setError(e.toString());
       rethrow;
     }
   }
 
-  // 📌 Crear múltiples ingresos (batch)
+  // ð Crear múltiples ingresos (batch)
   Future<void> addIncomesBatch(List<NewTransactionDTO> dtos) async {
     _setError(null);
     
     try {
-      print('📌 IncomeController: Creating ${dtos.length} incomes in batch...');
+      print('ð IncomeController: Creating ${dtos.length} incomes in batch...');
       final createdIncomes = await _service.addIncomesBatch(dtos);
-      print('✅ IncomeController: Batch creation completed. Created ${createdIncomes.length} incomes');
+      print('â IncomeController: Batch creation completed. Created ${createdIncomes.length} incomes');
       
       // Recargar la lista completa desde el servidor
       await loadIncomes();
     } catch (e) {
-      print('❌ IncomeController: Error in batch creation: $e');
+      print('â IncomeController: Error in batch creation: $e');
       _setError(e.toString());
       rethrow;
     }
   }
 
-  // 📌 Actualizar ingreso
+  // ð Actualizar ingreso
   Future<void> updateIncome(UpdateTransactionDTO dto) async {
-    print('🔄 IncomeController: Starting update for income ID: ${dto.id}');
+    print('ð IncomeController: Starting update for income ID: ${dto.id}');
     
     _setError(null);
     
     try {
-      print('🔄 IncomeController: Calling service.updateIncome...');
+      print('ð IncomeController: Calling service.updateIncome...');
       final updatedIncome = await _service.updateIncome(dto);
-      print('✅ IncomeController: Income updated successfully: ${updatedIncome.name}');
+      print('â IncomeController: Income updated successfully: ${updatedIncome.name}');
       
       // Recargar la lista completa desde el servidor
       await loadIncomes();
     } catch (e) {
-      print('❌ IncomeController: Error during update: $e');
+      print('â IncomeController: Error during update: $e');
       _setError(e.toString());
       rethrow;
     }
   }
 
-  // 📌 Actualizar múltiples ingresos (batch)
+  // ð Actualizar múltiples ingresos (batch)
   Future<void> updateIncomesBatch(List<UpdateTransactionDTO> dtos) async {
     _setError(null);
     
     try {
-      print('📌 IncomeController: Updating ${dtos.length} incomes in batch...');
+      print('ð IncomeController: Updating ${dtos.length} incomes in batch...');
       final updatedIncomes = await _service.updateIncomesBatch(dtos);
-      print('✅ IncomeController: Batch update completed. Updated ${updatedIncomes.length} incomes');
+      print('â IncomeController: Batch update completed. Updated ${updatedIncomes.length} incomes');
       
       // Recargar la lista completa desde el servidor
       await loadIncomes();
     } catch (e) {
-      print('❌ IncomeController: Error in batch update: $e');
+      print('â IncomeController: Error in batch update: $e');
       _setError(e.toString());
       rethrow;
     }
   }
 
-  // 📌 Eliminar ingreso
+  // ð Eliminar ingreso
   Future<void> deleteIncome(int id) async {
     _setLoading(true);
     try {
-      print('📌 IncomeController: Deleting income ID: $id');
+      print('ð IncomeController: Deleting income ID: $id');
       await _service.deleteIncome(id);
-      print('✅ IncomeController: Income deleted successfully');
+      print('â IncomeController: Income deleted successfully');
       
       // Recargar la lista completa desde el servidor
       await loadIncomes();
       _setError(null);
     } catch (e) {
-      print('❌ IncomeController: Error deleting income: $e');
+      print('â IncomeController: Error deleting income: $e');
       _setError(e.toString());
       rethrow;
     } finally {
@@ -226,19 +226,19 @@ class IncomeController extends ChangeNotifier {
     }
   }
 
-  // 📌 Eliminar múltiples ingresos (batch)
+  // ð Eliminar múltiples ingresos (batch)
   Future<void> deleteIncomesBatch(List<int> ids) async {
     _setError(null);
     
     try {
-      print('📌 IncomeController: Deleting ${ids.length} incomes in batch...');
+      print('ð IncomeController: Deleting ${ids.length} incomes in batch...');
       await _service.deleteIncomesBatch(ids);
-      print('✅ IncomeController: Batch deletion completed successfully');
+      print('â IncomeController: Batch deletion completed successfully');
       
       // Recargar la lista completa desde el servidor
       await loadIncomes();
     } catch (e) {
-      print('❌ IncomeController: Error in batch deletion: $e');
+      print('â IncomeController: Error in batch deletion: $e');
       _setError(e.toString());
       rethrow;
     }
@@ -246,50 +246,50 @@ class IncomeController extends ChangeNotifier {
 
   // ============= ANALYSIS METHODS =============
 
-  // 📌 Obtener análisis mensual de ingresos
+  // ð Obtener análisis mensual de ingresos
   Future<void> loadMonthlyIncomeAnalysis(int year, int month) async {
     _setLoading(true);
     try {
-      print('🔄 IncomeController: Loading monthly income analysis for $year-$month...');
+      print('ð IncomeController: Loading monthly income analysis for $year-$month...');
       final analysis = await _service.getMonthlyIncomeAnalysis(year, month);
-      print('✅ IncomeController: Monthly analysis loaded - Total: ${analysis['totalAmount']}, Count: ${analysis['count']}');
+      print('â IncomeController: Monthly analysis loaded - Total: ${analysis['totalAmount']}, Count: ${analysis['count']}');
       _setError(null);
     } catch (e) {
-      print('❌ IncomeController: Error loading monthly analysis: $e');
+      print('â IncomeController: Error loading monthly analysis: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // 📌 Obtener análisis anual de ingresos
+  // ð Obtener análisis anual de ingresos
   Future<void> loadYearlyIncomeAnalysis(int year) async {
     _setLoading(true);
     try {
-      print('🔄 IncomeController: Loading yearly income analysis for $year...');
+      print('ð IncomeController: Loading yearly income analysis for $year...');
       final analysis = await _service.getYearlyIncomeAnalysis(year);
-      print('✅ IncomeController: Yearly analysis loaded - Total: ${analysis['totalAmount']}, Count: ${analysis['count']}');
+      print('â IncomeController: Yearly analysis loaded - Total: ${analysis['totalAmount']}, Count: ${analysis['count']}');
       _setError(null);
     } catch (e) {
-      print('❌ IncomeController: Error loading yearly analysis: $e');
+      print('â IncomeController: Error loading yearly analysis: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // 📌 Obtener ingresos por categoría
+  // ð Obtener ingresos por categoría
   Future<void> loadIncomesByCategory(int categoryId) async {
     _setLoading(true);
     try {
-      print('🔄 IncomeController: Loading incomes by category ID: $categoryId...');
+      print('ð IncomeController: Loading incomes by category ID: $categoryId...');
       final incomesByCategory = await _service.getIncomesByCategory(categoryId);
-      print('✅ IncomeController: Loaded ${incomesByCategory.length} incomes for category');
+      print('â IncomeController: Loaded ${incomesByCategory.length} incomes for category');
       incomes = incomesByCategory;
       _updateStatistics();
       _setError(null);
     } catch (e) {
-      print('❌ IncomeController: Error loading incomes by category: $e');
+      print('â IncomeController: Error loading incomes by category: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
@@ -298,7 +298,7 @@ class IncomeController extends ChangeNotifier {
 
   // ============= UTILITY METHODS =============
 
-  // 📌 Limpiar datos
+  // ð Limpiar datos
   void clearData() {
     incomes.clear();
     incomeSummaries.clear();
@@ -310,7 +310,7 @@ class IncomeController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 📌 Obtener ingreso por ID (desde la lista local)
+  // ð Obtener ingreso por ID (desde la lista local)
   TransactionDetailDTO? getIncomeById(int id) {
     try {
       return incomes.firstWhere((income) => income.id == id);
@@ -319,12 +319,12 @@ class IncomeController extends ChangeNotifier {
     }
   }
 
-  // 📌 Obtener ingresos por categoría (desde la lista local)
+  // ð Obtener ingresos por categoría (desde la lista local)
   List<TransactionDetailDTO> getIncomesByCategory(int categoryId) {
     return incomes.where((income) => income.categoryId == categoryId).toList();
   }
 
-  // 📌 Obtener ingresos por rango de fechas (desde la lista local)
+  // ð Obtener ingresos por rango de fechas (desde la lista local)
   List<TransactionDetailDTO> getIncomesByDateRange(DateTime from, DateTime to) {
     return incomes.where((income) {
       final incomeDate = DateTime.parse(income.date);
@@ -333,30 +333,30 @@ class IncomeController extends ChangeNotifier {
     }).toList();
   }
 
-  // 📌 Obtener ingresos por rango de monto (desde la lista local)
+  // ð Obtener ingresos por rango de monto (desde la lista local)
   List<TransactionDetailDTO> getIncomesByAmountRange(double minAmount, double maxAmount) {
     return incomes.where((income) => 
         income.amount >= minAmount && income.amount <= maxAmount).toList();
   }
 
-  // 📌 Verificar si hay ingresos cargados
+  // ð Verificar si hay ingresos cargados
   bool get hasIncomes => incomes.isNotEmpty;
 
-  // 📌 Obtener el mayor ingreso
+  // ð Obtener el mayor ingreso
   TransactionDetailDTO? get highestIncome {
     if (incomes.isEmpty) return null;
     return incomes.reduce((current, next) => 
         current.amount > next.amount ? current : next);
   }
 
-  // 📌 Obtener el menor ingreso
+  // ð Obtener el menor ingreso
   TransactionDetailDTO? get lowestIncome {
     if (incomes.isEmpty) return null;
     return incomes.reduce((current, next) => 
         current.amount < next.amount ? current : next);
   }
 
-  // 📌 Obtener ingresos recientes (últimos 30 días)
+  // ð Obtener ingresos recientes (últimos 30 días)
   List<TransactionDetailDTO> get recentIncomes {
     final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
     return incomes.where((income) {

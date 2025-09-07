@@ -94,7 +94,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
       case TransactionType.EXPENSE:
         return 'Egreso';
       default:
-        return 'Egreso';
+        return 'Ingreso';
     }
   }
   
@@ -105,7 +105,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
       case TransactionType.EXPENSE:
         return Icons.trending_down;
       default:
-        return Icons.trending_down;
+        return Icons.trending_up;
     }
   }
   
@@ -116,7 +116,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
       case TransactionType.EXPENSE:
         return Colors.red;
       default:
-        return Colors.red;
+        return Colors.green;
     }
   }
 
@@ -208,7 +208,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                     ),
                     const SizedBox(height: 20),
 
-                    /// DESCRIPCI�N
+                    /// DESCRIPCIï¿½N
                     _buildInputLabel('Descripcion (opcional)'),
                     const SizedBox(height: 8),
                     TextFormField(
@@ -220,8 +220,8 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                     ),
                     const SizedBox(height: 20),
 
-                    /// TIPO DE TRANSACCI�N
-                    _buildInputLabel('Tipo de transacci�n'),
+                    /// TIPO DE TRANSACCIï¿½N
+                    _buildInputLabel('Tipo de transacción'),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<TransactionType>(
                       key: ValueKey(_selectedType), // Force rebuild when type changes
@@ -281,7 +281,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                       },
                       validator: (value) {
                         if (value == null) {
-                          return 'Selecciona el tipo de transacci�n';
+                          return 'Selecciona el tipo de transacción';
                         }
                         return null;
                       },
@@ -311,8 +311,8 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                     ),
                     const SizedBox(height: 20),
 
-                    /// CATEGOR�A
-                    _buildInputLabel('Categoria'),
+                    /// CATEGORï¿½A
+                    _buildInputLabel('Categoría'),
                     const SizedBox(height: 8),
                     Consumer<CategoryController>(
                       builder: (context, categoryController, child) {
@@ -334,7 +334,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 ),
                                 SizedBox(width: 12),
-                                Text('Cargando categorias...'),
+                                Text('Cargando categorías...'),
                               ],
                             ),
                           );
@@ -345,7 +345,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                         return DropdownButtonFormField<CategoryEnrollmentDTO>(
                           value: _selectedEnrollment,
                           decoration: _buildInputDecoration(
-                            hint: 'Selecciona una categoria',
+                            hint: 'Selecciona una categoría',
                             icon: Icons.category,
                           ),
                           items: [
@@ -506,7 +506,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                                     ),
                                   )
                                 : const Text(
-                                    'Crear Transaccion',
+                                    'Crear Transacción',
                                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                   ),
                           ),

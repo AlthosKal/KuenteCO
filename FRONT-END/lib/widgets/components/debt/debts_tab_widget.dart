@@ -64,7 +64,7 @@ class DebtsTabWidget extends StatelessWidget {
       onDebtAssign: (debt) => _assignDebtToProfile(context, debt),
       onAddDebt: () => _showCreateDebtModal(context),
       showFilters: true,
-      showFab: true,  // ← Habilitado FloatingActionButton como en transacciones
+      showFab: true,  // â Habilitado FloatingActionButton como en transacciones
       compact: false,
     );
   }

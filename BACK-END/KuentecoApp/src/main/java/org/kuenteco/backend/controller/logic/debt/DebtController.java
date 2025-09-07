@@ -184,7 +184,7 @@ public class DebtController implements DebtResource {
             HttpServletRequest request) {
         DebtEnrollmentDTO dto = debtEnrollmentService.enrollProfileToDebt(profileId, debtId);
         return new ResponseEntity<>(
-                ApiResponse.ok("Presupuesto asignado correctamente", dto, request.getRequestURI()),
+                ApiResponse.ok("Deuda asignado correctamente", dto, request.getRequestURI()),
                 HttpStatus.CREATED);
     }
 
@@ -199,8 +199,7 @@ public class DebtController implements DebtResource {
                                                 e.profileId(), e.debtId()))
                         .toList();
         return new ResponseEntity<>(
-                ApiResponse.ok(
-                        "Presupuesto asignado correctamente", results, request.getRequestURI()),
+                ApiResponse.ok("Deudas asignadas correctamente", results, request.getRequestURI()),
                 HttpStatus.CREATED);
     }
 
@@ -259,7 +258,8 @@ public class DebtController implements DebtResource {
             @RequestParam List<Integer> id, HttpServletRequest request) {
         id.forEach(debtEnrollmentService::removeDebtEnrollment);
         return new ResponseEntity<>(
-                ApiResponse.ok("Asignación eliminada correctamente", null, request.getRequestURI()),
+                ApiResponse.ok(
+                        "Asignaciónes eliminadas correctamente", null, request.getRequestURI()),
                 HttpStatus.NO_CONTENT);
     }
 }

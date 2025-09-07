@@ -88,7 +88,7 @@ class TermsView extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 12),
                                     Text(
-                                      'Última actualización: Marzo 5, 2025',
+                                      'Ãltima actualización: Marzo 5, 2025',
                                       style: theme.textTheme.bodyMedium?.copyWith(
                                         color: kPrimaryPurple.withOpacity(0.9),
                                       ),

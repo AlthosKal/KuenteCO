@@ -39,7 +39,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
     await _loadDataBasedOnRole();
   }
   
-  /// Cargar datos seg�n el rol del usuario
+  /// Cargar datos segï¿½n el rol del usuario
   Future<void> _loadDataBasedOnRole() async {
     final budgetController = Provider.of<BudgetController>(context, listen: false);
     
@@ -51,18 +51,15 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
         await budgetController.loadEnrollments();
       } else {
         // Si es un usuario regular, cargar sus presupuestos
-        print('BudgetCardWidget: Loading user budgets...');
         await budgetController.loadBudgets();
       }
     } catch (e) {
-      print('BudgetCardWidget: Error loading data: $e');
       // No hacer fallback para perfiles, solo para usuarios
       final role = await _storage.read(key: 'role');
       if (role != 'ROLE_PROFILE') {
         try {
           await budgetController.loadBudgets();
         } catch (fallbackError) {
-          print('BudgetCardWidget: Fallback also failed: $fallbackError');
         }
       }
     }
@@ -82,7 +79,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
       );
     }
 
-    // � Estado de error
+    // ï¿½ Estado de error
     if (budgetController.errorMessage != null) {
       return _buildErrorCard(
         errorMessage: budgetController.errorMessage!,
@@ -108,7 +105,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
   
   /// Widget para mostrar presupuestos de usuarios
   Widget _buildBudgetCard(BudgetController budgetController) {
-    // =9 Si no hay presupuestos � mostrar bot�n para crear
+    // =9 Si no hay presupuestos ï¿½ mostrar botï¿½n para crear
     if (budgetController.budgets.isEmpty) {
       return InkWell(
         onTap: () => Navigator.pushNamed(context, AppRoutes.budgetView),
@@ -423,7 +420,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
     );
   }
 
-  /// � Helper para mostrar card de error
+  /// ï¿½ Helper para mostrar card de error
   Widget _buildErrorCard({
     required String errorMessage,
     required VoidCallback onRetry,

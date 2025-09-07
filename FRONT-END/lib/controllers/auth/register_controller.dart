@@ -39,18 +39,18 @@ class RegisterController {
         await _authService.register(dto);
 
         if (context.mounted) {
-          /// ✅ Mostramos mensaje de éxito
+          /// â Mostramos mensaje de éxito
           ToastHelper.showSuccess(
             context,
             title: 'Registro exitoso',
             description: 'Verifica tu correo para activar tu cuenta',
           );
 
-          /// ✅ Redirigimos a la vista de verificación de registro
+          /// â Redirigimos a la vista de verificación de registro
           Navigator.pushReplacementNamed(
             context,
             AppRoutes.verificationRegister,
-            arguments: email, // 🔥 enviamos el email a la pantalla de verificación
+            arguments: email, // ð¥ enviamos el email a la pantalla de verificación
           );
         }
       },

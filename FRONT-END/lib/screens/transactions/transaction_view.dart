@@ -39,7 +39,6 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
     _categoryController = CategoryController(CategoryService(ApiClient()));
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      print('TransactionView: PostFrameCallback executing - about to call _loadDataBasedOnRole()');
       _loadDataBasedOnRole();
     });
   }
@@ -47,10 +46,8 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
   /// Cargar datos según el rol del usuario
   Future<void> _loadDataBasedOnRole() async {
     try {
-      print('TransactionView: Starting _loadDataBasedOnRole()');
       final role = await _storage.read(key: 'role');
       _userRole = role;
-      print('TransactionView: User role detected: $role');
       
       // Inicializar TabController según el rol del usuario
       // Los perfiles solo tienen 2 tabs (sin deudas), los usuarios tienen 3 tabs
@@ -60,29 +57,17 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
       if (role == 'ROLE_PROFILE') {
         // Si es un perfil, cargar sus transacciones (puede crear/editar/eliminar)
         // Los perfiles NO pueden acceder a deudas
-        print('TransactionView: Loading profile transactions...');
         await _transactionController.loadTransactions();
-        print('TransactionView: Profile transactions loaded, count: ${_transactionController.transactions.length}');
-        print('TransactionView: Skipping debts load for profile - not allowed');
         await _categoryController.loadProfileEnrollments();
-        print('TransactionView: Profile enrollments loaded');
       } else {
         // Si es un usuario, cargar todas las transacciones y deudas
-        print('TransactionView: Loading user transactions...');
         await _transactionController.loadTransactions();
-        print('TransactionView: User transactions loaded, count: ${_transactionController.transactions.length}');
         await _debtController.loadDebts();
-        print('TransactionView: User debts loaded, count: ${_debtController.debts.length}');
         await _categoryController.loadCategories();
-        print('TransactionView: Categories loaded');
       }
       
-      print('TransactionView: About to call setState()');
       setState(() {}); // Actualizar UI después de detectar el rol
-      print('TransactionView: setState() completed');
     } catch (e) {
-      print('TransactionView: Error loading data: $e');
-      print('TransactionView: Error stack trace: ${e.toString()}');
     }
   }
 
@@ -187,7 +172,7 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
       );
     }
 
-    // TAB FINAL: ESTADÍSTICAS
+    // TAB FINAL: ESTADÃSTICAS
     tabs.add(
       StatisticsTabWidget(
         userRole: _userRole,

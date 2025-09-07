@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:file_selector/file_selector.dart';
 import '../../../../controllers/excel_controller.dart';
@@ -7,7 +7,7 @@ import '../../../../controllers/excel_controller.dart';
 class ExcelControlsWidget extends StatelessWidget {
   final VoidCallback? onExport;
   final VoidCallback? onDownloadTemplate;
-  final Function(File)? onImport;
+  final Function(XFile)? onImport;
 
   const ExcelControlsWidget({
     Key? key,
@@ -242,10 +242,10 @@ class ExcelControlsWidget extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          _buildInfoItem('• Formatos soportados: .xlsx, .xls'),
-          _buildInfoItem('• Tamaño máximo: 10MB'),
-          _buildInfoItem('• Incluye: Transacciones, Deudas, Categorías, Presupuestos'),
-          _buildInfoItem('• La plantilla muestra la estructura requerida'),
+          _buildInfoItem('â¢ Formatos soportados: .xlsx, .xls'),
+          _buildInfoItem('â¢ Tamaño máximo: 10MB'),
+          _buildInfoItem('â¢ Incluye: Transacciones, Deudas, Categorías, Presupuestos'),
+          _buildInfoItem('â¢ La plantilla muestra la estructura requerida'),
         ],
       ),
     );
@@ -326,7 +326,7 @@ class ExcelControlsWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Última descarga exitosa',
+                  'Ãltima descarga exitosa',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.green[800],
@@ -364,13 +364,11 @@ class ExcelControlsWidget extends StatelessWidget {
       );
 
       if (result != null) {
-        final file = File(result.path);
-        
         // Mostrar diálogo de confirmación
-        final confirmed = await _showImportConfirmationDialog(context, file);
+        final confirmed = await _showImportConfirmationDialog(context, result);
         
         if (confirmed && onImport != null) {
-          onImport!(file);
+          onImport!(result);
         }
       }
     } catch (e) {
@@ -388,8 +386,8 @@ class ExcelControlsWidget extends StatelessWidget {
     }
   }
 
-  Future<bool> _showImportConfirmationDialog(BuildContext context, File file) async {
-    final fileName = file.path.split('/').last;
+  Future<bool> _showImportConfirmationDialog(BuildContext context, XFile file) async {
+    final fileName = file.name;
     final fileSize = await file.length();
     final fileSizeKB = (fileSize / 1024).toStringAsFixed(1);
     
@@ -407,7 +405,7 @@ class ExcelControlsWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('¿Deseas importar el siguiente archivo?'),
+            Text('Â¿Deseas importar el siguiente archivo?'),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),

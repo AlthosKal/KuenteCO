@@ -115,9 +115,6 @@ public class ExcelServiceImpl implements ExcelService {
     private void exportTransactions(Workbook workbook, User user) {
         if (user.getType().equals(UserType.PERSONAL)) {
             List<Transaction> transactions = slaveTransactionRepository.findByUser(user);
-            if (transactions.isEmpty()) {
-                throw new ExcelException("No tienes Transacciones registradas");
-            }
             exportTransactionsByPersonalUser(workbook, transactions);
         } else if (user.getType().equals(UserType.BUSINESS)) {
             List<Profile> profiles = slaveProfileRepository.findByUser(user);
@@ -125,9 +122,6 @@ public class ExcelServiceImpl implements ExcelService {
                     profiles.stream()
                             .flatMap(p -> slaveTransactionRepository.findByProfile(p).stream())
                             .toList();
-            if (transactions.isEmpty()) {
-                throw new ExcelException("No tienes Transacciones registradas");
-            }
             exportTransactionsByBusinessUser(workbook, transactions);
         }
     }
@@ -141,17 +135,20 @@ public class ExcelServiceImpl implements ExcelService {
         header.createCell(2).setCellValue("Fecha");
         header.createCell(3).setCellValue("Descripción");
         header.createCell(4).setCellValue("Tipo");
-        AtomicInteger rowIdx = new AtomicInteger(1);
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        transactions.forEach(
-                transaction -> {
-                    Row row = sheet.createRow(rowIdx.getAndIncrement());
-                    row.createCell(0).setCellValue(transaction.getName());
-                    row.createCell(1).setCellValue(transaction.getAmount().doubleValue());
-                    row.createCell(2).setCellValue(dtf.format(transaction.getTransactionDate()));
-                    row.createCell(3).setCellValue(transaction.getDescription().getDescription());
-                    row.createCell(4).setCellValue(transaction.getDescription().getType().name());
-                });
+        
+        if (!transactions.isEmpty()) {
+            AtomicInteger rowIdx = new AtomicInteger(1);
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            transactions.forEach(
+                    transaction -> {
+                        Row row = sheet.createRow(rowIdx.getAndIncrement());
+                        row.createCell(0).setCellValue(transaction.getName());
+                        row.createCell(1).setCellValue(transaction.getAmount().doubleValue());
+                        row.createCell(2).setCellValue(dtf.format(transaction.getTransactionDate()));
+                        row.createCell(3).setCellValue(transaction.getDescription().getDescription());
+                        row.createCell(4).setCellValue(transaction.getDescription().getType().name());
+                    });
+        }
     }
 
     private void exportTransactionsByBusinessUser(
@@ -164,18 +161,21 @@ public class ExcelServiceImpl implements ExcelService {
         header.createCell(3).setCellValue("Fecha");
         header.createCell(4).setCellValue("Descripción");
         header.createCell(5).setCellValue("Tipo");
-        AtomicInteger rowIdx = new AtomicInteger(1);
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        transactions.forEach(
-                transaction -> {
-                    Row row = sheet.createRow(rowIdx.getAndIncrement());
-                    row.createCell(0).setCellValue(transaction.getProfile().getEmail());
-                    row.createCell(1).setCellValue(transaction.getName());
-                    row.createCell(2).setCellValue(transaction.getAmount().doubleValue());
-                    row.createCell(3).setCellValue(dtf.format(transaction.getTransactionDate()));
-                    row.createCell(4).setCellValue(transaction.getDescription().getDescription());
-                    row.createCell(5).setCellValue(transaction.getDescription().getType().name());
-                });
+        
+        if (!transactions.isEmpty()) {
+            AtomicInteger rowIdx = new AtomicInteger(1);
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            transactions.forEach(
+                    transaction -> {
+                        Row row = sheet.createRow(rowIdx.getAndIncrement());
+                        row.createCell(0).setCellValue(transaction.getProfile().getEmail());
+                        row.createCell(1).setCellValue(transaction.getName());
+                        row.createCell(2).setCellValue(transaction.getAmount().doubleValue());
+                        row.createCell(3).setCellValue(dtf.format(transaction.getTransactionDate()));
+                        row.createCell(4).setCellValue(transaction.getDescription().getDescription());
+                        row.createCell(5).setCellValue(transaction.getDescription().getType().name());
+                    });
+        }
     }
 
     private void exportBudgets(Workbook workbook, User user) {
@@ -186,19 +186,17 @@ public class ExcelServiceImpl implements ExcelService {
         header.createCell(2).setCellValue("Restante");
 
         List<Budget> budgets = slaveBudgetRepository.findByUser(user);
-        if (budgets.isEmpty()) {
-            throw new ExcelException("No tienes presupuestos registrados");
+        
+        if (!budgets.isEmpty()) {
+            AtomicInteger rowIdx = new AtomicInteger(1);
+            budgets.forEach(
+                    budget -> {
+                        Row row = sheet.createRow(rowIdx.getAndIncrement());
+                        row.createCell(0).setCellValue(budget.getName());
+                        row.createCell(1).setCellValue(budget.getTotalBudget().doubleValue());
+                        row.createCell(2).setCellValue(budget.getRemainingBudget().doubleValue());
+                    });
         }
-
-        AtomicInteger rowIdx = new AtomicInteger(1);
-
-        budgets.forEach(
-                budget -> {
-                    Row row = sheet.createRow(rowIdx.getAndIncrement());
-                    row.createCell(0).setCellValue(budget.getName());
-                    row.createCell(1).setCellValue(budget.getTotalBudget().doubleValue());
-                    row.createCell(2).setCellValue(budget.getRemainingBudget().doubleValue());
-                });
     }
 
     private void exportCategories(Workbook workbook, User user) {
@@ -210,22 +208,21 @@ public class ExcelServiceImpl implements ExcelService {
         header.createCell(3).setCellValue("Fecha de Registro");
 
         List<Category> categories = slaveCategoryRepository.findByUser(user);
-        if (categories.isEmpty()) {
-            throw new ExcelException("No tienes Categorías registradas");
+        
+        if (!categories.isEmpty()) {
+            AtomicInteger rowIdx = new AtomicInteger(1);
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            categories.forEach(
+                    category -> {
+                        Row row = sheet.createRow(rowIdx.getAndIncrement());
+                        row.createCell(0).setCellValue(category.getName());
+                        row.createCell(1)
+                                .setCellValue(
+                                        category.getDescription().getAssignedBudget().doubleValue());
+                        row.createCell(2).setCellValue(category.getDescription().getState().name());
+                        row.createCell(3).setCellValue(dtf.format(category.getRegisterDate()));
+                    });
         }
-
-        AtomicInteger rowIdx = new AtomicInteger(1);
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        categories.forEach(
-                category -> {
-                    Row row = sheet.createRow(rowIdx.getAndIncrement());
-                    row.createCell(0).setCellValue(category.getName());
-                    row.createCell(1)
-                            .setCellValue(
-                                    category.getDescription().getAssignedBudget().doubleValue());
-                    row.createCell(2).setCellValue(category.getDescription().getState().name());
-                    row.createCell(3).setCellValue(dtf.format(category.getRegisterDate()));
-                });
     }
 
     private void exportDebts(Workbook workbook, User user) {
@@ -239,22 +236,21 @@ public class ExcelServiceImpl implements ExcelService {
         header.createCell(5).setCellValue("Estado");
 
         List<Debt> debts = slaveDebtRepository.findByUser(user);
-        if (debts.isEmpty()) {
-            throw new ExcelException("No tienes Deudas registradas");
+        
+        if (!debts.isEmpty()) {
+            AtomicInteger rowIdx = new AtomicInteger(1);
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            debts.forEach(
+                    debt -> {
+                        Row row = sheet.createRow(rowIdx.getAndIncrement());
+                        row.createCell(0).setCellValue(debt.getName());
+                        row.createCell(1).setCellValue(debt.getTotalAmount().doubleValue());
+                        row.createCell(2).setCellValue(debt.getPendingAmount().doubleValue());
+                        row.createCell(3).setCellValue(dtf.format(debt.getStartDate()));
+                        row.createCell(4).setCellValue(dtf.format(debt.getExpirationDate()));
+                        row.createCell(5).setCellValue(debt.getState().name());
+                    });
         }
-
-        AtomicInteger rowIdx = new AtomicInteger(1);
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        debts.forEach(
-                debt -> {
-                    Row row = sheet.createRow(rowIdx.getAndIncrement());
-                    row.createCell(0).setCellValue(debt.getName());
-                    row.createCell(1).setCellValue(debt.getTotalAmount().doubleValue());
-                    row.createCell(2).setCellValue(debt.getPendingAmount().doubleValue());
-                    row.createCell(3).setCellValue(dtf.format(debt.getStartDate()));
-                    row.createCell(4).setCellValue(dtf.format(debt.getExpirationDate()));
-                    row.createCell(5).setCellValue(debt.getState().name());
-                });
     }
 
     private void importTransactions(Sheet sheet, User user) {

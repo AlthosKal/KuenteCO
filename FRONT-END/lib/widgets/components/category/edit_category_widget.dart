@@ -97,8 +97,8 @@ class _EditCategoryWidgetState extends State<EditCategoryWidget> {
         registerDate: widget.category.registerDate,
       );
 
-      print('✏️ Original category: ${widget.category.toJson()}');
-      print('✏️ Updated category: ${updatedCategory.toJson()}');
+      print('âï¸ Original category: ${widget.category.toJson()}');
+      print('âï¸ Updated category: ${updatedCategory.toJson()}');
 
       await controller.updateCategory(updatedCategory);
 

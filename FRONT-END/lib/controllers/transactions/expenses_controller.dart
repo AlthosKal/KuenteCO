@@ -45,13 +45,13 @@ class ExpensesController extends ChangeNotifier {
 
   // ============= LOAD OPERATIONS =============
 
-  // 📌 Cargar todos los gastos
+  // ð Cargar todos los gastos
   Future<void> loadExpenses() async {
     _setLoading(true);
     try {
-      print('🔄 ExpensesController: Loading all expenses from server...');
+      print('ð ExpensesController: Loading all expenses from server...');
       expenses = await _service.getAllExpenses();
-      print('✅ ExpensesController: Loaded ${expenses.length} expenses from server');
+      print('â ExpensesController: Loaded ${expenses.length} expenses from server');
       
       // Log de todos los gastos para debug
       for (int i = 0; i < expenses.length; i++) {
@@ -61,46 +61,46 @@ class ExpensesController extends ChangeNotifier {
       _updateStatistics();
       _setError(null);
     } catch (e) {
-      print('❌ ExpensesController: Error loading expenses: $e');
+      print('â ExpensesController: Error loading expenses: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // 📌 Cargar gasto por ID
+  // ð Cargar gasto por ID
   Future<void> loadExpenseById(int id) async {
     _setLoading(true);
     try {
-      print('🔄 ExpensesController: Loading expense ID: $id');
+      print('ð ExpensesController: Loading expense ID: $id');
       currentExpense = await _service.getExpenseById(id);
-      print('✅ ExpensesController: Loaded expense: ${currentExpense?.name}');
+      print('â ExpensesController: Loaded expense: ${currentExpense?.name}');
       _setError(null);
     } catch (e) {
-      print('❌ ExpensesController: Error loading expense: $e');
+      print('â ExpensesController: Error loading expense: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // 📌 Cargar resumen de gastos
+  // ð Cargar resumen de gastos
   Future<void> loadExpenseSummaries() async {
     _setLoading(true);
     try {
-      print('🔄 ExpensesController: Loading expense summaries...');
+      print('ð ExpensesController: Loading expense summaries...');
       expenseSummaries = await _service.getExpenseSummary();
-      print('✅ ExpensesController: Loaded ${expenseSummaries.length} expense summaries');
+      print('â ExpensesController: Loaded ${expenseSummaries.length} expense summaries');
       _setError(null);
     } catch (e) {
-      print('❌ ExpensesController: Error loading expense summaries: $e');
+      print('â ExpensesController: Error loading expense summaries: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // 📌 Cargar gastos filtrados
+  // ð Cargar gastos filtrados
   Future<void> loadFilteredExpenses({
     int? categoryId,
     int? budgetId,
@@ -112,7 +112,7 @@ class ExpensesController extends ChangeNotifier {
   }) async {
     _setLoading(true);
     try {
-      print('🔄 ExpensesController: Loading filtered expenses...');
+      print('ð ExpensesController: Loading filtered expenses...');
       // Usando métodos existentes del servicio según los filtros
       if (categoryId != null) {
         expenses = await _service.getExpensesByCategory(categoryId);
@@ -128,12 +128,12 @@ class ExpensesController extends ChangeNotifier {
       } else {
         expenses = await _service.getAllExpenses();
       }
-      print('✅ ExpensesController: Loaded ${expenses.length} filtered expenses');
+      print('â ExpensesController: Loaded ${expenses.length} filtered expenses');
       
       _updateStatistics();
       _setError(null);
     } catch (e) {
-      print('❌ ExpensesController: Error loading filtered expenses: $e');
+      print('â ExpensesController: Error loading filtered expenses: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
@@ -142,93 +142,93 @@ class ExpensesController extends ChangeNotifier {
 
   // ============= CRUD OPERATIONS =============
 
-  // 📌 Crear gasto
+  // ð Crear gasto
   Future<void> addExpense(NewTransactionDTO dto) async {
     _setError(null);
     
     try {
-      print('📌 ExpensesController: Creating expense...');
+      print('ð ExpensesController: Creating expense...');
       final createdExpense = await _service.createExpense(dto);
-      print('✅ ExpensesController: Expense created with ID: ${createdExpense.id}');
+      print('â ExpensesController: Expense created with ID: ${createdExpense.id}');
       
       // Recargar la lista completa desde el servidor
       await loadExpenses();
     } catch (e) {
-      print('❌ ExpensesController: Error creating expense: $e');
+      print('â ExpensesController: Error creating expense: $e');
       _setError(e.toString());
       rethrow;
     }
   }
 
-  // 📌 Crear múltiples gastos (batch)
+  // ð Crear múltiples gastos (batch)
   Future<void> addExpensesBatch(List<NewTransactionDTO> dtos) async {
     _setError(null);
     
     try {
-      print('📌 ExpensesController: Creating ${dtos.length} expenses in batch...');
+      print('ð ExpensesController: Creating ${dtos.length} expenses in batch...');
       final createdExpenses = await _service.createExpensesBatch(dtos);
-      print('✅ ExpensesController: Batch creation completed. Created ${createdExpenses.length} expenses');
+      print('â ExpensesController: Batch creation completed. Created ${createdExpenses.length} expenses');
       
       // Recargar la lista completa desde el servidor
       await loadExpenses();
     } catch (e) {
-      print('❌ ExpensesController: Error in batch creation: $e');
+      print('â ExpensesController: Error in batch creation: $e');
       _setError(e.toString());
       rethrow;
     }
   }
 
-  // 📌 Actualizar gasto
+  // ð Actualizar gasto
   Future<void> updateExpense(UpdateTransactionDTO dto) async {
-    print('🔄 ExpensesController: Starting update for expense ID: ${dto.id}');
+    print('ð ExpensesController: Starting update for expense ID: ${dto.id}');
     
     _setError(null);
     
     try {
-      print('🔄 ExpensesController: Calling service.updateExpense...');
+      print('ð ExpensesController: Calling service.updateExpense...');
       final updatedExpense = await _service.updateExpense(dto);
-      print('✅ ExpensesController: Expense updated successfully: ${updatedExpense.name}');
+      print('â ExpensesController: Expense updated successfully: ${updatedExpense.name}');
       
       // Recargar la lista completa desde el servidor
       await loadExpenses();
     } catch (e) {
-      print('❌ ExpensesController: Error during update: $e');
+      print('â ExpensesController: Error during update: $e');
       _setError(e.toString());
       rethrow;
     }
   }
 
-  // 📌 Actualizar múltiples gastos (batch)
+  // ð Actualizar múltiples gastos (batch)
   Future<void> updateExpensesBatch(List<UpdateTransactionDTO> dtos) async {
     _setError(null);
     
     try {
-      print('📌 ExpensesController: Updating ${dtos.length} expenses in batch...');
+      print('ð ExpensesController: Updating ${dtos.length} expenses in batch...');
       final updatedExpenses = await _service.updateExpensesBatch(dtos);
-      print('✅ ExpensesController: Batch update completed. Updated ${updatedExpenses.length} expenses');
+      print('â ExpensesController: Batch update completed. Updated ${updatedExpenses.length} expenses');
       
       // Recargar la lista completa desde el servidor
       await loadExpenses();
     } catch (e) {
-      print('❌ ExpensesController: Error in batch update: $e');
+      print('â ExpensesController: Error in batch update: $e');
       _setError(e.toString());
       rethrow;
     }
   }
 
-  // 📌 Eliminar gasto
+  // ð Eliminar gasto
   Future<void> deleteExpense(int id) async {
     _setLoading(true);
     try {
-      print('📌 ExpensesController: Deleting expense ID: $id');
+      print('ð ExpensesController: Deleting expense ID: $id');
       await _service.deleteExpense(id);
-      print('✅ ExpensesController: Expense deleted successfully');
+      print('â ExpensesController: Expense deleted successfully');
       
       // Recargar la lista completa desde el servidor
       await loadExpenses();
       _setError(null);
     } catch (e) {
-      print('❌ ExpensesController: Error deleting expense: $e');
+      print('â ExpensesController: Error deleting expense: $e');
       _setError(e.toString());
       rethrow;
     } finally {
@@ -236,19 +236,19 @@ class ExpensesController extends ChangeNotifier {
     }
   }
 
-  // 📌 Eliminar múltiples gastos (batch)
+  // ð Eliminar múltiples gastos (batch)
   Future<void> deleteExpensesBatch(List<int> ids) async {
     _setError(null);
     
     try {
-      print('📌 ExpensesController: Deleting ${ids.length} expenses in batch...');
+      print('ð ExpensesController: Deleting ${ids.length} expenses in batch...');
       await _service.deleteExpensesBatch(ids);
-      print('✅ ExpensesController: Batch deletion completed successfully');
+      print('â ExpensesController: Batch deletion completed successfully');
       
       // Recargar la lista completa desde el servidor
       await loadExpenses();
     } catch (e) {
-      print('❌ ExpensesController: Error in batch deletion: $e');
+      print('â ExpensesController: Error in batch deletion: $e');
       _setError(e.toString());
       rethrow;
     }
@@ -256,11 +256,11 @@ class ExpensesController extends ChangeNotifier {
 
   // ============= ANALYSIS METHODS =============
 
-  // 📌 Obtener análisis mensual de gastos
+  // ð Obtener análisis mensual de gastos
   Future<void> loadMonthlyExpenseAnalysis(int year, int month) async {
     _setLoading(true);
     try {
-      print('🔄 ExpensesController: Loading monthly expense analysis for $year-$month...');
+      print('ð ExpensesController: Loading monthly expense analysis for $year-$month...');
       // Implementando análisis mensual usando datos existentes
       final from = '$year-${month.toString().padLeft(2, '0')}-01';
       final to = '$year-${month.toString().padLeft(2, '0')}-31';
@@ -270,21 +270,21 @@ class ExpensesController extends ChangeNotifier {
         total += expense.amount;
       }
       final analysis = {'totalAmount': total, 'count': monthlyExpenses.length};
-      print('✅ ExpensesController: Monthly analysis loaded - Total: ${analysis['totalAmount']}, Count: ${analysis['count']}');
+      print('â ExpensesController: Monthly analysis loaded - Total: ${analysis['totalAmount']}, Count: ${analysis['count']}');
       _setError(null);
     } catch (e) {
-      print('❌ ExpensesController: Error loading monthly analysis: $e');
+      print('â ExpensesController: Error loading monthly analysis: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // 📌 Obtener análisis anual de gastos
+  // ð Obtener análisis anual de gastos
   Future<void> loadYearlyExpenseAnalysis(int year) async {
     _setLoading(true);
     try {
-      print('🔄 ExpensesController: Loading yearly expense analysis for $year...');
+      print('ð ExpensesController: Loading yearly expense analysis for $year...');
       // Implementando análisis anual usando datos existentes
       final monthlyTotals = await _service.getMonthlyExpenseTotals(year);
       double totalAmount = 0.0;
@@ -299,27 +299,27 @@ class ExpensesController extends ChangeNotifier {
       );
       totalCount = yearlyExpenses.length;
       final analysis = {'totalAmount': totalAmount, 'count': totalCount};
-      print('✅ ExpensesController: Yearly analysis loaded - Total: ${analysis['totalAmount']}, Count: ${analysis['count']}');
+      print('â ExpensesController: Yearly analysis loaded - Total: ${analysis['totalAmount']}, Count: ${analysis['count']}');
       _setError(null);
     } catch (e) {
-      print('❌ ExpensesController: Error loading yearly analysis: $e');
+      print('â ExpensesController: Error loading yearly analysis: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // 📌 Obtener gastos por categoría
+  // ð Obtener gastos por categoría
   Future<void> loadExpensesByCategory() async {
     _setLoading(true);
     try {
-      print('🔄 ExpensesController: Loading expenses by category...');
+      print('ð ExpensesController: Loading expenses by category...');
       // Usando método existente para obtener gastos categorizados
       final expensesByCategory = await _service.getExpensesByCategoryBreakdown();
-      print('✅ ExpensesController: Loaded expenses for ${expensesByCategory.length} categories');
+      print('â ExpensesController: Loaded expenses for ${expensesByCategory.length} categories');
       _setError(null);
     } catch (e) {
-      print('❌ ExpensesController: Error loading expenses by category: $e');
+      print('â ExpensesController: Error loading expenses by category: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
@@ -328,38 +328,38 @@ class ExpensesController extends ChangeNotifier {
 
   // ============= BUDGET METHODS =============
 
-  // 📌 Obtener gastos por presupuesto
+  // ð Obtener gastos por presupuesto
   Future<void> loadExpensesByBudget(int budgetId) async {
     _setLoading(true);
     try {
-      print('🔄 ExpensesController: Loading expenses for budget ID: $budgetId');
+      print('ð ExpensesController: Loading expenses for budget ID: $budgetId');
       final expensesByBudget = await _service.getExpensesByBudget(budgetId);
-      print('✅ ExpensesController: Loaded ${expensesByBudget.length} expenses for budget');
+      print('â ExpensesController: Loaded ${expensesByBudget.length} expenses for budget');
       _setError(null);
     } catch (e) {
-      print('❌ ExpensesController: Error loading expenses by budget: $e');
+      print('â ExpensesController: Error loading expenses by budget: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // 📌 Verificar límite de presupuesto
+  // ð Verificar límite de presupuesto
   Future<bool> checkBudgetLimit(int budgetId, double amount) async {
     try {
-      print('🔄 ExpensesController: Checking budget limit for budget ID: $budgetId, amount: $amount');
+      print('ð ExpensesController: Checking budget limit for budget ID: $budgetId, amount: $amount');
       final withinLimit = await _service.checkBudgetLimit(budgetId, amount);
-      print('✅ ExpensesController: Budget limit check - Within limit: $withinLimit');
+      print('â ExpensesController: Budget limit check - Within limit: $withinLimit');
       return withinLimit;
     } catch (e) {
-      print('❌ ExpensesController: Error checking budget limit: $e');
+      print('â ExpensesController: Error checking budget limit: $e');
       return false;
     }
   }
 
   // ============= UTILITY METHODS =============
 
-  // 📌 Limpiar datos
+  // ð Limpiar datos
   void clearData() {
     expenses.clear();
     expenseSummaries.clear();
@@ -371,7 +371,7 @@ class ExpensesController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 📌 Obtener gasto por ID (desde la lista local)
+  // ð Obtener gasto por ID (desde la lista local)
   TransactionDetailDTO? getExpenseById(int id) {
     try {
       return expenses.firstWhere((expense) => expense.id == id);
@@ -380,12 +380,12 @@ class ExpensesController extends ChangeNotifier {
     }
   }
 
-  // 📌 Obtener gastos por categoría (desde la lista local)
+  // ð Obtener gastos por categoría (desde la lista local)
   List<TransactionDetailDTO> getExpensesByCategory(int categoryId) {
     return expenses.where((expense) => expense.categoryId == categoryId).toList();
   }
 
-  // 📌 Obtener gastos por rango de fechas (desde la lista local)
+  // ð Obtener gastos por rango de fechas (desde la lista local)
   List<TransactionDetailDTO> getExpensesByDateRange(DateTime from, DateTime to) {
     return expenses.where((expense) {
       final expenseDate = expense.transactionDate ?? DateTime.now();
@@ -394,30 +394,30 @@ class ExpensesController extends ChangeNotifier {
     }).toList();
   }
 
-  // 📌 Obtener gastos por rango de monto (desde la lista local)
+  // ð Obtener gastos por rango de monto (desde la lista local)
   List<TransactionDetailDTO> getExpensesByAmountRange(double minAmount, double maxAmount) {
     return expenses.where((expense) => 
         expense.amount >= minAmount && expense.amount <= maxAmount).toList();
   }
 
-  // 📌 Verificar si hay gastos cargados
+  // ð Verificar si hay gastos cargados
   bool get hasExpenses => expenses.isNotEmpty;
 
-  // 📌 Obtener el mayor gasto
+  // ð Obtener el mayor gasto
   TransactionDetailDTO? get highestExpense {
     if (expenses.isEmpty) return null;
     return expenses.reduce((current, next) => 
         current.amount > next.amount ? current : next);
   }
 
-  // 📌 Obtener el menor gasto
+  // ð Obtener el menor gasto
   TransactionDetailDTO? get lowestExpense {
     if (expenses.isEmpty) return null;
     return expenses.reduce((current, next) => 
         current.amount < next.amount ? current : next);
   }
 
-  // 📌 Obtener gastos recientes (últimos 30 días)
+  // ð Obtener gastos recientes (últimos 30 días)
   List<TransactionDetailDTO> get recentExpenses {
     final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
     return expenses.where((expense) {
@@ -426,12 +426,12 @@ class ExpensesController extends ChangeNotifier {
     }).toList();
   }
 
-  // 📌 Obtener gastos por presupuesto (desde la lista local)
+  // ð Obtener gastos por presupuesto (desde la lista local)
   List<TransactionDetailDTO> getExpensesByBudgetLocal(int budgetId) {
     return expenses.where((expense) => expense.budgetId == budgetId).toList();
   }
 
-  // 📌 Calcular porcentaje del presupuesto usado
+  // ð Calcular porcentaje del presupuesto usado
   double calculateBudgetUsagePercentage(int budgetId, double budgetLimit) {
     final budgetExpenses = getExpensesByBudgetLocal(budgetId);
     double totalSpent = 0.0;

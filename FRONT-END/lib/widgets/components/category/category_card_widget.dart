@@ -109,7 +109,7 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
       builder: (context, snapshot) {
         final role = snapshot.data;
         
-        // ESTRATEGIA MÁS AGRESIVA: Priorizar el estado correcto sobre el error
+        // ESTRATEGIA MÃS AGRESIVA: Priorizar el estado correcto sobre el error
         // Si tenemos datos válidos (aunque sea una lista vacía), mostrar el estado correcto
         bool hasValidData = role != null && !categoryController.isLoading;
         bool hasCategories = role != 'ROLE_PROFILE' && categoryController.categories.isNotEmpty;
@@ -151,7 +151,7 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
   
   /// Widget para mostrar categorías de usuarios
   Widget _buildCategoryCard(CategoryController categoryController) {
-    // 🔹 Si no hay categorías → mostrar botón para crear
+    // ð¹ Si no hay categorías â mostrar botón para crear
     if (categoryController.categories.isEmpty) {
       return InkWell(
         onTap: () => Navigator.pushNamed(context, AppRoutes.categoryView),
@@ -220,7 +220,7 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
       );
     }
 
-    // 🔹 Si hay categorías → mostrar información de la primera
+    // ð¹ Si hay categorías â mostrar información de la primera
     final category = categoryController.categories.first;
     return InkWell(
       onTap: () => Navigator.pushNamed(context, AppRoutes.categoryView),
@@ -309,7 +309,7 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
   
   /// Widget para mostrar enrollments de perfiles
   Widget _buildEnrollmentCard(CategoryController categoryController) {
-    // 🔹 Si no hay enrollments → mostrar mensaje sin navegación
+    // ð¹ Si no hay enrollments â mostrar mensaje sin navegación
     if (categoryController.enrollments.isEmpty) {
       return Container(
         decoration: BoxDecoration(
@@ -379,7 +379,7 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
       );
     }
 
-    // 🔹 Si hay enrollments → mostrar información del primero
+    // ð¹ Si hay enrollments â mostrar información del primero
     final enrollment = categoryController.enrollments.first;
     return Container(
       decoration: BoxDecoration(
@@ -464,7 +464,7 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
     );
   }
 
-  /// ⚠️ Helper para mostrar card de error
+  /// â ï¸ Helper para mostrar card de error
   Widget _buildErrorCard({
     required String errorMessage,
     required VoidCallback onRetry,

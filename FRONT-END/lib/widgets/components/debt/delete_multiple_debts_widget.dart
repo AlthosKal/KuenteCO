@@ -109,7 +109,7 @@ class _DeleteMultipleDebtsWidgetState extends State<DeleteMultipleDebtsWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Eliminar M�ltiples Deudas',
+                  'Eliminar Mï¿½ltiples Deudas',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.red[700],
@@ -151,7 +151,7 @@ class _DeleteMultipleDebtsWidgetState extends State<DeleteMultipleDebtsWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '� Advertencia',
+                  'ï¿½ Advertencia',
                   style: TextStyle(
                     color: Colors.orange[700],
                     fontWeight: FontWeight.bold,
@@ -160,7 +160,7 @@ class _DeleteMultipleDebtsWidgetState extends State<DeleteMultipleDebtsWidget> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Esta acci�n eliminar� permanentemente las deudas seleccionadas y no se puede deshacer.',
+                  'Esta acciï¿½n eliminarï¿½ permanentemente las deudas seleccionadas y no se puede deshacer.',
                   style: TextStyle(
                     color: Colors.orange[600],
                     fontSize: 14,
@@ -322,7 +322,7 @@ class _DeleteMultipleDebtsWidgetState extends State<DeleteMultipleDebtsWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Resumen de Eliminaci�n',
+                'Resumen de Eliminaciï¿½n',
                 style: TextStyle(
                   color: Colors.red[700],
                   fontWeight: FontWeight.bold,

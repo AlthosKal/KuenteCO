@@ -53,15 +53,12 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
     super.dispose();
   }
 
-  /// 📌 Acción cuando el usuario envía el código ingresado
+  /// ð Acción cuando el usuario envía el código ingresado
   void _submitValidateCode() {
     if (!_formKey.currentState!.validate()) return;
 
     final code = _validateController.getCodeInput();
 
-    // ✅ Aquí debes elegir QUÉ método usar:
-    // Si es activación de cuenta -> validateVerificationCode
-    // Si es recuperación de contraseña -> validatePasswordRecoveryCode
     _validateController.validatePasswordRecoveryCode(
       context: context,
       email: widget.email,
@@ -69,7 +66,7 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
     );
   }
 
-  /// 📌 Mueve el foco automáticamente entre los campos
+  /// ð Mueve el foco automáticamente entre los campos
   void _onCodeFieldChange(String value, int index) {
     if (value.length == 1 && index < 5) {
       _focusNodes[index + 1].requestFocus();
@@ -78,13 +75,13 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
     }
   }
 
-  /// 📌 Lógica para reenviar el código
+  /// ð Lógica para reenviar el código
   Future<void> _resendCode() async {
     if (_validateController.timerCount > 0) return;
 
     final dto = SendVerificationCodeDTO(email: widget.email);
 
-    // ✅ Aquí también decides si es registro o recuperación
+    // â Aquí también decides si es registro o recuperación
     await _authService.sendVerificationCode(isRegistration: false, dto: dto);
 
     _validateController.startTimer(
@@ -109,7 +106,7 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
             FormTitleText(text: widget.email),
             const SizedBox(height: 30),
 
-            /// 🔢 Campos individuales para cada dígito
+            /// ð¢ Campos individuales para cada dígito
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
@@ -154,7 +151,7 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
 
             const SizedBox(height: 20),
 
-            /// ⏳ Timer del código
+            /// â³ Timer del código
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -176,7 +173,7 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
 
             const SizedBox(height: 10),
 
-            /// 🔁 Botón para reenviar código
+            /// ð Botón para reenviar código
             TextButton(
               onPressed: _validateController.timerCount == 0 ? _resendCode : null,
               child: Text(
@@ -192,7 +189,7 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
 
             const SizedBox(height: 30),
 
-            /// ✅ Botón de verificación
+            /// â Botón de verificación
             ValueListenableBuilder(
               valueListenable: _validateController.isLoading,
               builder: (context, isLoading, _) {

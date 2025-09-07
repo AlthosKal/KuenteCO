@@ -72,7 +72,7 @@ class ValidateVerificationCodeController {
         _validatedCode = code;
         ToastHelper.showSuccess(context, title: 'Código validado correctamente');
 
-        /// ✅ Redirige pasando email y código directamente al constructor
+        /// â Redirige pasando email y código directamente al constructor
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

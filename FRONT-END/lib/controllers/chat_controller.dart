@@ -66,7 +66,7 @@ class ChatController extends ChangeNotifier {
 
   /// Chat básico con AI
   Future<void> sendMessage(String message, {Model? model}) async {
-    print('🔄 ChatController: Enviando mensaje básico');
+    print('ð ChatController: Enviando mensaje básico');
     _setLoading(true);
     _setError(null);
 
@@ -81,9 +81,9 @@ class ChatController extends ChangeNotifier {
       _currentConversationId = _lastChatResponse!.conversationId;
       
       await _addToHistory(message, _lastChatResponse!.analysis.response);
-      print('✅ ChatController: Mensaje enviado y respuesta recibida');
+      print('â ChatController: Mensaje enviado y respuesta recibida');
     } catch (e) {
-      print('❌ ChatController: Error enviando mensaje: $e');
+      print('â ChatController: Error enviando mensaje: $e');
       _setError('Error al enviar mensaje: ${e.toString()}');
     } finally {
       _setLoading(false);
@@ -96,7 +96,7 @@ class ChatController extends ChangeNotifier {
     List<int>? specificDebtIds,
     String? customMessage,
   }) async {
-    print('🔄 ChatController: Iniciando análisis de deudas');
+    print('ð ChatController: Iniciando análisis de deudas');
     _setDebtAnalyzing(true);
     _setError(null);
     _lastDebtAnalysisType = 'GENERAL_ANALYSIS';
@@ -113,9 +113,9 @@ class ChatController extends ChangeNotifier {
         _lastDebtAnalysis!.analysis ?? 'Análisis de deudas completado',
       );
       
-      print('✅ ChatController: Análisis de deudas completado');
+      print('â ChatController: Análisis de deudas completado');
     } catch (e) {
-      print('❌ ChatController: Error en análisis de deudas: $e');
+      print('â ChatController: Error en análisis de deudas: $e');
       _setError('Error al analizar deudas: ${e.toString()}');
     } finally {
       _setDebtAnalyzing(false);
@@ -128,7 +128,7 @@ class ChatController extends ChangeNotifier {
     required double monthlyIncome,
     List<int>? debtIds,
   }) async {
-    print('🔄 ChatController: Iniciando análisis de riesgo');
+    print('ð ChatController: Iniciando análisis de riesgo');
     _setDebtAnalyzing(true);
     _setError(null);
     _lastDebtAnalysisType = 'RISK_ANALYSIS';
@@ -145,9 +145,9 @@ class ChatController extends ChangeNotifier {
         _lastDebtAnalysis!.analysis ?? 'Análisis de riesgo completado',
       );
       
-      print('✅ ChatController: Análisis de riesgo completado');
+      print('â ChatController: Análisis de riesgo completado');
     } catch (e) {
-      print('❌ ChatController: Error en análisis de riesgo: $e');
+      print('â ChatController: Error en análisis de riesgo: $e');
       _setError('Error al analizar riesgo: ${e.toString()}');
     } finally {
       _setDebtAnalyzing(false);
@@ -160,7 +160,7 @@ class ChatController extends ChangeNotifier {
     required double availableBudget,
     List<int>? priorityDebtIds,
   }) async {
-    print('🔄 ChatController: Generando estrategia de pago');
+    print('ð ChatController: Generando estrategia de pago');
     _setDebtAnalyzing(true);
     _setError(null);
     _lastDebtAnalysisType = 'PAYMENT_STRATEGY';
@@ -177,9 +177,9 @@ class ChatController extends ChangeNotifier {
         _lastDebtAnalysis!.analysis ?? 'Estrategia generada',
       );
       
-      print('✅ ChatController: Estrategia de pago generada');
+      print('â ChatController: Estrategia de pago generada');
     } catch (e) {
-      print('❌ ChatController: Error generando estrategia: $e');
+      print('â ChatController: Error generando estrategia: $e');
       _setError('Error al generar estrategia: ${e.toString()}');
     } finally {
       _setDebtAnalyzing(false);
@@ -188,7 +188,7 @@ class ChatController extends ChangeNotifier {
 
   /// Análisis dinámico
   Future<void> getDynamicAnalysis(String message, {Model? model}) async {
-    print('🔄 ChatController: Solicitando análisis dinámico');
+    print('ð ChatController: Solicitando análisis dinámico');
     _setLoading(true);
     _setError(null);
 
@@ -203,9 +203,9 @@ class ChatController extends ChangeNotifier {
       _currentConversationId = _lastDynamicAnalysis!.body.conversationId;
       
       await _addToHistory(message, _lastDynamicAnalysis!.body.response);
-      print('✅ ChatController: Análisis dinámico completado');
+      print('â ChatController: Análisis dinámico completado');
     } catch (e) {
-      print('❌ ChatController: Error en análisis dinámico: $e');
+      print('â ChatController: Error en análisis dinámico: $e');
       _setError('Error en análisis dinámico: ${e.toString()}');
     } finally {
       _setLoading(false);
@@ -214,15 +214,15 @@ class ChatController extends ChangeNotifier {
 
   /// Cargar historial de chat
   Future<void> loadChatHistory() async {
-    print('🔄 ChatController: Cargando historial de chat');
+    print('ð ChatController: Cargando historial de chat');
     _setLoading(true);
 
     try {
       // _chatHistory = await _historyService.getChatHistory();
       // Por ahora usar historial local
-      print('✅ ChatController: Historial cargado: ${_chatHistory.length} mensajes');
+      print('â ChatController: Historial cargado: ${_chatHistory.length} mensajes');
     } catch (e) {
-      print('❌ ChatController: Error cargando historial: $e');
+      print('â ChatController: Error cargando historial: $e');
       _setError('Error al cargar historial: ${e.toString()}');
     } finally {
       _setLoading(false);
@@ -245,9 +245,9 @@ class ChatController extends ChangeNotifier {
       // Guardar en el servicio de historial (por implementar)
       try {
         // await _historyService.saveChatHistory(historyItem);
-        print('📝 ChatController: Historial guardado localmente');
+        print('ð ChatController: Historial guardado localmente');
       } catch (e) {
-        print('⚠️ ChatController: Error guardando en historial: $e');
+        print('â ï¸ ChatController: Error guardando en historial: $e');
       }
     }
   }
@@ -262,19 +262,19 @@ class ChatController extends ChangeNotifier {
     _lastDebtAnalysisType = null;
     _setError(null);
     notifyListeners();
-    print('🧹 ChatController: Conversación actual limpiada');
+    print('ð§¹ ChatController: Conversación actual limpiada');
   }
 
   /// Limpiar todo el historial
   Future<void> clearAllHistory() async {
-    print('🔄 ChatController: Limpiando todo el historial');
+    print('ð ChatController: Limpiando todo el historial');
     try {
       // await _historyService.clearAllHistory();
       _chatHistory.clear();
       clearCurrentConversation();
-      print('✅ ChatController: Historial limpiado completamente');
+      print('â ChatController: Historial limpiado completamente');
     } catch (e) {
-      print('❌ ChatController: Error limpiando historial: $e');
+      print('â ChatController: Error limpiando historial: $e');
       _setError('Error al limpiar historial: ${e.toString()}');
     }
   }

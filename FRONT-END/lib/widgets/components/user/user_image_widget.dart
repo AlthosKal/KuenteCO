@@ -21,7 +21,7 @@ class _UserImageWidgetState extends State<UserImageWidget> {
   Uint8List? _selectedImageBytes;
   bool _isProcessing = false;
 
-  // ✅ MÉTODO COMPATIBLE WEB + MÓVIL
+  // â MÃTODO COMPATIBLE WEB + MÃVIL
   Future<void> _pickImageAndUploadOrUpdate() async {
     if (_isProcessing) return;
 
@@ -30,7 +30,7 @@ class _UserImageWidgetState extends State<UserImageWidget> {
     try {
       final picker = ImagePicker();
 
-      // ✅ Configuración optimizada para web y móvil
+      // â Configuración optimizada para web y móvil
       final pickedFile = await picker.pickImage(
         source: ImageSource.gallery,
         maxWidth: kIsWeb ? null : 1200,
@@ -39,11 +39,11 @@ class _UserImageWidgetState extends State<UserImageWidget> {
       );
 
       if (pickedFile == null) {
-        debugPrint('📷 User cancelled image selection');
+        debugPrint('ð· User cancelled image selection');
         return;
       }
 
-      debugPrint('📷 User image picked: ${pickedFile.name}');
+      debugPrint('ð· User image picked: ${pickedFile.name}');
 
       final bytes = await pickedFile.readAsBytes();
 
@@ -56,7 +56,7 @@ class _UserImageWidgetState extends State<UserImageWidget> {
         _selectedImageBytes = bytes;
       });
 
-      // ✅ Crear MultipartFile con nombre adecuado
+      // â Crear MultipartFile con nombre adecuado
       final fileName = pickedFile.name.isNotEmpty
           ? pickedFile.name
           : 'user_image_${DateTime.now().millisecondsSinceEpoch}.jpg';
@@ -68,13 +68,13 @@ class _UserImageWidgetState extends State<UserImageWidget> {
 
       final currentImage = widget.userController.user.value?.image;
 
-      // ✅ Upload o update según corresponda
+      // â Upload o update según corresponda
       if (currentImage == null) {
-        debugPrint('📤 Uploading new user image...');
+        debugPrint('ð¤ Uploading new user image...');
         await widget.userController.uploadUserImage(multipartFile, fileName);
         _showSnackBar('Imagen subida correctamente');
       } else {
-        debugPrint('🔄 Updating existing user image...');
+        debugPrint('ð Updating existing user image...');
         await widget.userController.updateUserImage(multipartFile, fileName);
         _showSnackBar('Imagen actualizada correctamente');
       }
@@ -85,13 +85,13 @@ class _UserImageWidgetState extends State<UserImageWidget> {
         setState(() => _selectedImageBytes = null);
       }
 
-      debugPrint('✅ User image processed successfully');
+      debugPrint('â User image processed successfully');
 
     } catch (e, stackTrace) {
-      debugPrint('❌ Error processing user image: $e');
+      debugPrint('â Error processing user image: $e');
       debugPrint('Stack trace: $stackTrace');
 
-      // ✅ No mostrar error si el usuario canceló en web
+      // â No mostrar error si el usuario canceló en web
       if (kIsWeb && (e.toString().contains('User cancelled') ||
           e.toString().contains('AbortError'))) {
         return;
@@ -120,7 +120,7 @@ class _UserImageWidgetState extends State<UserImageWidget> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Sí, eliminar', style: TextStyle(color: Colors.red)),
+            child: const Text('eliminar', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -131,13 +131,13 @@ class _UserImageWidgetState extends State<UserImageWidget> {
     setState(() => _isProcessing = true);
 
     try {
-      debugPrint('🗑️ Deleting user image...');
+      debugPrint('ðï¸ Deleting user image...');
       await widget.userController.deleteUserImage();
       await widget.userController.loadUser();
       _showSnackBar('Imagen eliminada correctamente');
-      debugPrint('✅ User image deleted successfully');
+      debugPrint('â User image deleted successfully');
     } catch (e) {
-      debugPrint('❌ Error deleting user image: $e');
+      debugPrint('â Error deleting user image: $e');
       _showSnackBar('Error al eliminar la imagen: ${e.toString()}', isError: true);
     } finally {
       if (mounted) {
@@ -184,7 +184,7 @@ class _UserImageWidgetState extends State<UserImageWidget> {
   }
 
   Widget _buildImageContent(String? imageUrl) {
-    // ✅ Mostrar loading si está procesando
+    // â Mostrar loading si está procesando
     if (_isProcessing) {
       return Container(
         color: Colors.grey[200],
@@ -213,7 +213,7 @@ class _UserImageWidgetState extends State<UserImageWidget> {
             _selectedImageBytes!,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
-              debugPrint('❌ Error displaying temp user image: $error');
+              debugPrint('â Error displaying temp user image: $error');
               return const Center(
                 child: Icon(Icons.error, size: 50, color: Colors.red),
               );
@@ -245,7 +245,7 @@ class _UserImageWidgetState extends State<UserImageWidget> {
           return const Center(child: CircularProgressIndicator());
         },
         errorBuilder: (context, error, stackTrace) {
-          debugPrint('❌ Error loading user image: $error');
+          debugPrint('â Error loading user image: $error');
           return const Center(
             child: Icon(Icons.person, size: 100, color: Colors.grey),
           );

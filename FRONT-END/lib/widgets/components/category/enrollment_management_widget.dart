@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../controllers/business_logic/category_controller.dart';
-import 'batch_assign_category_widget.dart';
+import 'assign_multiple_categories_widget.dart';
 
 class EnrollmentManagementWidget extends StatelessWidget {
   final VoidCallback? onEnrollmentChanged;
@@ -105,7 +105,7 @@ class EnrollmentManagementWidget extends StatelessWidget {
           SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Usa el botón de asignación masiva (➕) para asignar múltiples categorías a múltiples perfiles de una vez.',
+              'Usa el botón de asignación masiva (â) para asignar múltiples categorías a múltiples perfiles de una vez.',
               style: TextStyle(fontSize: 12),
             ),
           ),

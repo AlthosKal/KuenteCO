@@ -273,17 +273,17 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
                   'Gastos', 
                   expenses, 
                   total, 
-                  Colors.orange,
+                  Colors.red,
                   Icons.trending_down,
                 ),
               ],
               if (debts > 0) ...[
                 const SizedBox(height: 8),
                 _buildDistributionRow(
-                  'Deudas', 
+                  'Deudas',
                   debts, 
                   total, 
-                  Colors.red,
+                  Colors.orange,
                   Icons.account_balance_wallet,
                 ),
               ],
@@ -399,10 +399,10 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
                   color = Colors.green;
                   icon = Icons.trending_up;
                 } else if (isExpense) {
-                  color = Colors.orange;
+                  color = Colors.red;
                   icon = Icons.trending_down;
                 } else if (isDebt) {
-                  color = Colors.red;
+                  color = Colors.orange;
                   icon = Icons.account_balance_wallet;
                 }
 

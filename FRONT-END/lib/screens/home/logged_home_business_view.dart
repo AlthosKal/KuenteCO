@@ -20,7 +20,7 @@ class LoggedHomeBusinessView extends StatefulWidget {
     required this.profileImageUrl,
   });
 
-  /// ✅ Factory que carga el usuario autenticado antes de mostrar la vista
+  /// â Factory que carga el usuario autenticado antes de mostrar la vista
   static Future<Widget> create() async {
     final user = await AuthService().getAuthenticatedUser();
     return LoggedHomeBusinessView(
@@ -42,7 +42,7 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
         body: SafeArea(
           child: Column(
             children: [
-              /// ✅ NAVBAR ARRIBA
+              /// â NAVBAR ARRIBA
               KuentecoLoggedNavbar(
                 currentRoute: '/homeBusiness',
                 onLogout: () {
@@ -50,14 +50,14 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                 },
               ),
 
-              /// ✅ CONTENIDO SCROLLABLE  
+              /// â CONTENIDO SCROLLABLE  
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      /// 🏷️ HEADER
+                      /// ð·ï¸ HEADER
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -89,7 +89,7 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
 
                       const SizedBox(height: 20),
 
-                      /// 🔲 CARD CONTENEDOR GRANDE
+                      /// ð² CARD CONTENEDOR GRANDE
                       BlurredCard(
                         child: Padding(
                           padding: const EdgeInsets.all(16),
@@ -126,7 +126,7 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
 
                       const SizedBox(height: 15),
 
-                      /// ✅ FOOTER
+                      /// â FOOTER
                       const FooterLoggedWidget(),
                     ],
                   ),
@@ -139,7 +139,7 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
     );
   }
 
-  /// 🏗️ Helper para crear cada card
+  /// ðï¸ Helper para crear cada card
   Widget _buildCardItem({
     required IconData icon,
     required String title,

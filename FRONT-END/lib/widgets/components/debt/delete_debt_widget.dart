@@ -100,7 +100,7 @@ class DeleteDebtWidget extends StatelessWidget {
               const Icon(Icons.warning, color: Colors.red, size: 20),
               const SizedBox(width: 8),
               Text(
-                '¿Estás seguro que quieres eliminar esta deuda?',
+                'Â¿Estás seguro que quieres eliminar esta deuda?',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: Colors.red[700],
                   fontWeight: FontWeight.w600,

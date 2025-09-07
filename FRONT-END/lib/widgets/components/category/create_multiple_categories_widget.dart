@@ -250,7 +250,7 @@ class _CreateMultipleCategoriesWidgetState extends State<CreateMultipleCategorie
                     const SizedBox(width: 12),
                     const Expanded(
                       child: Text(
-                        'Crear Múltiples Categorías',
+                        'Crear Múltiples Categorís',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,

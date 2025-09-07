@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/chat_controller.dart';
@@ -50,7 +49,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
           tabs: const [
             Tab(
               icon: Icon(Icons.psychology),
-              text: 'An�lisis IA',
+              text: 'Análisis IA',
             ),
             Tab(
               icon: Icon(Icons.table_chart),
@@ -99,7 +98,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
         Expanded(
           child: Column(
             children: [
-              // Área de mensajes
+              // Ãrea de mensajes
               Expanded(
                 child: _buildChatArea(context, chatController),
               ),
@@ -122,7 +121,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Gesti�n de Archivos Excel',
+            'Gestión de Archivos Excel',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: Colors.grey[800],
@@ -130,7 +129,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
           ),
           const SizedBox(height: 8),
           Text(
-            'Exporta e importa datos financieros en formato Excel para an�lisis externos o respaldo de informaci�n.',
+            'Exporta e importa datos financieros en formato Excel para análisis externos o respaldo de información.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Colors.grey[600],
             ),
@@ -466,9 +465,9 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
   ) async {
     try {
       await chatController.analyzeDebtsGeneral();
-      _showSuccessMessage(context, 'An�lisis general completado exitosamente');
+      _showSuccessMessage(context, 'Análisis general completado exitosamente');
     } catch (e) {
-      _showErrorMessage(context, 'Error realizando an�lisis general: $e');
+      _showErrorMessage(context, 'Error realizando análisis general: $e');
     }
   }
 
@@ -479,9 +478,9 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
   ) async {
     try {
       await chatController.analyzeDebtsRisk();
-      _showSuccessMessage(context, 'An�lisis de riesgo completado exitosamente');
+      _showSuccessMessage(context, 'Análisis de riesgo completado exitosamente');
     } catch (e) {
-      _showErrorMessage(context, 'Error realizando an�lisis de riesgo: $e');
+      _showErrorMessage(context, 'Error realizando análisis de riesgo: $e');
     }
   }
 
@@ -505,7 +504,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
   Future<void> _exportToExcel(BuildContext context, ExcelController excelController) async {
     try {
       await excelController.exportAllData();
-      _showSuccessMessage(context, 'Exportaci�n a Excel completada exitosamente');
+      _showSuccessMessage(context, 'Exportación a Excel completada exitosamente');
     } catch (e) {
       _showErrorMessage(context, 'Error exportando a Excel: $e');
     }
@@ -523,11 +522,11 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
   Future<void> _importFromExcel(
     BuildContext context,
     ExcelController excelController,
-    File file,
+    dynamic file,
   ) async {
     try {
       await excelController.importFromExcel(file);
-      _showSuccessMessage(context, 'Importaci�n desde Excel completada exitosamente');
+      _showSuccessMessage(context, 'Importación desde Excel completada exitosamente');
     } catch (e) {
       _showErrorMessage(context, 'Error importando desde Excel: $e');
     }
@@ -535,7 +534,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
 
   Future<void> _retryExcelOperation(BuildContext context, ExcelController excelController) async {
     excelController.clearMessages();
-    _showInfoMessage(context, 'Operaci�n reiniciada. Intenta nuevamente.');
+    _showInfoMessage(context, 'Operación reiniciada. Intenta nuevamente.');
   }
 
   Future<void> _proceedWithValidData(BuildContext context, ExcelController excelController) async {
@@ -556,7 +555,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
           children: [
             Icon(Icons.psychology, color: Colors.blue),
             SizedBox(width: 8),
-            Text('Detalles del An�lisis IA'),
+            Text('Detalles del Análisis IA'),
           ],
         ),
         content: SingleChildScrollView(
@@ -616,7 +615,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
       MaterialPageRoute(
         builder: (context) => Scaffold(
           appBar: AppBar(
-            title: const Text('An�lisis Detallado'),
+            title: const Text('Análisis Detallado'),
             backgroundColor: Colors.blue[600],
             foregroundColor: Colors.white,
           ),

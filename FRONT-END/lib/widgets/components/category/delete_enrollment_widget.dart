@@ -282,7 +282,7 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
     try {
       // Usar eliminación por lotes para mejor rendimiento
       final enrollmentIds = validEnrollments.map((e) => e.id!).toList();
-      print('📌 EnrollmentDeleteWidget: Using batch deletion for ${enrollmentIds.length} enrollments');
+      print('ð EnrollmentDeleteWidget: Using batch deletion for ${enrollmentIds.length} enrollments');
       
       await widget.controller.deleteEnrollmentsByIds(enrollmentIds);
       
@@ -296,7 +296,7 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
         ),
       );
     } catch (e) {
-      print('❌ EnrollmentDeleteWidget: Batch deletion failed: $e');
+      print('â EnrollmentDeleteWidget: Batch deletion failed: $e');
       Navigator.of(context).pop(); // Cierra loading
       
       // Intentar eliminación individual como fallback
@@ -306,7 +306,7 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
   
   // Método de respaldo para eliminación individual
   Future<void> _fallbackIndividualDeletion(List<CategoryEnrollmentDTO> enrollments) async {
-    print('📌 EnrollmentDeleteWidget: Attempting fallback individual deletion');
+    print('ð EnrollmentDeleteWidget: Attempting fallback individual deletion');
     
     showDialog(
       context: context,
@@ -324,7 +324,7 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
           deletedCount++;
         } catch (individualError) {
           errors.add('Error eliminando ${enrollment.categoryName}: ${individualError.toString()}');
-          print('❌ EnrollmentDeleteWidget: Individual delete failed for ${enrollment.categoryName}: $individualError');
+          print('â EnrollmentDeleteWidget: Individual delete failed for ${enrollment.categoryName}: $individualError');
         }
       }
       
@@ -382,14 +382,14 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
   }
 
   Future<void> _deleteSingleEnrollment(CategoryEnrollmentDTO enrollment) async {
-    print('📌 EnrollmentDeleteWidget: Starting single enrollment deletion');
-    print('📌 EnrollmentDeleteWidget: Enrollment ID: ${enrollment.id}');
-    print('📌 EnrollmentDeleteWidget: Category: ${enrollment.categoryName}');
-    print('📌 EnrollmentDeleteWidget: Profile: ${enrollment.profileEmail}');
+    print('ð EnrollmentDeleteWidget: Starting single enrollment deletion');
+    print('ð EnrollmentDeleteWidget: Enrollment ID: ${enrollment.id}');
+    print('ð EnrollmentDeleteWidget: Category: ${enrollment.categoryName}');
+    print('ð EnrollmentDeleteWidget: Profile: ${enrollment.profileEmail}');
     
     // Validar que la asignación tenga un ID válido
     if (enrollment.id == null || enrollment.id! <= 0) {
-      print('❌ EnrollmentDeleteWidget: Invalid enrollment ID detected: ${enrollment.id}');
+      print('â EnrollmentDeleteWidget: Invalid enrollment ID detected: ${enrollment.id}');
       Navigator.of(context).pop(false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -408,7 +408,7 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
     );
     
     try {
-      print('✅ EnrollmentDeleteWidget: Enrollment ID is valid, proceeding with deletion');
+      print('â EnrollmentDeleteWidget: Enrollment ID is valid, proceeding with deletion');
       await widget.controller.deleteEnrollment(enrollment.id!);
       
       Navigator.of(context).pop(); // Cierra loading
@@ -421,9 +421,9 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
           duration: const Duration(seconds: 2),
         ),
       );
-      print('✅ EnrollmentDeleteWidget: Single enrollment deleted successfully');
+      print('â EnrollmentDeleteWidget: Single enrollment deleted successfully');
     } catch (e) {
-      print('❌ EnrollmentDeleteWidget: Error deleting single enrollment: $e');
+      print('â EnrollmentDeleteWidget: Error deleting single enrollment: $e');
       Navigator.of(context).pop(); // Cierra loading
       Navigator.of(context).pop(false); // Cierra dialog con fallo
       
