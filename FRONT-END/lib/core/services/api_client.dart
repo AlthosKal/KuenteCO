@@ -176,10 +176,19 @@ class ApiClient {
 
   Future<Response> postChat(String path, dynamic data) async {
     try {
-      return await _dioChat.post(path, data: data);
+      final response = await _dioChat.post(path, data: data);
+      // Logging simplificado para debugging
+      if (response.data != null) {
+        print('✅ ApiClient: Chat response recibido correctamente');
+      }
+      return response;
     } on DioException catch (e) {
+      print('❌ ApiClient: Error DioException: ${e.message}');
       final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al enviar datos al chat.';
       throw Exception(mensaje);
+    } catch (e) {
+      print('❌ ApiClient: Error general: $e');
+      throw Exception('Error inesperado: $e');
     }
   }
 

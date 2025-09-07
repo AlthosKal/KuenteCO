@@ -8,7 +8,7 @@ import '../../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
 import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 import '../../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
 import '../../../utils/enum/transaction_type_enum.dart';
-import '../common/detail_modal_widget.dart';
+import '../../common/detail_modal_widget.dart';
 import 'create_multiple_transactions_widget.dart';
 import 'create_transaction_widget.dart';
 import 'delete_multiple_transactions_widget.dart';

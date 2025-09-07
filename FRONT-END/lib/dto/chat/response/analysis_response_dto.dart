@@ -13,9 +13,19 @@ class AnalysisResponseDTO {
 
   factory AnalysisResponseDTO.fromJson(Map<String, dynamic> json) {
     return AnalysisResponseDTO(
-      response: json['response'],
-      analysis: json['analysis'],
-      data: DataResponseDTO.fromJson(json['data']),
+      response: json['response'] ?? '',
+      analysis: json['analysis'] ?? '',
+      data: json['data'] != null 
+          ? DataResponseDTO.fromJson(json['data'])
+          : DataResponseDTO.empty(),
+    );
+  }
+
+  factory AnalysisResponseDTO.empty() {
+    return AnalysisResponseDTO(
+      response: '',
+      analysis: '',
+      data: DataResponseDTO.empty(),
     );
   }
 }
