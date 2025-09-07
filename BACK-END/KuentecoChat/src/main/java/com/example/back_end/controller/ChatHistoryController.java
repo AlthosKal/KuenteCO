@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/chat/history")
 @RequiredArgsConstructor
+@CrossOrigin
 public class ChatHistoryController implements ChatHistoryResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatHistoryController.class);
