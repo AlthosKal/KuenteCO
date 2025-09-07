@@ -28,7 +28,7 @@ class KuentecoNavbar extends StatelessWidget {
     );
   }
 
-  /// 📱 Layout para pantallas pequeñas
+  /// ð± Layout para pantallas pequeñas
   Widget _buildMobileLayout(BuildContext context) => Column(
     mainAxisSize: MainAxisSize.min,
     children: [
@@ -41,7 +41,7 @@ class KuentecoNavbar extends StatelessWidget {
     ],
   );
 
-  /// 💻 Layout para pantallas grandes
+  /// ð» Layout para pantallas grandes
   Widget _buildDesktopLayout(BuildContext context) => Row(
     children: [
       _buildLogo(context, false),
@@ -50,7 +50,7 @@ class KuentecoNavbar extends StatelessWidget {
     ],
   );
 
-  /// 🔑 Botones de login / register
+  /// ð Botones de login / register
   List<Widget> _buildAuthButtons(BuildContext context) => [
     _buildButton(
       context,
@@ -68,7 +68,7 @@ class KuentecoNavbar extends StatelessWidget {
     ),
   ];
 
-  /// 🖼️ Logo con fallback y navegación al home
+  /// Logo que lleva al home
   Widget _buildLogo(BuildContext context, bool isSmallScreen) {
     final defaultWidth = isSmallScreen ? 220.0 : 250.0;
     final defaultHeight = isSmallScreen ? 55.0 : 62.5;
@@ -103,7 +103,7 @@ class KuentecoNavbar extends StatelessWidget {
     );
   }
 
-  /// 🔘 Construye cualquier botón del navbar (incluye login y register)
+  /// ð Construye cualquier botón del navbar (incluye login y register)
   Widget _buildButton(
       BuildContext context,
       String text,

@@ -18,7 +18,7 @@ class LoginController {
   LoginController({AuthService? authService})
       : _authService = authService ?? AuthService();
 
-  /// 🔥 Método de login
+  /// ð¥ Método de login
   Future<void> login({
     required BuildContext context,
     required String nameOrEmail,
@@ -33,14 +33,14 @@ class LoginController {
 
     await GlobalExceptionHandler.run(
           () async {
-        /// ✅ 1️⃣ Loguear usuario y obtener token + role
+        /// â 1ï¸â£ Loguear usuario y obtener token + role
         final tokenResponse = await _authService.login(dto);
 
-        /// ✅ 2️⃣ Obtener detalles del usuario (nombre, imagen, etc.)
+        /// â 2ï¸â£ Obtener detalles del usuario (nombre, imagen, etc.)
         final user = await _authService.getAuthenticatedUser();
 
         if (context.mounted) {
-          /// ✅ 3️⃣ Mostrar mensaje de éxito
+          /// â 3ï¸â£ Mostrar mensaje de éxito
           ToastHelper.showSuccess(
             context,
             title: 'Inicio de Sesión Exitoso',
@@ -49,14 +49,14 @@ class LoginController {
                 : 'Has iniciado como cuenta Business',
           );
 
-          /// ✅ 4️⃣ Redirigir a la vista correcta según el tipo de cuenta
+          /// â 4ï¸â£ Redirigir a la vista correcta según el tipo de cuenta
           if (tokenResponse.type == 'PERSONAL') {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (_) => LoggedHomePersonalView(
                   userName: user.username,
-                  profileImageUrl: user.image?.imageUrl ?? '', // ✅ Usa la URL de la imagen
+                  profileImageUrl: user.image?.imageUrl ?? '', // â Usa la URL de la imagen
                 ),
               ),
             );
@@ -66,7 +66,7 @@ class LoginController {
               MaterialPageRoute(
                 builder: (_) => LoggedHomeBusinessView(
                   userName: user.username,
-                  profileImageUrl: user.image?.imageUrl ?? '', // ✅ Usa la URL de la imagen
+                  profileImageUrl: user.image?.imageUrl ?? '', // â Usa la URL de la imagen
                 ),
               ),
             );
@@ -74,7 +74,7 @@ class LoginController {
         }
       },
       onError: (error) {
-        /// ❌ Mostrar mensaje de error
+        /// â Mostrar mensaje de error
         ToastHelper.showError(
           context,
           title: 'Error al iniciar Sesión',
@@ -87,17 +87,17 @@ class LoginController {
     isLoading.value = false;
   }
 
-  /// 🔒 Toggle para mostrar/ocultar contraseña
+  /// ð Toggle para mostrar/ocultar contraseña
   void togglePasswordVisibility() {
     obscurePassword.value = !obscurePassword.value;
   }
 
-  /// ✅ Cambiar recordar contraseña
+  /// â Cambiar recordar contraseña
   void toggleRememberPassword(bool? value) {
     rememberPassword.value = value ?? false;
   }
 
-  /// ♻️ Liberar recursos
+  /// â»ï¸ Liberar recursos
   void dispose() {
     rememberPassword.dispose();
     obscurePassword.dispose();

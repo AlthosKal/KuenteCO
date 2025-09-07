@@ -69,7 +69,7 @@ class _CreateCategoryWidgetState extends State<CreateCategoryWidget> {
       // Verificar si hay errores después de la operación
       if (mounted) {
         if (controller.errorMessage == null) {
-          // Éxito - cerrar diálogo devolviendo true para indicar éxito
+          // Ãxito - cerrar diálogo devolviendo true para indicar éxito
           Navigator.pop(context, true);
           _showSnackBar(
             'Categoría creada exitosamente',

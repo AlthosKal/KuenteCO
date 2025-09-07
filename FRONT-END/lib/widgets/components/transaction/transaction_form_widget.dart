@@ -227,11 +227,11 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _buildTypeOption('expense', 'Gasto', Icons.trending_down, Colors.orange),
+          child: _buildTypeOption('expense', 'Gasto', Icons.trending_down, Colors.red),
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _buildTypeOption('debt', 'Deuda', Icons.account_balance_wallet, Colors.red),
+          child: _buildTypeOption('debt', 'Deuda', Icons.account_balance_wallet, Colors.orange),
         ),
       ],
     );

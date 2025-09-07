@@ -15,6 +15,9 @@ import '../../widgets/components/category/delete_multiple_categories_widget.dart
 import '../../widgets/components/category/edit_category_widget.dart';
 import '../../widgets/components/category/edit_multiple_categories_widget.dart';
 import '../../widgets/components/category/enrollment_management_widget.dart';
+import '../../widgets/common/background/background_widget.dart';
+import '../../widgets/common/navbar/navbar_logged_widget.dart';
+import '../../widgets/common/footer/footer_logged_widget.dart';
 
 class CategoryView extends StatefulWidget {
   const CategoryView({super.key});
@@ -62,14 +65,14 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
             await categoryController.loadEnrollments();
           } catch (enrollmentError) {
             if (mounted) {
-              debugPrint('⚠️ CategoryView: Error loading enrollment summaries: $enrollmentError');
+              debugPrint('â ï¸ CategoryView: Error loading enrollment summaries: $enrollmentError');
             }
           }
         }
       }
     } catch (e) {
       if (mounted) {
-        debugPrint('❌ Error loading data in CategoryView: $e');
+        debugPrint('â Error loading data in CategoryView: $e');
       }
       
       final String? role = await _storage.read(key: 'role');
@@ -78,7 +81,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
           await categoryController.loadCategories();
         } catch (fallbackError) {
           if (mounted) {
-            debugPrint('❌ CategoryView: Fallback also failed: $fallbackError');
+            debugPrint('â CategoryView: Fallback also failed: $fallbackError');
           }
         }
       }
@@ -105,7 +108,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
       }
     } catch (e) {
       if (mounted) {
-        debugPrint('❌ Error checking user type: $e');
+        debugPrint('â Error checking user type: $e');
         setState(() => _isBusinessUser = false);
       }
     }
@@ -188,10 +191,10 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                 ),
               ),
               const Divider(),
-              Text("📅 Fecha de registro: $registerDateStr"),
-              Text("💰 Presupuesto asignado: \$${category.description.assignedBudget}"),
-              Text("💰 Presupuesto ID: ${category.budgetId ?? 'Sin asignar'}"),
-              Text("🔄 Estado: ${category.description.state}"),
+              Text("Fecha de registro: $registerDateStr"),
+              Text("Presupuesto asignado: \$${category.description.assignedBudget}"),
+              Text("Presupuesto ID: ${category.budgetId ?? 'Sin asignar'}"),
+              Text("Estado: ${category.description.state}"),
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 onPressed: () {
@@ -392,30 +395,78 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
       builder: (context, snapshot) {
         final isProfile = snapshot.data ?? false;
         
-        return Scaffold(
-          appBar: _buildAppBar(controller, isProfile),
-          body: controller.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : controller.errorMessage != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        controller.errorMessage!,
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => _loadDataBasedOnRole(),
-                        child: const Text('Reintentar'),
-                      ),
-                    ],
+        return Background(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  /// NAVBAR
+                  KuentecoLoggedNavbar(
+                    currentRoute: '/categories',
+                    onLogout: () {
+                      Navigator.pushReplacementNamed(context, '/login');
+                    },
                   ),
-                )
-              : isProfile
-                  ? _buildProfileView(controller)
-                  : _buildUserView(controller),
+
+                  /// HEADER CON TÍTULO
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Categorías',
+                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          isProfile
+                              ? 'Gestiona tus categorías de gastos'
+                              : 'Administra las categorías de tus perfiles',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  /// CONTENIDO
+                  Expanded(
+                    child: controller.isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : controller.errorMessage != null
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  controller.errorMessage!,
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                                const SizedBox(height: 16),
+                                ElevatedButton(
+                                  onPressed: () => _loadDataBasedOnRole(),
+                                  child: const Text('Reintentar'),
+                                ),
+                              ],
+                            ),
+                          )
+                        : isProfile
+                            ? _buildProfileView(controller)
+                            : _buildUserView(controller),
+                  ),
+
+                  /// FOOTER
+                  const FooterLoggedWidget(),
+                ],
+              ),
+            ),
+          ),
         );
       },
     );
@@ -513,55 +564,77 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
       return _buildEmptyState();
     }
     
-    return ListView.builder(
-      padding: const EdgeInsets.all(8),
-      itemCount: controller.categories.length + 1, // +1 para el botón de agregar
-      itemBuilder: (context, index) => _buildUserViewItem(context, controller, index),
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(8),
+        itemCount: controller.categories.length + 1, // +1 para el botón de agregar
+        itemBuilder: (context, index) => _buildUserViewItem(context, controller, index),
+      ),
     );
   }
   
   Widget _buildEmptyState() {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.category_outlined,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No tienes categorías aún',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Crea tu primera categoría usando el botón de abajo',
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          _buildCreateCategoryButton(
-            'Crear primera categoría',
-            'Toca para comenzar a organizar tus gastos',
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.category_outlined,
+                size: 64,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No tienes categorías aún',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Crea tu primera categoría usando el botón de abajo',
+                style: TextStyle(
+                  color: Colors.grey[500],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              _buildCreateCategoryButton(
+                'Crear primera categoría',
+                'Toca para comenzar a organizar tus gastos',
+              ),
+            ],
+          ),
+        ),
     );
   }
   
@@ -595,41 +668,67 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
   /// Vista para perfiles (solo pueden ver categorías asignadas)
   Widget _buildProfileView(CategoryController controller) {
     return controller.enrollments.isEmpty
-        ? Padding(
-            padding: const EdgeInsets.all(8),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.assignment_ind_outlined,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No tienes categorías asignadas',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Contacta al administrador para que te asigne categorías',
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
+        ? Container(
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.assignment_ind_outlined,
+                      size: 64,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No tienes categorías asignadas',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Contacta al administrador para que te asigne categorías',
+                      style: TextStyle(
+                        color: Colors.grey[500],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
           )
-        : ListView.builder(
-            padding: const EdgeInsets.all(8),
-            itemCount: controller.enrollments.length,
+        : Container(
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ListView.builder(
+              padding: const EdgeInsets.all(8),
+              itemCount: controller.enrollments.length,
             itemBuilder: (context, index) {
               final enrollment = controller.enrollments[index];
               
@@ -706,6 +805,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                 ),
               );
             },
+            ),
           );
   }
 }

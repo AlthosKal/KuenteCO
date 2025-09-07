@@ -228,7 +228,7 @@ class DeleteTransactionWidget extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          '¿Estás seguro de que deseas eliminar esta transacción? Esta acción no se puede deshacer.',
+                          'Â¿Estás seguro de que deseas eliminar esta transacción? Esta acción no se puede deshacer.',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Colors.red[700],
                           ),

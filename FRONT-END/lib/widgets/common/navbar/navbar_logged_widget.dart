@@ -52,7 +52,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     _loadAuthenticatedData();
   }
 
-  /// ✅ Detecta automáticamente el tipo de autenticación y carga los datos correspondientes
+  /// â Detecta automáticamente el tipo de autenticación y carga los datos correspondientes
   Future<void> _loadAuthenticatedData() async {
     try {
       // Obtener el rol guardado en storage
@@ -108,7 +108,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     );
   }
 
-  /// ✅ LAYOUT MOBILE
+  /// â LAYOUT MOBILE
   Widget _buildMobileLayout(BuildContext context) => Column(
     children: [
       Center(child: _buildLogo(context, true)),
@@ -124,7 +124,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     ],
   );
 
-  /// ✅ LAYOUT DESKTOP
+  /// â LAYOUT DESKTOP
   Widget _buildDesktopLayout(BuildContext context) => Row(
     children: [
       _buildLogo(context, false),
@@ -137,7 +137,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     ],
   );
 
-  /// ✅ Logo con navegación dinámica según tipo de autenticación
+  /// â Logo con navegación dinámica según tipo de autenticación
   
   Widget _buildLogo(BuildContext context, bool isSmallScreen) {
     final double defaultWidth = isSmallScreen ? 220.0 : 250.0;
@@ -170,7 +170,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     );
   }
 
-  /// ✅ Botón de perfil que detecta automáticamente el tipo de autenticación
+  /// â Botón de perfil que detecta automáticamente el tipo de autenticación
   Widget _buildProfileButton(BuildContext context) {
     if (_currentRole == 'ROLE_PROFILE' && _authenticatedProfile != null) {
       // Es un perfil autenticado - usar ProfileButtonWidget
@@ -196,7 +196,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
   }
 
 
-  /// ✅ Navegación dinámica al home según el tipo de autenticación
+  /// â Navegación dinámica al home según el tipo de autenticación
   Future<void> _navigateToHome(BuildContext context) async {
     if (!mounted) return;
 
@@ -244,7 +244,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     }
   }
 
-  /// ✅ Navegación manteniendo historial (excepto logout)
+  /// â Navegación manteniendo historial (excepto logout)
   void _navigateToRoute(BuildContext context, String route) {
     if (route == widget.currentRoute) return;
     Navigator.pushNamed(context, route);

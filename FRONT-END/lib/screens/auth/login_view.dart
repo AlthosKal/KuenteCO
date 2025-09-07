@@ -36,7 +36,7 @@ class _LoginFormState extends State<LoginForm> {
   final _nameOrEmailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
   
-  /// ✅ Estado del tipo de login usando enum
+  /// â Estado del tipo de login usando enum
   final ValueNotifier<LoginType> _selectedLoginType =
       ValueNotifier<LoginType>(LoginType.USER);
 
@@ -84,7 +84,7 @@ class _LoginFormState extends State<LoginForm> {
             FormTitleText(text: 'Inicio de Sesión'),
             const SizedBox(height: 20),
 
-            /// ✅ Campo email/usuario
+            /// â Campo email/usuario
             CustomFormField(
               controller: _nameOrEmailController,
               focusNode: _nameOrEmailFocusNode,
@@ -94,7 +94,7 @@ class _LoginFormState extends State<LoginForm> {
             ),
             const SizedBox(height: 12),
 
-            /// ✅ Campo contraseña
+            /// â Campo contraseña
             ValueListenableBuilder<bool>(
               valueListenable: _loginController.obscurePassword,
               builder: (context, obscure, _) {
@@ -107,7 +107,7 @@ class _LoginFormState extends State<LoginForm> {
             ),
             const SizedBox(height: 10),
 
-            /// 🔥 Selector de tipo de login
+            /// ð¥ Selector de tipo de login
             const Text(
               'Iniciar sesión como',
               style: TextStyle(
@@ -143,7 +143,7 @@ class _LoginFormState extends State<LoginForm> {
             ),
             const SizedBox(height: 10),
 
-            /// ✅ Checkbox de recordar contraseña
+            /// â Checkbox de recordar contraseña
             ValueListenableBuilder<bool>(
               valueListenable: _loginController.rememberPassword,
               builder: (context, remember, _) {
@@ -169,7 +169,7 @@ class _LoginFormState extends State<LoginForm> {
             ),
             const SizedBox(height: 20),
 
-            /// ✅ Botón de login
+            /// â Botón de login
             ValueListenableBuilder<LoginType>(
               valueListenable: _selectedLoginType,
               builder: (context, loginType, _) {
@@ -190,7 +190,7 @@ class _LoginFormState extends State<LoginForm> {
             ),
             const SizedBox(height: 12),
 
-            /// ✅ Botón de registro
+            /// â Botón de registro
             TextButton(
               onPressed: () => Navigator.pushNamed(context, AppRoutes.register),
               child: const Text.rich(
@@ -199,7 +199,7 @@ class _LoginFormState extends State<LoginForm> {
                   style: TextStyle(color: Colors.white),
                   children: [
                     TextSpan(
-                      text: 'Regístrate',
+                      text: 'Registrate',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -207,7 +207,7 @@ class _LoginFormState extends State<LoginForm> {
               ),
             ),
 
-            /// ✅ Botón de recuperar contraseña
+            /// â Botón de recuperar contraseña
             TextButton(
               onPressed: () =>
                   Navigator.pushNamed(context, AppRoutes.sendVerificationCode),
@@ -230,7 +230,7 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
-  /// 🎨 Botón custom para Usuario / Perfil
+  /// ð¨ Botón custom para Usuario / Perfil
   Widget _buildLoginTypeButton({
     required String label,
     required IconData icon,

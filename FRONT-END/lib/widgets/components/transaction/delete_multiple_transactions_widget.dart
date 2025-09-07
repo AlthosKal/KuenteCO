@@ -240,7 +240,7 @@ class _DeleteMultipleTransactionsWidgetState
             style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
           ),
           content: Text(
-            '¿Está seguro de que desea eliminar $selectedCount transacciones?\n\nEsta acción es irreversible y eliminará todas las transacciones seleccionadas de forma permanente.',
+            'Â¿Está seguro de que desea eliminar $selectedCount transacciones?\n\nEsta acción es irreversible y eliminará todas las transacciones seleccionadas de forma permanente.',
           ),
           actions: [
             TextButton(

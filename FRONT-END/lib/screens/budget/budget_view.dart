@@ -13,6 +13,9 @@ import '../../widgets/components/budget/delete_budget_widget.dart';
 import '../../widgets/components/budget/delete_multiple_budgets_widget.dart';
 import '../../widgets/components/budget/edit_budget_widget.dart';
 import '../../widgets/components/budget/edit_multiple_budgets_widget.dart';
+import '../../widgets/common/background/background_widget.dart';
+import '../../widgets/common/navbar/navbar_logged_widget.dart';
+import '../../widgets/common/footer/footer_logged_widget.dart';
 
 class BudgetView extends StatefulWidget {
   const BudgetView({super.key});
@@ -36,34 +39,25 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
   
   /// Cargar datos según el rol del usuario
   Future<void> _loadDataBasedOnRole() async {
-    print('BudgetView: _loadDataBasedOnRole() called');
     final budgetController = Provider.of<BudgetController>(context, listen: false);
     
     try {
       final role = await _storage.read(key: 'role');
-      print('BudgetView: User role detected: $role');
       
       if (role == 'ROLE_PROFILE') {
         // Si es un perfil, cargar sus enrollments de presupuestos
-        print('BudgetView: Loading enrollments for profile');
         await budgetController.loadEnrollments();
       } else {
         // Si es un usuario regular, cargar sus presupuestos
-        print('BudgetView: Loading budgets for regular user');
         await budgetController.loadBudgets();
       }
-      print('BudgetView: Data loading completed successfully');
     } catch (e) {
-      print('BudgetView: Error loading data: $e');
       // No hacer fallback para perfiles, solo para usuarios
       final role = await _storage.read(key: 'role');
       if (role != 'ROLE_PROFILE') {
-        print('BudgetView: Attempting fallback loadBudgets()');
         try {
           await budgetController.loadBudgets();
-          print('BudgetView: Fallback loadBudgets() succeeded');
         } catch (fallbackError) {
-          print('BudgetView: Fallback also failed: $fallbackError');
         }
       }
     }
@@ -148,11 +142,11 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
                 ),
               ),
               const Divider(),
-              Text("📅 Fecha de creación: $registerDateStr"),
-              Text("💰 Monto total: \$${budget.totalAmount}"),
-              Text("📊 Estado: ${budget.status}"),
+              Text("Fecha de creación: $registerDateStr"),
+              Text("Monto total: \$${budget.totalAmount}"),
+              Text("Estado: ${budget.status}"),
               if (budget.description != null)
-                Text("📝 Descripción: ${budget.description}"),
+                Text("Descripción: ${budget.description}"),
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 onPressed: () {
@@ -202,7 +196,6 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
     
     if (result == true) {
       clearSelection();
-      // La actualización se refleja automáticamente a través del Provider
     }
   }
   
@@ -220,7 +213,6 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
     
     if (result == true) {
       clearSelection();
-      // La eliminación se refleja automáticamente a través del Provider
     }
   }
   
@@ -331,30 +323,78 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
       builder: (context, snapshot) {
         final isProfile = snapshot.data ?? false;
         
-        return Scaffold(
-          appBar: _buildAppBar(controller, isProfile),
-          body: controller.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : controller.errorMessage != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        controller.errorMessage!,
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => _loadDataBasedOnRole(),
-                        child: const Text('Reintentar'),
-                      ),
-                    ],
+        return Background(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  /// NAVBAR
+                  KuentecoLoggedNavbar(
+                    currentRoute: '/budgets',
+                    onLogout: () {
+                      Navigator.pushReplacementNamed(context, '/login');
+                    },
                   ),
-                )
-              : isProfile
-                  ? _buildProfileView(controller)
-                  : _buildUserView(controller),
+
+                  /// HEADER CON TÍTULO
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Presupuestos',
+                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          isProfile
+                              ? 'Gestiona tus presupuestos personales'
+                              : 'Administra los presupuestos de tus perfiles',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  /// CONTENIDO
+                  Expanded(
+                    child: controller.isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : controller.errorMessage != null
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  controller.errorMessage!,
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                                const SizedBox(height: 16),
+                                ElevatedButton(
+                                  onPressed: () => _loadDataBasedOnRole(),
+                                  child: const Text('Reintentar'),
+                                ),
+                              ],
+                            ),
+                          )
+                        : isProfile
+                            ? _buildProfileView(controller)
+                            : _buildUserView(controller),
+                  ),
+
+                  /// FOOTER
+                  const FooterLoggedWidget(),
+                ],
+              ),
+            ),
+          ),
         );
       },
     );
@@ -452,55 +492,77 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
       return _buildEmptyState();
     }
     
-    return ListView.builder(
-      padding: const EdgeInsets.all(8),
-      itemCount: controller.budgets.length + 1, // +1 para el botón de agregar
-      itemBuilder: (context, index) => _buildUserViewItem(context, controller, index),
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(8),
+        itemCount: controller.budgets.length + 1, // +1 para el botón de agregar
+        itemBuilder: (context, index) => _buildUserViewItem(context, controller, index),
+      ),
     );
   }
   
   Widget _buildEmptyState() {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.account_balance_wallet_outlined,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No tienes presupuestos aún',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Crea tu primer presupuesto usando el botón de abajo',
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          _buildCreateBudgetButton(
-            'Crear primer presupuesto',
-            'Toca para comenzar a gestionar tu dinero',
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.account_balance_wallet_outlined,
+                size: 64,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No tienes presupuestos aún',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Crea tu primer presupuesto usando el botón de abajo',
+                style: TextStyle(
+                  color: Colors.grey[500],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              _buildCreateBudgetButton(
+                'Crear primer presupuesto',
+                'Toca para comenzar a gestionar tu dinero',
+              ),
+            ],
+          ),
+        ),
     );
   }
   
@@ -534,107 +596,135 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
   /// Vista para perfiles (solo pueden ver presupuestos asignados)
   Widget _buildProfileView(BudgetController controller) {
     return controller.enrollments.isEmpty
-        ? Padding(
-            padding: const EdgeInsets.all(8),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.account_balance_outlined,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No tienes presupuestos asignados',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Contacta al administrador para que te asigne presupuestos',
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          )
-        : ListView.builder(
-            padding: const EdgeInsets.all(8),
-            itemCount: controller.enrollments.length,
-            itemBuilder: (context, index) {
-              final enrollment = controller.enrollments[index];
-              
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.blue.withValues(alpha: 0.3),
-                        width: 1.5,
-                        style: BorderStyle.solid,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.withValues(alpha: 0.15),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.account_balance,
-                              size: 24,
-                              color: Colors.blue,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  enrollment.budgetName,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Presupuesto asignado por ${enrollment.userEmail}',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+        ? Container(
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: const Offset(0, 2),
                 ),
-              );
-            },
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.account_balance_outlined,
+                      size: 64,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No tienes presupuestos asignados',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Contacta al administrador para que te asigne presupuestos',
+                      style: TextStyle(
+                        color: Colors.grey[500],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+          )
+        : Container(
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ListView.builder(
+              padding: const EdgeInsets.all(8),
+              itemCount: controller.enrollments.length,
+              itemBuilder: (context, index) {
+                final enrollment = controller.enrollments[index];
+                
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.blue.withValues(alpha: 0.3),
+                          width: 1.5,
+                          style: BorderStyle.solid,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withValues(alpha: 0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.account_balance,
+                                size: 24,
+                                color: Colors.blue,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    enrollment.budgetName,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Presupuesto asignado por ${enrollment.userEmail}',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
           );
   }
 }

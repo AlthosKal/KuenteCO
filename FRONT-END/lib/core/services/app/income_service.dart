@@ -11,21 +11,21 @@ class IncomeService {
 
   // ============= INCOME SPECIFIC METHODS =============
 
-  // ✅ Get all income transactions
+  // â Get all income transactions
   Future<List<TransactionDetailDTO>> getAllIncomes() async {
     return await _transactionService.getTransactionsWithFilters(
       type: 'INCOME',
     );
   }
 
-  // ✅ Get income by ID
+  // â Get income by ID
   Future<TransactionDetailDTO> getIncomeById(int id) async {
     final transaction = await _transactionService.getTransactionById(id);
     // Note: In backend, we would validate that this is actually an income
     return transaction;
   }
 
-  // ✅ Get income summary
+  // â Get income summary
   Future<List<TransactionSummaryDTO>> getIncomeSummary() async {
     // Get all summaries and filter by income type if needed
     final summaries = await _transactionService.getTransactionSummary();
@@ -33,7 +33,7 @@ class IncomeService {
     return summaries;
   }
 
-  // ✅ Get incomes by category
+  // â Get incomes by category
   Future<List<TransactionDetailDTO>> getIncomesByCategory(int categoryId) async {
     return await _transactionService.getTransactionsWithFilters(
       categoryId: categoryId,
@@ -41,7 +41,7 @@ class IncomeService {
     );
   }
 
-  // ✅ Get incomes by budget
+  // â Get incomes by budget
   Future<List<TransactionDetailDTO>> getIncomesByBudget(int budgetId) async {
     return await _transactionService.getTransactionsWithFilters(
       budgetId: budgetId,
@@ -49,7 +49,7 @@ class IncomeService {
     );
   }
 
-  // ✅ Get incomes by profile
+  // â Get incomes by profile
   Future<List<TransactionDetailDTO>> getIncomesByProfile(int profileId) async {
     return await _transactionService.getTransactionsWithFilters(
       profileId: profileId,
@@ -57,7 +57,7 @@ class IncomeService {
     );
   }
 
-  // ✅ Get incomes by date range
+  // â Get incomes by date range
   Future<List<TransactionDetailDTO>> getIncomesByDateRange({
     required String from,
     required String to,
@@ -69,7 +69,7 @@ class IncomeService {
     );
   }
 
-  // ✅ Get incomes by amount range
+  // â Get incomes by amount range
   Future<List<TransactionDetailDTO>> getIncomesByAmountRange({
     double? minAmount,
     double? maxAmount,
@@ -83,45 +83,45 @@ class IncomeService {
 
   // ============= INCOME CRUD OPERATIONS =============
 
-  // ✅ Create new income
+  // â Create new income
   Future<TransactionDetailDTO> addIncome(NewTransactionDTO dto) async {
-    print('📌 IncomeService: Creating income transaction');
+    print('ð IncomeService: Creating income transaction');
     return await _transactionService.addTransaction(dto);
   }
 
-  // ✅ Create multiple incomes
+  // â Create multiple incomes
   Future<List<TransactionDetailDTO>> addIncomesBatch(List<NewTransactionDTO> dtos) async {
-    print('📌 IncomeService: Creating ${dtos.length} income transactions in batch');
+    print('ð IncomeService: Creating ${dtos.length} income transactions in batch');
     return await _transactionService.addTransactionsBatch(dtos);
   }
 
-  // ✅ Update income
+  // â Update income
   Future<TransactionDetailDTO> updateIncome(UpdateTransactionDTO dto) async {
-    print('📌 IncomeService: Updating income transaction ID: ${dto.id}');
+    print('ð IncomeService: Updating income transaction ID: ${dto.id}');
     return await _transactionService.updateTransaction(dto);
   }
 
-  // ✅ Update multiple incomes
+  // â Update multiple incomes
   Future<List<TransactionDetailDTO>> updateIncomesBatch(List<UpdateTransactionDTO> dtos) async {
-    print('📌 IncomeService: Updating ${dtos.length} income transactions in batch');
+    print('ð IncomeService: Updating ${dtos.length} income transactions in batch');
     return await _transactionService.updateTransactionsBatch(dtos);
   }
 
-  // ✅ Delete income
+  // â Delete income
   Future<void> deleteIncome(int id) async {
-    print('📌 IncomeService: Deleting income transaction ID: $id');
+    print('ð IncomeService: Deleting income transaction ID: $id');
     await _transactionService.deleteTransaction(id);
   }
 
-  // ✅ Delete multiple incomes
+  // â Delete multiple incomes
   Future<void> deleteIncomesBatch(List<int> ids) async {
-    print('📌 IncomeService: Deleting ${ids.length} income transactions in batch');
+    print('ð IncomeService: Deleting ${ids.length} income transactions in batch');
     await _transactionService.deleteTransactionsBatch(ids);
   }
 
   // ============= INCOME ANALYTICS =============
 
-  // ✅ Get total income amount
+  // â Get total income amount
   Future<double> getTotalIncomeAmount() async {
     final incomes = await getAllIncomes();
     double total = 0.0;
@@ -131,7 +131,7 @@ class IncomeService {
     return total;
   }
 
-  // ✅ Get average income amount
+  // â Get average income amount
   Future<double> getAverageIncomeAmount() async {
     final incomes = await getAllIncomes();
     if (incomes.isEmpty) return 0.0;
@@ -142,13 +142,13 @@ class IncomeService {
     return total / incomes.length;
   }
 
-  // ✅ Get income count
+  // â Get income count
   Future<int> getIncomeCount() async {
     final incomes = await getAllIncomes();
     return incomes.length;
   }
 
-  // ✅ Get monthly income totals
+  // â Get monthly income totals
   Future<Map<String, double>> getMonthlyIncomeTotals(int year) async {
     final from = '$year-01-01';
     final to = '$year-12-31';
@@ -167,7 +167,7 @@ class IncomeService {
     return monthlyTotals;
   }
 
-  // ✅ Get monthly income analysis
+  // â Get monthly income analysis
   Future<Map<String, dynamic>> getMonthlyIncomeAnalysis(int year, int month) async {
     final from = '$year-${month.toString().padLeft(2, '0')}-01';
     final to = '$year-${month.toString().padLeft(2, '0')}-31';
@@ -187,7 +187,7 @@ class IncomeService {
     };
   }
 
-  // ✅ Get yearly income analysis
+  // â Get yearly income analysis
   Future<Map<String, dynamic>> getYearlyIncomeAnalysis(int year) async {
     final from = '$year-01-01';
     final to = '$year-12-31';
@@ -209,7 +209,7 @@ class IncomeService {
     };
   }
 
-  // ✅ Get filtered incomes
+  // â Get filtered incomes
   Future<List<TransactionDetailDTO>> getFilteredIncomes({
     int? categoryId,
     int? budgetId,

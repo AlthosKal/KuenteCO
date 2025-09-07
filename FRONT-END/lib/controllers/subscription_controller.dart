@@ -42,7 +42,7 @@ class SubscriptionController extends ChangeNotifier {
   Future<void> loadSubscriptionPrices() async {
     // Los precios están hardcodeados, MercadoPago maneja los precios reales
     subscriptionPrices = <SubscriptionPriceConfigDTO>[];
-    print('💰 Usando precios estéticos - MercadoPago maneja los precios reales');
+    print('ð° Usando precios estéticos - MercadoPago maneja los precios reales');
   }
 
   Future<void> loadSubscriptionById(int id) async {

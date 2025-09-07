@@ -238,7 +238,7 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Crea tu primera transacción para comenzar a usar la app',
+              'Crea tu primera transacción para empezar',
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),

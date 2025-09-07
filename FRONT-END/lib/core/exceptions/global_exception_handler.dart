@@ -10,8 +10,8 @@ class GlobalExceptionHandler {
     try {
       return await task();
     } catch (e, stack) {
-      print('🛑 Error global: $e');
-      print('📍 Stack trace: $stack');
+      print('ð Error global: $e');
+      print('ð Stack trace: $stack');
 
       // Resuelve mensaje amigable
       String userMessage = _resolveMessage(e);

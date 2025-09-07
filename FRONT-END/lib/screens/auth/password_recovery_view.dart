@@ -57,7 +57,7 @@ class _RecoverPasswordFormState extends State<RecoverPasswordForm> {
     super.dispose();
   }
 
-  /// 📌 Envía la solicitud para cambiar la contraseña
+  /// ð Envía la solicitud para cambiar la contraseña
   void _submitChangePassword() {
     if (!_formKey.currentState!.validate()) return;
 
@@ -82,7 +82,7 @@ class _RecoverPasswordFormState extends State<RecoverPasswordForm> {
             FormTitleText(text: 'Ingresa tu nueva contraseña'),
             const SizedBox(height: 30),
 
-            /// 🔑 Campo nueva contraseña
+            /// ð Campo nueva contraseña
             ValueListenableBuilder<bool>(
               valueListenable: _changePasswordController.obscurePassword,
               builder: (context, obscure, _) {
@@ -94,7 +94,7 @@ class _RecoverPasswordFormState extends State<RecoverPasswordForm> {
               },
             ),
 
-            /// 🔑 Campo confirmar contraseña
+            /// ð Campo confirmar contraseña
             ValueListenableBuilder<bool>(
               valueListenable: _changePasswordController.obscurePassword,
               builder: (context, obscure, _) {
@@ -117,7 +117,7 @@ class _RecoverPasswordFormState extends State<RecoverPasswordForm> {
 
             const SizedBox(height: 30),
 
-            /// 🔄 Botón para enviar nueva contraseña
+            /// ð Botón para enviar nueva contraseña
             ValueListenableBuilder(
               valueListenable: _changePasswordController.isLoading,
               builder: (context, isLoading, _) {

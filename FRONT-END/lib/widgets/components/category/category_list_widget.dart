@@ -76,7 +76,7 @@ class CategoryListWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "💰 Presupuesto: \$${category.description.assignedBudget}",
+                      "ð° Presupuesto: \$${category.description.assignedBudget}",
                       style: TextStyle(
                         color: isSelected ? Colors.blue[600] : null,
                       ),

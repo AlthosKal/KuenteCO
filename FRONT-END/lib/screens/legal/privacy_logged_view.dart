@@ -4,14 +4,14 @@ import '../../widgets/common/background/background_widget.dart';
 import '../../widgets/common/footer/footer_logged_widget.dart';
 import '../../widgets/common/navbar/navbar_logged_widget.dart';
 
-// 🎨 Colores principales
+// ð¨ Colores principales
 const kPrimaryPurple = Color(0xFF890cac);
 const kLightPurple = Color(0xFFEDE7F6);
 
 class PrivacyLoggedView extends StatelessWidget {
   const PrivacyLoggedView({super.key});
 
-  /// 🔹 Construcción de cada sección de la política
+  /// ð¹ Construcción de cada sección de la política
   Widget _buildSection(String title, String content, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -49,22 +49,22 @@ class PrivacyLoggedView extends StatelessWidget {
       body: Background(
         child: Column(
           children: [
-            /// ✅ Navbar de usuario logueado
+            /// â Navbar de usuario logueado
             KuentecoLoggedNavbar(
-              currentRoute: '/privacy', // 🔥 CORREGIDO: antes estaba '/privacidad'
+              currentRoute: '/privacy', // ð¥ CORREGIDO: antes estaba '/privacidad'
               onLogout: () {
                 print('Usuario cerró sesión desde Privacy');
               },
             ),
 
-            /// ✅ Contenido
+            /// â Contenido
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
                     SizedBox(height: screenSize.height * 0.05),
 
-                    /// 📦 Contenedor principal
+                    /// ð¦ Contenedor principal
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 32.0),
                       child: Center(
@@ -82,7 +82,7 @@ class PrivacyLoggedView extends StatelessWidget {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                /// 📌 Encabezado
+                                /// ð Encabezado
                                 Column(
                                   children: [
                                     Text(
@@ -95,7 +95,7 @@ class PrivacyLoggedView extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 12),
                                     Text(
-                                      'Última actualización: Marzo 5, 2025',
+                                      'Ãltima actualización: Marzo 5, 2025',
                                       style: theme.textTheme.bodyMedium?.copyWith(
                                         color: kPrimaryPurple.withOpacity(0.9),
                                       ),
@@ -104,7 +104,7 @@ class PrivacyLoggedView extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 24),
 
-                                /// 📜 Contenido de la política
+                                /// ð Contenido de la política
                                 MediaQuery.removePadding(
                                   context: context,
                                   removeTop: true,
@@ -157,7 +157,7 @@ class PrivacyLoggedView extends StatelessWidget {
               ),
             ),
 
-            /// ✅ Footer
+            /// â Footer
             const FooterLoggedWidget(),
           ],
         ),

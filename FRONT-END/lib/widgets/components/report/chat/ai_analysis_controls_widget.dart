@@ -286,7 +286,7 @@ class AIAnalysisControlsWidget extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Último análisis realizado: $analysisTypeText',
+              'Ãltimo análisis realizado: $analysisTypeText',
               style: TextStyle(
                 fontSize: 12,
                 color: analysisColor,

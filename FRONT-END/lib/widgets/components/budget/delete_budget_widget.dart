@@ -21,7 +21,7 @@ class DeleteBudgetWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('¿Estás seguro de que deseas eliminar este presupuesto?'),
+            const Text('Â¿Estás seguro de que deseas eliminar este presupuesto?'),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),

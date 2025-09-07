@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../controllers/business_logic/category_controller.dart';
 import '../../../controllers/transactions/transaction_controller.dart';
+import '../../../core/services/app/auth_service.dart';
 import '../../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
 import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 import '../../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
@@ -17,7 +18,7 @@ import 'edit_transaction_widget.dart';
 import 'multiple_operations_widget.dart';
 import 'transaction_list_widget.dart';
 
-class TransactionsTabWidget extends StatelessWidget {
+class TransactionsTabWidget extends StatefulWidget {
   final String? userRole;
   final TransactionController transactionController;
   final CategoryController categoryController;
@@ -32,12 +33,51 @@ class TransactionsTabWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<TransactionsTabWidget> createState() => _TransactionsTabWidgetState();
+}
+
+class _TransactionsTabWidgetState extends State<TransactionsTabWidget> {
+  bool _isBusinessUser = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkUserType();
+  }
+
+  Future<void> _checkUserType() async {
+    try {
+      if (widget.userRole == 'ROLE_PROFILE') {
+        // Los perfiles no son usuarios Business
+        if (mounted) {
+          setState(() => _isBusinessUser = false);
+        }
+        return;
+      }
+      
+      final AuthService authService = AuthService();
+      final user = await authService.getAuthenticatedUser();
+      
+      if (mounted) {
+        setState(() {
+          _isBusinessUser = user.userType.toLowerCase() != 'personal';
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        debugPrint('⚠ Error checking user type: $e');
+        setState(() => _isBusinessUser = false);
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
-          if (userRole == 'ROLE_PROFILE')
+          if (widget.userRole == 'ROLE_PROFILE')
             MultipleOperationsWidget(
               title: 'Operaciones Múltiples',
               color: Theme.of(context).primaryColor,
@@ -47,9 +87,9 @@ class TransactionsTabWidget extends StatelessWidget {
             ),
           
           Expanded(
-            child: userRole == 'ROLE_PROFILE'
+            child: widget.userRole == 'ROLE_PROFILE'
                 ? _buildProfileTransactionsView(context)
-                : _buildBusinessUserSummaryView(context),
+                : _buildUserTransactionsView(context),
           ),
         ],
       ),
@@ -68,14 +108,17 @@ class TransactionsTabWidget extends StatelessWidget {
     );
   }
   
-  Widget _buildBusinessUserSummaryView(BuildContext context) {
+  Widget _buildUserTransactionsView(BuildContext context) {
+    // Usuarios personales pueden hacer transacciones, usuarios de negocio no
+    final canManageTransactions = !_isBusinessUser;
+    
     return TransactionListWidget(
       onTransactionTap: (transaction) => _showTransactionDetail(context, transaction),
-      onTransactionEdit: null,
-      onTransactionDelete: null,
-      onAddTransaction: null,
+      onTransactionEdit: canManageTransactions ? (transaction) => _editTransaction(context, transaction) : null,
+      onTransactionDelete: canManageTransactions ? (transaction) => _deleteTransaction(context, transaction) : null,
+      onAddTransaction: canManageTransactions ? () => _showCreateTransactionModal(context) : null,
       showFilters: true,
-      showFab: false,
+      showFab: canManageTransactions,
       compact: false,
     );
   }
@@ -98,7 +141,7 @@ class TransactionsTabWidget extends StatelessWidget {
         cardColor = Colors.green;
         transactionIcon = Icons.trending_up;
       } else if (transaction.descriptionExtra!.type == TransactionType.EXPENSE) {
-        cardColor = Colors.orange;
+        cardColor = Colors.red;
         transactionIcon = Icons.trending_down;
       }
     } else {
@@ -107,10 +150,10 @@ class TransactionsTabWidget extends StatelessWidget {
         cardColor = Colors.green;
         transactionIcon = Icons.trending_up;
       } else if (nameLower.contains('gasto') || nameLower.contains('expense') || nameLower.contains('egreso')) {
-        cardColor = Colors.orange;
+        cardColor = Colors.red;
         transactionIcon = Icons.trending_down;
       } else if (nameLower.contains('deuda') || nameLower.contains('debt')) {
-        cardColor = Colors.red;
+        cardColor = Colors.orange;
         transactionIcon = Icons.account_balance_wallet;
       }
     }
@@ -133,7 +176,7 @@ class TransactionsTabWidget extends StatelessWidget {
 
     List<ActionButton> actions = [];
     
-    if (userRole == 'ROLE_PROFILE') {
+    if (widget.userRole == 'ROLE_PROFILE') {
       actions.addAll([
         ActionButton(
           label: 'Editar',
@@ -190,12 +233,12 @@ class TransactionsTabWidget extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => MultiProvider(
         providers: [
-          ChangeNotifierProvider<TransactionController>.value(value: transactionController),
-          ChangeNotifierProvider<CategoryController>.value(value: categoryController),
+          ChangeNotifierProvider<TransactionController>.value(value: widget.transactionController),
+          ChangeNotifierProvider<CategoryController>.value(value: widget.categoryController),
         ],
         child: CreateTransactionWidget(
           onCreateTransaction: (newTransaction) => _createTransaction(context, newTransaction),
-          isLoading: transactionController.isLoading,
+          isLoading: widget.transactionController.isLoading,
         ),
       ),
     );
@@ -208,13 +251,13 @@ class TransactionsTabWidget extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => MultiProvider(
         providers: [
-          ChangeNotifierProvider<TransactionController>.value(value: transactionController),
-          ChangeNotifierProvider<CategoryController>.value(value: categoryController),
+          ChangeNotifierProvider<TransactionController>.value(value: widget.transactionController),
+          ChangeNotifierProvider<CategoryController>.value(value: widget.categoryController),
         ],
         child: EditTransactionWidget(
           transaction: transaction,
           onUpdateTransaction: (updateTransaction) => _updateTransaction(context, updateTransaction),
-          isLoading: transactionController.isLoading,
+          isLoading: widget.transactionController.isLoading,
         ),
       ),
     );
@@ -228,14 +271,14 @@ class TransactionsTabWidget extends StatelessWidget {
       builder: (context) => DeleteTransactionWidget(
         transaction: transaction,
         onDeleteTransaction: (transactionToDelete) => _deleteTransaction(context, transactionToDelete),
-        isLoading: transactionController.isLoading,
+        isLoading: widget.transactionController.isLoading,
       ),
     );
   }
 
   void _createTransaction(BuildContext context, NewTransactionDTO newTransaction) async {
     try {
-      await transactionController.addTransaction(newTransaction);
+      await widget.transactionController.addTransaction(newTransaction);
       
       if (context.mounted) {
         Navigator.pop(context);
@@ -261,7 +304,7 @@ class TransactionsTabWidget extends StatelessWidget {
 
   void _updateTransaction(BuildContext context, UpdateTransactionDTO updateTransaction) async {
     try {
-      await transactionController.updateTransaction(updateTransaction);
+      await widget.transactionController.updateTransaction(updateTransaction);
       
       if (context.mounted) {
         Navigator.pop(context);
@@ -287,7 +330,7 @@ class TransactionsTabWidget extends StatelessWidget {
 
   void _deleteTransaction(BuildContext context, TransactionDetailDTO transaction) async {
     try {
-      await transactionController.deleteTransaction(transaction.id);
+      await widget.transactionController.deleteTransaction(transaction.id);
       
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -314,22 +357,22 @@ class TransactionsTabWidget extends StatelessWidget {
       context: context,
       builder: (context) => MultiProvider(
         providers: [
-          ChangeNotifierProvider<TransactionController>.value(value: transactionController),
-          ChangeNotifierProvider<CategoryController>.value(value: categoryController),
+          ChangeNotifierProvider<TransactionController>.value(value: widget.transactionController),
+          ChangeNotifierProvider<CategoryController>.value(value: widget.categoryController),
         ],
         child: const CreateMultipleTransactionsWidget(),
       ),
     );
 
     if (result == true) {
-      onRefresh();
+      widget.onRefresh();
     }
   }
 
   void _navigateToEditMultiple(BuildContext context) async {
-    await transactionController.loadTransactions();
+    await widget.transactionController.loadTransactions();
     
-    if (transactionController.transactions.isEmpty) {
+    if (widget.transactionController.transactions.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('No hay transacciones disponibles para editar'),
@@ -343,23 +386,23 @@ class TransactionsTabWidget extends StatelessWidget {
       context: context,
       builder: (context) => MultiProvider(
         providers: [
-          ChangeNotifierProvider<TransactionController>.value(value: transactionController),
-          ChangeNotifierProvider<CategoryController>.value(value: categoryController),
+          ChangeNotifierProvider<TransactionController>.value(value: widget.transactionController),
+          ChangeNotifierProvider<CategoryController>.value(value: widget.categoryController),
         ],
         child: EditMultipleTransactionsWidget(
-          controller: transactionController,
-          transactionsToEdit: transactionController.transactions,
+          controller: widget.transactionController,
+          transactionsToEdit: widget.transactionController.transactions,
         ),
       ),
     );
 
-    onRefresh();
+    widget.onRefresh();
   }
 
   void _navigateToDeleteMultiple(BuildContext context) async {
-    await transactionController.loadTransactions();
+    await widget.transactionController.loadTransactions();
     
-    if (transactionController.transactions.isEmpty) {
+    if (widget.transactionController.transactions.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('No hay transacciones disponibles para eliminar'),
@@ -373,15 +416,15 @@ class TransactionsTabWidget extends StatelessWidget {
       context: context,
       builder: (context) => MultiProvider(
         providers: [
-          ChangeNotifierProvider<TransactionController>.value(value: transactionController),
+          ChangeNotifierProvider<TransactionController>.value(value: widget.transactionController),
         ],
         child: DeleteMultipleTransactionsWidget(
-          controller: transactionController,
-          transactionsToDelete: transactionController.transactions,
+          controller: widget.transactionController,
+          transactionsToDelete: widget.transactionController.transactions,
         ),
       ),
     );
 
-    onRefresh();
+    widget.onRefresh();
   }
 }

@@ -235,7 +235,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
             style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
           ),
           content: Text(
-            '¿Está seguro de que desea eliminar $selectedCount categorías?\n\nEsta acción es irreversible y eliminará todas las categorías seleccionadas de forma permanente.',
+            'Â¿Está seguro de que desea eliminar $selectedCount categorías?\n\nEsta acción es irreversible y eliminará todas las categorías seleccionadas de forma permanente.',
           ),
           actions: [
             TextButton(

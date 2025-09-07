@@ -75,7 +75,7 @@ class ApiClient {
           if (e.response?.statusCode == 401) {
             // TODO: Implement proper navigation to login
             if (kDebugMode) {
-              print('🔐 Unauthorized access - redirect to ${AppRoutes.login}');
+              print('ð Unauthorized access - redirect to ${AppRoutes.login}');
             }
           }
           return handler.next(e);
@@ -92,9 +92,14 @@ class ApiClient {
   Future<Response> getApp(
       String path, {
         Map<String, dynamic>? queryParameters,
+        Options? options,
       }) async {
     try {
-      return await _dioApp.get(path, queryParameters: queryParameters);
+      return await _dioApp.get(
+        path, 
+        queryParameters: queryParameters,
+        options: options,
+      );
     } on DioException catch (e) {
       final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al obtener datos.';
       throw Exception(mensaje);

@@ -59,7 +59,7 @@ class UserButtomPersonalWidget extends StatelessWidget {
       await authService.logout();
       Navigator.pushReplacementNamed(context, AppRoutes.homeGuest);
     } catch (e) {
-      print("❌ Error al cerrar sesión: $e");
+      print("â Error al cerrar sesión: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al cerrar sesión: $e')),
       );

@@ -96,7 +96,7 @@ class _AssignCategoryWidgetState extends State<AssignCategoryWidget> {
 
       if (mounted) {
         if (controller.errorMessage == null) {
-          // Éxito - cerrar diálogo y mostrar mensaje
+          // Ãxito - cerrar diálogo y mostrar mensaje
           Navigator.pop(context, true);
           _showSnackBar(
             'Categoría "${widget.category.name}" asignada a "${_selectedProfile!.username}"',

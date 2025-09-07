@@ -131,7 +131,7 @@
 //                   const Icon(Icons.check_circle, color: Colors.white, size: 16),
 //                   const SizedBox(width: 6),
 //                   Text(
-//                     'Última sincronización: $_lastSyncDate',
+//                     'Ãltima sincronización: $_lastSyncDate',
 //                     style: const TextStyle(color: Colors.white, fontSize: 12),
 //                   ),
 //                 ],
@@ -345,28 +345,28 @@
 //           const SizedBox(height: 12),
 //
 //           _buildInfoItem(
-//             '🔒',
+//             'ð',
 //             'Seguridad',
 //             'Tu información bancaria se maneja de forma segura y encriptada.',
 //           ),
 //           const SizedBox(height: 8),
 //
 //           _buildInfoItem(
-//             '📊',
+//             'ð',
 //             'Datos Importados',
 //             'Se importarán movimientos de débitos, créditos y transferencias.',
 //           ),
 //           const SizedBox(height: 8),
 //
 //           _buildInfoItem(
-//             '⏱️',
+//             'â±ï¸',
 //             'Frecuencia',
 //             'Recomendamos sincronizar semanalmente para mantener actualizada la información.',
 //           ),
 //           const SizedBox(height: 8),
 //
 //           _buildInfoItem(
-//             '🔄',
+//             'ð',
 //             'Duplicados',
 //             'El sistema detecta automáticamente transacciones duplicadas.',
 //           ),
@@ -456,7 +456,7 @@
 //               color: success ? Colors.green : Colors.red,
 //             ),
 //             const SizedBox(width: 8),
-//             Text(success ? 'Éxito' : 'Error'),
+//             Text(success ? 'Ãxito' : 'Error'),
 //           ],
 //         ),
 //         content: Text(message),
@@ -678,7 +678,7 @@
 //                 const SizedBox(height: 4),
 //                 if (isSuccess)
 //                   Text(
-//                     '${sync['transactionsImported']} transacciones importadas • ${sync['accountNumber']}',
+//                     '${sync['transactionsImported']} transacciones importadas â¢ ${sync['accountNumber']}',
 //                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
 //                       color: color.withOpacity(0.8),
 //                     ),

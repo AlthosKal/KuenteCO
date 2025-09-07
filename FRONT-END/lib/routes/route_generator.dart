@@ -27,13 +27,13 @@ import 'app_routes.dart';
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
-    // ✅ RUTA HOME INVITADO
+    // â RUTA HOME INVITADO
       case AppRoutes.homeGuest:
         return MaterialPageRoute(
           builder: (_) => const HomeGuestPage(title: 'Inicio'),
         );
 
-    // ✅ AUTENTICACIÓN
+    // â AUTENTICACIÃN
       case AppRoutes.login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
 
@@ -59,7 +59,7 @@ class RouteGenerator {
           builder: (_) => ValidateCodeScreen(email: email),
         );
 
-    // ✅ HOME PERSONAL con FutureBuilder
+    // â HOME PERSONAL con FutureBuilder
       case AppRoutes.homePersonal:
         return MaterialPageRoute(
           builder: (_) => FutureBuilder<Widget>(
@@ -80,7 +80,7 @@ class RouteGenerator {
           ),
         );
 
-    // ✅ HOME BUSINESS con FutureBuilder
+    // â HOME BUSINESS con FutureBuilder
       case AppRoutes.homeBusiness:
         return MaterialPageRoute(
           builder: (_) => FutureBuilder<Widget>(
@@ -121,11 +121,11 @@ class RouteGenerator {
           ),
         );
 
-    // ✅ SUSCRIPCIONES
+    // â SUSCRIPCIONES
       case AppRoutes.suscriptions:
         return MaterialPageRoute(builder: (_) => const SubscriptionPlansView());
 
-    // ✅ RUTAS LOGGED
+    // â RUTAS LOGGED
       case AppRoutes.contactLogged:
         return MaterialPageRoute(builder: (_) => const ContactLoggedView());
       case AppRoutes.termsLogged:
@@ -133,7 +133,7 @@ class RouteGenerator {
       case AppRoutes.privacyLogged:
         return MaterialPageRoute(builder: (_) => const PrivacyLoggedView());
 
-    // ✅ RUTAS GUEST
+    // â RUTAS GUEST
       case AppRoutes.contact:
         return MaterialPageRoute(builder: (_) => const ContactView());
       case AppRoutes.terms:
@@ -141,14 +141,14 @@ class RouteGenerator {
       case AppRoutes.privacy:
         return MaterialPageRoute(builder: (_) => const PrivacyView());
 
-    // ✅ VERIFICACIÓN DE REGISTRO
+    // â VERIFICACIÃN DE REGISTRO
       case AppRoutes.verificationRegister:
         final email = settings.arguments as String;
         return MaterialPageRoute(
           builder: (_) => VerificationRegisterScreen(email: email),
         );
 
-    // ✅ PANTALLA DE PERFILES
+    // â PANTALLA DE PERFILES
       case AppRoutes.profileScreen:
         return MaterialPageRoute(builder: (_) => ProfileScreen());
       case AppRoutes.accountScreen:
@@ -162,7 +162,7 @@ class RouteGenerator {
 
 
 
-    // ✅ DEFAULT -> RUTA NO ENCONTRADA
+    // â DEFAULT -> RUTA NO ENCONTRADA
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

@@ -20,11 +20,11 @@ class UserController extends ChangeNotifier {
       user.value = await _userService.getUserDetail();
       userImage = user.value?.image;
       if (kDebugMode) {
-        debugPrint('✅ Usuario cargado correctamente');
+        debugPrint('â Usuario cargado correctamente');
       }
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('🛑 Error cargando usuario: $e');
+        debugPrint('ð Error cargando usuario: $e');
       }
     } finally {
       isLoading.value = false;
@@ -44,11 +44,11 @@ class UserController extends ChangeNotifier {
       _updateUserWithNewImage(result);
       
       if (kDebugMode) {
-        debugPrint('✅ Imagen de usuario subida correctamente');
+        debugPrint('â Imagen de usuario subida correctamente');
       }
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('🛑 Error subiendo imagen: $e');
+        debugPrint('ð Error subiendo imagen: $e');
       }
       rethrow;
     } finally {
@@ -77,7 +77,7 @@ class UserController extends ChangeNotifier {
       isLoading.value = true;
       final result = await _userService.updateUserImage(multipartfile, fileName);
       userImage = result;
-      // CRÍTICO: Actualizar user.value para que la vista se refresque
+      // CRÃTICO: Actualizar user.value para que la vista se refresque
       if (user.value != null) {
         final updatedUser = UserDetailDTO(
           version: user.value!.version,
@@ -90,9 +90,9 @@ class UserController extends ChangeNotifier {
         );
         user.value = updatedUser; // Esto dispara el ValueListenableBuilder
       }
-      print("✅ Imagen de usuario actualizada correctamente");
+      print("â Imagen de usuario actualizada correctamente");
     } catch (e) {
-      print("🛑 Error actualizando imagen: $e");
+      print("ð Error actualizando imagen: $e");
       rethrow; // Re-lanza el error para que la vista lo maneje
     } finally {
       isLoading.value = false;
@@ -103,7 +103,7 @@ class UserController extends ChangeNotifier {
   Future<void> deleteUserImage() async {
     try {
       if (userImage == null || userImage?.imageId == null) {
-        print("ℹ️ No hay imagen para eliminar.");
+        print("â¹ï¸ No hay imagen para eliminar.");
         return;
       }
       isLoading.value = true;
@@ -121,9 +121,9 @@ class UserController extends ChangeNotifier {
           state: user.value!.state,
         );
       }
-      print("✅ Imagen de usuario eliminada correctamente");
+      print("â Imagen de usuario eliminada correctamente");
     } catch (e) {
-      print("🛑 Error eliminando imagen: $e");
+      print("ð Error eliminando imagen: $e");
     } finally {
       isLoading.value = false;
       notifyListeners();
@@ -137,9 +137,9 @@ class UserController extends ChangeNotifier {
       await _userService.deleteUser();
       user.value = null;
       userImage = null;
-      print("✅ Usuario eliminado exitosamente");
+      print("â Usuario eliminado exitosamente");
     } catch (e) {
-      print("🛑 Error eliminando usuario: $e");
+      print("ð Error eliminando usuario: $e");
     } finally {
       isLoading.value = false;
       notifyListeners();

@@ -295,7 +295,7 @@ class _IncomeViewState extends State<IncomeView> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Eliminar Ingreso'),
-        content: Text('¿Estás seguro de que deseas eliminar "${income.name}"?'),
+        content: Text('Â¿Estás seguro de que deseas eliminar "${income.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),

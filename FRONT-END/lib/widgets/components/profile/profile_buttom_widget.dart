@@ -108,7 +108,7 @@ class ProfileButtonWidget extends StatelessWidget {
     );
   }
 
-  /// ✅ Lógica de navegación y logout (extraída del navbar original)
+  /// â Lógica de navegación y logout (extraída del navbar original)
   Future<void> _handleMenuSelection(BuildContext context, String value) async {
     switch (value) {
       case 'profile':

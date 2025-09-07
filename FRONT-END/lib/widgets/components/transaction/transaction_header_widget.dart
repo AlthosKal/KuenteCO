@@ -17,7 +17,7 @@ class TransactionHeaderWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// TÍTULO
+          /// TÃTULO
           Text(
             'Transacciones',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -29,7 +29,7 @@ class TransactionHeaderWidget extends StatelessWidget {
           Text(
             userRole == 'ROLE_PROFILE'
                 ? 'Gestiona tus movimientos financieros'
-                : 'Resumen de transacciones de tus perfiles',
+                : 'Resumen de transacciones',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Colors.black54,
             ),

@@ -112,7 +112,7 @@ class _AssignmentListWidgetState extends State<AssignmentListWidget> with MultiS
       builder: (context) => AlertDialog(
         title: const Text('Confirmar Eliminación'),
         content: Text(
-          '¿Estás seguro de que deseas eliminar ${selectedEnrollments.length} asignaciones?\n\nEsta acción no se puede deshacer.',
+          'Â¿Estás seguro de que deseas eliminar ${selectedEnrollments.length} asignaciones?\n\nEsta acción no se puede deshacer.',
         ),
         actions: [
           TextButton(

@@ -18,14 +18,14 @@ class ProfileService {
 
   bool get isReady => _api.isInitialized;
 
-  /// ✅ Obtener todos los perfiles
+  /// â Obtener todos los perfiles
   Future<List<ProfileDetailDTO>> getAllProfiles() async {
     final response = await _api.getApp('/profile');
     final data = response.data['data'] as List;
     return data.map((e) => ProfileDetailDTO.fromJson(e)).toList();
   }
 
-  /// ✅ Obtener perfil autenticado
+  /// â Obtener perfil autenticado
   Future<ProfileDetailDTO> getAuthenticatedProfile() async {
     final response = await _api.getApp('/profile/details');
     final Map<String, dynamic> json = response.data;
@@ -33,9 +33,9 @@ class ProfileService {
     return ProfileDetailDTO.fromJson(actualData);
   }
 
-  /// ✅ Obtener perfil por ID
+  /// â Obtener perfil por ID
   Future<ProfileDetailDTO> getProfileById(int id) async {
-    // ✅ Verificar si estamos ejecutando como perfil
+    // â Verificar si estamos ejecutando como perfil
     final role = await _storage.read(key: 'role');
     
     if (role == 'ROLE_PROFILE') {
@@ -49,7 +49,7 @@ class ProfileService {
         }
       } catch (e) {
         // Si falla obtener el perfil autenticado, continuar con el método original
-        debugPrint('🔴 Error getting authenticated profile, falling back to getProfileById: $e');
+        debugPrint('ð´ Error getting authenticated profile, falling back to getProfileById: $e');
       }
       
       // Si el ID no coincide o hubo error, intentar el endpoint original
@@ -64,7 +64,7 @@ class ProfileService {
   }
 
 
-  /// ✅ Crear perfil
+  /// â Crear perfil
   Future<void> createProfile(NewProfileDTO dto) async {
     await _api.postApp('/profile/add', dto.toJson());
   }
@@ -102,18 +102,18 @@ class ProfileService {
       },
     );
 
-    // ✅ Guardamos token y rol para perfil
+    // â Guardamos token y rol para perfil
     await _storage.write(key: 'Authorization', value: apiResponse.data.token);
     await _storage.write(key: 'role', value: 'ROLE_PROFILE'); // Indicamos que es perfil
 
     return apiResponse.data;
   }
 
-  /// ✅ Actualizar perfil
+  /// â Actualizar perfil
   Future<void> updateProfile(UpdateProfileDTO dto, {MultipartFile? imageFile}) async {
-    print('🔍 ProfileService - updateProfile called');
-    print('🔍 ProfileService - removeImage: ${dto.removeImage}');
-    print('🔍 ProfileService - imageFile: ${imageFile != null ? "PROVIDED" : "NULL"}');
+    print('ð ProfileService - updateProfile called');
+    print('ð ProfileService - removeImage: ${dto.removeImage}');
+    print('ð ProfileService - imageFile: ${imageFile != null ? "PROVIDED" : "NULL"}');
     
     // Crear FormData con profile como texto plano
     final formData = FormData();
@@ -123,11 +123,11 @@ class ProfileService {
     
     // Agregar la imagen si existe
     if (imageFile != null) {
-      print('🔍 ProfileService - Adding image to FormData');
+      print('ð ProfileService - Adding image to FormData');
       formData.files.add(MapEntry('image', imageFile));
     }
     
-    print('🔍 ProfileService - FormData fields: ${formData.fields.length}, files: ${formData.files.length}');
+    print('ð ProfileService - FormData fields: ${formData.fields.length}, files: ${formData.files.length}');
     await _api.patchApp('/profile/update', formData);
   }
 
@@ -140,12 +140,12 @@ class ProfileService {
     await _api.patchApp('/profile/change-password', payload);
   }
 
-  /// ✅ Eliminar perfil
+  /// â Eliminar perfil
   Future<void> deleteProfile(int id) async {
     await _api.deleteApp('/profile/delete/$id');
   }
 
-  /// 🚪 LOGOUT PERFIL
+  /// ðª LOGOUT PERFIL
   Future<void> logout() async {
     await _api.postApp('/profile/logout', {});
     await _storage.delete(key: 'Authorization');

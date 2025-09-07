@@ -12,7 +12,7 @@ class CategoryService {
 
   CategoryService(this._apiClient);
 
-  // ✅ GET /category
+  // â GET /category
   Future<List<CategoryDTO>> getAllCategories() async {
     final response = await _apiClient.getApp('/category');
     
@@ -41,7 +41,7 @@ class CategoryService {
         .toList();
   }
 
-  // ✅ GET /category/report/summary
+  // â GET /category/report/summary
   Future<List<CategoryEnrollmentSummaryDTO>> getCategoryReportSummary() async {
     final response = await _apiClient.getApp('/category/report/summary');
     return (response.data as List)
@@ -49,13 +49,13 @@ class CategoryService {
         .toList();
   }
 
-  // ✅ GET /category/report/{id}
+  // â GET /category/report/{id}
   Future<CategoryReportDTO> getCategoryReportById(int id) async {
     final response = await _apiClient.getApp('/category/report/$id');
     return CategoryReportDTO.fromJson(response.data);
   }
 
-  // ✅ GET /category/enroll
+  // â GET /category/enroll
   Future<List<CategoryEnrollmentDTO>> getAllEnrollments() async {
     final response = await _apiClient.getApp('/category/enroll');
     final responseData = response.data;
@@ -89,7 +89,7 @@ class CategoryService {
         .toList();
   }
 
-  // ✅ GET /category/enroll/user - Returns enrollment summaries for business users
+  // â GET /category/enroll/user - Returns enrollment summaries for business users
   Future<List<CategoryEnrollmentSummaryDTO>> getEnrollmentSummariesByUser() async {
     final response = await _apiClient.getApp('/category/enroll/user');
     final responseData = response.data;
@@ -115,7 +115,7 @@ class CategoryService {
       return [];
     }
     
-    print('📌 CategoryService: /enroll/user data list length: ${dataList.length}');
+    print('ð CategoryService: /enroll/user data list length: ${dataList.length}');
     
     // PASO 1: Agrupar por categoría ya que el backend envía un elemento por perfil
     Map<String, List<Map<String, dynamic>>> groupedByCategory = {};
@@ -130,13 +130,13 @@ class CategoryService {
       groupedByCategory[categoryName]!.add(itemMap);
     }
     
-    print('📌 CategoryService: Grouped into ${groupedByCategory.length} categories');
+    print('ð CategoryService: Grouped into ${groupedByCategory.length} categories');
     
     // PASO 2: Crear CategoryEnrollmentSummaryDTO agrupados
     List<CategoryEnrollmentSummaryDTO> result = [];
     
     groupedByCategory.forEach((categoryName, categoryItems) {
-      print('📌 CategoryService: Processing category "$categoryName" with ${categoryItems.length} profiles');
+      print('ð CategoryService: Processing category "$categoryName" with ${categoryItems.length} profiles');
       
       // Combinar todos los enrollmentIds de esta categoría
       List<int> allEnrollmentIds = [];
@@ -190,7 +190,7 @@ class CategoryService {
       );
       
       result.add(groupedDTO);
-      print('✅ CategoryService: Created grouped DTO for "$categoryName" with ${enrolledProfiles.length} profiles');
+      print('â CategoryService: Created grouped DTO for "$categoryName" with ${enrolledProfiles.length} profiles');
     });
     
     return result;
@@ -237,7 +237,7 @@ class CategoryService {
     }
   }
 
-  // ✅ POST /category/add
+  // â POST /category/add
   Future<void> addCategory(NewCategoryDTO dto) async {
     final response = await _apiClient.postApp('/category/add', dto.toJson());
     
@@ -247,7 +247,7 @@ class CategoryService {
     }
   }
 
-  // ✅ POST /category/batch/add
+  // â POST /category/batch/add
   Future<void> addCategoriesBatch(List<NewCategoryDTO> dtos) async {
     final response = await _apiClient.postApp(
       '/category/batch/add',
@@ -260,7 +260,7 @@ class CategoryService {
     }
   }
 
-  // 🔧 PATCH /category/update (CORREGIDO: Ahora usa UpdateCategoryDTO)
+  // ð§ PATCH /category/update (CORREGIDO: Ahora usa UpdateCategoryDTO)
   Future<void> updateCategory(CategoryDTO dto) async {
     // Convertir CategoryDTO a UpdateCategoryDTO
     final updateDto = UpdateCategoryDTO.fromCategoryDTO(dto);
@@ -273,7 +273,7 @@ class CategoryService {
     }
   }
 
-  // 🔧 PUT /category/batch/update (CORREGIDO: Ahora usa UpdateCategoryDTO)
+  // ð§ PUT /category/batch/update (CORREGIDO: Ahora usa UpdateCategoryDTO)
   Future<void> updateCategoriesBatch(List<CategoryDTO> dtos) async {
     // Convertir CategoryDTO a UpdateCategoryDTO
     final updateDtos = dtos.map((dto) => UpdateCategoryDTO.fromCategoryDTO(dto)).toList();
@@ -282,8 +282,8 @@ class CategoryService {
       updateDtos.map((e) => e.toJson()).toList(),
     );
     
-    print('📌 CategoryService: Batch update response type: ${response.data.runtimeType}');
-    print('📌 CategoryService: Batch update response data: ${response.data}');
+    print('ð CategoryService: Batch update response type: ${response.data.runtimeType}');
+    print('ð CategoryService: Batch update response data: ${response.data}');
     
     // Verificamos que la petición fue exitosa
     if (response.statusCode != 200 && response.statusCode != 201) {
@@ -292,10 +292,10 @@ class CategoryService {
     
     // No necesitamos parsear la respuesta ya que CategoryController
     // recarga todas las categorías después usando getAllCategories()
-    print('✅ CategoryService: Batch update completed successfully');
+    print('â CategoryService: Batch update completed successfully');
   }
 
-  // ✅ POST /category/enroll/add?profileId=id&categoryId=id
+  // â POST /category/enroll/add?profileId=id&categoryId=id
   Future<void> enrollProfileToCategory(int profileId, int categoryId) async {
     await _apiClient.postApp(
       '/category/enroll/add?profileId=$profileId&categoryId=$categoryId',
@@ -303,23 +303,23 @@ class CategoryService {
     );
   }
 
-  // ✅ DELETE /category/{id}
+  // â DELETE /category/{id}
   Future<void> deleteCategory(int id) async {
     await _apiClient.deleteApp('/category/$id');
   }
 
-  // ✅ DELETE /category/batch?id=id&id=id
+  // â DELETE /category/batch?id=id&id=id
   Future<void> deleteCategoriesBatch(List<int> ids) async {
     final queryParams = ids.map((id) => 'id=$id').join('&');
     await _apiClient.deleteApp('/category/batch?$queryParams');
   }
 
-  // ✅ GET /category/enroll - Get detailed enrollments for business users
+  // â GET /category/enroll - Get detailed enrollments for business users
   Future<List<CategoryEnrollmentDTO>> getDetailedEnrollments() async {
     final response = await _apiClient.getApp('/category/enroll');
     
-    print('📌 CategoryService: Raw response data type for detailed enrollments: ${response.data.runtimeType}');
-    print('📌 CategoryService: Raw response data for detailed enrollments: ${response.data}');
+    print('ð CategoryService: Raw response data type for detailed enrollments: ${response.data.runtimeType}');
+    print('ð CategoryService: Raw response data for detailed enrollments: ${response.data}');
     
     // El backend puede retornar un objeto envuelto con la estructura:
     // { "data": [...] } o directamente la lista
@@ -327,107 +327,107 @@ class CategoryService {
     
     if (responseData is String) {
       // Si el backend retorna un mensaje de texto
-      print('📌 CategoryService: Detailed enrollments response is string, returning empty list');
+      print('ð CategoryService: Detailed enrollments response is string, returning empty list');
       return [];
     }
     
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
       // Si viene envuelto en un objeto con key 'data'
-      print('📌 CategoryService: Detailed enrollments response has data key, extracting list');
+      print('ð CategoryService: Detailed enrollments response has data key, extracting list');
       dataList = responseData['data'] as List<dynamic>;
     } else if (responseData is List<dynamic>) {
       // Si viene directamente como lista
-      print('📌 CategoryService: Detailed enrollments response is direct list');
+      print('ð CategoryService: Detailed enrollments response is direct list');
       dataList = responseData;
     } else {
       // Si es cualquier otro formato, asumir lista vacía
-      print('❌ CategoryService: Unknown detailed enrollments response format, returning empty list');
+      print('â CategoryService: Unknown detailed enrollments response format, returning empty list');
       return [];
     }
     
-    print('📌 CategoryService: Detailed enrollments data list length: ${dataList.length}');
+    print('ð CategoryService: Detailed enrollments data list length: ${dataList.length}');
     
     return dataList
         .map((e) => CategoryEnrollmentDTO.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
-  // ✅ DELETE /category/enroll/{id}
+  // â DELETE /category/enroll/{id}
   Future<void> deleteEnrollment(int id) async {
-    print('📌 CategoryService: Starting deleteEnrollment request');
-    print('📌 CategoryService: Enrollment ID to delete: $id');
-    print('📌 CategoryService: Request URL: /category/enroll/$id');
+    print('ð CategoryService: Starting deleteEnrollment request');
+    print('ð CategoryService: Enrollment ID to delete: $id');
+    print('ð CategoryService: Request URL: /category/enroll/$id');
     
     try {
       final response = await _apiClient.deleteApp('/category/enroll/$id');
-      print('✅ CategoryService: Delete enrollment response status: ${response.statusCode}');
-      print('✅ CategoryService: Delete enrollment response data: ${response.data}');
+      print('â CategoryService: Delete enrollment response status: ${response.statusCode}');
+      print('â CategoryService: Delete enrollment response data: ${response.data}');
       
       if (response.statusCode != 200 && response.statusCode != 204) {
-        print('❌ CategoryService: Unexpected status code: ${response.statusCode}');
+        print('â CategoryService: Unexpected status code: ${response.statusCode}');
         throw Exception('Failed to delete enrollment: ${response.statusCode}');
       }
       
-      print('✅ CategoryService: Enrollment deleted successfully');
+      print('â CategoryService: Enrollment deleted successfully');
     } catch (e) {
-      print('❌ CategoryService: Error deleting enrollment: $e');
+      print('â CategoryService: Error deleting enrollment: $e');
       rethrow;
     }
   }
 
-  // ✅ DELETE /category/enroll/category/{categoryId} - Delete all enrollments for a specific category
+  // â DELETE /category/enroll/category/{categoryId} - Delete all enrollments for a specific category
   // Alternative approach: Delete enrollments individually if bulk endpoint fails
   Future<void> deleteAllEnrollmentsByCategory(int categoryId) async {
-    print('📌 CategoryService: Starting deleteAllEnrollmentsByCategory request');
-    print('📌 CategoryService: Category ID: $categoryId');
-    print('📌 CategoryService: Request URL: /category/enroll/category/$categoryId');
+    print('ð CategoryService: Starting deleteAllEnrollmentsByCategory request');
+    print('ð CategoryService: Category ID: $categoryId');
+    print('ð CategoryService: Request URL: /category/enroll/category/$categoryId');
     
     try {
       // Try the bulk delete endpoint first
       final response = await _apiClient.deleteApp('/category/enroll/category/$categoryId');
-      print('✅ CategoryService: Delete all enrollments response status: ${response.statusCode}');
-      print('✅ CategoryService: Delete all enrollments response data: ${response.data}');
+      print('â CategoryService: Delete all enrollments response status: ${response.statusCode}');
+      print('â CategoryService: Delete all enrollments response data: ${response.data}');
       
       if (response.statusCode != 200 && response.statusCode != 204) {
-        print('❌ CategoryService: Unexpected status code: ${response.statusCode}');
+        print('â CategoryService: Unexpected status code: ${response.statusCode}');
         throw Exception('Failed to delete all enrollments for category: ${response.statusCode}');
       }
       
-      print('✅ CategoryService: All enrollments for category deleted successfully');
+      print('â CategoryService: All enrollments for category deleted successfully');
     } catch (e) {
-      print('❌ CategoryService: Bulk delete failed with error: $e');
-      print('📌 CategoryService: Attempting fallback - individual deletion');
+      print('â CategoryService: Bulk delete failed with error: $e');
+      print('ð CategoryService: Attempting fallback - individual deletion');
       
       try {
         final allEnrollments = await getDetailedEnrollments();
         final categoryEnrollments = allEnrollments.where((enrollment) => enrollment.id != null).toList();
         
-        print('📌 CategoryService: Found ${categoryEnrollments.length} total enrollments to filter');
+        print('ð CategoryService: Found ${categoryEnrollments.length} total enrollments to filter');
         
-        print('✅ CategoryService: Fallback preparation completed - UI will handle individual deletions');
+        print('â CategoryService: Fallback preparation completed - UI will handle individual deletions');
 
         rethrow;
         
       } catch (fallbackError) {
-        print('❌ CategoryService: Fallback also failed: $fallbackError');
+        print('â CategoryService: Fallback also failed: $fallbackError');
         rethrow;
       }
     }
   }
   
-  // 🆕 POST /category/enroll/add/batch (NUEVO: Asignación masiva de categorías)
+  // ð POST /category/enroll/add/batch (NUEVO: Asignación masiva de categorías)
   Future<List<CategoryEnrollmentDTO>> enrollProfilesToCategoriesBatch(List<BatchEnrollmentRequestDTO> enrollments) async {
-    print('📌 CategoryService: Starting batch enrollment request');
-    print('📌 CategoryService: Enrollments to create: ${enrollments.length}');
+    print('ð CategoryService: Starting batch enrollment request');
+    print('ð CategoryService: Enrollments to create: ${enrollments.length}');
     
     final response = await _apiClient.postApp(
       '/category/enroll/add/batch',
       enrollments.map((e) => e.toJson()).toList(),
     );
     
-    print('✅ CategoryService: Batch enrollment response status: ${response.statusCode}');
-    print('✅ CategoryService: Batch enrollment response data: ${response.data}');
+    print('â CategoryService: Batch enrollment response status: ${response.statusCode}');
+    print('â CategoryService: Batch enrollment response data: ${response.data}');
     
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('Failed to create batch enrollments: ${response.statusCode}');
@@ -442,7 +442,7 @@ class CategoryService {
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {
-      print('❌ CategoryService: Unexpected response format for batch enrollment');
+      print('â CategoryService: Unexpected response format for batch enrollment');
       return [];
     }
     
@@ -451,13 +451,13 @@ class CategoryService {
         .toList();
   }
   
-  // 🔧 DELETE /category/enroll/batch (CORREGIDO: Ahora usa el endpoint correcto del backend)
+  // ð§ DELETE /category/enroll/batch (CORREGIDO: Ahora usa el endpoint correcto del backend)
   Future<void> deleteEnrollmentsBatch(List<int> enrollmentIds) async {
-    print('📌 CategoryService: Starting batch enrollment deletion request');
-    print('📌 CategoryService: Enrollment IDs to delete: $enrollmentIds');
+    print('ð CategoryService: Starting batch enrollment deletion request');
+    print('ð CategoryService: Enrollment IDs to delete: $enrollmentIds');
     
     if (enrollmentIds.isEmpty) {
-      print('📌 CategoryService: No enrollment IDs provided, nothing to delete');
+      print('ð CategoryService: No enrollment IDs provided, nothing to delete');
       return;
     }
     
@@ -466,38 +466,38 @@ class CategoryService {
     
     try {
       final response = await _apiClient.deleteApp('/category/enroll/batch?$queryParams');
-      print('✅ CategoryService: Batch delete enrollments response status: ${response.statusCode}');
-      print('✅ CategoryService: Batch delete enrollments response data: ${response.data}');
+      print('â CategoryService: Batch delete enrollments response status: ${response.statusCode}');
+      print('â CategoryService: Batch delete enrollments response data: ${response.data}');
       
       if (response.statusCode != 200 && response.statusCode != 204) {
-        print('❌ CategoryService: Unexpected status code: ${response.statusCode}');
+        print('â CategoryService: Unexpected status code: ${response.statusCode}');
         throw Exception('Failed to delete enrollments in batch: ${response.statusCode}');
       }
       
-      print('✅ CategoryService: Enrollments deleted successfully in batch');
+      print('â CategoryService: Enrollments deleted successfully in batch');
     } catch (e) {
-      print('❌ CategoryService: Error deleting enrollments in batch: $e');
+      print('â CategoryService: Error deleting enrollments in batch: $e');
       rethrow;
     }
   }
   
-  // ✅ Alternative method: Delete enrollments by IDs (DEPRECATED - usar deleteEnrollmentsBatch)
+  // â Alternative method: Delete enrollments by IDs (DEPRECATED - usar deleteEnrollmentsBatch)
   @Deprecated('Use deleteEnrollmentsBatch instead')
   Future<void> deleteEnrollmentsByIds(List<int> enrollmentIds) async {
-    print('📌 CategoryService: Starting deleteEnrollmentsByIds request (DEPRECATED)');
-    print('📌 CategoryService: Enrollment IDs to delete: $enrollmentIds');
+    print('ð CategoryService: Starting deleteEnrollmentsByIds request (DEPRECATED)');
+    print('ð CategoryService: Enrollment IDs to delete: $enrollmentIds');
     
     if (enrollmentIds.isEmpty) {
-      print('📌 CategoryService: No enrollment IDs provided, nothing to delete');
+      print('ð CategoryService: No enrollment IDs provided, nothing to delete');
       return;
     }
     
     try {
       final deletePromises = enrollmentIds.map((id) => deleteEnrollment(id)).toList();
       await Future.wait(deletePromises);
-      print('✅ CategoryService: All enrollments deleted successfully via individual calls');
+      print('â CategoryService: All enrollments deleted successfully via individual calls');
     } catch (e) {
-      print('❌ CategoryService: Error deleting enrollments by IDs: $e');
+      print('â CategoryService: Error deleting enrollments by IDs: $e');
       rethrow;
     }
   }
