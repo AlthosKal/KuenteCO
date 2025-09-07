@@ -90,7 +90,7 @@ class _CreateBudgetWidgetState extends State<CreateBudgetWidget> {
                       }
                       final amount = double.tryParse(value);
                       if (amount == null || amount <= 0) {
-                        return 'Ingresa un monto vÃ¡lido';
+                        return 'Ingresa un monto válido';
                       }
                       return null;
                     },

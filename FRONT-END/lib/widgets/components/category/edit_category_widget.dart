@@ -17,7 +17,7 @@ class EditCategoryWidget extends StatefulWidget {
   @override
   State<EditCategoryWidget> createState() => _EditCategoryWidgetState();
 
-  /// MÃ©todo estÃ¡tico para mostrar el diÃ¡logo de ediciÃ³n
+  /// Método estático para mostrar el diálogo de edición
   static Future<bool?> showEditDialog(
       BuildContext context,
       CategoryDTO category,
@@ -106,7 +106,7 @@ class _EditCategoryWidgetState extends State<EditCategoryWidget> {
         if (controller.errorMessage == null) {
           Navigator.pop(context, true);
           _showSnackBar(
-            'CategorÃ­a "${nameController.text}" actualizada exitosamente',
+            'Categoría "${nameController.text}" actualizada exitosamente',
             backgroundColor: Colors.green,
           );
         } else {
@@ -118,7 +118,7 @@ class _EditCategoryWidgetState extends State<EditCategoryWidget> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = 'Error al actualizar la categorÃ­a: $e';
+          _errorMessage = 'Error al actualizar la categoría: $e';
         });
       }
     } finally {
@@ -142,7 +142,7 @@ class _EditCategoryWidgetState extends State<EditCategoryWidget> {
           ),
           const SizedBox(width: 12),
           const Text(
-            'Editar CategorÃ­a',
+            'Editar Categoría',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -158,7 +158,7 @@ class _EditCategoryWidgetState extends State<EditCategoryWidget> {
             TextField(
               controller: nameController,
               decoration: const InputDecoration(
-                labelText: 'Nombre de la categorÃ­a',
+                labelText: 'Nombre de la categoría',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.category_outlined),
               ),

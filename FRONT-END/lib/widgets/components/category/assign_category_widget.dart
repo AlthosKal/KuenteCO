@@ -14,7 +14,7 @@ class AssignCategoryWidget extends StatefulWidget {
     required this.category,
   });
 
-  /// Mostrar el diÃ¡logo de asignaciÃ³n
+  /// Mostrar el diálogo de asignación
   static Future<bool?> showAssignDialog(
     BuildContext context,
     CategoryDTO category,
@@ -96,10 +96,10 @@ class _AssignCategoryWidgetState extends State<AssignCategoryWidget> {
 
       if (mounted) {
         if (controller.errorMessage == null) {
-          // Ãxito - cerrar diÃ¡logo y mostrar mensaje
+          // Ãxito - cerrar diálogo y mostrar mensaje
           Navigator.pop(context, true);
           _showSnackBar(
-            'CategorÃ­a "${widget.category.name}" asignada a "${_selectedProfile!.username}"',
+            'Categoría "${widget.category.name}" asignada a "${_selectedProfile!.username}"',
             backgroundColor: Colors.green,
           );
         } else {
@@ -112,7 +112,7 @@ class _AssignCategoryWidgetState extends State<AssignCategoryWidget> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = 'Error al asignar categorÃ­a: $e';
+          _errorMessage = 'Error al asignar categoría: $e';
         });
       }
     } finally {
@@ -166,14 +166,14 @@ class _AssignCategoryWidgetState extends State<AssignCategoryWidget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'Asignar CategorÃ­a',
+                            'Asignar Categoría',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            'CategorÃ­a: ${widget.category.name}',
+                            'Categoría: ${widget.category.name}',
                             style: const TextStyle(
                               fontSize: 14,
                               color: Colors.grey,
@@ -397,7 +397,7 @@ class _AssignCategoryWidgetState extends State<AssignCategoryWidget> {
 
                 const SizedBox(height: 16),
 
-                // Botones de acciÃ³n
+                // Botones de acción
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [

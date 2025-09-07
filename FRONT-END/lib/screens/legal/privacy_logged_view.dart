@@ -11,7 +11,7 @@ const kLightPurple = Color(0xFFEDE7F6);
 class PrivacyLoggedView extends StatelessWidget {
   const PrivacyLoggedView({super.key});
 
-  /// ð¹ ConstrucciÃ³n de cada secciÃ³n de la polÃ­tica
+  /// ð¹ Construcción de cada sección de la política
   Widget _buildSection(String title, String content, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -53,7 +53,7 @@ class PrivacyLoggedView extends StatelessWidget {
             KuentecoLoggedNavbar(
               currentRoute: '/privacy', // ð¥ CORREGIDO: antes estaba '/privacidad'
               onLogout: () {
-                print('Usuario cerrÃ³ sesiÃ³n desde Privacy');
+                print('Usuario cerró sesión desde Privacy');
               },
             ),
 
@@ -86,7 +86,7 @@ class PrivacyLoggedView extends StatelessWidget {
                                 Column(
                                   children: [
                                     Text(
-                                      'PolÃ­tica de Privacidad',
+                                      'Política de Privacidad',
                                       style: theme.textTheme.headlineMedium?.copyWith(
                                         color: kPrimaryPurple,
                                         fontWeight: FontWeight.bold,
@@ -95,7 +95,7 @@ class PrivacyLoggedView extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 12),
                                     Text(
-                                      'Ãltima actualizaciÃ³n: Marzo 5, 2025',
+                                      'Ãltima actualización: Marzo 5, 2025',
                                       style: theme.textTheme.bodyMedium?.copyWith(
                                         color: kPrimaryPurple.withOpacity(0.9),
                                       ),
@@ -104,7 +104,7 @@ class PrivacyLoggedView extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 24),
 
-                                /// ð Contenido de la polÃ­tica
+                                /// ð Contenido de la política
                                 MediaQuery.removePadding(
                                   context: context,
                                   removeTop: true,
@@ -113,33 +113,33 @@ class PrivacyLoggedView extends StatelessWidget {
                                     physics: const NeverScrollableScrollPhysics(),
                                     children: [
                                       _buildSection(
-                                        'InformaciÃ³n que Recopilamos',
-                                        'Recopilamos informaciÃ³n personal cuando usted se registra, utiliza nuestros servicios, o completa formularios en nuestra plataforma. Esta informaciÃ³n puede incluir su nombre, direcciÃ³n de correo electrÃ³nico, informaciÃ³n de contacto y detalles de pago.',
+                                        'Información que Recopilamos',
+                                        'Recopilamos información personal cuando usted se registra, utiliza nuestros servicios, o completa formularios en nuestra plataforma. Esta información puede incluir su nombre, dirección de correo electrónico, información de contacto y detalles de pago.',
                                         theme,
                                       ),
                                       _buildSection(
-                                        'CÃ³mo Utilizamos su InformaciÃ³n',
-                                        'Utilizamos la informaciÃ³n recopilada para proporcionar, mantener y mejorar nuestros servicios, procesar transacciones, enviar notificaciones relacionadas con su cuenta, y comunicarnos con usted sobre actualizaciones o promociones.',
+                                        'Cómo Utilizamos su Información',
+                                        'Utilizamos la información recopilada para proporcionar, mantener y mejorar nuestros servicios, procesar transacciones, enviar notificaciones relacionadas con su cuenta, y comunicarnos con usted sobre actualizaciones o promociones.',
                                         theme,
                                       ),
                                       _buildSection(
-                                        'Compartir InformaciÃ³n',
-                                        'No vendemos, intercambiamos ni transferimos su informaciÃ³n personal a terceros sin su consentimiento, excepto cuando sea necesario para proporcionar un servicio solicitado o requerido por la ley.',
+                                        'Compartir Información',
+                                        'No vendemos, intercambiamos ni transferimos su información personal a terceros sin su consentimiento, excepto cuando sea necesario para proporcionar un servicio solicitado o requerido por la ley.',
                                         theme,
                                       ),
                                       _buildSection(
                                         'Seguridad de Datos',
-                                        'Implementamos medidas de seguridad diseÃ±adas para proteger su informaciÃ³n personal contra acceso, alteraciÃ³n, divulgaciÃ³n o destrucciÃ³n no autorizados.',
+                                        'Implementamos medidas de seguridad diseñadas para proteger su información personal contra acceso, alteración, divulgación o destrucción no autorizados.',
                                         theme,
                                       ),
                                       _buildSection(
                                         'Sus Derechos',
-                                        'Usted tiene derecho a acceder, corregir o eliminar su informaciÃ³n personal. Si desea ejercer alguno de estos derechos, pÃ³ngase en contacto con nosotros a travÃ©s de los canales proporcionados.',
+                                        'Usted tiene derecho a acceder, corregir o eliminar su información personal. Si desea ejercer alguno de estos derechos, póngase en contacto con nosotros a través de los canales proporcionados.',
                                         theme,
                                       ),
                                       _buildSection(
-                                        'Cambios en esta PolÃ­tica',
-                                        'Podemos actualizar nuestra PolÃ­tica de Privacidad de vez en cuando. Le notificaremos cualquier cambio publicando la nueva PolÃ­tica de Privacidad en esta pÃ¡gina.',
+                                        'Cambios en esta Política',
+                                        'Podemos actualizar nuestra Política de Privacidad de vez en cuando. Le notificaremos cualquier cambio publicando la nueva Política de Privacidad en esta página.',
                                         theme,
                                       ),
                                     ],

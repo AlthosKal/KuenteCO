@@ -1,4 +1,4 @@
-/// DTO para el resultado de validaciÃ³n al importar deudas desde Excel
+/// DTO para el resultado de validación al importar deudas desde Excel
 class DebtExcelValidationResultDTO {
   final bool isValid;
   final List<String> errors;
@@ -59,9 +59,9 @@ class DebtExcelValidationResultDTO {
 
   String get summaryMessage {
     if (isValid) {
-      return 'ValidaciÃ³n exitosa: $validRows de $totalRows filas vÃ¡lidas${warnings.isNotEmpty ? ' con ${warnings.length} advertencia(s)' : ''}';
+      return 'Validación exitosa: $validRows de $totalRows filas válidas${warnings.isNotEmpty ? ' con ${warnings.length} advertencia(s)' : ''}';
     } else {
-      return 'ValidaciÃ³n fallÃ³: $validRows vÃ¡lidas, $invalidRows invÃ¡lidas de $totalRows filas totales';
+      return 'Validación falló: $validRows válidas, $invalidRows inválidas de $totalRows filas totales';
     }
   }
 }

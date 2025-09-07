@@ -185,7 +185,7 @@ class _ContactLoggedViewState extends State<ContactLoggedView> {
     );
   }
 
-  /// ð¤ BotÃ³n para enviar el mensaje
+  /// ð¤ Botón para enviar el mensaje
   Widget _buildSubmitButton() {
     return ElevatedButton(
       onPressed: _submitForm,
@@ -203,7 +203,7 @@ class _ContactLoggedViewState extends State<ContactLoggedView> {
     );
   }
 
-  /// ð InformaciÃ³n de contacto
+  /// ð Información de contacto
   Widget _buildContactInfoSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),

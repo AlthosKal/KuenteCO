@@ -230,7 +230,7 @@ class _CreateMultipleDebtsWidgetState extends State<CreateMultipleDebtsWidget> {
                     ),
                     keyboardType: TextInputType.number,
                     onChanged: (value) {
-                      // Auto-llenar el monto pendiente si estÃ¡ vacÃ­o
+                      // Auto-llenar el monto pendiente si está vacío
                       if (debt.pendingAmountController.text.isEmpty) {
                         debt.pendingAmountController.text = value;
                       }
@@ -530,7 +530,7 @@ class _CreateMultipleDebtsWidgetState extends State<CreateMultipleDebtsWidget> {
       context: context,
       initialDate: debt.expirationDate,
       firstDate: debt.startDate,
-      lastDate: DateTime.now().add(const Duration(days: 3650)), // 10 aÃ±os
+      lastDate: DateTime.now().add(const Duration(days: 3650)), // 10 años
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(

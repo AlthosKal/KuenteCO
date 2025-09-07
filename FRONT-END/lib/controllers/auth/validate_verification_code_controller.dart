@@ -41,14 +41,14 @@ class ValidateVerificationCodeController {
       if (context.mounted) {
         ToastHelper.showSuccess(
           context,
-          title: 'Cuenta activada correctamente. Ahora puedes iniciar sesiÃ³n',
+          title: 'Cuenta activada correctamente. Ahora puedes iniciar sesión',
         );
         Navigator.pushReplacementNamed(context, AppRoutes.login);
       }
     }, onError: (error) {
       ToastHelper.showError(
         context,
-        title: 'Error al validar el cÃ³digo de verificaciÃ³n',
+        title: 'Error al validar el código de verificación',
         description: error.toString(),
       );
       isLoading.value = false;
@@ -70,9 +70,9 @@ class ValidateVerificationCodeController {
 
       if (context.mounted) {
         _validatedCode = code;
-        ToastHelper.showSuccess(context, title: 'CÃ³digo validado correctamente');
+        ToastHelper.showSuccess(context, title: 'Código validado correctamente');
 
-        /// â Redirige pasando email y cÃ³digo directamente al constructor
+        /// â Redirige pasando email y código directamente al constructor
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -83,7 +83,7 @@ class ValidateVerificationCodeController {
     }, onError: (error) {
       ToastHelper.showError(
         context,
-        title: 'Error al validar el cÃ³digo de verificaciÃ³n',
+        title: 'Error al validar el código de verificación',
         description: error.toString(),
       );
       isLoading.value = false;

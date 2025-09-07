@@ -26,7 +26,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
   @override
   void initState() {
     super.initState();
-    // Crear copias editables de las categorÃ­as
+    // Crear copias editables de las categorías
     editableCategories = widget.categoriesToEdit.map((category) {
       return CategoryDTO(
         id: category.id,
@@ -41,9 +41,9 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
     }).toList();
   }
 
-  // MÃ©todo helper para obtener nombre del estado
+  // Método helper para obtener nombre del estado
   String _getStateDisplayName(state_enum.State state) {
-    return state.name; // Usar directamente .name de la extensiÃ³n
+    return state.name; // Usar directamente .name de la extensión
   }
 
   @override
@@ -64,7 +64,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Editar MÃºltiples CategorÃ­as',
+                  'Editar Múltiples Categorías',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -81,7 +81,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
             const SizedBox(height: 16),
 
             Text(
-              'Editando ${editableCategories.length} categorÃ­as',
+              'Editando ${editableCategories.length} categorías',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.blueGrey[600],
@@ -106,7 +106,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'CategorÃ­a ${index + 1}',
+                              'Categoría ${index + 1}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -119,7 +119,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
                             TextFormField(
                               initialValue: editableCategories[index].name,
                               decoration: InputDecoration(
-                                labelText: 'Nombre de la categorÃ­a',
+                                labelText: 'Nombre de la categoría',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
@@ -127,7 +127,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Por favor ingrese un nombre para la categorÃ­a';
+                                  return 'Por favor ingrese un nombre para la categoría';
                                 }
                                 if (value.length > 50) {
                                   return 'El nombre no puede exceder 50 caracteres';
@@ -164,7 +164,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
                                 }
                                 final budget = double.tryParse(value);
                                 if (budget == null) {
-                                  return 'Ingrese un valor numÃ©rico vÃ¡lido';
+                                  return 'Ingrese un valor numérico válido';
                                 }
                                 if (budget < 0) {
                                   return 'El presupuesto no puede ser negativo';
@@ -201,7 +201,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
                               items: state_enum.State.values.map((state) {
                                 return DropdownMenuItem<state_enum.State>(
                                   value: state,
-                                  child: Text(_getStateDisplayName(state)), // â ARREGLADO: Usar mÃ©todo helper
+                                  child: Text(_getStateDisplayName(state)), // â ARREGLADO: Usar método helper
                                 );
                               }).toList(),
                               onChanged: (state_enum.State? newValue) {
@@ -254,7 +254,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                   ),
-                  child: const Text('Actualizar CategorÃ­as'),
+                  child: const Text('Actualizar Categorías'),
                 ),
               ],
             ),
@@ -293,7 +293,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${editableCategories.length} categorÃ­as actualizadas exitosamente'),
+          content: Text('${editableCategories.length} categorías actualizadas exitosamente'),
           backgroundColor: Colors.green,
           duration: const Duration(seconds: 3),
         ),
@@ -305,7 +305,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error al actualizar las categorÃ­as: ${e.toString()}'),
+          content: Text('Error al actualizar las categorías: ${e.toString()}'),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 5),
         ),

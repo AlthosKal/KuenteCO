@@ -36,14 +36,14 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
 
   // â MÃTODO COMPATIBLE WEB + MÃVIL
   Future<void> _pickImage() async {
-    if (_isPickingImage) return; // Prevenir mÃºltiples clicks
+    if (_isPickingImage) return; // Prevenir múltiples clicks
 
     setState(() => _isPickingImage = true);
 
     try {
       final picker = ImagePicker();
 
-      // â ConfiguraciÃ³n que funciona en ambas plataformas
+      // â Configuración que funciona en ambas plataformas
       final pickedFile = await picker.pickImage(
         source: ImageSource.gallery,
         maxWidth: kIsWeb ? null : 800, // Web no soporta bien maxWidth
@@ -58,12 +58,12 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
 
       debugPrint('ð· Image picked: ${pickedFile.name} (${pickedFile.path})');
 
-      // â Leer bytes - funciona tanto en web como mÃ³vil
+      // â Leer bytes - funciona tanto en web como móvil
       final bytes = await pickedFile.readAsBytes();
 
       if (bytes.isEmpty) {
         debugPrint('â Image bytes are empty');
-        _showError('Error: imagen vacÃ­a');
+        _showError('Error: imagen vacía');
         return;
       }
 
@@ -92,12 +92,12 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
       debugPrint('â Error picking image: $e');
       debugPrint('Stack trace: $stackTrace');
 
-      // â Manejo especÃ­fico de errores por plataforma
+      // â Manejo específico de errores por plataforma
       if (kIsWeb) {
         if (e.toString().contains('User cancelled') ||
             e.toString().contains('AbortError')) {
           debugPrint('ð« User cancelled image selection on web');
-          return; // No mostrar error si usuario cancelÃ³
+          return; // No mostrar error si usuario canceló
         }
       }
 
@@ -113,7 +113,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
       builder: (context) => AlertDialog(
         title: const Text('Â¿Eliminar imagen de perfil?'),
         content: const Text(
-          'Â¿EstÃ¡s seguro de que deseas eliminar tu imagen de perfil? Este cambio se aplicarÃ¡ al guardar.',
+          '¿Estás seguro de que deseas eliminar tu imagen de perfil? Este cambio se aplicará al guardar.',
         ),
         actions: [
           TextButton(
@@ -123,7 +123,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: const Text(
-              'SÃ­, eliminar',
+              'eliminar',
               style: TextStyle(color: Colors.red),
             ),
           ),
@@ -206,7 +206,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
   }
 
   Widget _buildImageContent(ImageDTO? currentImage, bool shouldRemoveImage) {
-    // â Mostrar loading si estÃ¡ seleccionando imagen
+    // â Mostrar loading si está seleccionando imagen
     if (_isPickingImage) {
       return Container(
         color: Colors.grey[200],
@@ -259,7 +259,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
       );
     }
 
-    // Si se marcÃ³ para eliminar
+    // Si se marcó para eliminar
     if (shouldRemoveImage) {
       return const Center(
         child: Column(
@@ -268,7 +268,7 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
             Icon(Icons.person_off, size: 40, color: Colors.grey),
             SizedBox(height: 4),
             Text(
-              'Se eliminarÃ¡',
+              'Se eliminará¡',
               style: TextStyle(fontSize: 10, color: Colors.grey),
             ),
           ],

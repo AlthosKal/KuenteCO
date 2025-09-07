@@ -1,7 +1,7 @@
 import 'base_dynamic_response_dto.dart';
 import 'char_data_dto.dart';
 
-/// DTO para respuestas de grÃ¡ficos del chat AI
+/// DTO para respuestas de gráficos del chat AI
 class ChartDataResponseDTO extends BaseDynamicResponseDTO {
   final String chartType;
   final List<CharDataDTO> data;
@@ -43,7 +43,7 @@ class ChartDataResponseDTO extends BaseDynamicResponseDTO {
     };
   }
 
-  /// Getter para tipos de grÃ¡ficos soportados
+  /// Getter para tipos de gráficos soportados
   static List<String> get supportedChartTypes => [
     'line',
     'bar', 
@@ -53,6 +53,6 @@ class ChartDataResponseDTO extends BaseDynamicResponseDTO {
     'donut'
   ];
 
-  /// Verificar si el tipo de grÃ¡fico es vÃ¡lido
+  /// Verificar si el tipo de gráfico es válido
   bool get isValidChartType => supportedChartTypes.contains(chartType);
 }

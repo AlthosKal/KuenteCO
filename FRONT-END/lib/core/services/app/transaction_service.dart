@@ -17,32 +17,24 @@ class TransactionService {
 
   // â GET /transaction - Get all transactions
   Future<List<TransactionDetailDTO>> getAllTransactions() async {
-    print('ð TransactionService: Starting getAllTransactions() - About to make GET /transaction request');
     try {
       final response = await _apiClient.getApp('/transaction');
-      print('ð¡ TransactionService: Received response from GET /transaction');
-      print('ð¡ TransactionService: Response status code: ${response.statusCode}');
     
-    print('ð TransactionService: Raw response data type: ${response.data.runtimeType}');
-    print('ð TransactionService: Raw response data: ${response.data}');
     
     final responseData = response.data;
     
     if (responseData is String) {
-      print('ð TransactionService: Response is string, returning empty list');
       return [];
     }
     
     List<dynamic> dataList;
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
-      print('ð TransactionService: Response has data key, extracting list');
       final dataValue = responseData['data'];
       if (dataValue is List<dynamic>) {
         // Caso 1: data es directamente una lista (para perfiles)
         dataList = dataValue;
       } else if (dataValue is Map<String, dynamic> && dataValue.containsKey('profiles')) {
         // Caso 2: data es un mapa con profiles (para usuarios de negocio)
-        print('ð TransactionService: Found business user format with profiles');
         final profiles = dataValue['profiles'] as List<dynamic>;
         dataList = [];
         
@@ -51,34 +43,24 @@ class TransactionService {
           if (profile is Map<String, dynamic> && profile.containsKey('transactions')) {
             final transactions = profile['transactions'] as List<dynamic>;
             dataList.addAll(transactions);
-            print('ð TransactionService: Added ${transactions.length} transactions from profile: ${profile['email']}');
           }
         }
-        print('ð TransactionService: Total transactions extracted from profiles: ${dataList.length}');
       } else if (dataValue is String) {
-        print('ð TransactionService: Data field is a string message, returning empty list');
         return [];
       } else {
-        print('â TransactionService: Data key exists but value is not a List, String or Map with profiles, it is ${dataValue.runtimeType}');
-        print('â TransactionService: Data field content: $dataValue');
         return [];
       }
     } else if (responseData is List<dynamic>) {
-      print('ð TransactionService: Response is direct list');
       dataList = responseData;
     } else {
-      print('â TransactionService: Response is not a Map with data key or List, it is ${responseData.runtimeType}');
-      print('â TransactionService: Response content: $responseData');
       return [];
     }
     
-    print('ð TransactionService: Data list length: ${dataList.length}');
     
     return dataList
         .map((e) => TransactionDetailDTO.fromJson(e as Map<String, dynamic>))
         .toList();
     } catch (e) {
-      print('â TransactionService: Exception in getAllTransactions(): $e');
       throw e;
     }
   }
@@ -91,15 +73,12 @@ class TransactionService {
 
   // â GET /transaction/summary - Get transaction summary
   Future<List<TransactionSummaryDTO>> getTransactionSummary() async {
-    final response = await _apiClient.getApp('/transaction/summary');
+    final response = await _apiClient.getApp('/transaction/report/summary');
     
-    print('ð TransactionService: Transaction summary raw response: ${response.data.runtimeType}');
-    print('ð TransactionService: Transaction summary raw data: ${response.data}');
     
     final responseData = response.data;
     
     if (responseData is String) {
-      print('ð TransactionService: Summary response is string, returning empty list');
       return [];
     }
     
@@ -107,29 +86,21 @@ class TransactionService {
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
       final dataValue = responseData['data'];
       
-      print('ð TransactionService: Data field type: ${dataValue.runtimeType}');
-      print('ð TransactionService: Data field content: $dataValue');
       
       if (dataValue is List<dynamic>) {
         dataList = dataValue;
       } else if (dataValue is String) {
-        print('ð TransactionService: Summary data field is a string message, returning empty list');
         return [];
       } else {
-        // Si es otro tipo (Map, etc), mostrar error y devolver lista vacÃ­a
-        print('â TransactionService: Summary data field is not a List or String, it is ${dataValue.runtimeType}');
-        print('â TransactionService: Data field content: $dataValue');
+        // Si es otro tipo (Map, etc), mostrar error y devolver lista vacía
         return [];
       }
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {
-      print('â TransactionService: Response is not a Map with data key or List, it is ${responseData.runtimeType}');
-      print('â TransactionService: Response content: $responseData');
       return [];
     }
     
-    print('ð TransactionService: Processing ${dataList.length} transaction summaries');
     
     return dataList
         .map((e) => TransactionSummaryDTO.fromJson(e as Map<String, dynamic>))
@@ -155,7 +126,6 @@ class TransactionService {
     final responseData = response.data;
     
     if (responseData is String) {
-      print('ð TransactionService: Category summary response is string, returning empty list');
       return [];
     }
     
@@ -165,13 +135,11 @@ class TransactionService {
       if (dataValue is List<dynamic>) {
         dataList = dataValue;
       } else {
-        print('â TransactionService: Category data key exists but value is not a List, it is ${dataValue.runtimeType}');
         return [];
       }
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {
-      print('â TransactionService: Unknown category summary response format, returning empty list');
       return [];
     }
     
@@ -182,12 +150,9 @@ class TransactionService {
 
   // â POST /transaction/add - Create new transaction
   Future<TransactionDetailDTO> addTransaction(NewTransactionDTO dto) async {
-    print('ð TransactionService: Creating transaction with payload: ${dto.toJson()}');
     
     final response = await _apiClient.postApp('/transaction/add', dto.toJson());
     
-    print('ð¡ TransactionService: Create response status: ${response.statusCode}');
-    print('ð¡ TransactionService: Create response data: ${response.data}');
     
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('Failed to create transaction: ${response.statusCode}');
@@ -198,15 +163,12 @@ class TransactionService {
 
   // â POST /transaction/add/batch - Create multiple transactions
   Future<List<TransactionDetailDTO>> addTransactionsBatch(List<NewTransactionDTO> dtos) async {
-    print('ð TransactionService: Creating ${dtos.length} transactions in batch');
     
     final response = await _apiClient.postApp(
       '/transaction/batch/add',
       dtos.map((e) => e.toJson()).toList(),
     );
     
-    print('ð¡ TransactionService: Batch create response status: ${response.statusCode}');
-    print('ð¡ TransactionService: Batch create response data: ${response.data}');
     
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('Failed to create transactions in batch: ${response.statusCode}');
@@ -218,8 +180,7 @@ class TransactionService {
     if (responseData is Map<String, dynamic> && responseData.containsKey('success')) {
       final success = responseData['success'];
       if (success == true) {
-        print('â TransactionService: Batch creation successful, backend returned data: null (as expected)');
-        // Devolver lista vacÃ­a ya que el backend no retorna las transacciones creadas
+        // Devolver lista vacía ya que el backend no retorna las transacciones creadas
         return [];
       } else {
         throw Exception('Batch creation failed: ${responseData['message'] ?? 'Unknown error'}');
@@ -233,8 +194,7 @@ class TransactionService {
       if (dataValue is List<dynamic>) {
         dataList = dataValue;
       } else if (dataValue == null) {
-        // Backend devuelve data: null, esto es vÃ¡lido para operaciones batch
-        print('ð TransactionService: Backend returned data: null, treating as successful batch operation');
+        // Backend devuelve data: null, esto es válido para operaciones batch
         return [];
       } else {
         throw Exception('Batch create data key exists but value is not a List, it is ${dataValue.runtimeType}');
@@ -252,12 +212,9 @@ class TransactionService {
 
   // â PATCH /transaction/update - Update transaction
   Future<TransactionDetailDTO> updateTransaction(UpdateTransactionDTO dto) async {
-    print('ð TransactionService: Updating transaction with payload: ${dto.toJson()}');
     
     final response = await _apiClient.patchApp('/transaction/update', dto.toJson());
     
-    print('ð¡ TransactionService: Update response status: ${response.statusCode}');
-    print('ð¡ TransactionService: Update response data: ${response.data}');
     
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('Failed to update transaction: ${response.statusCode}');
@@ -268,15 +225,12 @@ class TransactionService {
 
   // â PUT /transaction/update/batch - Update multiple transactions
   Future<List<TransactionDetailDTO>> updateTransactionsBatch(List<UpdateTransactionDTO> dtos) async {
-    print('ð TransactionService: Updating ${dtos.length} transactions in batch');
     
     final response = await _apiClient.putApp(
       '/transaction/batch/update',
       dtos.map((e) => e.toJson()).toList(),
     );
     
-    print('ð¡ TransactionService: Batch update response status: ${response.statusCode}');
-    print('ð¡ TransactionService: Batch update response data: ${response.data}');
     
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('Failed to update transactions in batch: ${response.statusCode}');
@@ -305,43 +259,33 @@ class TransactionService {
 
   // â DELETE /transaction/{id} - Delete transaction by ID
   Future<void> deleteTransaction(int id) async {
-    print('ð TransactionService: Deleting transaction ID: $id');
     
     final response = await _apiClient.deleteApp('/transaction/$id');
     
-    print('ð¡ TransactionService: Delete response status: ${response.statusCode}');
-    print('ð¡ TransactionService: Delete response data: ${response.data}');
     
     if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception('Failed to delete transaction: ${response.statusCode}');
     }
     
-    print('â TransactionService: Transaction deleted successfully');
   }
 
   // â DELETE /transaction/batch - Delete multiple transactions
   Future<void> deleteTransactionsBatch(List<int> ids) async {
-    print('ð TransactionService: Deleting ${ids.length} transactions in batch');
-    print('ð TransactionService: Transaction IDs to delete: $ids');
     
     if (ids.isEmpty) {
-      print('ð TransactionService: No transaction IDs provided, nothing to delete');
       return;
     }
     
-    // El backend espera parÃ¡metros de query: ?id=1&id=2&id=3
+    // El backend espera parámetros de query: ?id=1&id=2&id=3
     final queryParams = ids.map((id) => 'id=$id').join('&');
     
     final response = await _apiClient.deleteApp('/transaction/batch?$queryParams');
     
-    print('ð¡ TransactionService: Batch delete response status: ${response.statusCode}');
-    print('ð¡ TransactionService: Batch delete response data: ${response.data}');
     
     if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception('Failed to delete transactions in batch: ${response.statusCode}');
     }
     
-    print('â TransactionService: Transactions deleted successfully in batch');
   }
 
   // ============= BANCOLOMBIA INTEGRATION =============
@@ -349,12 +293,9 @@ class TransactionService {
   // â POST /transaction/bancolombia/sync - Sync transactions from Bancolombia
   Future<List<TransactionDetailDTO>> syncBancolombiaTransactions(
       BancolombiaTransactionRequestDTO dto) async {
-    print('ð TransactionService: Syncing Bancolombia transactions');
     
     final response = await _apiClient.postApp('/transaction/bancolombia/sync', dto.toJson());
     
-    print('ð¡ TransactionService: Bancolombia sync response status: ${response.statusCode}');
-    print('ð¡ TransactionService: Bancolombia sync response data: ${response.data}');
     
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('Failed to sync Bancolombia transactions: ${response.statusCode}');
@@ -368,13 +309,11 @@ class TransactionService {
       if (dataValue is List<dynamic>) {
         dataList = dataValue;
       } else {
-        print('â TransactionService: Bancolombia data key exists but value is not a List, it is ${dataValue.runtimeType}');
         return [];
       }
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {
-      print('â TransactionService: Unknown Bancolombia sync response format, returning empty list');
       return [];
     }
     
@@ -409,14 +348,12 @@ class TransactionService {
     
     final query = queryParams.isNotEmpty ? '?${queryParams.join('&')}' : '';
     
-    print('ð TransactionService: Filtering transactions with query: $query');
     
     final response = await _apiClient.getApp('/transaction/filter$query');
     
     final responseData = response.data;
     
     if (responseData is String) {
-      print('ð TransactionService: Filter response is string, returning empty list');
       return [];
     }
     
@@ -426,13 +363,11 @@ class TransactionService {
       if (dataValue is List<dynamic>) {
         dataList = dataValue;
       } else {
-        print('â TransactionService: Filter data key exists but value is not a List, it is ${dataValue.runtimeType}');
         return [];
       }
     } else if (responseData is List<dynamic>) {
       dataList = responseData;
     } else {
-      print('â TransactionService: Unknown filter response format, returning empty list');
       return [];
     }
     

@@ -48,15 +48,15 @@ class ProfileService {
           return authenticatedProfile;
         }
       } catch (e) {
-        // Si falla obtener el perfil autenticado, continuar con el mÃ©todo original
+        // Si falla obtener el perfil autenticado, continuar con el método original
         debugPrint('ð´ Error getting authenticated profile, falling back to getProfileById: $e');
       }
       
       // Si el ID no coincide o hubo error, intentar el endpoint original
-      // (esto podrÃ­a fallar si el perfil no tiene permisos)
+      // (esto podría fallar si el perfil no tiene permisos)
     }
     
-    // MÃ©todo original para usuarios o cuando no coincide el ID
+    // Método original para usuarios o cuando no coincide el ID
     final response = await _api.getApp('/profile/$id');
     final Map<String, dynamic> json = response.data;
     final actualData = json['data'] ?? json;
@@ -69,7 +69,7 @@ class ProfileService {
     await _api.postApp('/profile/add', dto.toJson());
   }
 
-  /// Iniciar sesiÃ³n con un perfil usando credenciales directas
+  /// Iniciar sesión con un perfil usando credenciales directas
   Future<TokenResponseDTO> profileLogin(String nameOrEmail, String password) async {
     final payload = {
       'nameOrEmail': nameOrEmail,
@@ -87,7 +87,7 @@ class ProfileService {
             if (decoded is Map<String, dynamic>) {
               return TokenResponseDTO.fromJson(decoded);
             } else {
-              throw Exception('Cadena no contenÃ­a un Map<String, dynamic>: $data');
+              throw Exception('Cadena no contenía un Map<String, dynamic>: $data');
             }
           } catch (_) {
             throw Exception('No se pudo decodificar JSON del string: $data');
@@ -131,7 +131,7 @@ class ProfileService {
     await _api.patchApp('/profile/update', formData);
   }
 
-  /// Cambiar contraseÃ±a
+  /// Cambiar contraseña
   Future<void> changeProfilePassword(String currentPassword, String newPassword) async {
     final payload = {
       'currentPassword': currentPassword,

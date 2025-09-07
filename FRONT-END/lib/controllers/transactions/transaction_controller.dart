@@ -41,9 +41,7 @@ class TransactionController extends ChangeNotifier {
   Future<void> loadTransactions() async {
     _setLoading(true);
     try {
-      print('ð TransactionController: Loading transactions from server...');
       transactions = await _service.getAllTransactions();
-      print('â TransactionController: Loaded ${transactions.length} transactions from server');
       
       // Log de todas las transacciones para debug
       for (int i = 0; i < transactions.length; i++) {
@@ -52,23 +50,19 @@ class TransactionController extends ChangeNotifier {
       
       _setError(null);
     } catch (e) {
-      print('â TransactionController: Error loading transactions: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // ð Cargar transacciÃ³n por ID
+  // ð Cargar transacción por ID
   Future<void> loadTransactionById(int id) async {
     _setLoading(true);
     try {
-      print('ð TransactionController: Loading transaction ID: $id');
       currentTransaction = await _service.getTransactionById(id);
-      print('â TransactionController: Loaded transaction: ${currentTransaction?.name}');
       _setError(null);
     } catch (e) {
-      print('â TransactionController: Error loading transaction: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
@@ -79,12 +73,9 @@ class TransactionController extends ChangeNotifier {
   Future<void> loadTransactionSummaries() async {
     _setLoading(true);
     try {
-      print('ð TransactionController: Loading transaction summaries...');
       transactionSummaries = await _service.getTransactionSummary();
-      print('â TransactionController: Loaded ${transactionSummaries.length} transaction summaries');
       _setError(null);
     } catch (e) {
-      print('â TransactionController: Error loading transaction summaries: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
@@ -95,10 +86,7 @@ class TransactionController extends ChangeNotifier {
   Future<void> loadUserProfilesWithTransactions() async {
     _setLoading(true);
     try {
-      print('ð TransactionController: Loading user profiles with transactions...');
       userProfilesWithTransactions = await _service.getProfilesWithTransactions();
-      print('â TransactionController: Loaded profiles with transactions for user: ${userProfilesWithTransactions?.username}');
-      print('â TransactionController: Total profiles: ${userProfilesWithTransactions?.profiles?.length ?? 0}');
       
       // Log information about each profile
       if (userProfilesWithTransactions?.profiles != null) {
@@ -110,23 +98,19 @@ class TransactionController extends ChangeNotifier {
       
       _setError(null);
     } catch (e) {
-      print('â TransactionController: Error loading profiles with transactions: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // ð Cargar transacciones por categorÃ­a
+  // ð Cargar transacciones por categoría
   Future<void> loadTransactionsByCategory() async {
     _setLoading(true);
     try {
-      print('ð TransactionController: Loading transactions by category...');
       transactionsByCategory = await _service.getTransactionsByCategory();
-      print('â TransactionController: Loaded ${transactionsByCategory.length} category summaries');
       _setError(null);
     } catch (e) {
-      print('â TransactionController: Error loading transactions by category: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
@@ -137,28 +121,22 @@ class TransactionController extends ChangeNotifier {
   Future<void> loadProfilesWithTransactions() async {
     _setLoading(true);
     try {
-      print('ð TransactionController: Loading user profiles with transactions...');
       userProfilesWithTransactions = await _service.getProfilesWithTransactions();
-      print('â TransactionController: Loaded profiles with transactions for user: ${userProfilesWithTransactions?.username}');
       _setError(null);
     } catch (e) {
-      print('â TransactionController: Error loading profiles with transactions: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
     }
   }
 
-  // ð Cargar transacciones de perfil especÃ­fico
+  // ð Cargar transacciones de perfil específico
   Future<void> loadProfileTransactions(int profileId) async {
     _setLoading(true);
     try {
-      print('ð TransactionController: Loading transactions for profile ID: $profileId');
       currentProfileWithTransactions = await _service.getProfileTransactions(profileId);
-      print('â TransactionController: Loaded transactions for profile: ${currentProfileWithTransactions?.email}');
       _setError(null);
     } catch (e) {
-      print('â TransactionController: Error loading profile transactions: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
@@ -167,93 +145,77 @@ class TransactionController extends ChangeNotifier {
 
   // ============= CRUD OPERATIONS =============
 
-  // ð Crear transacciÃ³n
+  // ð Crear transacción
   Future<void> addTransaction(NewTransactionDTO dto) async {
     _setError(null);
     
     try {
-      print('ð TransactionController: Creating transaction...');
       final createdTransaction = await _service.addTransaction(dto);
-      print('â TransactionController: Transaction created with ID: ${createdTransaction.id}');
       
       // Recargar la lista completa desde el servidor
       await loadTransactions();
     } catch (e) {
-      print('â TransactionController: Error creating transaction: $e');
       _setError(e.toString());
       rethrow;
     }
   }
 
-  // ð Crear mÃºltiples transacciones (batch)
+  // ð Crear múltiples transacciones (batch)
   Future<void> addTransactionsBatch(List<NewTransactionDTO> dtos) async {
     _setError(null);
     
     try {
-      print('ð TransactionController: Creating ${dtos.length} transactions in batch...');
       final createdTransactions = await _service.addTransactionsBatch(dtos);
-      print('â TransactionController: Batch creation completed. Created ${createdTransactions.length} transactions');
       
       // Recargar la lista completa desde el servidor
       await loadTransactions();
     } catch (e) {
-      print('â TransactionController: Error in batch creation: $e');
       _setError(e.toString());
       rethrow;
     }
   }
 
-  // ð Actualizar transacciÃ³n
+  // ð Actualizar transacción
   Future<void> updateTransaction(UpdateTransactionDTO dto) async {
-    print('ð TransactionController: Starting update for transaction ID: ${dto.id}');
     
     _setError(null);
     
     try {
-      print('ð TransactionController: Calling service.updateTransaction...');
       final updatedTransaction = await _service.updateTransaction(dto);
-      print('â TransactionController: Transaction updated successfully: ${updatedTransaction.name}');
       
       // Recargar la lista completa desde el servidor
       await loadTransactions();
     } catch (e) {
-      print('â TransactionController: Error during update: $e');
       _setError(e.toString());
       rethrow;
     }
   }
 
-  // ð Actualizar mÃºltiples transacciones (batch)
+  // ð Actualizar múltiples transacciones (batch)
   Future<void> updateTransactionsBatch(List<UpdateTransactionDTO> dtos) async {
     _setError(null);
     
     try {
-      print('ð TransactionController: Updating ${dtos.length} transactions in batch...');
       final updatedTransactions = await _service.updateTransactionsBatch(dtos);
-      print('â TransactionController: Batch update completed. Updated ${updatedTransactions.length} transactions');
       
       // Recargar la lista completa desde el servidor
       await loadTransactions();
     } catch (e) {
-      print('â TransactionController: Error in batch update: $e');
       _setError(e.toString());
       rethrow;
     }
   }
 
-  // ð Eliminar transacciÃ³n
+  // ð Eliminar transacción
   Future<void> deleteTransaction(int id) async {
     _setLoading(true);
     try {
-      print('ð TransactionController: Deleting transaction ID: $id');
       await _service.deleteTransaction(id);
-      print('â TransactionController: Transaction deleted successfully');
       
       // Recargar la lista completa desde el servidor
       await loadTransactions();
       _setError(null);
     } catch (e) {
-      print('â TransactionController: Error deleting transaction: $e');
       _setError(e.toString());
       rethrow;
     } finally {
@@ -261,19 +223,16 @@ class TransactionController extends ChangeNotifier {
     }
   }
 
-  // ð Eliminar mÃºltiples transacciones (batch)
+  // ð Eliminar múltiples transacciones (batch)
   Future<void> deleteTransactionsBatch(List<int> ids) async {
     _setError(null);
     
     try {
-      print('ð TransactionController: Deleting ${ids.length} transactions in batch...');
       await _service.deleteTransactionsBatch(ids);
-      print('â TransactionController: Batch deletion completed successfully');
       
       // Recargar la lista completa desde el servidor
       await loadTransactions();
     } catch (e) {
-      print('â TransactionController: Error in batch deletion: $e');
       _setError(e.toString());
       rethrow;
     }
@@ -294,7 +253,6 @@ class TransactionController extends ChangeNotifier {
   }) async {
     _setLoading(true);
     try {
-      print('ð TransactionController: Loading filtered transactions...');
       transactions = await _service.getTransactionsWithFilters(
         categoryId: categoryId,
         budgetId: budgetId,
@@ -305,10 +263,8 @@ class TransactionController extends ChangeNotifier {
         maxAmount: maxAmount,
         type: type,
       );
-      print('â TransactionController: Loaded ${transactions.length} filtered transactions');
       _setError(null);
     } catch (e) {
-      print('â TransactionController: Error loading filtered transactions: $e');
       _setError(e.toString());
     } finally {
       _setLoading(false);
@@ -322,14 +278,11 @@ class TransactionController extends ChangeNotifier {
     _setError(null);
     
     try {
-      print('ð TransactionController: Syncing Bancolombia transactions...');
       final syncedTransactions = await _service.syncBancolombiaTransactions(dto);
-      print('â TransactionController: Bancolombia sync completed. Synced ${syncedTransactions.length} transactions');
       
       // Recargar la lista completa desde el servidor
       await loadTransactions();
     } catch (e) {
-      print('â TransactionController: Error syncing Bancolombia transactions: $e');
       _setError(e.toString());
       rethrow;
     }
@@ -349,7 +302,7 @@ class TransactionController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ð Obtener transacciÃ³n por ID (desde la lista local)
+  // ð Obtener transacción por ID (desde la lista local)
   TransactionDetailDTO? getTransactionById(int id) {
     try {
       return transactions.firstWhere((transaction) => transaction.id == id);

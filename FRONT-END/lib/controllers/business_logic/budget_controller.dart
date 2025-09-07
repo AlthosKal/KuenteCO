@@ -29,29 +29,23 @@ class BudgetController extends ChangeNotifier {
 
   // â Obtener todos los presupuestos
   Future<void> loadBudgets() async {
-    print('BudgetController: loadBudgets() called');
     _setLoading(true);
     try {
-      print('BudgetController: Calling service.getBudgets()');
       budgets = await _service.getBudgets();
-      print('BudgetController: Received ${budgets.length} budgets');
       errorMessage = null;
     } catch (e) {
-      print('BudgetController: Error loading budgets: $e');
-      // Si es un error de "no hay datos" o lista vacÃ­a, no es realmente un error
+      // Si es un error de "no hay datos" o lista vacía, no es realmente un error
       if (e.toString().toLowerCase().contains('empty') ||
           e.toString().toLowerCase().contains('no data') ||
           e.toString().toLowerCase().contains('not found') ||
           e.toString().contains('404')) {
-        print('ð BudgetController: No budgets found for user - this is normal');
-        budgets = []; // Asegurar lista vacÃ­a
+        budgets = []; // Asegurar lista vacía
         errorMessage = null; // No mostrar como error
       } else {
         errorMessage = 'Error al cargar presupuestos: $e';
       }
     } finally {
       _setLoading(false);
-      print('BudgetController: loadBudgets() finished, loading: $isLoading');
     }
   }
 
@@ -76,14 +70,12 @@ class BudgetController extends ChangeNotifier {
       enrollments = await _service.getEnrollments();
       errorMessage = null;
     } catch (e) {
-      print('BudgetController: Error loading enrollments: $e');
-      // Si es un error de "no hay datos" o lista vacÃ­a, no es realmente un error
+      // Si es un error de "no hay datos" o lista vacía, no es realmente un error
       if (e.toString().toLowerCase().contains('empty') ||
           e.toString().toLowerCase().contains('no data') ||
           e.toString().toLowerCase().contains('not found') ||
           e.toString().contains('404')) {
-        print('ð BudgetController: No enrollments found for profile - this is normal');
-        enrollments = []; // Asegurar lista vacÃ­a
+        enrollments = []; // Asegurar lista vacía
         errorMessage = null; // No mostrar como error
       } else {
         errorMessage = 'Error al cargar enrolamientos: $e';
@@ -97,16 +89,13 @@ class BudgetController extends ChangeNotifier {
   Future<void> createBudget(NewBudgetDTO dto) async {
     _setLoading(true);
     try {
-      print('BudgetController: Creating budget with data: ${dto.toJson()}');
       final newBudget = await _service.addBudget(dto);
-      print('BudgetController: Budget created successfully: ${newBudget.toJson()}');
       budgets.add(newBudget);
       errorMessage = null;
       notifyListeners();
     } catch (e) {
-      print('BudgetController: Error creating budget: $e');
       errorMessage = 'Error al crear presupuesto: $e';
-      rethrow; // Relanzar la excepciÃ³n para que el widget pueda manejarla
+      rethrow; // Relanzar la excepción para que el widget pueda manejarla
     } finally {
       _setLoading(false);
     }
@@ -114,23 +103,17 @@ class BudgetController extends ChangeNotifier {
 
   // â Actualizar presupuesto individual
   Future<void> updateBudget(UpdateBudgetDTO dto) async {
-    print('BudgetController: updateBudget called with DTO: ${dto.toJson()}');
     _setLoading(true);
     try {
-      print('BudgetController: Calling service.updateBudget');
       final updated = await _service.updateBudget(dto);
-      print('BudgetController: Service returned updated budget: ${updated.toJson()}');
       final index = budgets.indexWhere((b) => b.id == dto.id);
       if (index != -1) {
         budgets[index] = updated;
-        print('BudgetController: Updated budget at index $index');
       } else {
-        print('BudgetController: Budget with ID ${dto.id} not found in local list');
       }
       errorMessage = null;
       notifyListeners();
     } catch (e) {
-      print('BudgetController: Error updating budget: $e');
       errorMessage = 'Error al actualizar presupuesto: $e';
       rethrow;
     } finally {
@@ -138,17 +121,13 @@ class BudgetController extends ChangeNotifier {
     }
   }
 
-  // â Actualizar mÃºltiples presupuestos
+  // â Actualizar múltiples presupuestos
   Future<void> updateBudgetsBatch(List<UpdateBudgetDTO> dtos) async {
-    print('BudgetController: updateBudgetsBatch called with ${dtos.length} DTOs');
     for (final dto in dtos) {
-      print('BudgetController: DTO: ${dto.toJson()}');
     }
     _setLoading(true);
     try {
-      print('BudgetController: Calling service.updateBudgetsBatch');
       await _service.updateBudgetsBatch(dtos);
-      print('BudgetController: Batch update completed, updating local budgets');
       
       // Actualizar los presupuestos en la lista local
       for (final dto in dtos) {
@@ -163,16 +142,13 @@ class BudgetController extends ChangeNotifier {
             status: budgets[index].status,
             creationDate: budgets[index].creationDate,
           );
-          print('BudgetController: Updated budget at index $index with ID ${dto.id}');
         } else {
-          print('BudgetController: Budget with ID ${dto.id} not found in local list');
         }
       }
       
       errorMessage = null;
       notifyListeners();
     } catch (e) {
-      print('BudgetController: Error in batch update: $e');
       errorMessage = 'Error al actualizar presupuestos: $e';
       rethrow;
     } finally {
@@ -196,23 +172,18 @@ class BudgetController extends ChangeNotifier {
     }
   }
 
-  // â Eliminar mÃºltiples presupuestos
+  // â Eliminar múltiples presupuestos
   Future<void> deleteBudgetsBatch(List<int> ids) async {
-    print('BudgetController: deleteBudgetsBatch called with ${ids.length} IDs: $ids');
     _setLoading(true);
     try {
-      print('BudgetController: Calling service.deleteBudgetsBatch');
       await _service.deleteBudgetsBatch(ids);
-      print('BudgetController: Batch delete completed, removing from local budgets');
       
       // Eliminar los presupuestos de la lista local
       budgets.removeWhere((budget) => ids.contains(budget.id));
-      print('BudgetController: Removed ${ids.length} budgets from local list');
       
       errorMessage = null;
       notifyListeners();
     } catch (e) {
-      print('BudgetController: Error in batch delete: $e');
       errorMessage = 'Error al eliminar presupuestos: $e';
       rethrow;
     } finally {
@@ -223,32 +194,24 @@ class BudgetController extends ChangeNotifier {
   // â Asignar presupuesto a perfil
   Future<void> enrollProfileToBudget(int profileId, int budgetId) async {
     try {
-      print('BudgetController: Enrolling profile $profileId to budget $budgetId');
       await _service.enrollProfileToBudget(profileId, budgetId);
-      print('BudgetController: Profile enrolled successfully');
     } catch (e) {
-      print('BudgetController: Error enrolling profile to budget: $e');
       rethrow;
     }
   }
 
-  // â Eliminar mÃºltiples enrollments
+  // â Eliminar múltiples enrollments
   Future<void> deleteEnrollmentsBatch(List<int> ids) async {
-    print('BudgetController: deleteEnrollmentsBatch called with ${ids.length} IDs: $ids');
     _setLoading(true);
     try {
-      print('BudgetController: Calling service.deleteEnrollmentsBatch');
       await _service.deleteEnrollmentsBatch(ids);
-      print('BudgetController: Batch enrollment delete completed');
       
       // Actualizar la lista local de enrollments
       enrollments.removeWhere((enrollment) => ids.contains(enrollment.id));
-      print('BudgetController: Removed ${ids.length} enrollments from local list');
       
       errorMessage = null;
       notifyListeners();
     } catch (e) {
-      print('BudgetController: Error in batch enrollment delete: $e');
       errorMessage = 'Error al eliminar asignaciones: $e';
       rethrow;
     } finally {
@@ -256,19 +219,15 @@ class BudgetController extends ChangeNotifier {
     }
   }
 
-  // â Asignar mÃºltiples perfiles a presupuestos
+  // â Asignar múltiples perfiles a presupuestos
   Future<void> enrollProfileToBudgetBatch(List<Map<String, int>> enrollments) async {
-    print('BudgetController: enrollProfileToBudgetBatch called with ${enrollments.length} enrollments');
     _setLoading(true);
     try {
-      print('BudgetController: Calling service.enrollProfileToBudgetBatch');
       await _service.enrollProfileToBudgetBatch(enrollments);
-      print('BudgetController: Batch enrollment completed successfully');
       
       errorMessage = null;
       notifyListeners();
     } catch (e) {
-      print('BudgetController: Error in batch enrollment: $e');
       errorMessage = 'Error al asignar presupuestos: $e';
       rethrow;
     } finally {
@@ -278,19 +237,14 @@ class BudgetController extends ChangeNotifier {
 
   // â Obtener enrollments por usuario
   Future<void> loadUserEnrollments() async {
-    print('BudgetController: loadUserEnrollments() called');
     _setLoading(true);
     try {
-      print('BudgetController: Calling service.getEnrollmentsByUser()');
       enrollments = await _service.getEnrollmentsByUser();
-      print('BudgetController: Received ${enrollments.length} user enrollments');
       errorMessage = null;
     } catch (e) {
-      print('BudgetController: Error loading user enrollments: $e');
       errorMessage = 'Error al cargar asignaciones del usuario: $e';
     } finally {
       _setLoading(false);
-      print('BudgetController: loadUserEnrollments() finished, loading: $isLoading');
     }
   }
 

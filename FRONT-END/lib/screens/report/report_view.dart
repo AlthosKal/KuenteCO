@@ -346,7 +346,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
   }
 
   Widget _buildChatMessage(BuildContext context, ChatController chatController, int index) {
-    // Por ahora mostrar mensajes bÃ¡sicos, se puede expandir despuÃ©s
+    // Por ahora mostrar mensajes básicos, se puede expandir después
     final isUser = index % 2 == 0;
     final message = isUser ? "Mensaje del usuario" : "Respuesta de la IA";
 
@@ -660,7 +660,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
   }
 
   int _getChatMessageCount(ChatController chatController) {
-    // Por ahora retornar 0, se puede implementar el conteo real despuÃ©s
+    // Por ahora retornar 0, se puede implementar el conteo real después
     return 0;
   }
 

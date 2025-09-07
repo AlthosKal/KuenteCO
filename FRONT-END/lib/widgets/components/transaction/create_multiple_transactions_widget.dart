@@ -13,7 +13,7 @@ import '../../../dto/app/extra/description_transaction_extra.dart';
 import '../../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
 import '../../../utils/enum/transaction_type_enum.dart';
 
-// Clase auxiliar para manejar formularios mÃºltiples
+// Clase auxiliar para manejar formularios múltiples
 class TransactionFormData {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -33,15 +33,15 @@ class TransactionFormData {
     if (nameController.text.trim().isEmpty) return false;
     if (amountController.text.trim().isEmpty) return false;
     
-    // Validar que el monto sea un nÃºmero vÃ¡lido y positivo usando Decimal
+    // Validar que el monto sea un número válido y positivo usando Decimal
     try {
       final amount = Decimal.parse(amountController.text.trim());
       if (amount <= Decimal.zero) return false;
       
-      // Validar que el monto no sea excesivamente grande (mÃ¡ximo 999,999,999.99)
+      // Validar que el monto no sea excesivamente grande (máximo 999,999,999.99)
       if (amount > Decimal.parse('999999999.99')) return false;
       
-      // Validar que tenga mÃ¡ximo 2 decimales
+      // Validar que tenga máximo 2 decimales
       final amountString = amount.toString();
       if (amountString.contains('.')) {
         final decimalPart = amountString.split('.')[1];
@@ -56,7 +56,7 @@ class TransactionFormData {
   }
   
   NewTransactionDTO toNewTransactionDTO() {
-    // Usar Decimal para mejor precisiÃ³n y luego convertir a double
+    // Usar Decimal para mejor precisión y luego convertir a double
     final decimal = Decimal.parse(amountController.text.trim());
     
     return NewTransactionDTO(
@@ -87,12 +87,12 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
   String? _errorMessage;
   List<TransactionFormData> _transactions = [TransactionFormData()];
   
-  // Special enrollment object to represent "Sin categorÃ­a"
+  // Special enrollment object to represent "Sin categoría"
   static final CategoryEnrollmentDTO _noCategoryOption = CategoryEnrollmentDTO(
     id: -1,
     profileId: -1,
     categoryId: null,
-    categoryName: 'Sin categorÃ­a',
+    categoryName: 'Sin categoría',
     userEmail: '',
     profileEmail: '',
     enrollmentDate: DateTime.now().toIso8601String(),
@@ -101,7 +101,7 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
   @override
   void initState() {
     super.initState();
-    // Inicializar con una transacciÃ³n
+    // Inicializar con una transacción
     _transactions = [TransactionFormData()];
     _transactions[0].selectedEnrollment = _noCategoryOption;
     
@@ -183,18 +183,18 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
       if (value.contains('.')) {
         final decimalPart = value.split('.')[1];
         if (decimalPart.length > 2) {
-          return 'MÃ¡ximo 2 decimales';
+          return 'Máximo 2 decimales';
         }
       }
     } catch (e) {
-      return 'Formato de nÃºmero invÃ¡lido';
+      return 'Formato de número inválido';
     }
     
     return null;
   }
 
   Future<void> _createTransactions() async {
-    // Validar que todas las transacciones tengan datos vÃ¡lidos
+    // Validar que todas las transacciones tengan datos válidos
     final invalidTransactions = _transactions.where((trans) => !trans.isValid).toList();
     if (invalidTransactions.isNotEmpty) {
       setState(() {
@@ -206,7 +206,7 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
     // Validar que haya al menos 2 transacciones para justificar el batch
     if (_transactions.length == 1) {
       setState(() {
-        _errorMessage = 'Para creaciÃ³n en lote, agrega al menos 2 transacciones';
+        _errorMessage = 'Para creación en lote, agrega al menos 2 transacciones';
       });
       return;
     }
@@ -219,7 +219,7 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
     try {
       final controller = Provider.of<TransactionController>(context, listen: false);
       
-      // Crear mÃºltiples transacciones usando batch con validaciÃ³n adicional
+      // Crear múltiples transacciones usando batch con validación adicional
       final newTransactions = _transactions.map((trans) {
         // Validar que el monto se pueda parsear correctamente usando Decimal
         Decimal amount;
@@ -229,7 +229,7 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
             throw Exception('El monto debe ser mayor a 0');
           }
         } catch (e) {
-          throw Exception('Monto invÃ¡lido en transacciÃ³n "${trans.nameController.text}"');
+          throw Exception('Monto inválido en transacción "${trans.nameController.text}"');
         }
         
         return trans.toNewTransactionDTO();
@@ -248,7 +248,7 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
         print('   â Description: ${json['description']}');
       }
       
-      // Log final JSON array que se enviarÃ¡
+      // Log final JSON array que se enviará
       final finalJson = newTransactions.map((e) => e.toJson()).toList();
       print('ð¡ Final JSON to send:');
       print('ð¡ JSON Array Length: ${finalJson.length}');
@@ -306,7 +306,7 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            // Header de la transacciÃ³n con nÃºmero y botÃ³n eliminar
+            // Header de la transacción con número y botón eliminar
             Row(
               children: [
                 Container(
@@ -316,7 +316,7 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'TransacciÃ³n ${index + 1}',
+                    'Transacción ${index + 1}',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.blueAccent,
@@ -339,7 +339,7 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
             TextField(
               controller: transaction.nameController,
               decoration: const InputDecoration(
-                labelText: 'Nombre de la transacciÃ³n',
+                labelText: 'Nombre de la transacción',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.title),
                 isDense: true,
@@ -350,7 +350,7 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
             TextField(
               controller: transaction.descriptionController,
               decoration: const InputDecoration(
-                labelText: 'DescripciÃ³n',
+                labelText: 'Descripción',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.description),
                 isDense: true,
@@ -379,7 +379,7 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
             ),
             const SizedBox(height: 12),
             
-            // Tipo de transacciÃ³n
+            // Tipo de transacción
             DropdownButtonFormField<TransactionType>(
               value: transaction.type,
               decoration: const InputDecoration(
@@ -420,7 +420,7 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
             ),
             const SizedBox(height: 12),
             
-            // CategorÃ­a
+            // Categoría
             Consumer<CategoryController>(
               builder: (context, categoryController, child) {
                 final enrollments = [_noCategoryOption, ...categoryController.enrollments];
@@ -428,7 +428,7 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
                 return DropdownButtonFormField<CategoryEnrollmentDTO>(
                   value: transaction.selectedEnrollment,
                   decoration: const InputDecoration(
-                    labelText: 'CategorÃ­a',
+                    labelText: 'Categoría',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.category),
                     isDense: true,
@@ -564,19 +564,19 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
                     const SizedBox(width: 12),
                     const Expanded(
                       child: Text(
-                        'Crear MÃºltiples Transacciones',
+                        'Crear Múltiples Transacciones',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    // BotÃ³n para agregar transacciÃ³n
+                    // Botón para agregar transacción
                     IconButton(
                       onPressed: _isLoading ? null : _addTransaction,
                       icon: const Icon(Icons.add_circle_outline),
                       color: Colors.green,
-                      tooltip: 'Agregar transacciÃ³n',
+                      tooltip: 'Agregar transacción',
                     ),
                   ],
                 ),
@@ -625,13 +625,13 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
                 ],
                 const SizedBox(height: 16),
                 
-                // Botones de acciÃ³n
+                // Botones de acción
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // InformaciÃ³n de transacciones
+                    // Información de transacciones
                     Text(
-                      '${_transactions.length} transacciÃ³n${_transactions.length > 1 ? 'es' : ''}',
+                      '${_transactions.length} transacción${_transactions.length > 1 ? 'es' : ''}',
                       style: TextStyle(
                         color: Colors.grey[600],
                         fontSize: 12,

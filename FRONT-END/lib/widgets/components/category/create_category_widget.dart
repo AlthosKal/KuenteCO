@@ -66,17 +66,17 @@ class _CreateCategoryWidgetState extends State<CreateCategoryWidget> {
 
       await controller.addCategory(newCategory);
       
-      // Verificar si hay errores despuÃ©s de la operaciÃ³n
+      // Verificar si hay errores después de la operación
       if (mounted) {
         if (controller.errorMessage == null) {
-          // Ãxito - cerrar diÃ¡logo devolviendo true para indicar Ã©xito
+          // Ãxito - cerrar diálogo devolviendo true para indicar éxito
           Navigator.pop(context, true);
           _showSnackBar(
-            'CategorÃ­a creada exitosamente',
+            'Categoría creada exitosamente',
             backgroundColor: Colors.green,
           );
         } else {
-          // Error desde el controller - mostrar en el diÃ¡logo
+          // Error desde el controller - mostrar en el diálogo
           setState(() {
             _errorMessage = controller.errorMessage;
           });
@@ -85,7 +85,7 @@ class _CreateCategoryWidgetState extends State<CreateCategoryWidget> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = 'Error al crear categorÃ­a: $e';
+          _errorMessage = 'Error al crear categoría: $e';
         });
       }
     } finally {
@@ -116,7 +116,7 @@ class _CreateCategoryWidgetState extends State<CreateCategoryWidget> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Header con icono y tÃ­tulo (similar al CategoryListWidget)
+                // Header con icono y título (similar al CategoryListWidget)
                 Row(
                   children: [
                     Container(
@@ -133,7 +133,7 @@ class _CreateCategoryWidgetState extends State<CreateCategoryWidget> {
                     ),
                     const SizedBox(width: 12),
                     const Text(
-                      'Crear Nueva CategorÃ­a',
+                      'Crear Nueva Categoría',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -156,7 +156,7 @@ class _CreateCategoryWidgetState extends State<CreateCategoryWidget> {
                         TextField(
                           controller: nameController,
                           decoration: const InputDecoration(
-                            labelText: 'Nombre de la categorÃ­a',
+                            labelText: 'Nombre de la categoría',
                             border: OutlineInputBorder(),
                             prefixIcon: Icon(Icons.category_outlined),
                           ),
@@ -211,7 +211,7 @@ class _CreateCategoryWidgetState extends State<CreateCategoryWidget> {
                 
                 const SizedBox(height: 20),
                 
-                // Botones de acciÃ³n (estilo similar a los iconos del listado)
+                // Botones de acción (estilo similar a los iconos del listado)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [

@@ -25,7 +25,7 @@ class CategoryService {
     } else if (responseData is Map && responseData.containsKey('data')) {
       final dataValue = responseData['data'];
       if (dataValue is String) {
-        // Si es un mensaje, retornar lista vacÃ­a
+        // Si es un mensaje, retornar lista vacía
         return [];
       } else if (dataValue is List) {
         dataList = dataValue;
@@ -68,10 +68,10 @@ class CategoryService {
     if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
       final dataValue = responseData['data'];
       if (dataValue is String) {
-        // Si 'data' es un string (mensaje de error), retornar lista vacÃ­a
+        // Si 'data' es un string (mensaje de error), retornar lista vacía
         return [];
       } else if (dataValue is List<dynamic>) {
-        // Si 'data' es una lista vÃ¡lida
+        // Si 'data' es una lista válida
         dataList = dataValue;
       } else {
         return [];
@@ -80,7 +80,7 @@ class CategoryService {
       // Si viene directamente como lista
       dataList = responseData;
     } else {
-      // Si es cualquier otro formato, asumir lista vacÃ­a
+      // Si es cualquier otro formato, asumir lista vacía
       return [];
     }
     
@@ -117,7 +117,7 @@ class CategoryService {
     
     print('ð CategoryService: /enroll/user data list length: ${dataList.length}');
     
-    // PASO 1: Agrupar por categorÃ­a ya que el backend envÃ­a un elemento por perfil
+    // PASO 1: Agrupar por categoría ya que el backend envía un elemento por perfil
     Map<String, List<Map<String, dynamic>>> groupedByCategory = {};
     
     for (final item in dataList) {
@@ -138,11 +138,11 @@ class CategoryService {
     groupedByCategory.forEach((categoryName, categoryItems) {
       print('ð CategoryService: Processing category "$categoryName" with ${categoryItems.length} profiles');
       
-      // Combinar todos los enrollmentIds de esta categorÃ­a
+      // Combinar todos los enrollmentIds de esta categoría
       List<int> allEnrollmentIds = [];
       List<EnrolledProfileSummaryDTO> enrolledProfiles = [];
       
-      // Usar el primer item para obtener informaciÃ³n base de la categorÃ­a
+      // Usar el primer item para obtener información base de la categoría
       final firstItem = categoryItems.first;
       
       for (final item in categoryItems) {
@@ -196,7 +196,7 @@ class CategoryService {
     return result;
   }
   
-  // MÃ©todos auxiliares para fechas
+  // Métodos auxiliares para fechas
   DateTime? _getEarliestDate(List<Map<String, dynamic>> items, String dateField) {
     DateTime? earliest;
     for (final item in items) {
@@ -223,7 +223,7 @@ class CategoryService {
     return latest;
   }
   
-  // MÃ©todo auxiliar para mapear el estado de la categorÃ­a
+  // Método auxiliar para mapear el estado de la categoría
   String? _mapCategoryState(dynamic state) {
     if (state == null) return null;
     switch (state.toString().toUpperCase()) {
@@ -241,7 +241,7 @@ class CategoryService {
   Future<void> addCategory(NewCategoryDTO dto) async {
     final response = await _apiClient.postApp('/category/add', dto.toJson());
     
-    // Verificamos que la peticiÃ³n fue exitosa
+    // Verificamos que la petición fue exitosa
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('Failed to create category: ${response.statusCode}');
     }
@@ -254,7 +254,7 @@ class CategoryService {
       dtos.map((e) => e.toJson()).toList(),
     );
 
-    // Verificamos que la peticiÃ³n fue exitosa
+    // Verificamos que la petición fue exitosa
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('Failed to create categories in batch: ${response.statusCode}');
     }
@@ -267,7 +267,7 @@ class CategoryService {
     final payload = updateDto.toJson();
     final response = await _apiClient.patchApp('/category/update', payload);
     
-    // Verificamos que la peticiÃ³n fue exitosa
+    // Verificamos que la petición fue exitosa
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('Failed to update category: ${response.statusCode}');
     }
@@ -285,13 +285,13 @@ class CategoryService {
     print('ð CategoryService: Batch update response type: ${response.data.runtimeType}');
     print('ð CategoryService: Batch update response data: ${response.data}');
     
-    // Verificamos que la peticiÃ³n fue exitosa
+    // Verificamos que la petición fue exitosa
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('Failed to update categories in batch: ${response.statusCode}');
     }
     
     // No necesitamos parsear la respuesta ya que CategoryController
-    // recarga todas las categorÃ­as despuÃ©s usando getAllCategories()
+    // recarga todas las categorías después usando getAllCategories()
     print('â CategoryService: Batch update completed successfully');
   }
 
@@ -341,7 +341,7 @@ class CategoryService {
       print('ð CategoryService: Detailed enrollments response is direct list');
       dataList = responseData;
     } else {
-      // Si es cualquier otro formato, asumir lista vacÃ­a
+      // Si es cualquier otro formato, asumir lista vacía
       print('â CategoryService: Unknown detailed enrollments response format, returning empty list');
       return [];
     }
@@ -416,7 +416,7 @@ class CategoryService {
     }
   }
   
-  // ð POST /category/enroll/add/batch (NUEVO: AsignaciÃ³n masiva de categorÃ­as)
+  // ð POST /category/enroll/add/batch (NUEVO: Asignación masiva de categorías)
   Future<List<CategoryEnrollmentDTO>> enrollProfilesToCategoriesBatch(List<BatchEnrollmentRequestDTO> enrollments) async {
     print('ð CategoryService: Starting batch enrollment request');
     print('ð CategoryService: Enrollments to create: ${enrollments.length}');
@@ -461,7 +461,7 @@ class CategoryService {
       return;
     }
     
-    // El backend espera parÃ¡metros de query: ?id=1&id=2&id=3
+    // El backend espera parámetros de query: ?id=1&id=2&id=3
     final queryParams = enrollmentIds.map((id) => 'id=$id').join('&');
     
     try {

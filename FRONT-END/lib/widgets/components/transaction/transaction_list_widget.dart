@@ -61,7 +61,7 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
     return Scaffold(
       body: Column(
         children: [
-          // Barra de bÃºsqueda y filtros
+          // Barra de búsqueda y filtros
           if (widget.showFilters) _buildSearchAndFilterBar(),
           
           // Panel de filtros
@@ -74,7 +74,7 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
           // Lista de transacciones
           Expanded(child: _buildTransactionsList()),
           
-          // BotÃ³n integrado para agregar transacciÃ³n
+          // Botón integrado para agregar transacción
           if (widget.showFab && widget.onAddTransaction != null)
             _buildAddTransactionButton(),
         ],
@@ -238,7 +238,7 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Crea tu primera transacciÃ³n para comenzar a usar la app',
+              'Crea tu primera transacción para empezar',
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
@@ -247,7 +247,7 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
               ElevatedButton.icon(
                 onPressed: widget.onAddTransaction,
                 icon: const Icon(Icons.add),
-                label: const Text('Crear TransacciÃ³n'),
+                label: const Text('Crear Transacción'),
               ),
             ],
           ],
@@ -275,7 +275,7 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Intenta con otros tÃ©rminos de bÃºsqueda o ajusta los filtros',
+              'Intenta con otros términos de búsqueda o ajusta los filtros',
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
@@ -310,7 +310,7 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
       }).toList();
     }
 
-    // Filtrar por bÃºsqueda
+    // Filtrar por búsqueda
     if (_searchQuery.isNotEmpty) {
       filtered = filtered.where((transaction) {
         return transaction.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
@@ -318,7 +318,7 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
       }).toList();
     }
 
-    // Ordenar por fecha (mÃ¡s recientes primero)
+    // Ordenar por fecha (más recientes primero)
     filtered.sort((a, b) => DateTime.parse(b.date).compareTo(DateTime.parse(a.date)));
 
     return filtered;
@@ -356,8 +356,8 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Eliminar TransacciÃ³n'),
-        content: Text('Â¿EstÃ¡s seguro de que deseas eliminar "${transaction.name}"?'),
+        title: const Text('Eliminar Transacción'),
+        content: Text('¿Estás seguro de que deseas eliminar "${transaction.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -399,7 +399,7 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
             onPressed: widget.onAddTransaction,
             icon: const Icon(Icons.add, color: Colors.white),
             label: const Text(
-              'Nueva TransacciÃ³n',
+              'Nueva Transacción',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

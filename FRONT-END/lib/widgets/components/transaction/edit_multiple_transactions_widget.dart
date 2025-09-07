@@ -31,12 +31,12 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
   final _formKey = GlobalKey<FormState>();
   List<UpdateTransactionDTO> editableTransactions = [];
 
-  // Special enrollment object to represent "Sin categorÃ­a"
+  // Special enrollment object to represent "Sin categoría"
   static final CategoryEnrollmentDTO _noCategoryOption = CategoryEnrollmentDTO(
     id: -1,
     profileId: -1,
     categoryId: null,
-    categoryName: 'Sin categorÃ­a',
+    categoryName: 'Sin categoría',
     userEmail: '',
     profileEmail: '',
     enrollmentDate: DateTime.now().toIso8601String(),
@@ -76,7 +76,7 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
     await categoryController.loadEnrollments();
   }
 
-  // MÃ©todo helper para obtener nombre del tipo de transacciÃ³n
+  // Método helper para obtener nombre del tipo de transacción
   String _getTypeDisplayName(TransactionType type) {
     switch (type) {
       case TransactionType.INCOME:
@@ -104,7 +104,7 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Editar MÃºltiples Transacciones',
+                  'Editar Múltiples Transacciones',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -146,7 +146,7 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'TransacciÃ³n ${index + 1}',
+                              'Transacción ${index + 1}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -159,7 +159,7 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
                             TextFormField(
                               initialValue: editableTransactions[index].name,
                               decoration: InputDecoration(
-                                labelText: 'Nombre de la transacciÃ³n',
+                                labelText: 'Nombre de la transacción',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
@@ -167,7 +167,7 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Por favor ingrese un nombre para la transacciÃ³n';
+                                  return 'Por favor ingrese un nombre para la transacción';
                                 }
                                 if (value.length > 100) {
                                   return 'El nombre no puede exceder 100 caracteres';
@@ -207,7 +207,7 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
                                 }
                                 final amount = double.tryParse(value);
                                 if (amount == null) {
-                                  return 'Ingrese un valor numÃ©rico vÃ¡lido';
+                                  return 'Ingrese un valor numérico válido';
                                 }
                                 if (amount < 0) {
                                   return 'El monto no puede ser negativo';
@@ -234,7 +234,7 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
                             TextFormField(
                               initialValue: editableTransactions[index].description.description,
                               decoration: InputDecoration(
-                                labelText: 'DescripciÃ³n',
+                                labelText: 'Descripción',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
@@ -311,7 +311,7 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
                                 return DropdownButtonFormField<CategoryEnrollmentDTO>(
                                   value: currentEnrollment,
                                   decoration: InputDecoration(
-                                    labelText: 'CategorÃ­a',
+                                    labelText: 'Categoría',
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12.0),
                                     ),

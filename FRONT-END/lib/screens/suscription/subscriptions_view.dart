@@ -69,7 +69,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
           );
         }
       } catch (e) {
-        print('â Error en redirecciÃ³n: $e');
+        print('â Error en redirección: $e');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -107,7 +107,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Planes de SuscripciÃ³n'),
+        title: const Text('Planes de Suscripción'),
         backgroundColor: Colors.purple,
         foregroundColor: Colors.white,
       ),
@@ -155,7 +155,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
 
                 const SizedBox(height: 24),
 
-                // TÃ­tulo de planes disponibles
+                // Título de planes disponibles
                 Text(
                   'Planes Disponibles',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -207,7 +207,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
                   Icon(Icons.check_circle, color: Colors.green.shade600),
                   const SizedBox(width: 8),
                   Text(
-                    'SuscripciÃ³n Actual',
+                    'Suscripción Actual',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -219,8 +219,8 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
               const SizedBox(height: 8),
               Text('Plan: ${_getPlanTitle(activeSub.subscriptionType)}'),
               Text('Estado: ${activeSub.subscriptionState.name}'),
-              Text('PrÃ³ximo pago: ${_formatDate(activeSub.nextPaymentDate)}'),
-              Text('RenovaciÃ³n automÃ¡tica: ${activeSub.isAutoRenewable ? "SÃ­" : "No"}'),
+              Text('Próximo pago: ${_formatDate(activeSub.nextPaymentDate)}'),
+              Text('Renovación automática: ${activeSub.isAutoRenewable ? "Sí" : "No"}'),
               if (activeSub.cardLastFourDigits != null)
                 Text('Tarjeta: **** ${activeSub.cardLastFourDigits}'),
               if (activeSub.cardBrand != null)
@@ -238,13 +238,13 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
       {
         'type': SubscriptionType.BASIC,
         'title': 'Plan Básico',
-        'description': 'Funcionalidades bÃ¡sicas\nIncluido por defecto',
+        'description': 'Funcionalidades básicas\nIncluido por defecto',
         'price': 'Gratis',
         'isDefault': true, // Plan por defecto
       },
       {
         'type': SubscriptionType.STANDARD,
-        'title': 'Plan EstÃ¡ndar',
+        'title': 'Plan Estándar',
         'description': 'Acceso completo\nSin anuncios',
         'price': '\$20.000 COP',
         'isDefault': false,
@@ -281,7 +281,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
       case SubscriptionType.BASIC:
         return 'Plan Básico';
       case SubscriptionType.STANDARD:
-        return 'Plan EstÃ¡ndar';
+        return 'Plan Estándar';
       case SubscriptionType.PREMIUM:
         return 'Plan Premium';
     }

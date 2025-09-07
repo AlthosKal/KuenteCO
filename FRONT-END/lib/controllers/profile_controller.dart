@@ -102,13 +102,13 @@ class ProfileController {
     }
   }
 
-  /// Iniciar sesiÃ³n con un perfil usando ID (mÃ©todo legacy)
+  /// Iniciar sesión con un perfil usando ID (método legacy)
   Future<void> profileLogin(int profileId, String password) async {
     if (isLoading.value) return;
     isLoading.value = true;
     try {
-      // Este mÃ©todo mantendremos para compatibilidad, pero realmente necesitarÃ­amos 
-      // implementar la lÃ³gica para obtener las credenciales por profileId
+      // Este método mantendremos para compatibilidad, pero realmente necesitaríamos 
+      // implementar la lógica para obtener las credenciales por profileId
       throw UnimplementedError('Use profileLoginDirect instead');
     } catch (e) {
       debugPrint('ð´ Error logging in with profile: $e');
@@ -118,13 +118,13 @@ class ProfileController {
     }
   }
 
-  /// Iniciar sesiÃ³n con un perfil usando credenciales directas
+  /// Iniciar sesión con un perfil usando credenciales directas
   Future<void> profileLoginDirect(String nameOrEmail, String password) async {
     if (isLoading.value) return;
     isLoading.value = true;
     try {
       final tokenResponse = await _profileService.profileLogin(nameOrEmail, password);
-      // Actualizar el perfil autenticado despuÃ©s del login
+      // Actualizar el perfil autenticado después del login
       await loadAuthenticatedProfile();
     } catch (e) {
       debugPrint('ð´ Error logging in with profile: $e');
@@ -134,7 +134,7 @@ class ProfileController {
     }
   }
 
-  /// Cambiar contraseÃ±a del perfil
+  /// Cambiar contraseña del perfil
   Future<void> changeProfilePassword(String currentPassword, String newPassword) async {
     if (isLoading.value) return;
     isLoading.value = true;
@@ -148,7 +148,7 @@ class ProfileController {
     }
   }
 
-  /// â Subir imagen de perfil (cuando aÃºn no tiene)
+  /// â Subir imagen de perfil (cuando aún no tiene)
   Future<ImageDTO?> uploadProfileImage(Uint8List bytes, String fileName) async {
     if (isLoading.value) return null;
     isLoading.value = true;

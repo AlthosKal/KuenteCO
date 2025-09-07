@@ -52,7 +52,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     _loadAuthenticatedData();
   }
 
-  /// â Detecta automÃ¡ticamente el tipo de autenticaciÃ³n y carga los datos correspondientes
+  /// â Detecta automáticamente el tipo de autenticación y carga los datos correspondientes
   Future<void> _loadAuthenticatedData() async {
     try {
       // Obtener el rol guardado en storage
@@ -80,7 +80,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
         }
       }
     } catch (e) {
-      print('Error cargando datos de autenticaciÃ³n: $e');
+      print('Error cargando datos de autenticación: $e');
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -137,7 +137,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     ],
   );
 
-  /// â Logo con navegaciÃ³n dinÃ¡mica segÃºn tipo de autenticaciÃ³n
+  /// â Logo con navegación dinámica según tipo de autenticación
   
   Widget _buildLogo(BuildContext context, bool isSmallScreen) {
     final double defaultWidth = isSmallScreen ? 220.0 : 250.0;
@@ -170,7 +170,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     );
   }
 
-  /// â BotÃ³n de perfil que detecta automÃ¡ticamente el tipo de autenticaciÃ³n
+  /// â Botón de perfil que detecta automáticamente el tipo de autenticación
   Widget _buildProfileButton(BuildContext context) {
     if (_currentRole == 'ROLE_PROFILE' && _authenticatedProfile != null) {
       // Es un perfil autenticado - usar ProfileButtonWidget
@@ -179,7 +179,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
         profile: _authenticatedProfile,
       );
     } else if (_authenticatedUser != null) {
-      // Es un usuario autenticado - usar widget segÃºn su tipo
+      // Es un usuario autenticado - usar widget según su tipo
       if (_authenticatedUser!.userType.toLowerCase() == 'personal') {
         return UserButtomPersonalWidget(
           profileImageUrl: _authenticatedUser!.image?.imageUrl ?? '',
@@ -191,12 +191,12 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
       }
     }
     
-    // Fallback si no hay autenticaciÃ³n
+    // Fallback si no hay autenticación
     return const SizedBox.shrink();
   }
 
 
-  /// â NavegaciÃ³n dinÃ¡mica al home segÃºn el tipo de autenticaciÃ³n
+  /// â Navegación dinámica al home según el tipo de autenticación
   Future<void> _navigateToHome(BuildContext context) async {
     if (!mounted) return;
 
@@ -213,7 +213,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
           ),
         );
       } else if (_authenticatedUser != null) {
-        // Navegar segÃºn el tipo de usuario
+        // Navegar según el tipo de usuario
         if (_authenticatedUser!.userType.toLowerCase() == 'personal') {
           Navigator.pushReplacement(
             context,
@@ -244,7 +244,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     }
   }
 
-  /// â NavegaciÃ³n manteniendo historial (excepto logout)
+  /// â Navegación manteniendo historial (excepto logout)
   void _navigateToRoute(BuildContext context, String route) {
     if (route == widget.currentRoute) return;
     Navigator.pushNamed(context, route);

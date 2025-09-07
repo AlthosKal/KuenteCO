@@ -11,19 +11,19 @@ class SubscriptionService {
 
   SubscriptionService(this._apiClient);
 
-  /// Crear una nueva suscripciÃ³n
+  /// Crear una nueva suscripción
   Future<CreateSubscriptionResponseDTO> createSubscription(
       CreateSubscriptionRequestDTO request) {
     return GlobalExceptionHandler.run(() async {
-      print('ð Creando suscripciÃ³n: ${request.toJson()}');
+      print('ð Creando suscripción: ${request.toJson()}');
       final response = await _apiClient.postApp(
         '/subscription/add',
         request.toJson(),
       );
-      print('ð Respuesta de creaciÃ³n: ${response.data}');
+      print('ð Respuesta de creación: ${response.data}');
       print('ð Tipo de respuesta: ${response.data.runtimeType}');
       
-      // El backend envÃ­a la respuesta en formato {success, message, data}
+      // El backend envía la respuesta en formato {success, message, data}
       final responseData = response.data;
       if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
         return CreateSubscriptionResponseDTO.fromJson(responseData['data']);
@@ -34,7 +34,7 @@ class SubscriptionService {
     });
   }
 
-  /// Obtener una suscripciÃ³n por id
+  /// Obtener una suscripción por id
   Future<SubscriptionResponseDTO> getSubscriptionById(int id) {
     return GlobalExceptionHandler.run(() async {
       final response = await _apiClient.getApp('/subscription/$id');
@@ -74,7 +74,7 @@ class SubscriptionService {
               return listData.map((e) => SubscriptionResponseDTO.fromJson(e)).toList();
             } else if (listData is Map) {
               // El backend devuelve un solo objeto en 'data', no una lista
-              print('ð¦ Backend devuelve objeto individual, convirtiÃ©ndolo a lista');
+              print('ð¦ Backend devuelve objeto individual, convirtiéndolo a lista');
               return [SubscriptionResponseDTO.fromJson(listData as Map<String, dynamic>)];
             }
           }
@@ -98,19 +98,19 @@ class SubscriptionService {
           }
         }
         
-        // Si llegamos aquÃ­, el formato no es el esperado
+        // Si llegamos aquí, el formato no es el esperado
         print('â ï¸ Formato inesperado en getMySubscriptions: ${response.data.runtimeType}');
         return <SubscriptionResponseDTO>[];
         
       } catch (e) {
         print('â Error en getMySubscriptions: $e');
-        // Si el endpoint no existe o falla, devolver lista vacÃ­a
+        // Si el endpoint no existe o falla, devolver lista vacía
         return <SubscriptionResponseDTO>[];
       }
     });
   }
 
-  /// Obtener historial de pagos de una suscripciÃ³n
+  /// Obtener historial de pagos de una suscripción
   Future<List<PaymentHistoryResponseDTO>> getPaymentHistory(int id) {
     return GlobalExceptionHandler.run(() async {
       try {
@@ -154,7 +154,7 @@ class SubscriptionService {
           }
         }
         
-        // Si llegamos aquÃ­, el formato no es el esperado
+        // Si llegamos aquí, el formato no es el esperado
         print('â ï¸ Formato inesperado en getPaymentHistory: ${response.data.runtimeType}');
         return <PaymentHistoryResponseDTO>[];
         
@@ -165,10 +165,10 @@ class SubscriptionService {
     });
   }
 
-  /// Obtener configuraciÃ³n de precios de suscripciones (datos hardcodeados - no hay endpoint)
+  /// Obtener configuración de precios de suscripciones (datos hardcodeados - no hay endpoint)
   Future<List<SubscriptionPriceConfigDTO>> getSubscriptionPrices() {
     return GlobalExceptionHandler.run(() async {
-      // El backend no tiene endpoint de precios, devolver lista vacÃ­a para usar fallback
+      // El backend no tiene endpoint de precios, devolver lista vacía para usar fallback
       print('ð¡ No hay endpoint de precios en el backend, usando planes predeterminados');
       return <SubscriptionPriceConfigDTO>[];
     });

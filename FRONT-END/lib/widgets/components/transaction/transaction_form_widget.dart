@@ -10,10 +10,10 @@ import '../../../utils/enum/transaction_type_enum.dart';
 import '../../../utils/formatters.dart';
 
 class TransactionFormWidget extends StatefulWidget {
-  final TransactionDetailDTO? transaction; // Si es null, es para crear nueva transacciÃ³n
+  final TransactionDetailDTO? transaction; // Si es null, es para crear nueva transacción
   final Function(NewTransactionDTO) onCreateTransaction;
   final Function(UpdateTransactionDTO)? onUpdateTransaction;
-  final List<String> categories; // Lista de categorÃ­as disponibles
+  final List<String> categories; // Lista de categorías disponibles
   final String? selectedTransactionType; // 'income', 'expense', 'debt'
   final bool isLoading;
 
@@ -50,7 +50,7 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
 
   void _initializeForm() {
     if (widget.transaction != null) {
-      // Modo ediciÃ³n
+      // Modo edición
       _nameController.text = widget.transaction!.name;
       _amountController.text = widget.transaction!.amount.toString();
       _descriptionController.text = widget.transaction!.description ?? '';
@@ -59,7 +59,7 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
       _selectedDate = widget.transaction!.transactionDate ?? DateTime.now();
       _transactionType = _determineTransactionType(widget.transaction!.name);
     } else {
-      // Modo creaciÃ³n
+      // Modo creación
       _transactionType = widget.selectedTransactionType ?? 'expense';
     }
   }
@@ -95,17 +95,17 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
         children: [
           // Header
           Text(
-            isEditing ? 'Editar TransacciÃ³n' : 'Nueva TransacciÃ³n',
+            isEditing ? 'Editar Transacción' : 'Nueva Transacción',
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 24),
 
-          // Tipo de transacciÃ³n (solo en modo creaciÃ³n)
+          // Tipo de transacción (solo en modo creación)
           if (!isEditing) ...[
             Text(
-              'Tipo de TransacciÃ³n',
+              'Tipo de Transacción',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -120,7 +120,7 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
             controller: _nameController,
             decoration: InputDecoration(
               labelText: 'Nombre *',
-              hintText: 'Ej: Salario, Compras supermercado, PrÃ©stamo',
+              hintText: 'Ej: Salario, Compras supermercado, Préstamo',
               prefixIcon: Icon(_getTransactionIcon()),
               border: const OutlineInputBorder(),
             ),
@@ -157,18 +157,18 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
               }
               final amount = double.tryParse(value.replaceAll(',', ''));
               if (amount == null || amount <= 0) {
-                return 'Ingresa un monto vÃ¡lido';
+                return 'Ingresa un monto válido';
               }
               return null;
             },
           ),
           const SizedBox(height: 16),
 
-          // Campo de descripciÃ³n
+          // Campo de descripción
           TextFormField(
             controller: _descriptionController,
             decoration: const InputDecoration(
-              labelText: 'DescripciÃ³n (opcional)',
+              labelText: 'Descripción (opcional)',
               hintText: 'Agrega detalles adicionales...',
               prefixIcon: Icon(Icons.notes),
               border: OutlineInputBorder(),
@@ -182,7 +182,7 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
           _buildDateSelector(),
           const SizedBox(height: 16),
 
-          // Selector de categorÃ­a
+          // Selector de categoría
           if (widget.categories.isNotEmpty) ...[
             _buildCategorySelector(),
             const SizedBox(height: 16),
@@ -190,7 +190,7 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
 
           const SizedBox(height: 24),
 
-          // Botones de acciÃ³n
+          // Botones de acción
           Row(
             children: [
               Expanded(
@@ -227,11 +227,11 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _buildTypeOption('expense', 'Gasto', Icons.trending_down, Colors.orange),
+          child: _buildTypeOption('expense', 'Gasto', Icons.trending_down, Colors.red),
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _buildTypeOption('debt', 'Deuda', Icons.account_balance_wallet, Colors.red),
+          child: _buildTypeOption('debt', 'Deuda', Icons.account_balance_wallet, Colors.orange),
         ),
       ],
     );
@@ -287,18 +287,18 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
     return DropdownButtonFormField<int>(
       value: _selectedCategoryId,
       decoration: const InputDecoration(
-        labelText: 'CategorÃ­a (opcional)',
+        labelText: 'Categoría (opcional)',
         prefixIcon: Icon(Icons.category),
         border: OutlineInputBorder(),
       ),
       items: [
         const DropdownMenuItem<int>(
           value: null,
-          child: Text('Sin categorÃ­a'),
+          child: Text('Sin categoría'),
         ),
         ...widget.categories.asMap().entries.map((entry) {
           return DropdownMenuItem<int>(
-            value: entry.key + 1, // Asumiendo que las categorÃ­as empiezan en 1
+            value: entry.key + 1, // Asumiendo que las categorías empiezan en 1
             child: Text(entry.value),
           );
         }),
@@ -350,7 +350,7 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
     final description = _descriptionController.text.trim();
 
     if (widget.transaction != null) {
-      // Modo ediciÃ³n
+      // Modo edición
       final updateDto = UpdateTransactionDTO(
         id: widget.transaction!.id,
         categoryId: _selectedCategoryId ?? 1, // Valor por defecto si es requerido
@@ -358,21 +358,21 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
         debtId: null, // Campo opcional
         name: name,
         description: DescriptionTransaction(
-          description: description.isEmpty ? 'Sin descripciÃ³n' : description,
+          description: description.isEmpty ? 'Sin descripción' : description,
           type: _getTransactionTypeEnum(),
         ),
         amount: amount,
       );
       widget.onUpdateTransaction?.call(updateDto);
     } else {
-      // Modo creaciÃ³n
+      // Modo creación
       final createDto = NewTransactionDTO(
         categoryId: _selectedCategoryId,
         budgetId: _selectedBudgetId,
         debtId: null, // Campo opcional
         name: name,
         description: DescriptionTransaction(
-          description: description.isEmpty ? 'Sin descripciÃ³n' : description,
+          description: description.isEmpty ? 'Sin descripción' : description,
           type: _getTransactionTypeEnum(),
         ),
         amount: amount,

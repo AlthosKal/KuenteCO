@@ -16,7 +16,7 @@ class IncomeController extends ChangeNotifier {
   List<TransactionSummaryDTO> incomeSummaries = [];
   TransactionDetailDTO? currentIncome;
   
-  // EstadÃ­sticas especÃ­ficas de ingresos
+  // Estadísticas específicas de ingresos
   double totalIncomeAmount = 0.0;
   double averageIncomeAmount = 0.0;
   int totalIncomeCount = 0;
@@ -150,7 +150,7 @@ class IncomeController extends ChangeNotifier {
     }
   }
 
-  // ð Crear mÃºltiples ingresos (batch)
+  // ð Crear múltiples ingresos (batch)
   Future<void> addIncomesBatch(List<NewTransactionDTO> dtos) async {
     _setError(null);
     
@@ -188,7 +188,7 @@ class IncomeController extends ChangeNotifier {
     }
   }
 
-  // ð Actualizar mÃºltiples ingresos (batch)
+  // ð Actualizar múltiples ingresos (batch)
   Future<void> updateIncomesBatch(List<UpdateTransactionDTO> dtos) async {
     _setError(null);
     
@@ -226,7 +226,7 @@ class IncomeController extends ChangeNotifier {
     }
   }
 
-  // ð Eliminar mÃºltiples ingresos (batch)
+  // ð Eliminar múltiples ingresos (batch)
   Future<void> deleteIncomesBatch(List<int> ids) async {
     _setError(null);
     
@@ -246,7 +246,7 @@ class IncomeController extends ChangeNotifier {
 
   // ============= ANALYSIS METHODS =============
 
-  // ð Obtener anÃ¡lisis mensual de ingresos
+  // ð Obtener análisis mensual de ingresos
   Future<void> loadMonthlyIncomeAnalysis(int year, int month) async {
     _setLoading(true);
     try {
@@ -262,7 +262,7 @@ class IncomeController extends ChangeNotifier {
     }
   }
 
-  // ð Obtener anÃ¡lisis anual de ingresos
+  // ð Obtener análisis anual de ingresos
   Future<void> loadYearlyIncomeAnalysis(int year) async {
     _setLoading(true);
     try {
@@ -278,7 +278,7 @@ class IncomeController extends ChangeNotifier {
     }
   }
 
-  // ð Obtener ingresos por categorÃ­a
+  // ð Obtener ingresos por categoría
   Future<void> loadIncomesByCategory(int categoryId) async {
     _setLoading(true);
     try {
@@ -319,7 +319,7 @@ class IncomeController extends ChangeNotifier {
     }
   }
 
-  // ð Obtener ingresos por categorÃ­a (desde la lista local)
+  // ð Obtener ingresos por categoría (desde la lista local)
   List<TransactionDetailDTO> getIncomesByCategory(int categoryId) {
     return incomes.where((income) => income.categoryId == categoryId).toList();
   }
@@ -356,7 +356,7 @@ class IncomeController extends ChangeNotifier {
         current.amount < next.amount ? current : next);
   }
 
-  // ð Obtener ingresos recientes (Ãºltimos 30 dÃ­as)
+  // ð Obtener ingresos recientes (últimos 30 días)
   List<TransactionDetailDTO> get recentIncomes {
     final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
     return incomes.where((income) {

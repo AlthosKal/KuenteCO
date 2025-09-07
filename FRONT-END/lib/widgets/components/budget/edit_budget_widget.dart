@@ -113,7 +113,7 @@ class _EditBudgetWidgetState extends State<EditBudgetWidget> {
                       }
                       final amount = double.tryParse(value);
                       if (amount == null || amount <= 0) {
-                        return 'Ingresa un monto vÃ¡lido';
+                        return 'Ingresa un monto válido';
                       }
                       return null;
                     },
@@ -135,7 +135,7 @@ class _EditBudgetWidgetState extends State<EditBudgetWidget> {
                       }
                       final remaining = double.tryParse(value);
                       if (remaining == null || remaining < 0) {
-                        return 'Ingresa un monto vÃ¡lido (puede ser 0)';
+                        return 'Ingresa un monto válido (puede ser 0)';
                       }
                       final total = double.tryParse(_amountController.text);
                       if (total != null && remaining > total) {

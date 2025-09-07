@@ -42,7 +42,7 @@ class ProfileButtonWidget extends StatelessWidget {
             children: [
               Icon(Icons.logout, size: 20, color: Colors.purpleAccent),
               SizedBox(width: 8),
-              Text('Cerrar sesiÃ³n', style: TextStyle(color: Colors.purpleAccent)),
+              Text('Cerrar sesión', style: TextStyle(color: Colors.purpleAccent)),
             ],
           ),
         ),
@@ -108,7 +108,7 @@ class ProfileButtonWidget extends StatelessWidget {
     );
   }
 
-  /// â LÃ³gica de navegaciÃ³n y logout (extraÃ­da del navbar original)
+  /// â Lógica de navegación y logout (extraída del navbar original)
   Future<void> _handleMenuSelection(BuildContext context, String value) async {
     switch (value) {
       case 'profile':
@@ -140,7 +140,7 @@ class ProfileButtonWidget extends StatelessWidget {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Error al cerrar sesiÃ³n: $e'),
+                content: Text('Error al cerrar sesión: $e'),
                 duration: const Duration(seconds: 3),
               ),
             );

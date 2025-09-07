@@ -34,11 +34,11 @@ class ProfileLoginController {
         await _profileService.profileLogin(dto.nameOrEmail, dto.password);
 
         if (context.mounted) {
-          /// â 2ï¸â£ Mostrar mensaje de Ã©xito
+          /// â 2ï¸â£ Mostrar mensaje de éxito
           ToastHelper.showSuccess(
             context,
-            title: 'Inicio de SesiÃ³n de Perfil Exitoso',
-            description: 'Has iniciado sesiÃ³n como perfil',
+            title: 'Inicio de Sesión de Perfil Exitoso',
+            description: 'Has iniciado sesión como perfil',
           );
 
           /// â 3ï¸â£ Navegar a la vista de perfil
@@ -49,7 +49,7 @@ class ProfileLoginController {
         /// â Mostrar mensaje de error
         ToastHelper.showError(
           context,
-          title: 'Error al iniciar SesiÃ³n de Perfil',
+          title: 'Error al iniciar Sesión de Perfil',
           description: error.toString(),
         );
         isLoading.value = false;

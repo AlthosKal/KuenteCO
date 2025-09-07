@@ -6,7 +6,7 @@ import '../../../dto/app/category/new_category_dto.dart';
 import '../../../dto/app/extra/description_category_extra.dart';
 import '../../../utils/enum/state_enum.dart' as state_enum;
 
-// Clase auxiliar para manejar formularios mÃºltiples
+// Clase auxiliar para manejar formularios múltiples
 class CategoryFormData {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController budgetController = TextEditingController();
@@ -45,7 +45,7 @@ class _CreateMultipleCategoriesWidgetState extends State<CreateMultipleCategorie
   @override
   void initState() {
     super.initState();
-    // Inicializar con una categorÃ­a
+    // Inicializar con una categoría
     _categories = [CategoryFormData()];
   }
 
@@ -84,19 +84,19 @@ class _CreateMultipleCategoriesWidgetState extends State<CreateMultipleCategorie
   }
 
   Future<void> _createCategories() async {
-    // Validar que todas las categorÃ­as tengan datos vÃ¡lidos
+    // Validar que todas las categorías tengan datos válidos
     final invalidCategories = _categories.where((cat) => !cat.isValid).toList();
     if (invalidCategories.isNotEmpty) {
       setState(() {
-        _errorMessage = 'Por favor, completa todos los campos de las categorÃ­as';
+        _errorMessage = 'Por favor, completa todos los campos de las categorías';
       });
       return;
     }
 
-    // Validar que haya al menos 2 categorÃ­as para justificar el batch
+    // Validar que haya al menos 2 categorías para justificar el batch
     if (_categories.length == 1) {
       setState(() {
-        _errorMessage = 'Para creaciÃ³n en lote, agrega al menos 2 categorÃ­as';
+        _errorMessage = 'Para creación en lote, agrega al menos 2 categorías';
       });
       return;
     }
@@ -109,7 +109,7 @@ class _CreateMultipleCategoriesWidgetState extends State<CreateMultipleCategorie
     try {
       final controller = Provider.of<CategoryController>(context, listen: false);
       
-      // Crear mÃºltiples categorÃ­as usando batch
+      // Crear múltiples categorías usando batch
       final newCategories = _categories.map((cat) => cat.toNewCategoryDTO()).toList();
       await controller.addCategoriesBatch(newCategories);
       
@@ -117,7 +117,7 @@ class _CreateMultipleCategoriesWidgetState extends State<CreateMultipleCategorie
         if (controller.errorMessage == null) {
           Navigator.pop(context, true);
           _showSnackBar(
-            '${_categories.length} categorÃ­as creadas exitosamente',
+            '${_categories.length} categorías creadas exitosamente',
             backgroundColor: Colors.green,
           );
         } else {
@@ -129,7 +129,7 @@ class _CreateMultipleCategoriesWidgetState extends State<CreateMultipleCategorie
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = 'Error al crear categorÃ­as: $e';
+          _errorMessage = 'Error al crear categorías: $e';
         });
       }
     } finally {
@@ -154,7 +154,7 @@ class _CreateMultipleCategoriesWidgetState extends State<CreateMultipleCategorie
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            // Header de la categorÃ­a con nÃºmero y botÃ³n eliminar
+            // Header de la categoría con número y botón eliminar
             Row(
               children: [
                 Container(
@@ -164,7 +164,7 @@ class _CreateMultipleCategoriesWidgetState extends State<CreateMultipleCategorie
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'CategorÃ­a ${index + 1}',
+                    'Categoría ${index + 1}',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.blueAccent,
@@ -187,7 +187,7 @@ class _CreateMultipleCategoriesWidgetState extends State<CreateMultipleCategorie
             TextField(
               controller: category.nameController,
               decoration: const InputDecoration(
-                labelText: 'Nombre de la categorÃ­a',
+                labelText: 'Nombre de la categoría',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.category_outlined),
                 isDense: true,
@@ -250,25 +250,25 @@ class _CreateMultipleCategoriesWidgetState extends State<CreateMultipleCategorie
                     const SizedBox(width: 12),
                     const Expanded(
                       child: Text(
-                        'Crear MÃºltiples CategorÃ­as',
+                        'Crear Múltiples Categorís',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    // BotÃ³n para agregar categorÃ­a
+                    // Botón para agregar categoría
                     IconButton(
                       onPressed: _isLoading ? null : _addCategory,
                       icon: const Icon(Icons.add_circle_outline),
                       color: Colors.green,
-                      tooltip: 'Agregar categorÃ­a',
+                      tooltip: 'Agregar categoría',
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 
-                // Lista de formularios de categorÃ­as
+                // Lista de formularios de categorías
                 Flexible(
                   child: SingleChildScrollView(
                     child: Column(
@@ -312,13 +312,13 @@ class _CreateMultipleCategoriesWidgetState extends State<CreateMultipleCategorie
                 
                 const SizedBox(height: 16),
                 
-                // Botones de acciÃ³n
+                // Botones de acción
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // InformaciÃ³n de categorÃ­as
+                    // Información de categorías
                     Text(
-                      '${_categories.length} categorÃ­a${_categories.length > 1 ? 's' : ''}',
+                      '${_categories.length} categoría${_categories.length > 1 ? 's' : ''}',
                       style: TextStyle(
                         color: Colors.grey[600],
                         fontSize: 12,

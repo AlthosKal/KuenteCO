@@ -1,4 +1,4 @@
-/// DTO para solicitar anÃ¡lisis de deudas al chat AI
+/// DTO para solicitar análisis de deudas al chat AI
 class DebtChatRequestDTO {
   final String message;
   final String userId;
@@ -38,7 +38,7 @@ class DebtChatRequestDTO {
     List<int>? debtIds,
   }) {
     return DebtChatRequestDTO(
-      message: 'Realiza un anÃ¡lisis de riesgo de mis deudas',
+      message: 'Realiza un análisis de riesgo de mis deudas',
       userId: userId,
       analysisType: 'RISK_ANALYSIS',
       debtIds: debtIds,

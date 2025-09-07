@@ -419,8 +419,8 @@ class _DeleteMultipleDebtsWidgetState extends State<DeleteMultipleDebtsWidget> {
   }
 
   String _getDebtDescription(DebtDTO debt) {
-    // DebtDTO no tiene campos de descripciÃ³n como TransactionDetailDTO
-    // Devolvemos informaciÃ³n bÃ¡sica de la deuda
+    // DebtDTO no tiene campos de descripción como TransactionDetailDTO
+    // Devolvemos información básica de la deuda
     return 'Estado: ${debt.state.name} - Vence: ${debt.expirationDate.day}/${debt.expirationDate.month}/${debt.expirationDate.year}';
   }
 

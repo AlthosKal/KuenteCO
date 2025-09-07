@@ -28,7 +28,7 @@ class KuentecoNavbar extends StatelessWidget {
     );
   }
 
-  /// ð± Layout para pantallas pequeÃ±as
+  /// ð± Layout para pantallas pequeñas
   Widget _buildMobileLayout(BuildContext context) => Column(
     mainAxisSize: MainAxisSize.min,
     children: [
@@ -103,7 +103,7 @@ class KuentecoNavbar extends StatelessWidget {
     );
   }
 
-  /// ð Construye cualquier botÃ³n del navbar (incluye login y register)
+  /// ð Construye cualquier botón del navbar (incluye login y register)
   Widget _buildButton(
       BuildContext context,
       String text,

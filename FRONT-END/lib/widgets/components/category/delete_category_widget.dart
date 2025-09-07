@@ -15,7 +15,7 @@ class DeleteCategoryWidget extends StatefulWidget {
   @override
   State<DeleteCategoryWidget> createState() => _DeleteCategoryWidgetState();
 
-  /// MÃ©todo estÃ¡tico para mostrar el diÃ¡logo de eliminaciÃ³n
+  /// Método estático para mostrar el diálogo de eliminación
   static Future<bool?> showDeleteDialog(
     BuildContext context,
     CategoryDTO category,
@@ -46,7 +46,7 @@ class _DeleteCategoryWidgetState extends State<DeleteCategoryWidget> {
   }
 
   Future<void> _deleteCategory() async {
-    // Evitar mÃºltiples eliminaciones si ya se estÃ¡ ejecutando
+    // Evitar múltiples eliminaciones si ya se está ejecutando
     if (_isDeleting) return;
     
     setState(() {
@@ -61,14 +61,14 @@ class _DeleteCategoryWidgetState extends State<DeleteCategoryWidget> {
       if (mounted) {
         Navigator.pop(context, true);
         _showSnackBar(
-          'CategorÃ­a "${widget.category.name}" eliminada exitosamente',
+          'Categoría "${widget.category.name}" eliminada exitosamente',
           backgroundColor: Colors.green,
         );
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = 'Error al eliminar la categorÃ­a: $e';
+          _errorMessage = 'Error al eliminar la categoría: $e';
           _isDeleting = false;
         });
       }
@@ -87,7 +87,7 @@ class _DeleteCategoryWidgetState extends State<DeleteCategoryWidget> {
           ),
           const SizedBox(width: 12),
           const Text(
-            'Eliminar CategorÃ­a',
+            'Eliminar Categoría',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -108,7 +108,7 @@ class _DeleteCategoryWidgetState extends State<DeleteCategoryWidget> {
                 ),
                 children: [
                   const TextSpan(
-                    text: 'Â¿EstÃ¡s seguro de que deseas eliminar la categorÃ­a ',
+                    text: '¿Estás seguro de que deseas eliminar la categoría ',
                   ),
                   TextSpan(
                     text: '"${widget.category.name}"',
@@ -141,7 +141,7 @@ class _DeleteCategoryWidgetState extends State<DeleteCategoryWidget> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Esta acciÃ³n no se puede deshacer.',
+                      'Esta acción no se puede deshacer.',
                       style: TextStyle(
                         color: Colors.orange.shade700,
                         fontSize: 14,

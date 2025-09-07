@@ -58,9 +58,9 @@ class _AccountScreenState extends State<AccountScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // BotÃ³n cambiar contraseÃ±a
+                  // Botón cambiar contraseña
                   PrimaryButton(
-                    label: "Cambiar contraseÃ±a",
+                    label: "Cambiar contraseña",
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
@@ -73,7 +73,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
                   const SizedBox(height: 24),
 
-                  // BotÃ³n eliminar cuenta
+                  // Botón eliminar cuenta
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: ElevatedButton.icon(
@@ -86,9 +86,9 @@ class _AccountScreenState extends State<AccountScreen> {
                         final confirm = await showDialog<bool>(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: const Text('Confirmar eliminaciÃ³n'),
+                            title: const Text('Confirmar eliminación'),
                             content: const Text(
-                                'Â¿EstÃ¡s seguro de que deseas eliminar tu cuenta? Esta acciÃ³n no se puede deshacer.'),
+                                'Â¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.'),
                             actions: [
                               TextButton(
                                 onPressed: () =>

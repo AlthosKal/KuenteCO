@@ -18,7 +18,7 @@ class LoginController {
   LoginController({AuthService? authService})
       : _authService = authService ?? AuthService();
 
-  /// ð¥ MÃ©todo de login
+  /// ð¥ Método de login
   Future<void> login({
     required BuildContext context,
     required String nameOrEmail,
@@ -40,16 +40,16 @@ class LoginController {
         final user = await _authService.getAuthenticatedUser();
 
         if (context.mounted) {
-          /// â 3ï¸â£ Mostrar mensaje de Ã©xito
+          /// â 3ï¸â£ Mostrar mensaje de éxito
           ToastHelper.showSuccess(
             context,
-            title: 'Inicio de SesiÃ³n Exitoso',
+            title: 'Inicio de Sesión Exitoso',
             description: tokenResponse.type == 'PERSONAL'
                 ? 'Has iniciado como usuario Personal'
                 : 'Has iniciado como cuenta Business',
           );
 
-          /// â 4ï¸â£ Redirigir a la vista correcta segÃºn el tipo de cuenta
+          /// â 4ï¸â£ Redirigir a la vista correcta según el tipo de cuenta
           if (tokenResponse.type == 'PERSONAL') {
             Navigator.pushReplacement(
               context,
@@ -77,7 +77,7 @@ class LoginController {
         /// â Mostrar mensaje de error
         ToastHelper.showError(
           context,
-          title: 'Error al iniciar SesiÃ³n',
+          title: 'Error al iniciar Sesión',
           description: error.toString(),
         );
         isLoading.value = false;
@@ -87,12 +87,12 @@ class LoginController {
     isLoading.value = false;
   }
 
-  /// ð Toggle para mostrar/ocultar contraseÃ±a
+  /// ð Toggle para mostrar/ocultar contraseña
   void togglePasswordVisibility() {
     obscurePassword.value = !obscurePassword.value;
   }
 
-  /// â Cambiar recordar contraseÃ±a
+  /// â Cambiar recordar contraseña
   void toggleRememberPassword(bool? value) {
     rememberPassword.value = value ?? false;
   }

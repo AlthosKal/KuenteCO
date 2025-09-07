@@ -36,7 +36,7 @@ class AuthService {
             if (decoded is Map<String, dynamic>) {
               return TokenResponseDTO.fromJson(decoded);
             } else {
-              throw Exception('Cadena no contenÃ­a un Map<String, dynamic>: $data');
+              throw Exception('Cadena no contenía un Map<String, dynamic>: $data');
             }
           } catch (_) {
             throw Exception('No se pudo decodificar JSON del string: $data');
@@ -94,7 +94,7 @@ class AuthService {
   Future<void> logout() async {
     await _api.postApp('/auth/logout', {});
     await _storage.delete(key: 'Authorization');
-    await _storage.delete(key: 'role'); // â Borramos el rol tambiÃ©n
+    await _storage.delete(key: 'role'); // â Borramos el rol también
   }
 
   /// â ELIMINAR USUARIO

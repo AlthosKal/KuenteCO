@@ -29,12 +29,12 @@ class GlobalExceptionHandler {
       return ApiErrorParser.extractMessage(error.response?.data);
     }
 
-    // Si es una excepciÃ³n personalizada con mensaje, respÃ©talo
+    // Si es una excepción personalizada con mensaje, respétalo
     if (error is Exception) {
       final message = error.toString();
       if (message.isNotEmpty &&
           message != 'Exception' &&
-          !message.contains('OcurriÃ³ un error inesperado')) {
+          !message.contains('Ocurrió un error inesperado')) {
         return message.replaceFirst('Exception: ', '');
       }
     }
@@ -42,15 +42,15 @@ class GlobalExceptionHandler {
     // Otros errores comunes
     final errorString = error.toString().toLowerCase();
     if (errorString.contains('unauthorized') || errorString.contains('401')) {
-      return 'SesiÃ³n expirada. Inicia sesiÃ³n nuevamente.';
+      return 'Sesión expirada. Inicia sesión nuevamente.';
     }
     if (errorString.contains('403')) {
-      return 'No tienes permisos para esta acciÃ³n.';
+      return 'No tienes permisos para esta acción.';
     }
     if (errorString.contains('404')) {
       return 'Recurso no encontrado.';
     }
 
-    return 'OcurriÃ³ un error inesperado. Intenta de nuevo.';
+    return 'Ocurrió un error inesperado. Intenta de nuevo.';
   }
 }

@@ -180,7 +180,7 @@ class _AssignBudgetToProfilesWidgetState extends State<AssignBudgetToProfilesWid
                     Text(
                       selectedCount > 0
                         ? '$selectedCount perfil${selectedCount == 1 ? '' : 'es'} seleccionado${selectedCount == 1 ? '' : 's'}'
-                        : 'NingÃºn perfil seleccionado',
+                        : 'Ningún perfil seleccionado',
                       style: TextStyle(
                         color: selectedCount > 0 ? Colors.purple : Colors.grey,
                         fontWeight: FontWeight.w500,

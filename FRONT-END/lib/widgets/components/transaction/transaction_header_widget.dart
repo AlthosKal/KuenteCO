@@ -29,7 +29,7 @@ class TransactionHeaderWidget extends StatelessWidget {
           Text(
             userRole == 'ROLE_PROFILE'
                 ? 'Gestiona tus movimientos financieros'
-                : 'Resumen de transacciones de tus perfiles',
+                : 'Resumen de transacciones',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Colors.black54,
             ),
@@ -58,7 +58,7 @@ class TransactionHeaderWidget extends StatelessWidget {
                       ),
                       Tab(
                         icon: Icon(Icons.bar_chart, size: 20),
-                        text: 'EstadÃ­sticas',
+                        text: 'Estadísticas',
                       ),
                     ]
                   : const [
@@ -72,7 +72,7 @@ class TransactionHeaderWidget extends StatelessWidget {
                       ),
                       Tab(
                         icon: Icon(Icons.analytics, size: 20),
-                        text: 'AnÃ¡lisis',
+                        text: 'Análisis',
                       ),
                     ],
             ),

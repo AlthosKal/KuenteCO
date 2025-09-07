@@ -15,6 +15,9 @@ import '../../widgets/components/category/delete_multiple_categories_widget.dart
 import '../../widgets/components/category/edit_category_widget.dart';
 import '../../widgets/components/category/edit_multiple_categories_widget.dart';
 import '../../widgets/components/category/enrollment_management_widget.dart';
+import '../../widgets/common/background/background_widget.dart';
+import '../../widgets/common/navbar/navbar_logged_widget.dart';
+import '../../widgets/common/footer/footer_logged_widget.dart';
 
 class CategoryView extends StatefulWidget {
   const CategoryView({super.key});
@@ -114,7 +117,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
   Future<void> _handleDeleteCategory(category) async {
     final result = await DeleteCategoryWidget.showDeleteDialog(context, category);
     if (result == true) {
-      // Forzar recarga despuÃ©s de eliminaciÃ³n exitosa
+      // Forzar recarga después de eliminación exitosa
       await _loadDataBasedOnRole();
     }
   }
@@ -122,7 +125,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
   Future<void> _handleEditCategory(category) async {
     final result = await EditCategoryWidget.showEditDialog(context, category);
     if (result == true) {
-      // La ediciÃ³n fue exitosa, la lista se actualizarÃ¡ automÃ¡ticamente
+      // La edición fue exitosa, la lista se actualizará automáticamente
       // gracias al Provider y el controlador
     }
   }
@@ -130,7 +133,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
   Future<void> _handleAssignCategory(category) async {
     final result = await AssignCategoryWidget.showAssignDialog(context, category);
     if (result == true) {
-      // La asignaciÃ³n fue exitosa - para usuarios business necesitamos
+      // La asignación fue exitosa - para usuarios business necesitamos
       // recargar los enrollment summaries para actualizar los contadores
       if (_isBusinessUser) {
         final categoryController = Provider.of<CategoryController>(context, listen: false);
@@ -139,7 +142,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     }
   }
   
-  // MÃ©todo para manejar eliminaciÃ³n individual de asignaciones
+  // Método para manejar eliminación individual de asignaciones
   Future<void> _handleDeleteSingleEnrollment(enrollment) async {
     final categoryController = Provider.of<CategoryController>(context, listen: false);
     
@@ -150,7 +153,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     );
     
     if (result == true) {
-      // La eliminaciÃ³n fue exitosa, recargar los datos
+      // La eliminación fue exitosa, recargar los datos
       await _loadDataBasedOnRole();
     }
   }
@@ -196,7 +199,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
               ElevatedButton.icon(
                 onPressed: () {
                   Navigator.pop(context);
-                  // AquÃ­ podrÃ­as navegar a un reporte detallado si lo deseas
+                  // Aquí podrías navegar a un reporte detallado si lo deseas
                 },
                 icon: const Icon(Icons.bar_chart),
                 label: const Text("Ver reporte completo"),
@@ -208,7 +211,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     );
   }
   
-  /// Obtener elementos a mostrar segÃºn el rol
+  /// Obtener elementos a mostrar según el rol
   List<dynamic> _getItemsToDisplay(CategoryController controller) {
     return controller.categories;
   }
@@ -228,7 +231,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
       builder: (context) => const CreateMultipleCategoriesWidget(),
     );
     
-    // Si se crearon categorÃ­as exitosamente, recargar la lista
+    // Si se crearon categorías exitosamente, recargar la lista
     if (result == true) {
       await _loadDataBasedOnRole();
     }
@@ -254,7 +257,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     
     clearSelection();
     
-    // Si se editaron categorÃ­as exitosamente, recargar la lista
+    // Si se editaron categorías exitosamente, recargar la lista
     if (result == true) {
       await _loadDataBasedOnRole();
     }
@@ -280,7 +283,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     
     clearSelection();
     
-    // Si se eliminaron categorÃ­as exitosamente, recargar la lista
+    // Si se eliminaron categorías exitosamente, recargar la lista
     if (result == true) {
       await _loadDataBasedOnRole();
     }
@@ -392,36 +395,84 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
       builder: (context, snapshot) {
         final isProfile = snapshot.data ?? false;
         
-        return Scaffold(
-          appBar: _buildAppBar(controller, isProfile),
-          body: controller.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : controller.errorMessage != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        controller.errorMessage!,
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => _loadDataBasedOnRole(),
-                        child: const Text('Reintentar'),
-                      ),
-                    ],
+        return Background(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  /// NAVBAR
+                  KuentecoLoggedNavbar(
+                    currentRoute: '/categories',
+                    onLogout: () {
+                      Navigator.pushReplacementNamed(context, '/login');
+                    },
                   ),
-                )
-              : isProfile
-                  ? _buildProfileView(controller)
-                  : _buildUserView(controller),
+
+                  /// HEADER CON TÍTULO
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Categorías',
+                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          isProfile
+                              ? 'Gestiona tus categorías de gastos'
+                              : 'Administra las categorías de tus perfiles',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  /// CONTENIDO
+                  Expanded(
+                    child: controller.isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : controller.errorMessage != null
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  controller.errorMessage!,
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                                const SizedBox(height: 16),
+                                ElevatedButton(
+                                  onPressed: () => _loadDataBasedOnRole(),
+                                  child: const Text('Reintentar'),
+                                ),
+                              ],
+                            ),
+                          )
+                        : isProfile
+                            ? _buildProfileView(controller)
+                            : _buildUserView(controller),
+                  ),
+
+                  /// FOOTER
+                  const FooterLoggedWidget(),
+                ],
+              ),
+            ),
+          ),
         );
       },
     );
   }
   
-  /// Construir botÃ³n reutilizable para crear categorÃ­a
+  /// Construir botón reutilizable para crear categoría
   Widget _buildCreateCategoryButton(String title, String subtitle) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -496,7 +547,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     );
   }
   
-  /// Mostrar diÃ¡logo para crear categorÃ­a
+  /// Mostrar diálogo para crear categoría
   Future<void> _showCreateCategoryDialog() async {
     final result = await showDialog<bool>(
       context: context,
@@ -507,66 +558,88 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     }
   }
   
-  /// Vista para usuarios regulares (pueden crear/editar categorÃ­as)
+  /// Vista para usuarios regulares (pueden crear/editar categorías)
   Widget _buildUserView(CategoryController controller) {
     if (controller.categories.isEmpty) {
       return _buildEmptyState();
     }
     
-    return ListView.builder(
-      padding: const EdgeInsets.all(8),
-      itemCount: controller.categories.length + 1, // +1 para el botÃ³n de agregar
-      itemBuilder: (context, index) => _buildUserViewItem(context, controller, index),
-    );
-  }
-  
-  Widget _buildEmptyState() {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.category_outlined,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No tienes categorías aún',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Crea tu primera categorÃ­a usando el botÃ³n de abajo',
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          _buildCreateCategoryButton(
-            'Crear primera categoría',
-            'Toca para comenzar a organizar tus gastos',
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
         ],
+      ),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(8),
+        itemCount: controller.categories.length + 1, // +1 para el botón de agregar
+        itemBuilder: (context, index) => _buildUserViewItem(context, controller, index),
       ),
     );
   }
   
+  Widget _buildEmptyState() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.category_outlined,
+                size: 64,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No tienes categorías aún',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Crea tu primera categoría usando el botón de abajo',
+                style: TextStyle(
+                  color: Colors.grey[500],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              _buildCreateCategoryButton(
+                'Crear primera categoría',
+                'Toca para comenzar a organizar tus gastos',
+              ),
+            ],
+          ),
+        ),
+    );
+  }
+  
   Widget _buildUserViewItem(BuildContext context, CategoryController controller, int index) {
-    // Si es el Ãºltimo item, mostrar el botÃ³n de agregar
+    // Si es el último item, mostrar el botón de agregar
     if (index == controller.categories.length) {
       return _buildCreateCategoryButton(
         'Crear nueva categoría',
@@ -574,7 +647,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
       );
     }
     
-    // Items normales de categorÃ­as
+    // Items normales de categorías
     final category = controller.categories[index];
     return CategoryListWidget(
       key: ValueKey(category.id),
@@ -592,44 +665,70 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     );
   }
   
-  /// Vista para perfiles (solo pueden ver categorÃ­as asignadas)
+  /// Vista para perfiles (solo pueden ver categorías asignadas)
   Widget _buildProfileView(CategoryController controller) {
     return controller.enrollments.isEmpty
-        ? Padding(
-            padding: const EdgeInsets.all(8),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.assignment_ind_outlined,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No tienes categorías asignadas',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Contacta al administrador para que te asigne categorías',
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
+        ? Container(
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.assignment_ind_outlined,
+                      size: 64,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No tienes categorías asignadas',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Contacta al administrador para que te asigne categorías',
+                      style: TextStyle(
+                        color: Colors.grey[500],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
           )
-        : ListView.builder(
-            padding: const EdgeInsets.all(8),
-            itemCount: controller.enrollments.length,
+        : Container(
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ListView.builder(
+              padding: const EdgeInsets.all(8),
+              itemCount: controller.enrollments.length,
             itemBuilder: (context, index) {
               final enrollment = controller.enrollments[index];
               
@@ -689,7 +788,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                               ],
                             ),
                           ),
-                          // BotÃ³n para eliminar la asignaciÃ³n individual
+                          // Botón para eliminar la asignación individual
                           IconButton(
                             onPressed: () => _handleDeleteSingleEnrollment(enrollment),
                             icon: const Icon(
@@ -706,6 +805,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                 ),
               );
             },
+            ),
           );
   }
 }

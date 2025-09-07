@@ -16,7 +16,7 @@ class ExpensesController extends ChangeNotifier {
   List<TransactionSummaryDTO> expenseSummaries = [];
   TransactionDetailDTO? currentExpense;
   
-  // EstadÃ­sticas especÃ­ficas de gastos
+  // Estadísticas específicas de gastos
   double totalExpenseAmount = 0.0;
   double averageExpenseAmount = 0.0;
   int totalExpenseCount = 0;
@@ -113,7 +113,7 @@ class ExpensesController extends ChangeNotifier {
     _setLoading(true);
     try {
       print('ð ExpensesController: Loading filtered expenses...');
-      // Usando mÃ©todos existentes del servicio segÃºn los filtros
+      // Usando métodos existentes del servicio según los filtros
       if (categoryId != null) {
         expenses = await _service.getExpensesByCategory(categoryId);
       } else if (from != null && to != null) {
@@ -160,7 +160,7 @@ class ExpensesController extends ChangeNotifier {
     }
   }
 
-  // ð Crear mÃºltiples gastos (batch)
+  // ð Crear múltiples gastos (batch)
   Future<void> addExpensesBatch(List<NewTransactionDTO> dtos) async {
     _setError(null);
     
@@ -198,7 +198,7 @@ class ExpensesController extends ChangeNotifier {
     }
   }
 
-  // ð Actualizar mÃºltiples gastos (batch)
+  // ð Actualizar múltiples gastos (batch)
   Future<void> updateExpensesBatch(List<UpdateTransactionDTO> dtos) async {
     _setError(null);
     
@@ -236,7 +236,7 @@ class ExpensesController extends ChangeNotifier {
     }
   }
 
-  // ð Eliminar mÃºltiples gastos (batch)
+  // ð Eliminar múltiples gastos (batch)
   Future<void> deleteExpensesBatch(List<int> ids) async {
     _setError(null);
     
@@ -256,12 +256,12 @@ class ExpensesController extends ChangeNotifier {
 
   // ============= ANALYSIS METHODS =============
 
-  // ð Obtener anÃ¡lisis mensual de gastos
+  // ð Obtener análisis mensual de gastos
   Future<void> loadMonthlyExpenseAnalysis(int year, int month) async {
     _setLoading(true);
     try {
       print('ð ExpensesController: Loading monthly expense analysis for $year-$month...');
-      // Implementando anÃ¡lisis mensual usando datos existentes
+      // Implementando análisis mensual usando datos existentes
       final from = '$year-${month.toString().padLeft(2, '0')}-01';
       final to = '$year-${month.toString().padLeft(2, '0')}-31';
       final monthlyExpenses = await _service.getExpensesByDateRange(from: from, to: to);
@@ -280,19 +280,19 @@ class ExpensesController extends ChangeNotifier {
     }
   }
 
-  // ð Obtener anÃ¡lisis anual de gastos
+  // ð Obtener análisis anual de gastos
   Future<void> loadYearlyExpenseAnalysis(int year) async {
     _setLoading(true);
     try {
       print('ð ExpensesController: Loading yearly expense analysis for $year...');
-      // Implementando anÃ¡lisis anual usando datos existentes
+      // Implementando análisis anual usando datos existentes
       final monthlyTotals = await _service.getMonthlyExpenseTotals(year);
       double totalAmount = 0.0;
       int totalCount = 0;
       for (final monthTotal in monthlyTotals.values) {
         totalAmount += monthTotal;
       }
-      // Obtener el conteo total del aÃ±o
+      // Obtener el conteo total del año
       final yearlyExpenses = await _service.getExpensesByDateRange(
         from: '$year-01-01', 
         to: '$year-12-31',
@@ -309,12 +309,12 @@ class ExpensesController extends ChangeNotifier {
     }
   }
 
-  // ð Obtener gastos por categorÃ­a
+  // ð Obtener gastos por categoría
   Future<void> loadExpensesByCategory() async {
     _setLoading(true);
     try {
       print('ð ExpensesController: Loading expenses by category...');
-      // Usando mÃ©todo existente para obtener gastos categorizados
+      // Usando método existente para obtener gastos categorizados
       final expensesByCategory = await _service.getExpensesByCategoryBreakdown();
       print('â ExpensesController: Loaded expenses for ${expensesByCategory.length} categories');
       _setError(null);
@@ -344,7 +344,7 @@ class ExpensesController extends ChangeNotifier {
     }
   }
 
-  // ð Verificar lÃ­mite de presupuesto
+  // ð Verificar límite de presupuesto
   Future<bool> checkBudgetLimit(int budgetId, double amount) async {
     try {
       print('ð ExpensesController: Checking budget limit for budget ID: $budgetId, amount: $amount');
@@ -380,7 +380,7 @@ class ExpensesController extends ChangeNotifier {
     }
   }
 
-  // ð Obtener gastos por categorÃ­a (desde la lista local)
+  // ð Obtener gastos por categoría (desde la lista local)
   List<TransactionDetailDTO> getExpensesByCategory(int categoryId) {
     return expenses.where((expense) => expense.categoryId == categoryId).toList();
   }
@@ -417,7 +417,7 @@ class ExpensesController extends ChangeNotifier {
         current.amount < next.amount ? current : next);
   }
 
-  // ð Obtener gastos recientes (Ãºltimos 30 dÃ­as)
+  // ð Obtener gastos recientes (últimos 30 días)
   List<TransactionDetailDTO> get recentExpenses {
     final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
     return expenses.where((expense) {

@@ -1,6 +1,6 @@
 import 'base_dynamic_response_dto.dart';
 
-/// DTO para la respuesta de anÃ¡lisis AI de deudas desde KuentecoChat
+/// DTO para la respuesta de análisis AI de deudas desde KuentecoChat
 class DebtAnalysisResponseDTO extends BaseDynamicResponseDTO {
   final DebtRiskAnalysisDTO? debtAnalysis;
   final List<String> recommendations;
@@ -35,7 +35,7 @@ class DebtAnalysisResponseDTO extends BaseDynamicResponseDTO {
   }
 }
 
-/// DTO para anÃ¡lisis de riesgo de deudas
+/// DTO para análisis de riesgo de deudas
 class DebtRiskAnalysisDTO {
   final double totalDebt;
   final double monthlyDebtPayment;
@@ -85,7 +85,7 @@ class DebtRiskAnalysisDTO {
     }
   }
 
-  /// Getter para obtener recomendaciÃ³n principal
+  /// Getter para obtener recomendación principal
   String get primaryRecommendation {
     return actionPlan.isNotEmpty ? actionPlan.first : 'Sin recomendaciones disponibles';
   }

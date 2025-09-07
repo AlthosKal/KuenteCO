@@ -30,7 +30,7 @@ class _UserImageWidgetState extends State<UserImageWidget> {
     try {
       final picker = ImagePicker();
 
-      // â ConfiguraciÃ³n optimizada para web y mÃ³vil
+      // â Configuración optimizada para web y móvil
       final pickedFile = await picker.pickImage(
         source: ImageSource.gallery,
         maxWidth: kIsWeb ? null : 1200,
@@ -48,7 +48,7 @@ class _UserImageWidgetState extends State<UserImageWidget> {
       final bytes = await pickedFile.readAsBytes();
 
       if (bytes.isEmpty) {
-        _showSnackBar('Error: imagen vacÃ­a', isError: true);
+        _showSnackBar('Error: imagen vacía', isError: true);
         return;
       }
 
@@ -68,7 +68,7 @@ class _UserImageWidgetState extends State<UserImageWidget> {
 
       final currentImage = widget.userController.user.value?.image;
 
-      // â Upload o update segÃºn corresponda
+      // â Upload o update según corresponda
       if (currentImage == null) {
         debugPrint('ð¤ Uploading new user image...');
         await widget.userController.uploadUserImage(multipartFile, fileName);
@@ -91,7 +91,7 @@ class _UserImageWidgetState extends State<UserImageWidget> {
       debugPrint('â Error processing user image: $e');
       debugPrint('Stack trace: $stackTrace');
 
-      // â No mostrar error si el usuario cancelÃ³ en web
+      // â No mostrar error si el usuario canceló en web
       if (kIsWeb && (e.toString().contains('User cancelled') ||
           e.toString().contains('AbortError'))) {
         return;
@@ -111,8 +111,8 @@ class _UserImageWidgetState extends State<UserImageWidget> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Â¿Eliminar imagen?'),
-        content: const Text('Â¿EstÃ¡s seguro de que deseas eliminar tu imagen de perfil?'),
+        title: const Text('¿Eliminar imagen?'),
+        content: const Text('¿Estás seguro de que deseas eliminar tu imagen de perfil?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -120,7 +120,7 @@ class _UserImageWidgetState extends State<UserImageWidget> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('SÃ­, eliminar', style: TextStyle(color: Colors.red)),
+            child: const Text('eliminar', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -184,7 +184,7 @@ class _UserImageWidgetState extends State<UserImageWidget> {
   }
 
   Widget _buildImageContent(String? imageUrl) {
-    // â Mostrar loading si estÃ¡ procesando
+    // â Mostrar loading si está procesando
     if (_isProcessing) {
       return Container(
         color: Colors.grey[200],

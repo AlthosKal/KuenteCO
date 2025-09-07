@@ -53,7 +53,7 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
     super.dispose();
   }
 
-  /// ð AcciÃ³n cuando el usuario envÃ­a el cÃ³digo ingresado
+  /// ð Acción cuando el usuario envía el código ingresado
   void _submitValidateCode() {
     if (!_formKey.currentState!.validate()) return;
 
@@ -66,7 +66,7 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
     );
   }
 
-  /// ð Mueve el foco automÃ¡ticamente entre los campos
+  /// ð Mueve el foco automáticamente entre los campos
   void _onCodeFieldChange(String value, int index) {
     if (value.length == 1 && index < 5) {
       _focusNodes[index + 1].requestFocus();
@@ -75,13 +75,13 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
     }
   }
 
-  /// ð LÃ³gica para reenviar el cÃ³digo
+  /// ð Lógica para reenviar el código
   Future<void> _resendCode() async {
     if (_validateController.timerCount > 0) return;
 
     final dto = SendVerificationCodeDTO(email: widget.email);
 
-    // â AquÃ­ tambiÃ©n decides si es registro o recuperaciÃ³n
+    // â Aquí también decides si es registro o recuperación
     await _authService.sendVerificationCode(isRegistration: false, dto: dto);
 
     _validateController.startTimer(
@@ -106,7 +106,7 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
             FormTitleText(text: widget.email),
             const SizedBox(height: 30),
 
-            /// ð¢ Campos individuales para cada dÃ­gito
+            /// ð¢ Campos individuales para cada dígito
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
@@ -151,7 +151,7 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
 
             const SizedBox(height: 20),
 
-            /// â³ Timer del cÃ³digo
+            /// â³ Timer del código
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -173,7 +173,7 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
 
             const SizedBox(height: 10),
 
-            /// ð BotÃ³n para reenviar cÃ³digo
+            /// ð Botón para reenviar código
             TextButton(
               onPressed: _validateController.timerCount == 0 ? _resendCode : null,
               child: Text(
@@ -189,7 +189,7 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
 
             const SizedBox(height: 30),
 
-            /// â BotÃ³n de verificaciÃ³n
+            /// â Botón de verificación
             ValueListenableBuilder(
               valueListenable: _validateController.isLoading,
               builder: (context, isLoading, _) {

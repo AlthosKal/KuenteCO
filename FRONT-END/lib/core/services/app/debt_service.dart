@@ -22,7 +22,6 @@ class DebtService {
     String? to,
     String? kind,
   }) async {
-    print('ð DebtService: Getting all debts');
     
     final queryParams = <String, String>{};
     if (from != null) queryParams['from'] = from;
@@ -49,7 +48,6 @@ class DebtService {
     String? to,
     String? kind,
   }) async {
-    print('ð DebtService: Getting debts by state: $state');
     
     final queryParams = <String, String>{};
     if (from != null) queryParams['from'] = from;
@@ -75,7 +73,6 @@ class DebtService {
     String? to,
     String? kind,
   }) async {
-    print('ð DebtService: Getting overdue debts');
     
     final queryParams = <String, String>{};
     if (from != null) queryParams['from'] = from;
@@ -111,7 +108,6 @@ class DebtService {
     String? to,
     String? kind,
   }) async {
-    print('ð DebtService: Getting debts expiring in $days days');
     
     final queryParams = <String, String>{
       'days': days.toString(),
@@ -139,7 +135,6 @@ class DebtService {
     String? to,
     String? kind,
   }) async {
-    print('ð DebtService: Getting total pending amount');
     
     final queryParams = <String, String>{};
     if (from != null) queryParams['from'] = from;
@@ -168,7 +163,6 @@ class DebtService {
     String? to,
     String? kind,
   }) async {
-    print('ð DebtService: Getting debt summary report');
     
     final queryParams = <String, String>{};
     if (from != null) queryParams['from'] = from;
@@ -190,7 +184,6 @@ class DebtService {
 
   // â Create new debt
   Future<DebtDTO> createDebt(NewDebtDTO dto) async {
-    print('ð DebtService: Creating new debt');
     
     final response = await _apiClient.postApp(
       '$_baseEndpoint/add',
@@ -205,7 +198,6 @@ class DebtService {
 
   // â Create multiple debts
   Future<List<DebtDTO>> createDebtsBatch(List<NewDebtDTO> dtos) async {
-    print('ð DebtService: Creating ${dtos.length} debts in batch');
     
     final response = await _apiClient.postApp(
       '$_baseEndpoint/batch/add',
@@ -222,7 +214,6 @@ class DebtService {
 
   // â Update debt
   Future<DebtDTO> updateDebt(DebtDTO dto) async {
-    print('ð DebtService: Updating debt ID: ${dto.id}');
     
     final response = await _apiClient.patchApp(
       '$_baseEndpoint/update',
@@ -237,7 +228,6 @@ class DebtService {
 
   // â Update multiple debts
   Future<List<DebtDTO>> updateDebtsBatch(List<DebtDTO> dtos) async {
-    print('ð DebtService: Updating ${dtos.length} debts in batch');
     
     final response = await _apiClient.putApp(
       '$_baseEndpoint/batch/update',
@@ -254,7 +244,6 @@ class DebtService {
 
   // â Make payment to debt
   Future<Map<String, dynamic>> makePayment(DebtPaymentDTO dto) async {
-    print('ð DebtService: Making payment to debt ID: ${dto.debtId}');
     
     final response = await _apiClient.postApp(
       '$_baseEndpoint/payment',
@@ -266,7 +255,6 @@ class DebtService {
 
   // â Update debt state
   Future<Map<String, dynamic>> updateDebtState(int id, StateDebt state) async {
-    print('ð DebtService: Updating debt state for ID: $id to $state');
     
     final response = await _apiClient.patchApp(
       '$_baseEndpoint/$id/state/${state.name}',
@@ -277,14 +265,12 @@ class DebtService {
 
   // â Delete debt
   Future<void> deleteDebt(int id) async {
-    print('ð DebtService: Deleting debt ID: $id');
     
     await _apiClient.deleteApp('$_baseEndpoint/$id');
   }
 
   // â Delete multiple debts
   Future<void> deleteDebtsBatch(List<int> ids) async {
-    print('ð DebtService: Deleting ${ids.length} debts in batch');
     
     // Note: ApiClient doesn't support query params in DELETE, need to adapt
     await _apiClient.deleteApp(
@@ -300,7 +286,6 @@ class DebtService {
     String? to,
     String? kind,
   }) async {
-    print('ð DebtService: Getting all debt enrollments');
     
     final queryParams = <String, String>{};
     if (from != null) queryParams['from'] = from;
@@ -326,7 +311,6 @@ class DebtService {
     String? to,
     String? kind,
   }) async {
-    print('ð DebtService: Getting assigned debts for profile');
     
     try {
       // Get enrollments which contain debt information
@@ -344,7 +328,6 @@ class DebtService {
             state: StateDebt.ACTIVE, // Assume active
           )).toList();
     } catch (e) {
-      print('â DebtService: Error getting assigned debts: $e');
       return [];
     }
   }
@@ -355,7 +338,6 @@ class DebtService {
     String? to,
     String? kind,
   }) async {
-    print('ð DebtService: Getting debt enrollments by user');
     
     final queryParams = <String, String>{};
     if (from != null) queryParams['from'] = from;
@@ -377,8 +359,6 @@ class DebtService {
 
   // â Enroll profile to debt
   Future<DebtEnrollmentDTO> enrollProfileToDebt(int profileId, int debtId) async {
-    print('ð DebtService: Enrolling profile $profileId to debt $debtId');
-    print('ð DebtService: Endpoint: $_baseEndpoint/enroll/add?profileId=$profileId&debtId=$debtId');
     
     try {
       final response = await _apiClient.postApp(
@@ -391,15 +371,14 @@ class DebtService {
       }
       throw Exception('Error: No data returned from server');
     } catch (e) {
-      print('â DebtService: Detailed error enrolling profile to debt: $e');
       
       // Try to extract more specific error information
       if (e.toString().contains('404')) {
         throw Exception('Error: Perfil o deuda no encontrados (profileId: $profileId, debtId: $debtId)');
       } else if (e.toString().contains('400')) {
-        throw Exception('Error: Datos invÃ¡lidos para asignaciÃ³n');
+        throw Exception('Error: Datos inválidos para asignación');
       } else if (e.toString().contains('409')) {
-        throw Exception('Error: Esta deuda ya estÃ¡ asignada a este perfil');
+        throw Exception('Error: Esta deuda ya está asignada a este perfil');
       } else if (e.toString().contains('500')) {
         throw Exception('Error del servidor: Verifica que el perfil y la deuda existan');
       }
@@ -410,7 +389,6 @@ class DebtService {
 
   // â Enroll profile to multiple debts (batch)
   Future<List<DebtEnrollmentDTO>> enrollProfileToDebtsBatch(List<Map<String, int>> enrollments) async {
-    print('ð DebtService: Batch enrolling profile to ${enrollments.length} debts');
     
     final response = await _apiClient.postApp(
       '$_baseEndpoint/enroll/add/batch',
@@ -427,14 +405,12 @@ class DebtService {
 
   // â Remove debt enrollment
   Future<void> removeDebtEnrollment(int id) async {
-    print('ð DebtService: Removing debt enrollment ID: $id');
     
     await _apiClient.deleteApp('$_baseEndpoint/enroll/$id');
   }
 
   // â Remove multiple debt enrollments (batch)
   Future<void> removeDebtEnrollmentsBatch(List<int> ids) async {
-    print('ð DebtService: Removing ${ids.length} debt enrollments in batch');
     
     await _apiClient.deleteApp(
       '$_baseEndpoint/enroll/batch?id=${ids.join(',')}',
@@ -447,20 +423,17 @@ class DebtService {
   // â Get all debt transactions (legacy compatibility)
   @Deprecated('Use getAllDebts() instead')
   Future<List<TransactionDetailDTO>> getAllDebtTransactions() async {
-    print('â ï¸  DebtService: Using deprecated getAllDebtTransactions()');
     // Return empty list as this method should be replaced
     return [];
   }
 
   // â Mark debt as paid (using new state management)
   Future<void> markDebtAsPaid(int debtId) async {
-    print('ð DebtService: Marking debt ID $debtId as paid');
     await updateDebtState(debtId, StateDebt.PAID);
   }
 
   // â Get active debts
   Future<List<DebtDTO>> getActiveDebts() async {
-    print('ð DebtService: Getting active debts');
     return await getDebtsByState(StateDebt.ACTIVE);
   }
 }

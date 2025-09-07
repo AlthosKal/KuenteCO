@@ -78,7 +78,7 @@ class TransactionCardWidget extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             
-            // TÃ­tulo
+            // Título
             const Text(
               'Transacciones',
               style: TextStyle(
@@ -91,7 +91,7 @@ class TransactionCardWidget extends StatelessWidget {
             
             const SizedBox(height: 8),
             
-            // InformaciÃ³n
+            // Información
             const Text(
               'Ver todas las transacciones',
               style: TextStyle(
@@ -113,10 +113,10 @@ class TransactionCardWidget extends StatelessWidget {
 
     final theme = Theme.of(context);
     
-    // Determinar el tipo de transacciÃ³n usando lÃ³gica hÃ­brida
+    // Determinar el tipo de transacción usando lógica híbrida
     TransactionType transactionType = _determineTransactionType(transaction!);
     
-    // Determinar color e icono basado en el tipo de transacciÃ³n
+    // Determinar color e icono basado en el tipo de transacción
     Color cardColor = customColor ?? _getTransactionColorByType(transactionType);
     IconData transactionIcon = _getTransactionIconByType(transactionType);
 
@@ -187,7 +187,7 @@ class TransactionCardWidget extends StatelessWidget {
               
               const SizedBox(height: 12),
               
-              // InformaciÃ³n adicional
+              // Información adicional
               Row(
                 children: [
                   Icon(
@@ -225,7 +225,7 @@ class TransactionCardWidget extends StatelessWidget {
                 const Divider(height: 1),
                 const SizedBox(height: 8),
                 
-                // Botones de acciÃ³n
+                // Botones de acción
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -265,7 +265,7 @@ class TransactionCardWidget extends StatelessWidget {
       return transaction.descriptionExtra!.type;
     }
     
-    // Fallback: detectar por nombre si no hay tipo explÃ­cito
+    // Fallback: detectar por nombre si no hay tipo explícito
     final name = transaction.name.toLowerCase();
     
     if (name.contains('ingreso') || name.contains('income')) {
@@ -336,7 +336,7 @@ class TransactionListItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     
-    // Determinar el tipo de transacciÃ³n usando lÃ³gica hÃ­brida
+    // Determinar el tipo de transacción usando lógica híbrida
     TransactionType transactionType = _determineTransactionType(transaction);
     
     Color transactionColor = _getTransactionColorByType(transactionType);
@@ -411,7 +411,7 @@ class TransactionListItemWidget extends StatelessWidget {
       return transaction.descriptionExtra!.type;
     }
     
-    // Fallback: detectar por nombre si no hay tipo explÃ­cito
+    // Fallback: detectar por nombre si no hay tipo explícito
     final name = transaction.name.toLowerCase();
     
     if (name.contains('ingreso') || name.contains('income')) {

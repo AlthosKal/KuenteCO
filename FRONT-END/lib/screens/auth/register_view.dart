@@ -70,7 +70,7 @@ class _RegisterFormState extends State<RegisterForm> {
       username: _usernameController.text,
       email: _emailController.text,
       password: _passwordController.text,
-      type: _selectedUserType.value, // â Se envÃ­a el enum al controller
+      type: _selectedUserType.value, // â Se envía el enum al controller
     );
   }
 
@@ -112,7 +112,7 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             const SizedBox(height: 12),
 
-            /// ð ContraseÃ±a
+            /// ð Contraseña
             ValueListenableBuilder<bool>(
               valueListenable: _registerController.obscurePassword,
               builder: (context, obscure, _) {
@@ -127,20 +127,20 @@ class _RegisterFormState extends State<RegisterForm> {
               },
             ),
 
-            /// ð Confirmar ContraseÃ±a
+            /// ð Confirmar Contraseña
             ValueListenableBuilder<bool>(
               valueListenable: _registerController.obscurePassword,
               builder: (context, obscure, _) {
                 return PasswordFormField(
                   controller: _confirmPasswordController,
                   focusNode: _confirmPasswordFocusNode,
-                  labelText: 'Confirmar ContraseÃ±a',
+                  labelText: 'Confirmar Contraseña',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Campo requerido';
                     }
                     if (value != _passwordController.text) {
-                      return 'Las contraseÃ±as no coinciden';
+                      return 'Las contraseñas no coinciden';
                     }
                     return null;
                   },
@@ -186,7 +186,7 @@ class _RegisterFormState extends State<RegisterForm> {
 
             const SizedBox(height: 20),
 
-            /// ð BotÃ³n de registrar
+            /// ð Botón de registrar
             ValueListenableBuilder(
               valueListenable: _registerController.isLoading,
               builder: (context, isLoading, _) {
@@ -200,7 +200,7 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             const SizedBox(height: 12),
 
-            /// ð BotÃ³n para volver a login
+            /// ð Botón para volver a login
             TextButton(
               onPressed: () => Navigator.pushNamed(context, AppRoutes.login),
               child: const Text.rich(
@@ -222,7 +222,7 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 
-  /// ð¨ BotÃ³n custom para Personal / Negocio
+  /// ð¨ Botón custom para Personal / Negocio
   Widget _buildAccountTypeButton({
     required String label,
     required IconData icon,

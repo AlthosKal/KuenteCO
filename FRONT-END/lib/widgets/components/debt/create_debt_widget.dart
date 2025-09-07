@@ -155,7 +155,7 @@ class _CreateDebtWidgetState extends State<CreateDebtWidget> {
             ),
           ),
           onChanged: (value) {
-            // Auto-llenar el monto pendiente si estÃ¡ vacÃ­o
+            // Auto-llenar el monto pendiente si está vacío
             if (_pendingAmountController.text.isEmpty) {
               _pendingAmountController.text = value;
             }
@@ -358,7 +358,7 @@ class _CreateDebtWidgetState extends State<CreateDebtWidget> {
       context: context,
       initialDate: _selectedExpirationDate,
       firstDate: _selectedStartDate,
-      lastDate: DateTime.now().add(const Duration(days: 3650)), // 10 aÃ±os
+      lastDate: DateTime.now().add(const Duration(days: 3650)), // 10 años
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(

@@ -30,7 +30,7 @@ class SendVerificationCodeController {
           AppRoutes.validateVerificationCode,
           arguments: email,
         );
-        ToastHelper.showSuccess(context, title: 'CÃ³digo de verificaciÃ³n enviado correctamente');
+        ToastHelper.showSuccess(context, title: 'Código de verificación enviado correctamente');
       }
     }, onError: (error){
       ToastHelper.showError(context, title: 'Error al enviar el correo', description: error.toString());

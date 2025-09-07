@@ -21,7 +21,7 @@ class DeleteBudgetWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Â¿EstÃ¡s seguro de que deseas eliminar este presupuesto?'),
+            const Text('Â¿Estás seguro de que deseas eliminar este presupuesto?'),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
@@ -60,7 +60,7 @@ class DeleteBudgetWidget {
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Esta acciÃ³n no se puede deshacer.',
+                      'Esta acción no se puede deshacer.',
                       style: TextStyle(fontSize: 13, color: Colors.red),
                     ),
                   ),
@@ -103,7 +103,7 @@ class DeleteBudgetWidget {
 
       // Cerrar loading
       Navigator.pop(context);
-      // Cerrar diÃ¡logo de confirmaciÃ³n
+      // Cerrar diálogo de confirmación
       Navigator.pop(context, true);
 
       ScaffoldMessenger.of(context).showSnackBar(

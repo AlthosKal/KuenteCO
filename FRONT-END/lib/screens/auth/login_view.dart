@@ -55,7 +55,7 @@ class _LoginFormState extends State<LoginForm> {
   void _submitLogin() {
     if (!_formKey.currentState!.validate()) return;
 
-    // Decidir quÃ© tipo de login usar basado en la selecciÃ³n
+    // Decidir qué tipo de login usar basado en la selección
     if (_selectedLoginType.value == LoginType.USER) {
       _loginController.login(
         context: context,
@@ -94,7 +94,7 @@ class _LoginFormState extends State<LoginForm> {
             ),
             const SizedBox(height: 12),
 
-            /// â Campo contraseÃ±a
+            /// â Campo contraseña
             ValueListenableBuilder<bool>(
               valueListenable: _loginController.obscurePassword,
               builder: (context, obscure, _) {
@@ -143,7 +143,7 @@ class _LoginFormState extends State<LoginForm> {
             ),
             const SizedBox(height: 10),
 
-            /// â Checkbox de recordar contraseÃ±a
+            /// â Checkbox de recordar contraseña
             ValueListenableBuilder<bool>(
               valueListenable: _loginController.rememberPassword,
               builder: (context, remember, _) {
@@ -169,7 +169,7 @@ class _LoginFormState extends State<LoginForm> {
             ),
             const SizedBox(height: 20),
 
-            /// â BotÃ³n de login
+            /// â Botón de login
             ValueListenableBuilder<LoginType>(
               valueListenable: _selectedLoginType,
               builder: (context, loginType, _) {
@@ -190,7 +190,7 @@ class _LoginFormState extends State<LoginForm> {
             ),
             const SizedBox(height: 12),
 
-            /// â BotÃ³n de registro
+            /// â Botón de registro
             TextButton(
               onPressed: () => Navigator.pushNamed(context, AppRoutes.register),
               child: const Text.rich(
@@ -207,13 +207,13 @@ class _LoginFormState extends State<LoginForm> {
               ),
             ),
 
-            /// â BotÃ³n de recuperar contraseÃ±a
+            /// â Botón de recuperar contraseña
             TextButton(
               onPressed: () =>
                   Navigator.pushNamed(context, AppRoutes.sendVerificationCode),
               child: const Text.rich(
                 TextSpan(
-                  text: '¿Olvidaste tu contraseÃ±a? ',
+                  text: '¿Olvidaste tu contraseña? ',
                   style: TextStyle(color: Colors.white),
                   children: [
                     TextSpan(
@@ -230,7 +230,7 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
-  /// ð¨ BotÃ³n custom para Usuario / Perfil
+  /// ð¨ Botón custom para Usuario / Perfil
   Widget _buildLoginTypeButton({
     required String label,
     required IconData icon,

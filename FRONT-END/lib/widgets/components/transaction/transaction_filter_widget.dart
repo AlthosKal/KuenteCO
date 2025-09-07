@@ -87,11 +87,11 @@ class _TransactionFilterWidgetState extends State<TransactionFilterWidget> {
           _buildAmountFilter(),
           const SizedBox(height: 16),
 
-          // Filtro por categorÃ­a
+          // Filtro por categoría
           _buildCategoryFilter(),
           const SizedBox(height: 20),
 
-          // Botones de acciÃ³n
+          // Botones de acción
           Row(
             children: [
               Expanded(
@@ -119,7 +119,7 @@ class _TransactionFilterWidgetState extends State<TransactionFilterWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Tipo de TransacciÃ³n',
+          'Tipo de Transacción',
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -239,7 +239,7 @@ class _TransactionFilterWidgetState extends State<TransactionFilterWidget> {
               child: TextField(
                 controller: _minAmountController,
                 decoration: const InputDecoration(
-                  labelText: 'Monto mÃ­nimo',
+                  labelText: 'Monto mínimo',
                   prefixText: '\$ ',
                   border: OutlineInputBorder(),
                 ),
@@ -255,7 +255,7 @@ class _TransactionFilterWidgetState extends State<TransactionFilterWidget> {
               child: TextField(
                 controller: _maxAmountController,
                 decoration: const InputDecoration(
-                  labelText: 'Monto mÃ¡ximo',
+                  labelText: 'Monto máximo',
                   prefixText: '\$ ',
                   border: OutlineInputBorder(),
                 ),
@@ -277,7 +277,7 @@ class _TransactionFilterWidgetState extends State<TransactionFilterWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'CategorÃ­a',
+          'Categoría',
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -286,22 +286,22 @@ class _TransactionFilterWidgetState extends State<TransactionFilterWidget> {
         DropdownButtonFormField<int>(
           value: _selectedCategoryId,
           decoration: const InputDecoration(
-            labelText: 'Seleccionar categorÃ­a',
+            labelText: 'Seleccionar categoría',
             border: OutlineInputBorder(),
           ),
           items: [
             const DropdownMenuItem<int>(
               value: null,
-              child: Text('Todas las categorÃ­as'),
+              child: Text('Todas las categorías'),
             ),
-            // TODO: Cargar categorÃ­as reales desde el servicio
+            // TODO: Cargar categorías reales desde el servicio
             DropdownMenuItem<int>(
               value: 1,
-              child: Text('CategorÃ­a 1'),
+              child: Text('Categoría 1'),
             ),
             DropdownMenuItem<int>(
               value: 2,
-              child: Text('CategorÃ­a 2'),
+              child: Text('Categoría 2'),
             ),
           ],
           onChanged: (value) {
@@ -383,7 +383,7 @@ class _TransactionFilterWidgetState extends State<TransactionFilterWidget> {
   }
 }
 
-// Widget para filtros rÃ¡pidos (chips horizontales)
+// Widget para filtros rápidos (chips horizontales)
 class QuickFiltersWidget extends StatefulWidget {
   final Function(String) onFilterSelected;
   final String? selectedFilter;

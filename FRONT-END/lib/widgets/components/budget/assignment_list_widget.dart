@@ -110,9 +110,9 @@ class _AssignmentListWidgetState extends State<AssignmentListWidget> with MultiS
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirmar EliminaciÃ³n'),
+        title: const Text('Confirmar Eliminación'),
         content: Text(
-          'Â¿EstÃ¡s seguro de que deseas eliminar ${selectedEnrollments.length} asignaciones?\n\nEsta acciÃ³n no se puede deshacer.',
+          'Â¿Estás seguro de que deseas eliminar ${selectedEnrollments.length} asignaciones?\n\nEsta acción no se puede deshacer.',
         ),
         actions: [
           TextButton(
@@ -140,14 +140,14 @@ class _AssignmentListWidgetState extends State<AssignmentListWidget> with MultiS
         }
         print('AssignmentListWidget: Attempting to delete enrollment IDs: $ids');
         
-        // Verificar que no hay IDs invÃ¡lidos (0 o null)
+        // Verificar que no hay IDs inválidos (0 o null)
         final validIds = ids.where((id) => id != 0).toList();
         if (validIds.length != ids.length) {
           print('AssignmentListWidget: Warning! Found invalid IDs. Original: $ids, Valid: $validIds');
         }
         
         if (validIds.isEmpty) {
-          _showErrorSnackBar('No se encontraron IDs vÃ¡lidos para eliminar');
+          _showErrorSnackBar('No se encontraron IDs válidos para eliminar');
           return;
         }
         
@@ -165,7 +165,7 @@ class _AssignmentListWidgetState extends State<AssignmentListWidget> with MultiS
     return AppBar(
       title: selectedEnrollmentKeys.isNotEmpty 
           ? Text('${selectedEnrollmentKeys.length} seleccionadas')
-          : const Text('GestiÃ³n de Asignaciones'),
+          : const Text('Gestión de Asignaciones'),
       actions: [
         if (selectedEnrollmentKeys.isNotEmpty)
           IconButton(
@@ -177,7 +177,7 @@ class _AssignmentListWidgetState extends State<AssignmentListWidget> with MultiS
           IconButton(
             icon: const Icon(Icons.clear),
             onPressed: clearSelection,
-            tooltip: 'Limpiar selecciÃ³n',
+            tooltip: 'Limpiar selección',
           ),
       ],
     );
@@ -244,7 +244,7 @@ class _AssignmentListWidgetState extends State<AssignmentListWidget> with MultiS
       controller: scrollController,
       itemCount: summaries.length + 1, // +1 para el contenedor de crear asignaciones
       itemBuilder: (context, index) {
-        // Si es el Ãºltimo item, mostrar el contenedor de crear asignaciones
+        // Si es el último item, mostrar el contenedor de crear asignaciones
         if (index == summaries.length) {
           return _buildCreateAssignmentsContainer();
         }
@@ -297,7 +297,7 @@ class _AssignmentListWidgetState extends State<AssignmentListWidget> with MultiS
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Crear mÃºltiples asignaciones',
+                          'Crear múltiples asignaciones',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -469,7 +469,7 @@ class _AssignmentListWidgetState extends State<AssignmentListWidget> with MultiS
           ),
           const SizedBox(height: 8),
           Text(
-            'Crea tu primera asignaciÃ³n usando el contenedor de abajo',
+            'Crea tu primera asignación usando el contenedor de abajo',
             style: TextStyle(
               color: Colors.grey[500],
             ),

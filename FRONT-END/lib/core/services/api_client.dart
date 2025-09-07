@@ -88,7 +88,7 @@ class ApiClient {
 
   bool get isInitialized => _isInitialized;
 
-  // MÃ©todos API con manejo de errores
+  // Métodos API con manejo de errores
   Future<Response> getApp(
       String path, {
         Map<String, dynamic>? queryParameters,
@@ -131,7 +131,7 @@ class ApiClient {
 
   Future<Response> patchApp(String path, [dynamic data]) async {
     try {
-      // Si es FormData, permitir que Dio maneje el Content-Type automÃ¡ticamente
+      // Si es FormData, permitir que Dio maneje el Content-Type automáticamente
       final options = data is FormData 
           ? Options(headers: {'Accept': 'application/json'}) 
           : null;
@@ -164,7 +164,7 @@ class ApiClient {
     }
   }
 
-  // MÃ©todos para la API del chat
+  // Métodos para la API del chat
   Future<Response> getChat(String path) async {
     try {
       return await _dioChat.get(path);

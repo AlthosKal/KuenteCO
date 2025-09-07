@@ -62,7 +62,7 @@ class DeleteTransactionWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Eliminar TransacciÃ³n',
+                        'Eliminar Transacción',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -70,7 +70,7 @@ class DeleteTransactionWidget extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Esta acciÃ³n no se puede deshacer',
+                        'Esta acción no se puede deshacer',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Colors.white.withValues(alpha: 0.9),
                         ),
@@ -228,7 +228,7 @@ class DeleteTransactionWidget extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Â¿EstÃ¡s seguro de que deseas eliminar esta transacciÃ³n? Esta acciÃ³n no se puede deshacer.',
+                          'Â¿Estás seguro de que deseas eliminar esta transacción? Esta acción no se puede deshacer.',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Colors.red[700],
                           ),
@@ -286,7 +286,7 @@ class DeleteTransactionWidget extends StatelessWidget {
                                 ),
                               )
                             : const Text(
-                                'Eliminar TransacciÃ³n',
+                                'Eliminar Transacción',
                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                       ),

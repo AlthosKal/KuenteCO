@@ -86,7 +86,7 @@ class _DeleteMultipleBudgetsWidgetState extends State<DeleteMultipleBudgetsWidge
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Esta acciÃ³n eliminarÃ¡ los presupuestos seleccionados permanentemente.',
+                      'Esta acción eliminará los presupuestos seleccionados permanentemente.',
                       style: TextStyle(fontSize: 13, color: Colors.red[700]),
                     ),
                   ),
@@ -137,7 +137,7 @@ class _DeleteMultipleBudgetsWidgetState extends State<DeleteMultipleBudgetsWidge
                 Text(
                   selectedCount > 0 
                     ? '$selectedCount presupuesto${selectedCount == 1 ? '' : 's'} seleccionado${selectedCount == 1 ? '' : 's'}'
-                    : 'NingÃºn presupuesto seleccionado',
+                    : 'Ningún presupuesto seleccionado',
                   style: TextStyle(
                     color: selectedCount > 0 ? Colors.red : Colors.grey,
                     fontWeight: FontWeight.w500,
@@ -243,7 +243,7 @@ class _DeleteMultipleBudgetsWidgetState extends State<DeleteMultipleBudgetsWidge
     try {
       final budgetController = Provider.of<BudgetController>(context, listen: false);
       
-      // Usar el mÃ©todo batch para eliminar mÃºltiples presupuestos
+      // Usar el método batch para eliminar múltiples presupuestos
       await budgetController.deleteBudgetsBatch(selectedIds);
 
       if (mounted) {

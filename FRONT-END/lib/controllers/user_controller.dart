@@ -109,7 +109,7 @@ class UserController extends ChangeNotifier {
       isLoading.value = true;
       await _userService.deleteUserImage();
       userImage = null;
-      // Actualizar tambiÃ©n la informaciÃ³n completa del usuario
+      // Actualizar también la información completa del usuario
       if (user.value != null) {
         user.value = UserDetailDTO(
           version: user.value!.version,

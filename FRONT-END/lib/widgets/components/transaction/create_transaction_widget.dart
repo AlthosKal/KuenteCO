@@ -38,12 +38,12 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
   DateTime _selectedDate = DateTime.now();
   TransactionType _selectedType = TransactionType.EXPENSE; // Default to Egreso
   
-  // Special enrollment object to represent "Sin categorÃ­a"
+  // Special enrollment object to represent "Sin categoría"
   static final CategoryEnrollmentDTO _noCategoryOption = CategoryEnrollmentDTO(
     id: -1, // Use -1 as a special ID for "no category"
     profileId: -1,
     categoryId: null, // null means no category
-    categoryName: 'Sin categorÃ­a',
+    categoryName: 'Sin categoría',
     userEmail: '',
     profileEmail: '',
     enrollmentDate: DateTime.now().toIso8601String(),
@@ -54,7 +54,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
     super.initState();
     _dateController.text = _formatDate(_selectedDate);
     
-    // Set "Sin categorÃ­a" as default selection
+    // Set "Sin categoría" as default selection
     _selectedEnrollment = _noCategoryOption;
     
     // Load profile enrollments (assigned categories, budgets, debts) when widget initializes
@@ -94,7 +94,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
       case TransactionType.EXPENSE:
         return 'Egreso';
       default:
-        return 'Egreso';
+        return 'Ingreso';
     }
   }
   
@@ -105,7 +105,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
       case TransactionType.EXPENSE:
         return Icons.trending_down;
       default:
-        return Icons.trending_down;
+        return Icons.trending_up;
     }
   }
   
@@ -116,7 +116,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
       case TransactionType.EXPENSE:
         return Colors.red;
       default:
-        return Colors.red;
+        return Colors.green;
     }
   }
 
@@ -221,7 +221,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                     const SizedBox(height: 20),
 
                     /// TIPO DE TRANSACCIï¿½N
-                    _buildInputLabel('Tipo de transacciï¿½n'),
+                    _buildInputLabel('Tipo de transacción'),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<TransactionType>(
                       key: ValueKey(_selectedType), // Force rebuild when type changes
@@ -281,7 +281,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                       },
                       validator: (value) {
                         if (value == null) {
-                          return 'Selecciona el tipo de transacciï¿½n';
+                          return 'Selecciona el tipo de transacción';
                         }
                         return null;
                       },
@@ -312,7 +312,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                     const SizedBox(height: 20),
 
                     /// CATEGORï¿½A
-                    _buildInputLabel('Categoria'),
+                    _buildInputLabel('Categoría'),
                     const SizedBox(height: 8),
                     Consumer<CategoryController>(
                       builder: (context, categoryController, child) {
@@ -334,22 +334,22 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 ),
                                 SizedBox(width: 12),
-                                Text('Cargando categorias...'),
+                                Text('Cargando categorías...'),
                               ],
                             ),
                           );
                         }
 
-                        // Always show dropdown even if no enrollments - user can select "Sin categorÃ­a"
+                        // Always show dropdown even if no enrollments - user can select "Sin categoría"
 
                         return DropdownButtonFormField<CategoryEnrollmentDTO>(
                           value: _selectedEnrollment,
                           decoration: _buildInputDecoration(
-                            hint: 'Selecciona una categoria',
+                            hint: 'Selecciona una categoría',
                             icon: Icons.category,
                           ),
                           items: [
-                            // Add "Sin categorÃ­a" option at the top
+                            // Add "Sin categoría" option at the top
                             DropdownMenuItem(
                               value: _noCategoryOption,
                               child: Text(_noCategoryOption.categoryName),
@@ -506,7 +506,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                                     ),
                                   )
                                 : const Text(
-                                    'Crear Transaccion',
+                                    'Crear Transacción',
                                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                   ),
                           ),

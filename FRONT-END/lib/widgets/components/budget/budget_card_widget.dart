@@ -51,18 +51,15 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
         await budgetController.loadEnrollments();
       } else {
         // Si es un usuario regular, cargar sus presupuestos
-        print('BudgetCardWidget: Loading user budgets...');
         await budgetController.loadBudgets();
       }
     } catch (e) {
-      print('BudgetCardWidget: Error loading data: $e');
       // No hacer fallback para perfiles, solo para usuarios
       final role = await _storage.read(key: 'role');
       if (role != 'ROLE_PROFILE') {
         try {
           await budgetController.loadBudgets();
         } catch (fallbackError) {
-          print('BudgetCardWidget: Fallback also failed: $fallbackError');
         }
       }
     }
@@ -322,7 +319,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
                   ),
                   const SizedBox(height: 4),
                   const Text(
-                    'El administrador aÃºn no te ha asignado presupuestos',
+                    'El administrador aún no te ha asignado presupuestos',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.purple,

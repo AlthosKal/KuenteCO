@@ -48,7 +48,7 @@ class AIAnalysisControlsWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'AnÃ¡lisis Inteligente de Deudas',
+                            'Análisis Inteligente de Deudas',
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.grey[800],
@@ -67,17 +67,17 @@ class AIAnalysisControlsWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 
-                // AnÃ¡lisis General y de Riesgo
+                // Análisis General y de Riesgo
                 Row(
                   children: [
                     Expanded(
                       child: _buildAnalysisButton(
                         context: context,
                         icon: Icons.analytics,
-                        label: 'AnÃ¡lisis\nGeneral',
+                        label: 'Análisis\nGeneral',
                         color: Colors.blue,
                         onPressed: isLoading ? null : onAnalyzeGeneral,
-                        description: 'EvaluaciÃ³n completa de todas tus deudas',
+                        description: 'Evaluación completa de todas tus deudas',
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -85,10 +85,10 @@ class AIAnalysisControlsWidget extends StatelessWidget {
                       child: _buildAnalysisButton(
                         context: context,
                         icon: Icons.warning_amber,
-                        label: 'AnÃ¡lisis de\nRiesgo',
+                        label: 'Análisis de\nRiesgo',
                         color: Colors.orange,
                         onPressed: isLoading ? null : onAnalyzeRisk,
-                        description: 'EvalÃºa el riesgo financiero de tus deudas',
+                        description: 'Evalúa el riesgo financiero de tus deudas',
                       ),
                     ),
                   ],
@@ -236,7 +236,7 @@ class AIAnalysisControlsWidget extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'La IA estÃ¡ procesando tu informaciÃ³n financiera',
+                  'La IA está procesando tu información financiera',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.blue[600],
@@ -257,12 +257,12 @@ class AIAnalysisControlsWidget extends StatelessWidget {
     
     switch (chatController.lastDebtAnalysisType) {
       case 'GENERAL_ANALYSIS':
-        analysisTypeText = 'AnÃ¡lisis General';
+        analysisTypeText = 'Análisis General';
         analysisIcon = Icons.analytics;
         analysisColor = Colors.blue;
         break;
       case 'RISK_ANALYSIS':
-        analysisTypeText = 'AnÃ¡lisis de Riesgo';
+        analysisTypeText = 'Análisis de Riesgo';
         analysisIcon = Icons.warning_amber;
         analysisColor = Colors.orange;
         break;
@@ -286,7 +286,7 @@ class AIAnalysisControlsWidget extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Ãltimo anÃ¡lisis realizado: $analysisTypeText',
+              'Ãltimo análisis realizado: $analysisTypeText',
               style: TextStyle(
                 fontSize: 12,
                 color: analysisColor,

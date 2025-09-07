@@ -67,7 +67,7 @@ class DeleteDebtWidget extends StatelessWidget {
                 ),
               ),
               Text(
-                'Esta acciÃ³n no se puede deshacer',
+                'Esta acción no se puede deshacer',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Colors.grey[600],
                 ),
@@ -100,7 +100,7 @@ class DeleteDebtWidget extends StatelessWidget {
               const Icon(Icons.warning, color: Colors.red, size: 20),
               const SizedBox(width: 8),
               Text(
-                'Â¿EstÃ¡s seguro que quieres eliminar esta deuda?',
+                'Â¿Estás seguro que quieres eliminar esta deuda?',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: Colors.red[700],
                   fontWeight: FontWeight.w600,
@@ -123,7 +123,7 @@ class DeleteDebtWidget extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Esta acciÃ³n eliminarÃ¡ permanentemente la deuda y no podrÃ¡ ser recuperada.',
+                    'Esta acción eliminará permanentemente la deuda y no podrá ser recuperada.',
                     style: TextStyle(
                       color: Colors.orange[700],
                       fontSize: 13,
@@ -264,8 +264,8 @@ class DeleteDebtWidget extends StatelessWidget {
   }
 
   String _getDebtDescription() {
-    // DebtDTO no tiene campos de descripciÃ³n como TransactionDetailDTO
-    // Devolvemos informaciÃ³n bÃ¡sica de la deuda
+    // DebtDTO no tiene campos de descripción como TransactionDetailDTO
+    // Devolvemos información básica de la deuda
     return 'Deuda: ${debt.name} - Estado: ${debt.state.name}';
   }
 

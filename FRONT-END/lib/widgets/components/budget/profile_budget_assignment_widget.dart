@@ -310,7 +310,7 @@ class _ProfileBudgetAssignmentWidgetState extends State<ProfileBudgetAssignmentW
             
             const SizedBox(height: 16),
             
-            // Botones de acciÃ³n
+            // Botones de acción
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [

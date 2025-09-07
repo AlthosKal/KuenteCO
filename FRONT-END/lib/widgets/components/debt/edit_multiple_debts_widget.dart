@@ -115,7 +115,7 @@ class _EditMultipleDebtsWidgetState extends State<EditMultipleDebtsWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Editar MÃºltiples Deudas',
+                  'Editar Múltiples Deudas',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.blue[700],
@@ -277,7 +277,7 @@ class _EditMultipleDebtsWidgetState extends State<EditMultipleDebtsWidget> {
                       return 'Requerido';
                     }
                     if (double.tryParse(value) == null) {
-                      return 'InvÃ¡lido';
+                      return 'Inválido';
                     }
                     if (double.parse(value) <= 0) {
                       return 'Debe ser > 0';
@@ -308,7 +308,7 @@ class _EditMultipleDebtsWidgetState extends State<EditMultipleDebtsWidget> {
                       return 'Requerido';
                     }
                     if (double.tryParse(value) == null) {
-                      return 'InvÃ¡lido';
+                      return 'Inválido';
                     }
                     final pendingAmount = double.parse(value);
                     if (pendingAmount < 0) {

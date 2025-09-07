@@ -79,10 +79,10 @@ class _EditProfileState extends State<EditProfile> {
       widget.onSuccess?.call();
 
       if (mounted) {
-        Navigator.of(context).pop(); // Cerrar el diÃ¡logo
+        Navigator.of(context).pop(); // Cerrar el diálogo
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('â Perfil actualizado con Ã©xito'),
+            content: Text('â Perfil actualizado con éxito'),
             backgroundColor: Colors.green,
           ),
         );
@@ -135,7 +135,7 @@ class _EditProfileState extends State<EditProfile> {
               ),
               const Divider(),
 
-              /// --- Formulario de ediciÃ³n de perfil ---
+              /// --- Formulario de edición de perfil ---
               Form(
                 key: _formKey,
                 child: Column(
@@ -165,14 +165,14 @@ class _EditProfileState extends State<EditProfile> {
                     TextFormField(
                       controller: _emailController,
                       decoration: const InputDecoration(
-                        labelText: 'Correo electrÃ³nico',
+                        labelText: 'Correo electrónico',
                         prefixIcon: Icon(Icons.email),
                       ),
                       enabled: !_isLoading,
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) =>
                       value == null || !value.contains('@')
-                          ? 'Correo invÃ¡lido'
+                          ? 'Correo inválido'
                           : null,
                     ),
                     const SizedBox(height: 16),
@@ -191,11 +191,11 @@ class _EditProfileState extends State<EditProfile> {
 
               const SizedBox(height: 12),
 
-              /// --- BotÃ³n cambiar contraseÃ±a ---
+              /// --- Botón cambiar contraseña ---
               SizedBox(
                 width: double.infinity,
                 child: PrimaryButton(
-                  label: "Cambiar contraseÃ±a",
+                  label: "Cambiar contraseña",
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
