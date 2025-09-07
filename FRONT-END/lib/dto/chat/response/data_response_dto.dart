@@ -13,10 +13,19 @@ class DataResponseDTO {
 
   factory DataResponseDTO.fromJson(Map<String, dynamic> json) {
     return DataResponseDTO(
-      name: json['name'],
-      description: json['description'],
-      values:
-      (json['values'] as List).map((e) => CharDataDTO.fromJson(e)).toList(),
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+      values: json['values'] != null
+          ? (json['values'] as List).map((e) => CharDataDTO.fromJson(e)).toList()
+          : [],
+    );
+  }
+
+  factory DataResponseDTO.empty() {
+    return DataResponseDTO(
+      name: '',
+      description: '',
+      values: [],
     );
   }
 }

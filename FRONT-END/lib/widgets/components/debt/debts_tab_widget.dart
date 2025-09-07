@@ -6,7 +6,7 @@ import '../../../controllers/profile_controller.dart';
 import '../../../dto/app/debt/debt_dto.dart';
 import '../../../dto/app/debt/new_debt_dto.dart';
 import '../../../dto/app/profile/profile_detail_dto.dart';
-import '../common/detail_modal_widget.dart';
+import '../../common/detail_modal_widget.dart';
 import '../transaction/multiple_operations_widget.dart';
 import 'create_debt_widget.dart';
 import 'create_multiple_debts_widget.dart';

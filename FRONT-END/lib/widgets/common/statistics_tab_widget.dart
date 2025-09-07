@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../transaction/transaction_statistics_widget.dart';
+import '../components/transaction/transaction_statistics_widget.dart';
 
 class StatisticsTabWidget extends StatelessWidget {
   final String? userRole;

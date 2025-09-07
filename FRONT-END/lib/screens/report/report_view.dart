@@ -7,6 +7,8 @@ import '../../widgets/components/report/chat/ai_analysis_controls_widget.dart';
 import '../../widgets/components/report/chat/debt_analysis_results_widget.dart';
 import '../../widgets/components/report/excel/excel_controls_widget.dart';
 import '../../widgets/components/report/excel/excel_validation_results_widget.dart';
+import '../../widgets/components/chat/chat_message_widget.dart';
+import '../../widgets/components/chat/animated_typing_dots.dart';
 
 class ReportView extends StatefulWidget {
   const ReportView({Key? key}) : super(key: key);
@@ -18,18 +20,21 @@ class ReportView extends StatefulWidget {
 class _ReportViewState extends State<ReportView> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late TextEditingController _messageController;
+  late ScrollController _chatScrollController;
   
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _messageController = TextEditingController();
+    _chatScrollController = ScrollController();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     _messageController.dispose();
+    _chatScrollController.dispose();
     super.dispose();
   }
 
@@ -268,18 +273,41 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
   }
 
   Widget _buildChatArea(BuildContext context, ChatController chatController) {
-    if (chatController.chatHistory.isEmpty && chatController.lastChatResponse == null) {
+    if (chatController.messages.isEmpty && !chatController.isTyping) {
       return _buildEmptyChat(context);
     }
 
     return Container(
       color: Colors.white,
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _getChatMessageCount(chatController),
-        itemBuilder: (context, index) {
-          return _buildChatMessage(context, chatController, index);
-        },
+      child: Column(
+        children: [
+          // Lista de mensajes
+          Expanded(
+            child: ListView.builder(
+              controller: _chatScrollController,
+              padding: const EdgeInsets.all(16),
+              itemCount: chatController.messages.length + (chatController.isTyping ? 1 : 0),
+              itemBuilder: (context, index) {
+                // Mostrar indicador de escritura al final
+                if (index == chatController.messages.length && chatController.isTyping) {
+                  return _buildTypingIndicator(context, chatController);
+                }
+                
+                final message = chatController.messages[index];
+                return ChatMessageWidget(
+                  message: message.content,
+                  type: message.isUser ? MessageType.user : MessageType.ai,
+                  timestamp: message.timestamp,
+                  enableTypewriter: !message.isUser, // Solo para mensajes de IA
+                  onTypewriterComplete: () {
+                    // Scroll automático cuando termina la animación
+                    _scrollToBottom();
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -345,59 +373,69 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildChatMessage(BuildContext context, ChatController chatController, int index) {
-    // Por ahora mostrar mensajes básicos, se puede expandir después
-    final isUser = index % 2 == 0;
-    final message = isUser ? "Mensaje del usuario" : "Respuesta de la IA";
-
+  Widget _buildTypingIndicator(BuildContext context, ChatController chatController) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (!isUser) ...[
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: Colors.blue[600],
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Icon(Icons.psychology, color: Colors.white, size: 18),
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.blue[600],
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  offset: const Offset(0, 2),
+                  blurRadius: 4,
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-          ],
+            child: const Icon(Icons.psychology, color: Colors.white, size: 20),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isUser ? Colors.blue[600] : Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                message,
-                style: TextStyle(
-                  color: isUser ? Colors.white : Colors.grey[800],
+                color: Colors.grey[50],
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(4),
+                  topRight: Radius.circular(20),
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
                 ),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Row(
+                children: [
+                  AnimatedTypingDots(
+                    color: Colors.blue[400],
+                    size: 6,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      chatController.currentTypingMessage ?? 'La IA está escribiendo...',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          if (isUser) ...[
-            const SizedBox(width: 12),
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: Colors.grey[400],
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Icon(Icons.person, color: Colors.white, size: 18),
-            ),
-          ],
         ],
       ),
     );
   }
+
+  // Método removido, ahora se usa AnimatedTypingDots widget
 
   Widget _buildMessageInput(BuildContext context, ChatController chatController, DebtController debtController) {
     return Container(
@@ -648,9 +686,22 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
     _messageController.clear();
     
     try {
-      await chatController.sendMessage(message);
+      await chatController.sendMessageWithTypewriter(message);
+      _scrollToBottom();
     } catch (e) {
       _showErrorMessage(context, 'Error enviando mensaje: $e');
+    }
+  }
+
+  void _scrollToBottom() {
+    if (_chatScrollController.hasClients) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        _chatScrollController.animateTo(
+          _chatScrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      });
     }
   }
 
@@ -659,10 +710,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
     _sendMessage();
   }
 
-  int _getChatMessageCount(ChatController chatController) {
-    // Por ahora retornar 0, se puede implementar el conteo real después
-    return 0;
-  }
+  // Método ya no necesario, se usa chatController.messages.length
 
   String _truncateText(String text, int maxLength) {
     if (text.length <= maxLength) return text;

@@ -9,6 +9,23 @@ import '../dto/chat/response/debt_analysis_response_dto.dart';
 import '../dto/chat/response/chat_history_dto.dart';
 import '../utils/enum/model_enum.dart';
 
+// Modelo para mensajes de chat
+class ChatMessage {
+  final String id;
+  final String content;
+  final bool isUser;
+  final DateTime timestamp;
+  final bool isTyping;
+
+  ChatMessage({
+    required this.id,
+    required this.content,
+    required this.isUser,
+    required this.timestamp,
+    this.isTyping = false,
+  });
+}
+
 class ChatController extends ChangeNotifier {
   final ChatService _chatService;
   final history.ChatService _historyService;
@@ -29,6 +46,11 @@ class ChatController extends ChangeNotifier {
   // Estado de análisis de deudas
   bool _isAnalyzingDebts = false;
   String? _lastDebtAnalysisType;
+  
+  // Control de mensajes en tiempo real
+  final List<ChatMessage> _messages = [];
+  String? _currentTypingMessage;
+  bool _isTyping = false;
 
   ChatController(this._chatService, this._historyService);
 
@@ -43,6 +65,11 @@ class ChatController extends ChangeNotifier {
   DebtAnalysisResponseDTO? get lastDebtAnalysis => _lastDebtAnalysis;
   List<ChatHistoryDTO> get chatHistory => List.unmodifiable(_chatHistory);
   String? get lastDebtAnalysisType => _lastDebtAnalysisType;
+  
+  // Getters para mensajes en tiempo real
+  List<ChatMessage> get messages => List.unmodifiable(_messages);
+  bool get isTyping => _isTyping;
+  String? get currentTypingMessage => _currentTypingMessage;
 
   void _setLoading(bool loading) {
     _isLoading = loading;
@@ -56,6 +83,12 @@ class ChatController extends ChangeNotifier {
 
   void _setError(String? error) {
     _errorMessage = error;
+    notifyListeners();
+  }
+
+  void _setTyping(bool typing, {String? message}) {
+    _isTyping = typing;
+    _currentTypingMessage = message;
     notifyListeners();
   }
 
@@ -329,5 +362,94 @@ class ChatController extends ChangeNotifier {
       userId: "dummy_user_id", 
       monthlyIncome: 50000.0, // Valor dummy
     );
+  }
+
+  /// Agregar mensaje del usuario
+  void _addUserMessage(String content) {
+    final message = ChatMessage(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      content: content,
+      isUser: true,
+      timestamp: DateTime.now(),
+    );
+    _messages.add(message);
+    notifyListeners();
+  }
+
+  /// Agregar mensaje de la IA
+  void _addAIMessage(String content) {
+    final message = ChatMessage(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      content: content,
+      isUser: false,
+      timestamp: DateTime.now(),
+    );
+    _messages.add(message);
+    notifyListeners();
+  }
+
+  /// Limpiar todos los mensajes
+  void clearMessages() {
+    _messages.clear();
+    _setTyping(false);
+    notifyListeners();
+  }
+
+  /// Actualizar método sendMessage para incluir manejo de mensajes
+  Future<void> sendMessageWithTypewriter(String message, {Model? model}) async {
+    print('🤖 ChatController: Enviando mensaje con efecto typewriter');
+    _setLoading(true);
+    _setError(null);
+    
+    // Agregar mensaje del usuario inmediatamente
+    _addUserMessage(message);
+
+    try {
+      final dto = ChatDTO(
+        model: model ?? Model.OPENAI,
+        conversationId: _currentConversationId,
+        prompt: message,
+      );
+
+      // Mostrar indicador de que la IA está escribiendo
+      _setTyping(true, message: 'La IA está analizando tu consulta...');
+
+      _lastChatResponse = await _chatService.askAi(dto);
+      
+      // Detener indicador de escritura
+      _setTyping(false);
+      
+      // Manejo seguro de la respuesta
+      if (_lastChatResponse != null) {
+        _currentConversationId = _lastChatResponse!.conversationId;
+        
+        // Validar que la respuesta tenga contenido antes de agregarlo
+        final responseText = _lastChatResponse!.analysis.response;
+        if (responseText.isNotEmpty) {
+          _addAIMessage(responseText);
+          await _addToHistory(message, responseText);
+        } else {
+          final fallbackMessage = 'La IA ha procesado tu consulta, pero no se pudo obtener una respuesta de texto.';
+          _addAIMessage(fallbackMessage);
+          await _addToHistory(message, fallbackMessage);
+        }
+      } else {
+        final errorMessage = 'No se pudo obtener respuesta del servidor.';
+        _addAIMessage(errorMessage);
+      }
+      
+      print('✅ ChatController: Mensaje enviado y respuesta recibida');
+    } catch (e, stackTrace) {
+      print('❌ ChatController: Error enviando mensaje: $e');
+      print('❌ StackTrace: $stackTrace');
+      _setTyping(false);
+      
+      // Agregar mensaje de error visible al usuario
+      final errorMessage = 'Lo siento, ocurrió un error al procesar tu mensaje. Por favor, intenta nuevamente.';
+      _addAIMessage(errorMessage);
+      _setError('Error al enviar mensaje: ${e.toString()}');
+    } finally {
+      _setLoading(false);
+    }
   }
 }
