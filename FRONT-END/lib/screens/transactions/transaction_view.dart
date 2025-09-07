@@ -11,7 +11,7 @@ import '../../core/services/app/debt_service.dart';
 import '../../core/services/app/transaction_service.dart';
 import '../../widgets/common/background/background_widget.dart';
 import '../../widgets/common/navbar/navbar_logged_widget.dart';
-import '../../widgets/components/common/statistics_tab_widget.dart';
+import '../../widgets/common/statistics_tab_widget.dart';
 import '../../widgets/components/debt/debts_tab_widget.dart';
 import '../../widgets/components/transaction/transaction_header_widget.dart';
 import '../../widgets/components/transaction/transactions_tab_widget.dart';

@@ -71,7 +71,7 @@ class DetailModalWidget extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             if (details.isNotEmpty) ...[
               const SizedBox(height: 24),
               /// DETALLES
@@ -80,7 +80,7 @@ class DetailModalWidget extends StatelessWidget {
                 child: _buildDetailRow(context, detail.label, detail.value),
               )).toList(),
             ],
-            
+
             if (actions.isNotEmpty) ...[
               const SizedBox(height: 24),
               /// ACCIONES
