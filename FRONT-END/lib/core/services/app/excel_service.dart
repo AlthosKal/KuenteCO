@@ -18,7 +18,16 @@ class ExcelService {
     print('🔄 ExcelService: Iniciando exportación de datos a Excel...');
     
     try {
-      final response = await _apiClient.getApp('/excel/export');
+      // Configurar para recibir datos binarios
+      final response = await _apiClient.getApp(
+        '/excel/export',
+        options: Options(
+          responseType: ResponseType.bytes,
+          headers: {
+            'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          },
+        ),
+      );
       
       print('✅ ExcelService: Exportación completada exitosamente');
       return response;

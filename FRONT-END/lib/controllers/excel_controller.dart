@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import '../core/services/app/excel_service.dart';
 import '../dto/app/excel/debt_excel_validation_result_dto.dart';
 import 'dart:typed_data';
+import 'dart:convert';
 
 // Import condicional para descarga de archivos
 import 'excel_download_stub.dart'
@@ -66,19 +67,27 @@ class ExcelController extends ChangeNotifier {
         final timestamp = DateTime.now().millisecondsSinceEpoch;
         final filename = 'finanzas_$timestamp.xlsx';
         
-        final filePath = await _excelService.downloadExcelFile(
-          response.data!,
-          filename,
-        );
+        // Con ResponseType.bytes, los datos deberían ser Uint8List
+        Uint8List bytes;
+        if (response.data is Uint8List) {
+          bytes = response.data!;
+        } else if (response.data is List<int>) {
+          bytes = Uint8List.fromList(response.data!);
+        } else {
+          throw Exception('Formato de datos no soportado: ${response.data.runtimeType}. Esperado Uint8List o List<int>');
+        }
         
-        _lastDownloadedFile = filePath;
+        // Usar descarga multiplataforma
+        final filePath = await download.downloadFile(bytes, filename);
+        
+        _lastDownloadedFile = filePath ?? filename;
         _setSuccess('Datos exportados exitosamente a: $filename');
         print('✅ ExcelController: Exportación completada');
       } else {
         throw Exception('No se recibieron datos del servidor');
       }
     } catch (e) {
-      print('✅ ExcelController: Error en exportación: $e');
+      print('❌ ExcelController: Error en exportación: $e');
       _setError('Error al exportar datos: ${e.toString()}');
     } finally {
       _setLoading(false);
@@ -183,12 +192,20 @@ class ExcelController extends ChangeNotifier {
         final timestamp = DateTime.now().millisecondsSinceEpoch;
         final filename = 'plantilla_finanzas_$timestamp.xlsx';
         
-        final filePath = await _excelService.downloadExcelFile(
-          response.data!,
-          filename,
-        );
+        // Con ResponseType.bytes, los datos deberían ser Uint8List
+        Uint8List bytes;
+        if (response.data is Uint8List) {
+          bytes = response.data!;
+        } else if (response.data is List<int>) {
+          bytes = Uint8List.fromList(response.data!);
+        } else {
+          throw Exception('Formato de datos no soportado: ${response.data.runtimeType}. Esperado Uint8List o List<int>');
+        }
         
-        _lastDownloadedFile = filePath;
+        // Usar descarga multiplataforma
+        final filePath = await download.downloadFile(bytes, filename);
+        
+        _lastDownloadedFile = filePath ?? filename;
         _setSuccess('Plantilla descargada: $filename');
         print('✅ ExcelController: Plantilla descargada');
       } else {
