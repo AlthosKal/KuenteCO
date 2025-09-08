@@ -242,6 +242,28 @@ END IF;
 END IF;
 END IF;
 
+    IF NEW.expiration_date > NOW() AND NEW.state = 'DEFEATED' THEN
+        UPDATE debt SET state = 'ACTIVE' WHERE id = NEW.id;
+        -- Insertar notificación de deuda actualizada
+        IF NEW.id_user IS NOT NULL THEN
+            IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'notification') THEN
+                INSERT INTO notification (id_user, id_profile, date_send, content)
+                VALUES (
+                           NEW.id_user,
+                           NULL,
+                           NOW(),
+                           jsonb_build_object(
+                                   'title', 'Deuda Actualizada',
+                                   'body', 'La fecha de expiración de "' || NEW.name || '" ha sido actualizada. ' ||
+                                           'Monto pendiente actual: $' || NEW.pending_amount,
+                                   'date', NOW()::text
+                           )
+                       );
+            END IF;
+        END IF;
+
+    END IF;
+
 RETURN NEW;
 END;
 $$;
