@@ -314,7 +314,8 @@ public class AuthServiceIntegrationTest extends BaseIntegrationTestWithoutWireMo
     // @Order(8)
     // @DisplayName("Endpoint de registro debe crear usuario y enviar email de verificación")
     // void testRegisterEndpoint_Success() throws Exception {
-    //     // Test temporalmente deshabilitado debido a problemas de dependencia con vistas SQL en CI
+    //     // Test temporalmente deshabilitado debido a problemas de dependencia con vistas SQL en
+    // CI
     //     // TODO: Reactivar cuando se resuelvan las dependencias de base de datos en el pipeline
     // }
 
