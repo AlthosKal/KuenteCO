@@ -59,17 +59,4 @@ public class NotificationController implements NotificationResource {
                         request.getRequestURI()),
                 HttpStatus.OK);
     }
-
-    @GetMapping("/search")
-    public ResponseEntity<?> searchNotificationsByUserId(
-            @RequestParam String keyword, HttpServletRequest request) {
-
-        Object notifications = notificationService.searchNotifications(keyword);
-        return new ResponseEntity<>(
-                ApiResponse.ok(
-                        "Búsqueda de notificaciones del usuario completada",
-                        notifications,
-                        request.getRequestURI()),
-                HttpStatus.OK);
-    }
 }
