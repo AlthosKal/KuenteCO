@@ -4,6 +4,7 @@ import '../../../controllers/profile_controller.dart';
 import '../../../core/services/app/profile_service.dart';
 import '../../../dto/app/profile/profile_detail_dto.dart';
 import '../../../routes/app_routes.dart';
+import '../notification/notification_widget.dart';
 
 class ProfileButtonWidget extends StatelessWidget {
   final String? profileImageUrl;
@@ -25,6 +26,16 @@ class ProfileButtonWidget extends StatelessWidget {
       tooltip: 'Opciones de perfil',
       onSelected: (value) => _handleMenuSelection(context, value),
       itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 'notifications',
+          child: Row(
+            children: [
+              Icon(Icons.notifications, size: 20),
+              SizedBox(width: 8),
+              Text('Notificaciones'),
+            ],
+          ),
+        ),
         const PopupMenuItem(
           value: 'profile',
           child: Row(
@@ -109,8 +120,18 @@ class ProfileButtonWidget extends StatelessWidget {
   }
 
   /// â Lógica de navegación y logout (extraída del navbar original)
+  void _showNotifications(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const NotificationWidget(),
+    );
+  }
+
   Future<void> _handleMenuSelection(BuildContext context, String value) async {
     switch (value) {
+      case 'notifications':
+        _showNotifications(context);
+        break;
       case 'profile':
         Navigator.pushNamed(context, AppRoutes.homeProfile);
         break;
