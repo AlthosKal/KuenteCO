@@ -21,8 +21,9 @@ chmod 600 /tmp/pg_basebackup_password
 
 # Esperar a que el nodo maestro esté disponible
 echo "Waiting for master node at $MASTER_HOST:$MASTER_PORT to be available..."
-until pg_isready -h $MASTER_HOST -p $MASTER_PORT -U $REPLICATOR_USER; do
-  echo "Waiting for master to be ready..."
+until pg_isready -h $MASTER_HOST -p $MASTER_PORT && \
+      psql -h $MASTER_HOST -p $MASTER_PORT -U $REPLICATOR_USER -d $POSTGRES_DB -c "SELECT 1" > /dev/null 2>&1; do
+  echo "Waiting for master and replicator user to be ready..."
   sleep 5
 done
 
