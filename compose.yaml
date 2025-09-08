@@ -15,7 +15,7 @@ services:
 
 # API KUENTECO-APP DEL BACKEND DE LA APLICACION
   kuenteco-app:
-    image: yefff/image-backend-kuenteco-app:1.0.5
+    image: yefff/image-backend-kuenteco-app:1.0.6
     container_name: KuentecoApp
     ports:
       - "8080:8080"
@@ -48,7 +48,7 @@ services:
 
 #BASE DE DATOS POSTGRESQL REPLICA :D
   postgres-replica-database:
-    image: yefff/image-slave-kuenteco:1.1.1
+    image: yefff/image-slave-kuenteco:1.1.2
     container_name: DatabaseSlaveKuenteCO
     volumes:
       - postgres-replica-data:/var/lib/postgresql/data
