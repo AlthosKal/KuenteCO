@@ -9,6 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional(transactionManager = "masterTransactionManager")
 public interface MasterExchangeRateRepository extends JpaRepository<ExchangeRate, Integer> {
-    @Query("SELECT  update_exchange_rates()")
+    @Query(value = "SELECT update_exchange_rates()", nativeQuery = true)
     void getExchangeRates();
 }
