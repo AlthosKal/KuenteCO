@@ -587,4 +587,5 @@ class TransactionStatsCompactWidget extends StatelessWidget {
       ],
     );
   }
+
 }

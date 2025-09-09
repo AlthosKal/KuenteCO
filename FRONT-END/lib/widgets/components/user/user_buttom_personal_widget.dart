@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/services/app/auth_service.dart';
 import '../../../routes/app_routes.dart';
 import '../notification/notification_widget.dart';
+import '../exchange_rate/currency_converter_widget.dart';
 
 class UserButtomPersonalWidget extends StatelessWidget {
   final String? profileImageUrl;
@@ -35,8 +36,17 @@ class UserButtomPersonalWidget extends StatelessWidget {
           ),
         ),
         PopupMenuItem<String>(
-          value: 'account',
+          value: 'currency_converter',
           child: ListTile(
+            leading: Icon(Icons.currency_exchange, size: 20),
+            title: Text('Conversor de Monedas'),
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'account',
+          child: const ListTile(
             leading: Icon(Icons.person, size: 20),
             title: Text('Mis datos'),
             dense: true,
@@ -45,7 +55,7 @@ class UserButtomPersonalWidget extends StatelessWidget {
         ),
         PopupMenuItem<String>(
           value: 'subscription',
-          child: ListTile(
+          child: const ListTile(
             leading: Icon(Icons.card_membership, size: 20),
             title: Text('Suscripción'),
             dense: true,
@@ -54,7 +64,7 @@ class UserButtomPersonalWidget extends StatelessWidget {
         ),
         PopupMenuItem<String>(
           value: 'logout',
-          child: ListTile(
+          child: const ListTile(
             leading: Icon(Icons.logout, size: 20),
             title: Text('Cerrar sesión'),
             dense: true,
@@ -66,6 +76,9 @@ class UserButtomPersonalWidget extends StatelessWidget {
         switch (value) {
           case 'notifications':
             _showNotifications(context);
+            break;
+          case 'currency_converter':
+            _showCurrencyConverter(context);
             break;
           case 'account':
             Navigator.pushNamed(context, AppRoutes.accountScreen);
@@ -85,6 +98,13 @@ class UserButtomPersonalWidget extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => const NotificationWidget(),
+    );
+  }
+
+  void _showCurrencyConverter(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const CurrencyConverterWidget(),
     );
   }
 

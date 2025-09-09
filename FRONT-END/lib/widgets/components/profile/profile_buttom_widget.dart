@@ -5,6 +5,7 @@ import '../../../core/services/app/profile_service.dart';
 import '../../../dto/app/profile/profile_detail_dto.dart';
 import '../../../routes/app_routes.dart';
 import '../notification/notification_widget.dart';
+import '../exchange_rate/currency_converter_widget.dart';
 
 class ProfileButtonWidget extends StatelessWidget {
   final String? profileImageUrl;
@@ -33,6 +34,16 @@ class ProfileButtonWidget extends StatelessWidget {
               Icon(Icons.notifications, size: 20),
               SizedBox(width: 8),
               Text('Notificaciones'),
+            ],
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'currency_converter',
+          child: Row(
+            children: [
+              Icon(Icons.currency_exchange, size: 20),
+              SizedBox(width: 8),
+              Text('Conversor de Monedas'),
             ],
           ),
         ),
@@ -127,10 +138,20 @@ class ProfileButtonWidget extends StatelessWidget {
     );
   }
 
+  void _showCurrencyConverter(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const CurrencyConverterWidget(),
+    );
+  }
+
   Future<void> _handleMenuSelection(BuildContext context, String value) async {
     switch (value) {
       case 'notifications':
         _showNotifications(context);
+        break;
+      case 'currency_converter':
+        _showCurrencyConverter(context);
         break;
       case 'profile':
         Navigator.pushNamed(context, AppRoutes.homeProfile);

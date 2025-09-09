@@ -1,5 +1,10 @@
 import 'chart_data_response_dto.dart';
 import 'debt_analysis_response_dto.dart';
+import 'expense_reduction_suggestion_dto.dart';
+import 'financial_health_score_dto.dart';
+import 'financial_projection_dto.dart';
+import 'spending_pattern_response_dto.dart';
+import 'report_download_response_dto.dart';
 
 abstract class BaseDynamicResponseDTO {
   final String type;
@@ -26,15 +31,17 @@ abstract class BaseDynamicResponseDTO {
       case 'DEBT_ANALYSIS':
         return DebtAnalysisResponseDTO.fromJson(json);
       case 'SPENDING_PATTERNS':
-        return SpendingPatternResponseDTO.fromJson(json);
+        return SpendingPatternResponseWrapperDTO.fromJson(json);
       case 'FINANCIAL_HEALTH':
-        return FinancialHealthResponseDTO.fromJson(json);
+        return FinancialHealthResponseWrapperDTO.fromJson(json);
       case 'EXPENSE_SUGGESTIONS':
-        return ExpenseReductionResponseDTO.fromJson(json);
+        return ExpenseReductionResponseWrapperDTO.fromJson(json);
       case 'FINANCIAL_PROJECTION':
-        return FinancialProjectionResponseDTO.fromJson(json);
+        return FinancialProjectionResponseWrapperDTO.fromJson(json);
       case 'REPORT_DOWNLOAD':
-        return ReportDownloadResponseDTO.fromJson(json);
+        return ReportDownloadResponseWrapperDTO.fromJson(json);
+      case 'BUDGET_COMPARISON':
+        return BudgetComparisonResponseDTO.fromJson(json);
       default:
         throw ArgumentError('Unknown response type: $type');
     }
@@ -70,58 +77,177 @@ class SimpleTextResponseDTO extends BaseDynamicResponseDTO {
   }
 }
 
-/// Placeholder para otros DTOs que referenciaremos
-class SpendingPatternResponseDTO extends BaseDynamicResponseDTO {
-  SpendingPatternResponseDTO() : super(type: 'SPENDING_PATTERNS');
+/// Wrapper DTOs que extienden BaseDynamicResponseDTO
+class SpendingPatternResponseWrapperDTO extends BaseDynamicResponseDTO {
+  final SpendingPatternResponseDTO spendingPatterns;
+
+  SpendingPatternResponseWrapperDTO({
+    required String? summary,
+    required String? analysis,
+    required this.spendingPatterns,
+  }) : super(type: 'SPENDING_PATTERNS', summary: summary, analysis: analysis);
   
-  factory SpendingPatternResponseDTO.fromJson(Map<String, dynamic> json) {
-    return SpendingPatternResponseDTO();
+  factory SpendingPatternResponseWrapperDTO.fromJson(Map<String, dynamic> json) {
+    return SpendingPatternResponseWrapperDTO(
+      summary: json['summary'],
+      analysis: json['analysis'],
+      spendingPatterns: SpendingPatternResponseDTO.fromJson(json),
+    );
   }
   
   @override
-  Map<String, dynamic> toJson() => {'type': type};
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      'summary': summary,
+      'analysis': analysis,
+      ...spendingPatterns.toJson(),
+    };
+  }
 }
 
-class FinancialHealthResponseDTO extends BaseDynamicResponseDTO {
-  FinancialHealthResponseDTO() : super(type: 'FINANCIAL_HEALTH');
+class FinancialHealthResponseWrapperDTO extends BaseDynamicResponseDTO {
+  final FinancialHealthScoreDTO healthScore;
+
+  FinancialHealthResponseWrapperDTO({
+    required String? summary,
+    required String? analysis,
+    required this.healthScore,
+  }) : super(type: 'FINANCIAL_HEALTH', summary: summary, analysis: analysis);
   
-  factory FinancialHealthResponseDTO.fromJson(Map<String, dynamic> json) {
-    return FinancialHealthResponseDTO();
+  factory FinancialHealthResponseWrapperDTO.fromJson(Map<String, dynamic> json) {
+    return FinancialHealthResponseWrapperDTO(
+      summary: json['summary'],
+      analysis: json['analysis'],
+      healthScore: FinancialHealthScoreDTO.fromJson(json['healthScore'] ?? json),
+    );
   }
   
   @override
-  Map<String, dynamic> toJson() => {'type': type};
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      'summary': summary,
+      'analysis': analysis,
+      'healthScore': healthScore.toJson(),
+    };
+  }
 }
 
-class ExpenseReductionResponseDTO extends BaseDynamicResponseDTO {
-  ExpenseReductionResponseDTO() : super(type: 'EXPENSE_SUGGESTIONS');
+class ExpenseReductionResponseWrapperDTO extends BaseDynamicResponseDTO {
+  final List<ExpenseReductionSuggestionDTO> suggestions;
+  final double totalPotentialSavings;
+
+  ExpenseReductionResponseWrapperDTO({
+    required String? summary,
+    required String? analysis,
+    required this.suggestions,
+    required this.totalPotentialSavings,
+  }) : super(type: 'EXPENSE_SUGGESTIONS', summary: summary, analysis: analysis);
   
-  factory ExpenseReductionResponseDTO.fromJson(Map<String, dynamic> json) {
-    return ExpenseReductionResponseDTO();
+  factory ExpenseReductionResponseWrapperDTO.fromJson(Map<String, dynamic> json) {
+    return ExpenseReductionResponseWrapperDTO(
+      summary: json['summary'],
+      analysis: json['analysis'],
+      suggestions: (json['suggestions'] as List?)
+          ?.map((e) => ExpenseReductionSuggestionDTO.fromJson(e))
+          .toList() ?? [],
+      totalPotentialSavings: (json['totalPotentialSavings'] as num?)?.toDouble() ?? 0.0,
+    );
   }
   
   @override
-  Map<String, dynamic> toJson() => {'type': type};
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      'summary': summary,
+      'analysis': analysis,
+      'suggestions': suggestions.map((e) => e.toJson()).toList(),
+      'totalPotentialSavings': totalPotentialSavings,
+    };
+  }
 }
 
-class FinancialProjectionResponseDTO extends BaseDynamicResponseDTO {
-  FinancialProjectionResponseDTO() : super(type: 'FINANCIAL_PROJECTION');
+class FinancialProjectionResponseWrapperDTO extends BaseDynamicResponseDTO {
+  final FinancialProjectionDTO projection;
+
+  FinancialProjectionResponseWrapperDTO({
+    required String? summary,
+    required String? analysis,
+    required this.projection,
+  }) : super(type: 'FINANCIAL_PROJECTION', summary: summary, analysis: analysis);
   
-  factory FinancialProjectionResponseDTO.fromJson(Map<String, dynamic> json) {
-    return FinancialProjectionResponseDTO();
+  factory FinancialProjectionResponseWrapperDTO.fromJson(Map<String, dynamic> json) {
+    return FinancialProjectionResponseWrapperDTO(
+      summary: json['summary'],
+      analysis: json['analysis'],
+      projection: FinancialProjectionDTO.fromJson(json['projection'] ?? json),
+    );
   }
   
   @override
-  Map<String, dynamic> toJson() => {'type': type};
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      'summary': summary,
+      'analysis': analysis,
+      'projection': projection.toJson(),
+    };
+  }
 }
 
-class ReportDownloadResponseDTO extends BaseDynamicResponseDTO {
-  ReportDownloadResponseDTO() : super(type: 'REPORT_DOWNLOAD');
+class ReportDownloadResponseWrapperDTO extends BaseDynamicResponseDTO {
+  final ReportDownloadResponseDTO reportDownload;
+
+  ReportDownloadResponseWrapperDTO({
+    required String? summary,
+    required String? analysis,
+    required this.reportDownload,
+  }) : super(type: 'REPORT_DOWNLOAD', summary: summary, analysis: analysis);
   
-  factory ReportDownloadResponseDTO.fromJson(Map<String, dynamic> json) {
-    return ReportDownloadResponseDTO();
+  factory ReportDownloadResponseWrapperDTO.fromJson(Map<String, dynamic> json) {
+    return ReportDownloadResponseWrapperDTO(
+      summary: json['summary'],
+      analysis: json['analysis'],
+      reportDownload: ReportDownloadResponseDTO.fromJson(json),
+    );
   }
   
   @override
-  Map<String, dynamic> toJson() => {'type': type};
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      'summary': summary,
+      'analysis': analysis,
+      ...reportDownload.toJson(),
+    };
+  }
+}
+
+class BudgetComparisonResponseDTO extends BaseDynamicResponseDTO {
+  final Map<String, dynamic> comparisonData;
+
+  BudgetComparisonResponseDTO({
+    required String? summary,
+    required String? analysis,
+    required this.comparisonData,
+  }) : super(type: 'BUDGET_COMPARISON', summary: summary, analysis: analysis);
+  
+  factory BudgetComparisonResponseDTO.fromJson(Map<String, dynamic> json) {
+    return BudgetComparisonResponseDTO(
+      summary: json['summary'],
+      analysis: json['analysis'],
+      comparisonData: Map<String, dynamic>.from(json['comparisonData'] ?? {}),
+    );
+  }
+  
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      'summary': summary,
+      'analysis': analysis,
+      'comparisonData': comparisonData,
+    };
+  }
 }
