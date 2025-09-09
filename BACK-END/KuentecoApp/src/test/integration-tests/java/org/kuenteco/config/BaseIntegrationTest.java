@@ -36,7 +36,12 @@ import org.springframework.test.context.TestPropertySource;
 
             // Configuraciones de seguridad para tests
             "spring.security.oauth2.client.registration.google.client-id=test-client-id",
-            "spring.security.oauth2.client.registration.google.client-secret=test-client-secret"
+            "spring.security.oauth2.client.registration.google.client-secret=test-client-secret",
+
+            // Configuraciones requeridas para SecurityConfig
+            "WEB_URL=http://localhost:3000",
+            "front-end.web-url=http://localhost:3000",
+            "front-end.mobile-url=http://localhost:3001"
         })
 @ExtendWith({PostgreSQLTestContainerConfig.class, WireMockConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)

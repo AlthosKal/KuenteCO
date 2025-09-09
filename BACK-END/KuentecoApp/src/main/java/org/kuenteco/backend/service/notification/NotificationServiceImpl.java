@@ -81,33 +81,6 @@ public class NotificationServiceImpl implements NotificationService {
         };
     }
 
-    @Override
-    public Object searchNotifications(String keyword) {
-        AuthCredentials credentials = getCredentials();
-        String email = credentials.email();
-        RoleList role = credentials.role();
-        log.info("Buscando notificaciones para: {}", email);
-
-        return switch (role) {
-            case ROLE_USER -> {
-                User user =
-                        slaveUserRepository
-                                .findByEmail(email)
-                                .orElseThrow(
-                                        () -> new NotificationException("Usuario no encontrado"));
-                yield getUserNotificationsByContentContaining(user, keyword);
-            }
-            case ROLE_PROFILE -> {
-                Profile profile =
-                        slaveProfileRepository
-                                .findByEmail(email)
-                                .orElseThrow(
-                                        () -> new NotificationException("Perfil no encontrado"));
-                yield getProfileNotificationsByContentContaining(profile, keyword);
-            }
-        };
-    }
-
     // Método placeholder para integración con servicios externos
     //    private void sendNotificationToExternalServices(Notification notification) {
     // TODO: Implementar integración con:
@@ -138,16 +111,6 @@ public class NotificationServiceImpl implements NotificationService {
         return notificationMapper.toDTOList(notifications);
     }
 
-    private Object getUserNotificationsByContentContaining(User user, String keyword) {
-        List<Notification> notifications =
-                slaveNotificationRepository.findByUserAndTitleContaining(user, keyword);
-
-        if (notifications.isEmpty()) {
-            return "No tienes deudas registradas";
-        }
-        return notificationMapper.toDTOList(notifications);
-    }
-
     private Object getProfileNotifications(Profile profile) {
         List<Notification> notifications =
                 slaveNotificationRepository.findByProfileOrderByDateSendDesc(profile);
@@ -163,16 +126,6 @@ public class NotificationServiceImpl implements NotificationService {
         List<Notification> notifications =
                 slaveNotificationRepository.findByProfileAfterAndDateSendBetween(
                         profile, fromDate, toDate);
-
-        if (notifications.isEmpty()) {
-            return "No tienes deudas registradas";
-        }
-        return notificationMapper.toDTOList(notifications);
-    }
-
-    private Object getProfileNotificationsByContentContaining(Profile profile, String keyword) {
-        List<Notification> notifications =
-                slaveNotificationRepository.findByProfileAndTitleContaining(profile, keyword);
 
         if (notifications.isEmpty()) {
             return "No tienes deudas registradas";

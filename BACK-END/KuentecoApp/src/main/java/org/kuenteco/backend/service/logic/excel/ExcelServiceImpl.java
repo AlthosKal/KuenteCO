@@ -135,7 +135,7 @@ public class ExcelServiceImpl implements ExcelService {
         header.createCell(2).setCellValue("Fecha");
         header.createCell(3).setCellValue("Descripción");
         header.createCell(4).setCellValue("Tipo");
-        
+
         if (!transactions.isEmpty()) {
             AtomicInteger rowIdx = new AtomicInteger(1);
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -144,9 +144,12 @@ public class ExcelServiceImpl implements ExcelService {
                         Row row = sheet.createRow(rowIdx.getAndIncrement());
                         row.createCell(0).setCellValue(transaction.getName());
                         row.createCell(1).setCellValue(transaction.getAmount().doubleValue());
-                        row.createCell(2).setCellValue(dtf.format(transaction.getTransactionDate()));
-                        row.createCell(3).setCellValue(transaction.getDescription().getDescription());
-                        row.createCell(4).setCellValue(transaction.getDescription().getType().name());
+                        row.createCell(2)
+                                .setCellValue(dtf.format(transaction.getTransactionDate()));
+                        row.createCell(3)
+                                .setCellValue(transaction.getDescription().getDescription());
+                        row.createCell(4)
+                                .setCellValue(transaction.getDescription().getType().name());
                     });
         }
     }
@@ -161,7 +164,7 @@ public class ExcelServiceImpl implements ExcelService {
         header.createCell(3).setCellValue("Fecha");
         header.createCell(4).setCellValue("Descripción");
         header.createCell(5).setCellValue("Tipo");
-        
+
         if (!transactions.isEmpty()) {
             AtomicInteger rowIdx = new AtomicInteger(1);
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -171,9 +174,12 @@ public class ExcelServiceImpl implements ExcelService {
                         row.createCell(0).setCellValue(transaction.getProfile().getEmail());
                         row.createCell(1).setCellValue(transaction.getName());
                         row.createCell(2).setCellValue(transaction.getAmount().doubleValue());
-                        row.createCell(3).setCellValue(dtf.format(transaction.getTransactionDate()));
-                        row.createCell(4).setCellValue(transaction.getDescription().getDescription());
-                        row.createCell(5).setCellValue(transaction.getDescription().getType().name());
+                        row.createCell(3)
+                                .setCellValue(dtf.format(transaction.getTransactionDate()));
+                        row.createCell(4)
+                                .setCellValue(transaction.getDescription().getDescription());
+                        row.createCell(5)
+                                .setCellValue(transaction.getDescription().getType().name());
                     });
         }
     }
@@ -186,7 +192,7 @@ public class ExcelServiceImpl implements ExcelService {
         header.createCell(2).setCellValue("Restante");
 
         List<Budget> budgets = slaveBudgetRepository.findByUser(user);
-        
+
         if (!budgets.isEmpty()) {
             AtomicInteger rowIdx = new AtomicInteger(1);
             budgets.forEach(
@@ -208,7 +214,7 @@ public class ExcelServiceImpl implements ExcelService {
         header.createCell(3).setCellValue("Fecha de Registro");
 
         List<Category> categories = slaveCategoryRepository.findByUser(user);
-        
+
         if (!categories.isEmpty()) {
             AtomicInteger rowIdx = new AtomicInteger(1);
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -218,7 +224,9 @@ public class ExcelServiceImpl implements ExcelService {
                         row.createCell(0).setCellValue(category.getName());
                         row.createCell(1)
                                 .setCellValue(
-                                        category.getDescription().getAssignedBudget().doubleValue());
+                                        category.getDescription()
+                                                .getAssignedBudget()
+                                                .doubleValue());
                         row.createCell(2).setCellValue(category.getDescription().getState().name());
                         row.createCell(3).setCellValue(dtf.format(category.getRegisterDate()));
                     });
@@ -236,7 +244,7 @@ public class ExcelServiceImpl implements ExcelService {
         header.createCell(5).setCellValue("Estado");
 
         List<Debt> debts = slaveDebtRepository.findByUser(user);
-        
+
         if (!debts.isEmpty()) {
             AtomicInteger rowIdx = new AtomicInteger(1);
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");

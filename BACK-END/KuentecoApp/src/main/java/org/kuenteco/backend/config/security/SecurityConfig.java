@@ -87,7 +87,8 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOriginPatterns(List.of(webUrl, mobileUrl, "http://localhost:5000"));
+        corsConfiguration.setAllowedOriginPatterns(
+                List.of(webUrl, mobileUrl, "http://localhost:5000"));
         corsConfiguration.setAllowedMethods(
                 List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(
