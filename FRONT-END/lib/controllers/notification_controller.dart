@@ -74,42 +74,6 @@ class NotificationController {
     }
   }
 
-  Future<void> searchNotifications({
-    required String keyword,
-    BuildContext? context,
-  }) async {
-    if (keyword.trim().isEmpty) {
-      await getAllNotifications(context: context);
-      return;
-    }
-
-    isLoading.value = true;
-    errorMessage.value = null;
-
-    try {
-      await GlobalExceptionHandler.run(
-        () async {
-          final result = await _notificationService.searchNotifications(
-            keyword: keyword.trim(),
-          );
-          notifications.value = result;
-        },
-        onError: (error) {
-          errorMessage.value = error.toString();
-          if (context != null && context.mounted) {
-            ToastHelper.showError(
-              context,
-              title: 'Error en la búsqueda',
-              description: error.toString(),
-            );
-          }
-        },
-      );
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
   void clearNotifications() {
     notifications.value = [];
     errorMessage.value = null;

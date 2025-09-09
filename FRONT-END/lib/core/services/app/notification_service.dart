@@ -10,10 +10,10 @@ class NotificationService {
   Future<List<NotificationDTO>> getAllNotifications() async {
     final response = await _api.getApp('/notification');
     final responseData = response.data;
-    
+
     // Manejar diferentes estructuras de respuesta
     List dataList;
-    
+
     if (responseData is List) {
       dataList = responseData;
     } else if (responseData is Map && responseData.containsKey('data')) {
@@ -29,7 +29,7 @@ class NotificationService {
     } else {
       return [];
     }
-    
+
     return dataList
         .map((item) => NotificationDTO.fromJson(item as Map<String, dynamic>))
         .toList();
@@ -44,12 +44,13 @@ class NotificationService {
       'toDate': toDate.toIso8601String(),
     };
 
-    final response = await _api.getApp('/notification/range', queryParameters: queryParams);
+    final response = await _api.getApp(
+        '/notification/range', queryParameters: queryParams);
     final responseData = response.data;
-    
+
     // Manejar diferentes estructuras de respuesta
     List dataList;
-    
+
     if (responseData is List) {
       dataList = responseData;
     } else if (responseData is Map && responseData.containsKey('data')) {
@@ -65,41 +66,7 @@ class NotificationService {
     } else {
       return [];
     }
-    
-    return dataList
-        .map((item) => NotificationDTO.fromJson(item as Map<String, dynamic>))
-        .toList();
-  }
 
-  Future<List<NotificationDTO>> searchNotifications({
-    required String keyword,
-  }) async {
-    final queryParams = {
-      'keyword': keyword,
-    };
-
-    final response = await _api.getApp('/notification/search', queryParameters: queryParams);
-    final responseData = response.data;
-    
-    // Manejar diferentes estructuras de respuesta
-    List dataList;
-    
-    if (responseData is List) {
-      dataList = responseData;
-    } else if (responseData is Map && responseData.containsKey('data')) {
-      final dataValue = responseData['data'];
-      if (dataValue is String) {
-        // Si es un mensaje, retornar lista vacía
-        return [];
-      } else if (dataValue is List) {
-        dataList = dataValue;
-      } else {
-        return [];
-      }
-    } else {
-      return [];
-    }
-    
     return dataList
         .map((item) => NotificationDTO.fromJson(item as Map<String, dynamic>))
         .toList();

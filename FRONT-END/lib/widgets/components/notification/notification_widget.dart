@@ -17,6 +17,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
   final TextEditingController _searchController = TextEditingController();
   DateTime? _fromDate;
   DateTime? _toDate;
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -36,16 +37,25 @@ class _NotificationWidgetState extends State<NotificationWidget> {
     await _notificationController.getAllNotifications(context: context);
   }
 
-  Future<void> _searchNotifications() async {
-    final keyword = _searchController.text.trim();
-    if (keyword.isNotEmpty) {
-      await _notificationController.searchNotifications(
-        keyword: keyword,
-        context: context,
-      );
-    } else {
-      await _loadNotifications();
+  void _clearSearch() {
+    setState(() {
+      _searchQuery = '';
+      _searchController.clear();
+    });
+  }
+
+  List<NotificationDTO> _filterNotifications(List<NotificationDTO> notifications) {
+    if (_searchQuery.isEmpty) {
+      return notifications;
     }
+    
+    return notifications.where((notification) {
+      final title = notification.content.title.toLowerCase();
+      final body = notification.content.body.toLowerCase();
+      final query = _searchQuery.toLowerCase();
+      
+      return title.contains(query) || body.contains(query);
+    }).toList();
   }
 
   Future<void> _filterByDateRange() async {
@@ -72,8 +82,9 @@ class _NotificationWidgetState extends State<NotificationWidget> {
 
     if (picked != null) {
       setState(() {
-        _fromDate = picked.start;
-        _toDate = picked.end;
+        // Ajustar las fechas para cubrir todo el día
+        _fromDate = DateTime(picked.start.year, picked.start.month, picked.start.day, 0, 0, 0);
+        _toDate = DateTime(picked.end.year, picked.end.month, picked.end.day, 23, 59, 59);
       });
       await _filterByDateRange();
     }
@@ -120,7 +131,9 @@ class _NotificationWidgetState extends State<NotificationWidget> {
             children: [
               _buildHeader(),
               const SizedBox(height: 16),
-              _buildSearchAndFilters(),
+              _buildSearchBar(),
+              const SizedBox(height: 16),
+              _buildFilters(),
               const SizedBox(height: 16),
               Expanded(
                 child: _buildNotificationsList(),
@@ -162,100 +175,100 @@ class _NotificationWidgetState extends State<NotificationWidget> {
     );
   }
 
-  Widget _buildSearchAndFilters() {
-    return Column(
-      children: [
-        // Barra de búsqueda
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.2),
-            ),
+  Widget _buildSearchBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.2),
+        ),
+      ),
+      child: TextField(
+        controller: _searchController,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          hintText: 'Buscar notificaciones...',
+          hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+          prefixIcon: Icon(
+            Icons.search,
+            color: Colors.white.withOpacity(0.7),
           ),
-          child: TextField(
-            controller: _searchController,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: 'Buscar notificaciones...',
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-              prefixIcon: Icon(
-                Icons.search,
-                color: Colors.white.withOpacity(0.7),
-              ),
-              suffixIcon: IconButton(
-                onPressed: _searchNotifications,
-                icon: Icon(
-                  Icons.arrow_forward,
-                  color: Colors.white.withOpacity(0.7),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: Icon(
+                    Icons.clear,
+                    color: Colors.white.withOpacity(0.7),
+                  ),
+                  onPressed: _clearSearch,
+                )
+              : null,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        ),
+        onChanged: (value) {
+          setState(() => _searchQuery = value);
+        },
+      ),
+    );
+  }
+
+  Widget _buildFilters() {
+    return Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: _selectDateRange,
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.2),
                 ),
               ),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.all(16),
-            ),
-            onSubmitted: (_) => _searchNotifications(),
-          ),
-        ),
-        const SizedBox(height: 8),
-        // Filtros de fecha
-        Row(
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: _selectDateRange,
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.2),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.date_range,
+                    color: Colors.white.withOpacity(0.7),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _fromDate != null && _toDate != null
+                          ? '${DateFormat('dd/MM/yy').format(_fromDate!)} - ${DateFormat('dd/MM/yy').format(_toDate!)}'
+                          : 'Filtrar por fecha de notificacíon',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.8),
+                        fontSize: 14,
+                      ),
                     ),
                   ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.date_range,
-                        color: Colors.white.withOpacity(0.7),
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _fromDate != null && _toDate != null
-                              ? '${DateFormat('dd/MM/yy').format(_fromDate!)} - ${DateFormat('dd/MM/yy').format(_toDate!)}'
-                              : 'Filtrar por fecha',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                ],
               ),
             ),
-            if (_fromDate != null && _toDate != null) ...[
-              const SizedBox(width: 8),
-              IconButton(
-                onPressed: _clearDateRange,
-                icon: Icon(
-                  Icons.clear,
-                  color: Colors.white.withOpacity(0.7),
-                ),
-              ),
-            ],
-            const SizedBox(width: 8),
-            IconButton(
-              onPressed: _loadNotifications,
-              icon: Icon(
-                Icons.refresh,
-                color: Colors.white.withOpacity(0.7),
-              ),
+          ),
+        ),
+        if (_fromDate != null && _toDate != null) ...[
+          const SizedBox(width: 8),
+          IconButton(
+            onPressed: _clearDateRange,
+            icon: Icon(
+              Icons.clear,
+              color: Colors.white.withOpacity(0.7),
             ),
-          ],
+          ),
+        ],
+        const SizedBox(width: 8),
+        IconButton(
+          onPressed: _loadNotifications,
+          icon: Icon(
+            Icons.refresh,
+            color: Colors.white.withOpacity(0.7),
+          ),
         ),
       ],
     );
@@ -276,6 +289,8 @@ class _NotificationWidgetState extends State<NotificationWidget> {
         return ValueListenableBuilder<List<NotificationDTO>>(
           valueListenable: _notificationController.notifications,
           builder: (context, notifications, _) {
+            final filteredNotifications = _filterNotifications(notifications);
+            
             if (notifications.isEmpty) {
               return Center(
                 child: Column(
@@ -299,10 +314,34 @@ class _NotificationWidgetState extends State<NotificationWidget> {
               );
             }
 
+            if (filteredNotifications.isEmpty && _searchQuery.isNotEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.search_off,
+                      size: 64,
+                      color: Colors.white.withOpacity(0.5),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No se encontraron resultados para "$_searchQuery"',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 16,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              );
+            }
+
             return ListView.builder(
-              itemCount: notifications.length,
+              itemCount: filteredNotifications.length,
               itemBuilder: (context, index) {
-                final notification = notifications[index];
+                final notification = filteredNotifications[index];
                 return _buildNotificationCard(notification);
               },
             );
