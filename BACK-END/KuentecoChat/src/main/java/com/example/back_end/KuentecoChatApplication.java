@@ -10,7 +10,7 @@ public class KuentecoChatApplication {
     public static void main(String[] args) {
         Dotenv dotenv = Dotenv.load();
 
-        // Configuracion de la base de datos
+        // Configuración de la base de datos
         System.setProperty("MONGO_URI", dotenv.get("MONGO_URI"));
 
         // Conexión al modelo de OpenAI

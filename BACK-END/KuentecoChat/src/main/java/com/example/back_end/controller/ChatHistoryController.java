@@ -2,6 +2,7 @@ package com.example.back_end.controller;
 
 import com.example.back_end.controller.resource.ChatHistoryResource;
 import com.example.back_end.dto.request.ChatHistoryDTO;
+import com.example.back_end.dto.request.ChatHistoryForConversationDTO;
 import com.example.back_end.exception.ApiResponse;
 import com.example.back_end.service.ChatService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +38,8 @@ public class ChatHistoryController implements ChatHistoryResource {
     public ResponseEntity<?> getHistory(
             @PathVariable String conversationId, HttpServletRequest request) {
         LOGGER.info("Fetching history for conversationId: {}", conversationId);
-        List<ChatHistoryDTO> history = chatService.getHistoryByConversationId(conversationId);
+        List<ChatHistoryForConversationDTO> history =
+                chatService.getHistoryByConversationId(conversationId);
         return new ResponseEntity<>(
                 ApiResponse.ok(
                         "Historial obtenido correctamente", history, request.getRequestURI()),
