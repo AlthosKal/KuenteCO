@@ -108,7 +108,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
                           if (widget.type == MessageType.ai && widget.enableTypewriter)
                             TypewriterTextWidget(
                               text: widget.message,
-                              speed: const Duration(milliseconds: 30),
+                              speed: const Duration(milliseconds: 10),
                               textStyle: _getTextStyle(context),
                               onComplete: widget.onTypewriterComplete,
                             )
