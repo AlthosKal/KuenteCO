@@ -8,7 +8,6 @@ import '../dto/chat/response/string_chat_response_dto.dart';
 import '../dto/chat/response/dynamic_analysis_response_dto.dart';
 import '../dto/chat/response/debt_analysis_response_dto.dart';
 import '../dto/chat/response/chat_history_dto.dart';
-import '../utils/enum/model_enum.dart';
 
 // Modelo para mensajes de chat
 class ChatMessage {
@@ -56,13 +55,11 @@ class ChatController extends ChangeNotifier {
   bool _isTyping = false;
   bool _isCancelled = false;
 
-  // Modelo de IA seleccionado y modelos disponibles  
-  Model _selectedModel = Model.OPENAI;
-  List<String> _availableModels = [];
 
   ChatController(this._chatService, this._historyService) {
     print('🏗️ ChatController: Constructor ejecutado, _currentConversationId: $_currentConversationId');
-    _loadAvailableModels();
+    // Inicializar con una conversación nueva y limpia
+    startNewConversation();
     // Cargar historial automáticamente sin await para no bloquear el constructor
     _loadHistoryAsync();
   }
@@ -80,13 +77,9 @@ class ChatController extends ChangeNotifier {
     } else {
       print('✅ ChatController: Historial cargado automáticamente exitosamente');
       
-      // Si hay conversaciones en el historial y no hay una conversación actual,
-      // usar la más reciente para continuar
-      if (_chatHistory.isNotEmpty && _currentConversationId == null) {
-        final latestConversation = _chatHistory.first;
-        _currentConversationId = latestConversation.conversationId;
-        print('💬 ChatController: Reanudando conversación más reciente: $_currentConversationId');
-      }
+      // Ya no seleccionamos automáticamente la conversación más reciente
+      // El usuario debe seleccionar explícitamente una conversación del historial
+      print('📚 ChatController: Historial cargado. Esperando selección manual de conversación.');
     }
   }
 
@@ -193,35 +186,7 @@ class ChatController extends ChangeNotifier {
   bool get isTyping => _isTyping;
   String? get currentTypingMessage => _currentTypingMessage;
   
-  // Getters y setters para modelo seleccionado
-  Model get selectedModel => _selectedModel;
-  List<String> get availableModels => List.unmodifiable(_availableModels);
-  
-  void setSelectedModel(Model model) {
-    print('🔄 ChatController: Cambiando modelo de ${_selectedModel.name} a ${model.name}');
-    _selectedModel = model;
-    notifyListeners();
-    print('✅ ChatController: Modelo cambiado a ${model.name}');
-  }
 
-  /// Cargar modelos disponibles desde el servidor
-  Future<void> _loadAvailableModels() async {
-    print('🤖 ChatController: Cargando modelos disponibles');
-    try {
-      _availableModels = await _chatService.getAllModels();
-      print('✅ ChatController: ${_availableModels.length} modelos cargados: $_availableModels');
-      notifyListeners();
-    } catch (e) {
-      print('❌ ChatController: Error cargando modelos: $e');
-      // Si falla, usar modelos por defecto del enum
-      _availableModels = Model.values.map((m) => m.name).toList();
-    }
-  }
-
-  /// Recargar modelos disponibles manualmente
-  Future<void> refreshAvailableModels() async {
-    await _loadAvailableModels();
-  }
 
   void _setLoading(bool loading) {
     _isLoading = loading;
@@ -281,14 +246,13 @@ class ChatController extends ChangeNotifier {
   }
 
   /// Chat básico con AI
-  Future<void> sendMessage(String message, {Model? model}) async {
+  Future<void> sendMessage(String message) async {
     print('ð ChatController: Enviando mensaje básico');
     _setLoading(true);
     _setError(null);
 
     try {
       final dto = ChatDTO(
-        model: model ?? _selectedModel,
         conversationId: _currentConversationId,
         prompt: message,
       );
@@ -414,14 +378,13 @@ class ChatController extends ChangeNotifier {
   }
 
   /// Análisis dinámico
-  Future<void> getDynamicAnalysis(String message, {Model? model}) async {
+  Future<void> getDynamicAnalysis(String message) async {
     print('ð ChatController: Solicitando análisis dinámico');
     _setLoading(true);
     _setError(null);
 
     try {
       final dto = ChatDTO(
-        model: model ?? _selectedModel,
         conversationId: _currentConversationId,
         prompt: message,
       );
@@ -505,7 +468,6 @@ class ChatController extends ChangeNotifier {
         _chatHistory[i] = ChatHistoryDTO(
           conversationId: _chatHistory[i].conversationId,
           prompt: firstMessageInConversation.prompt, // SIEMPRE usar el primer prompt como título
-          response: latestMessageInConversation.response, // Última respuesta
           date: latestMessageInConversation.date, // Fecha más reciente para ordenamiento
         );
       }
@@ -540,7 +502,6 @@ class ChatController extends ChangeNotifier {
       final historyItem = ChatHistoryDTO(
         conversationId: _currentConversationId!,
         prompt: prompt,
-        response: response,
         date: DateTime.now(),
       );
       
@@ -554,7 +515,6 @@ class ChatController extends ChangeNotifier {
         _chatHistory[existingIndex] = ChatHistoryDTO(
           conversationId: _currentConversationId!,
           prompt: _chatHistory[existingIndex].prompt, // Mantener el primer mensaje como título
-          response: response, // Actualizar con la última respuesta
           date: DateTime.now(), // Fecha más reciente para ordenamiento
         );
         
@@ -687,7 +647,7 @@ class ChatController extends ChangeNotifier {
   }
 
   /// Actualizar método sendMessage para incluir manejo de mensajes
-  Future<void> sendMessageWithTypewriter(String message, {Model? model}) async {
+  Future<void> sendMessageWithTypewriter(String message) async {
     print('🤖 ChatController: Enviando mensaje con efecto typewriter');
     print('🔍 ChatController: _currentConversationId actual: $_currentConversationId');
     _isCancelled = false; // Resetear estado de cancelación
@@ -699,7 +659,6 @@ class ChatController extends ChangeNotifier {
 
     try {
       final dto = ChatDTO(
-        model: model ?? _selectedModel,
         conversationId: _currentConversationId,
         prompt: message,
       );
@@ -842,8 +801,10 @@ class ChatController extends ChangeNotifier {
         }
         
         _addUserMessage(item.prompt, isNew: false); // Marcar como histórico
-        final plainTextResponse = _markdownToPlainText(item.response);
-        _addAIMessage(plainTextResponse, isNew: false); // Marcar como histórico
+        if (item.response != null) {
+          final plainTextResponse = _markdownToPlainText(item.response!);
+          _addAIMessage(plainTextResponse, isNew: false); // Marcar como histórico
+        }
       }
       
       print('✅ ChatController: Conversación cargada exitosamente con ${history.length} mensajes');
