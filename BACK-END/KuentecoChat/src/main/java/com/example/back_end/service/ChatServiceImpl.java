@@ -50,8 +50,6 @@ import org.springframework.util.StreamUtils;
 @Service
 public class ChatServiceImpl implements ChatService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatServiceImpl.class);
-
-    private final ChatClient deepseekChatClient;
     private final ChatClient openaiChatClient;
     private final AiHistoryRepository repository;
     private final ChatHistoryForConversationMapper chatHistoryForConversationMapper;
@@ -62,7 +60,6 @@ public class ChatServiceImpl implements ChatService {
     private final ReportGenerationService reportGenerationService;
 
     public ChatServiceImpl(
-            @Qualifier(value = "deepSeekChatModel") ChatModel deepseekChatClient,
             @Qualifier(value = "openAiChatModel") ChatModel openaiChatClient,
             JwtUtil jwtUtil,
             AiHistoryRepository repository,
@@ -73,14 +70,6 @@ public class ChatServiceImpl implements ChatService {
             ReportGenerationService reportGenerationService) {
 
         InMemoryChatMemory memory = new InMemoryChatMemory();
-
-        this.deepseekChatClient =
-                ChatClient.builder(deepseekChatClient)
-                        .defaultAdvisors(
-                                new PromptChatMemoryAdvisor(memory),
-                                new MessageChatMemoryAdvisor(memory))
-                        .build();
-
         this.openaiChatClient =
                 ChatClient.builder(openaiChatClient)
                         .defaultAdvisors(
@@ -98,7 +87,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    @Cacheable(value = "chats", key = "#dto.model + '-' + #dto.prompt") // Temporarily disabled
+    @Cacheable(value = "chats", key = "#dto.prompt") // Temporarily disabled
     // to prevent stale responses
     public DynamicAnalysisResponseDTO queryAi(ChatDTO dto, HttpServletRequest request) {
         try {
@@ -116,7 +105,7 @@ public class ChatServiceImpl implements ChatService {
 
             // Ejecutar la función con el contexto mejorado
             String response =
-                    getChatClient(dto.getModel())
+                    getChatClient()
                             .prompt()
                             .user(contextualPrompt)
                             .advisors(
@@ -170,7 +159,7 @@ public class ChatServiceImpl implements ChatService {
         } catch (Exception e) {
             LOGGER.error(
                     "Error generating dynamic response with model {}: {}",
-                    dto.getModel(),
+                    Model.OPENAI,
                     e.getMessage(),
                     e);
             throw handleChatException(e, dto);
@@ -215,28 +204,18 @@ public class ChatServiceImpl implements ChatService {
 
     private Object getFunctionData(String functionName, ChatDTO request) {
         try {
-            switch (functionName) {
-                case "BalanceOverTime":
-                    return executeBalanceFunction(request);
-                case "analyzeDebtRisk":
-                    return executeDebtAnalysisFunction(request);
-                case "analyzeUserSpendingPatterns":
-                    return executeSpendingPatternsFunction(request);
-                case "calculateFinancialHealthScore":
-                    return executeFinancialHealthFunction(request);
-                case "IncomesAndExpensesByPeriod":
-                    return executeIncomesAndExpensesFunction(request);
-                case "projectFinancialBalance":
-                    return executeProjectFinancialBalanceFunction(request);
-                case "suggestExpenseReductions":
-                    return executeSuggestExpenseReductionsFunction(request);
-                case "compareFinancialPeriods":
-                    return executeCompareFinancialPeriodsFunction(request);
-                case "financialStatement":
-                    return executeFinancialStatementFunction(request);
-                default:
-                    return null;
-            }
+            return switch (functionName) {
+                case "BalanceOverTime" -> executeBalanceFunction(request);
+                case "analyzeDebtRisk" -> executeDebtAnalysisFunction(request);
+                case "analyzeUserSpendingPatterns" -> executeSpendingPatternsFunction(request);
+                case "calculateFinancialHealthScore" -> executeFinancialHealthFunction(request);
+                case "IncomesAndExpensesByPeriod" -> executeIncomesAndExpensesFunction(request);
+                case "projectFinancialBalance" -> executeProjectFinancialBalanceFunction(request);
+                case "suggestExpenseReductions" -> executeSuggestExpenseReductionsFunction(request);
+                case "compareFinancialPeriods" -> executeCompareFinancialPeriodsFunction(request);
+                case "financialStatement" -> executeFinancialStatementFunction(request);
+                default -> null;
+            };
         } catch (Exception e) {
             LOGGER.error("Error executing function: {}", functionName, e);
             return null;
@@ -496,7 +475,7 @@ public class ChatServiceImpl implements ChatService {
         LOGGER.info(prompt.getInstructions().toString());
 
         String response =
-                getChatClient(dto.getModel())
+                getChatClient()
                         .prompt()
                         .user(prompt.toString())
                         .advisors(
@@ -519,16 +498,16 @@ public class ChatServiceImpl implements ChatService {
 
     private Prompt getPrompt(ChatDTO request, String fileContent) {
         PromptTemplate promptTemplate =
-                new PromptTemplate(loadPromptFromClasspath("ai_prompt_template.txt"));
+                new PromptTemplate(loadPromptFromClasspath());
 
         Map<String, Object> params =
                 Map.of("fileContent", fileContent, "prompt", request.getPrompt());
         return promptTemplate.create(params);
     }
 
-    private String loadPromptFromClasspath(String filename) {
+    private String loadPromptFromClasspath() {
         try (InputStream inputStream =
-                getClass().getClassLoader().getResourceAsStream("prompts/" + filename)) {
+                getClass().getClassLoader().getResourceAsStream("prompts/" + "ai_prompt_template.txt")) {
             if (inputStream == null) throw new FileNotFoundException("Prompt file not found");
             return StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
@@ -556,14 +535,8 @@ public class ChatServiceImpl implements ChatService {
         return "PDF"; // Por defecto
     }
 
-    private ChatClient getChatClient(Model model) {
-        if (model == Model.DEEPSEEK) {
-            return deepseekChatClient;
-
-        } else if (model == Model.OPENAI) {
+    private ChatClient getChatClient() {
             return openaiChatClient;
-        }
-        return deepseekChatClient;
     }
 
     private KuentecoAppConnector getConnector() {
@@ -584,16 +557,14 @@ public class ChatServiceImpl implements ChatService {
             rootCause = rootCause.getCause();
         }
 
-        String modelName = dto.getModel() != null ? dto.getModel().toString() : "UNKNOWN";
-
         // Manejo específico de timeouts
         if (rootCause instanceof io.netty.handler.timeout.ReadTimeoutException) {
-            LOGGER.warn("Timeout calling {} model for prompt: {}", modelName, dto.getPrompt());
+            LOGGER.warn("Timeout calling {} model for prompt: {}", Model.OPENAI.name(), dto.getPrompt());
             return new AiProfileException(
                     ApiError.AI_PROVIDER_TIMEOUT.getHttpStatus(),
                     ApiError.AI_PROVIDER_TIMEOUT.getMessage(),
                     List.of(
-                            "The " + modelName + " model did not respond in time",
+                            "The " + Model.OPENAI.name() + " model did not respond in time",
                             "This often happens with complex prompts or report generation",
                             "Try again or switch to a different model",
                             "Consider simplifying your request"));
@@ -603,12 +574,12 @@ public class ChatServiceImpl implements ChatService {
         if (e instanceof org.springframework.web.client.ResourceAccessException
                 || rootCause instanceof java.net.ConnectException
                 || rootCause instanceof java.net.UnknownHostException) {
-            LOGGER.warn("Network error calling {} model: {}", modelName, rootCause.getMessage());
+            LOGGER.warn("Network error calling {} model: {}", Model.OPENAI.name(), rootCause.getMessage());
             return new AiProfileException(
                     ApiError.AI_PROVIDER_UNAVAILABLE.getHttpStatus(),
                     ApiError.AI_PROVIDER_UNAVAILABLE.getMessage(),
                     List.of(
-                            "Cannot connect to " + modelName + " provider",
+                            "Cannot connect to " + Model.OPENAI.name()+ " provider",
                             "Check your internet connection",
                             "The AI service may be temporarily unavailable",
                             "Try again in a few minutes"));
@@ -630,7 +601,7 @@ public class ChatServiceImpl implements ChatService {
         }
 
         // Error genérico - no sabemos exactamente qué pasó
-        LOGGER.error("Unexpected error processing chat request with {} model", modelName, e);
+        LOGGER.error("Unexpected error processing chat request with {} model", Model.OPENAI.name(), e);
         return new AiProfileException(
                 ApiError.INTERNAL_ERROR.getHttpStatus(),
                 ApiError.INTERNAL_ERROR.getMessage(),
@@ -852,7 +823,6 @@ public class ChatServiceImpl implements ChatService {
                                     userProfiles.getTotalTransactions());
                             return List.of(userProfiles);
                         }
-                        break;
                     }
                     case TRANSACTION_LIST -> {
                         // Para usuarios PERSONAL, devolver directamente la lista de transacciones
@@ -864,7 +834,6 @@ public class ChatServiceImpl implements ChatService {
                                     wrapper.getTransactionList().size());
                             return wrapper.getTransactionList();
                         }
-                        break;
                     }
                     case MESSAGE -> {
                         LOGGER.info(
@@ -913,21 +882,15 @@ public class ChatServiceImpl implements ChatService {
                 return null;
             }
 
-            switch (functionName) {
-                case "BalanceOverTime":
-                    return generateBalanceChart(functionData);
-                case "IncomesAndExpensesByPeriod":
-                    return generateIncomeExpenseChart(functionData);
-                case "analyzeUserSpendingPatterns":
-                case "calculateFinancialHealthScore":
-                    return generateTransactionChart(functionData);
-                case "analyzeDebtRisk":
-                    return generateDebtChart(functionData);
-                case "compareFinancialPeriods":
-                    return generateBudgetComparisonChart(functionData);
-                default:
-                    return null;
-            }
+            return switch (functionName) {
+                case "BalanceOverTime" -> generateBalanceChart(functionData);
+                case "IncomesAndExpensesByPeriod" -> generateIncomeExpenseChart(functionData);
+                case "analyzeUserSpendingPatterns", "calculateFinancialHealthScore" ->
+                        generateTransactionChart(functionData);
+                case "analyzeDebtRisk" -> generateDebtChart(functionData);
+                case "compareFinancialPeriods" -> generateBudgetComparisonChart(functionData);
+                default -> null;
+            };
         } catch (Exception e) {
             LOGGER.warn(
                     "Error generating chart data for function {}: {}",
@@ -1168,8 +1131,7 @@ public class ChatServiceImpl implements ChatService {
 
                 if (value != null && expectedType.isAssignableFrom(value.getClass())) {
                     return (T) value;
-                } else if (value != null
-                        && expectedType == Double.class
+                } else if (expectedType == Double.class
                         && value instanceof Number) {
                     return (T) Double.valueOf(((Number) value).doubleValue());
                 } else if (value != null && expectedType == String.class) {
@@ -1185,8 +1147,7 @@ public class ChatServiceImpl implements ChatService {
 
                     if (value != null && expectedType.isAssignableFrom(value.getClass())) {
                         return (T) value;
-                    } else if (value != null
-                            && expectedType == Double.class
+                    } else if (expectedType == Double.class
                             && value instanceof Number) {
                         return (T) Double.valueOf(((Number) value).doubleValue());
                     } else if (value != null && expectedType == String.class) {
