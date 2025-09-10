@@ -10,64 +10,18 @@ import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import java.time.Duration;
 
 @Configuration
 public class AiConfiguration {
 
     private final KuentecoAppConnector kuentecoAppConnector;
 
-    // DeepSeek configuration
-    @Value("${spring.ai.deepseek.base-url}")
-    private String deepSeekBaseUrl;
-
-    @Value("${spring.ai.deepseek.api-key}")
-    private String deepSeekApiKey;
-
-    @Value("${spring.ai.deepseek.chat.options.temperature}")
-    private float deepSeekTemperature;
-
-    @Value("${spring.ai.deepseek.chat.options.model}")
-    private String deepSeekModel;
-
-    // OpenAI configuration
-    @Value("${spring.ai.openai.base-url}")
-    private String openaiBaseUrl;
-
-    @Value("${spring.ai.openai.api-key}")
-    private String openaiApiKey;
-
-    @Value("${spring.ai.openai.chat.options.temperature}")
-    private float openaiTemperature;
-
-    @Value("${spring.ai.openai.chat.options.model}")
-    private String openaiModel;
-
     public AiConfiguration(KuentecoAppConnector kuentecoAppConnector) {
         this.kuentecoAppConnector = kuentecoAppConnector;
-    }
-
-    // OpenAI Chat Model Bean
-    @Bean("openAiChatModel")
-    public OpenAiChatModel openAiChatModel() {
-        OpenAiApi openAiApi = new OpenAiApi(openaiBaseUrl, openaiApiKey);
-        return new OpenAiChatModel(
-                openAiApi,
-                OpenAiChatOptions.builder()
-                        .withModel(openaiModel)
-                        .withTemperature(openaiTemperature)
-                        .build());
-    }
-
-    // DeepSeek Chat Model Bean (using OpenAI-compatible API)
-    @Bean("deepSeekChatModel")
-    public OpenAiChatModel deepSeekChatModel() {
-        OpenAiApi deepSeekApi = new OpenAiApi(deepSeekBaseUrl, deepSeekApiKey);
-        return new OpenAiChatModel(
-                deepSeekApi,
-                OpenAiChatOptions.builder()
-                        .withModel(deepSeekModel)
-                        .withTemperature(deepSeekTemperature)
-                        .build());
     }
 
     @Bean(name = "incomesAndExpensesByPeriodFunction")

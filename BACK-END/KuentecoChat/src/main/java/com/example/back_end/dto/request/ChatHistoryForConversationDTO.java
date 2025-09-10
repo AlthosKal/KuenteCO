@@ -9,9 +9,10 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatHistoryDTO {
+public class ChatHistoryForConversationDTO {
     private String conversationId;
     private String prompt;
+    private String response;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime date;
