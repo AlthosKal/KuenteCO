@@ -4,7 +4,6 @@ class ChatFilesDTO extends ChatDTO {
   final List<String> files;
 
   ChatFilesDTO({
-    required super.model,
     required super.conversationId,
     required super.prompt,
     required this.files,

@@ -8,9 +8,6 @@ import lombok.Data;
 @Data
 public class ChatDTO {
 
-    @NotNull(message = "The model must be defined")
-    private Model model;
-
     private String conversationId;
 
     @NotBlank(message = "The prompt must be defined")

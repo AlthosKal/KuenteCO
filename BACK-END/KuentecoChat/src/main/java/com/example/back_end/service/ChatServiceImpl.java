@@ -7,10 +7,7 @@ import com.example.back_end.configuration.security.JwtUtil;
 import com.example.back_end.connector.KuentecoAppConnector;
 import com.example.back_end.connector.rest.transaction.TransactionResponseWrapper;
 import com.example.back_end.connector.rest.transaction.UserProfilesWithTransactionsDTO;
-import com.example.back_end.dto.request.ChatDTO;
-import com.example.back_end.dto.request.ChatFilesDTO;
-import com.example.back_end.dto.request.ChatHistoryDTO;
-import com.example.back_end.dto.request.ChatMultipartDTO;
+import com.example.back_end.dto.request.*;
 import com.example.back_end.dto.response.CharDataDTO;
 import com.example.back_end.dto.response.DynamicAnalysisResponseDTO;
 import com.example.back_end.dto.response.StringChatResponseDTO;
@@ -20,6 +17,7 @@ import com.example.back_end.entity.ChatHistory;
 import com.example.back_end.enums.ApiError;
 import com.example.back_end.enums.Model;
 import com.example.back_end.exception.AiProfileException;
+import com.example.back_end.mapper.ChatHistoryForConversationMapper;
 import com.example.back_end.mapper.ChatHistoryMapper;
 import com.example.back_end.repository.AiHistoryRepository;
 import com.example.back_end.service.functions.*;
@@ -52,10 +50,9 @@ import org.springframework.util.StreamUtils;
 @Service
 public class ChatServiceImpl implements ChatService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatServiceImpl.class);
-
-    private final ChatClient deepseekChatClient;
     private final ChatClient openaiChatClient;
     private final AiHistoryRepository repository;
+    private final ChatHistoryForConversationMapper chatHistoryForConversationMapper;
     private final ChatHistoryMapper chatHistoryMapper;
     private final ResponseTypeDetectorService responseTypeDetector;
     private final JwtUtil jwtUtil;
@@ -63,24 +60,16 @@ public class ChatServiceImpl implements ChatService {
     private final ReportGenerationService reportGenerationService;
 
     public ChatServiceImpl(
-            @Qualifier(value = "openAiChatModel") ChatModel deepseekChatClient,
             @Qualifier(value = "openAiChatModel") ChatModel openaiChatClient,
             JwtUtil jwtUtil,
             AiHistoryRepository repository,
+            ChatHistoryForConversationMapper chatHistoryForConversationMapper,
             ChatHistoryMapper chatHistoryMapper,
             ResponseTypeDetectorService responseTypeDetectorService,
             KuentecoAppConnector kuentecoAppConnector,
             ReportGenerationService reportGenerationService) {
 
         InMemoryChatMemory memory = new InMemoryChatMemory();
-
-        this.deepseekChatClient =
-                ChatClient.builder(deepseekChatClient)
-                        .defaultAdvisors(
-                                new PromptChatMemoryAdvisor(memory),
-                                new MessageChatMemoryAdvisor(memory))
-                        .build();
-
         this.openaiChatClient =
                 ChatClient.builder(openaiChatClient)
                         .defaultAdvisors(
@@ -90,14 +79,15 @@ public class ChatServiceImpl implements ChatService {
 
         this.jwtUtil = jwtUtil;
         this.repository = repository;
-        this.chatHistoryMapper = chatHistoryMapper;
+        this.chatHistoryForConversationMapper = chatHistoryForConversationMapper;
         this.responseTypeDetector = responseTypeDetectorService;
         this.kuentecoAppConnector = kuentecoAppConnector;
         this.reportGenerationService = reportGenerationService;
+        this.chatHistoryMapper = chatHistoryMapper;
     }
 
     @Override
-    @Cacheable(value = "chats", key = "#dto.model + '-' + #dto.prompt") // Temporarily disabled
+    @Cacheable(value = "chats", key = "#dto.prompt") // Temporarily disabled
     // to prevent stale responses
     public DynamicAnalysisResponseDTO queryAi(ChatDTO dto, HttpServletRequest request) {
         try {
@@ -115,7 +105,7 @@ public class ChatServiceImpl implements ChatService {
 
             // Ejecutar la función con el contexto mejorado
             String response =
-                    getChatClient(dto.getModel())
+                    getChatClient()
                             .prompt()
                             .user(contextualPrompt)
                             .advisors(
@@ -167,8 +157,12 @@ public class ChatServiceImpl implements ChatService {
             return new DynamicAnalysisResponseDTO(dtoResponse, dynamicResponse);
 
         } catch (Exception e) {
-            LOGGER.error("Error generating dynamic response", e);
-            throw new AiProfileException(ApiError.BAD_FORMAT);
+            LOGGER.error(
+                    "Error generating dynamic response with model {}: {}",
+                    Model.OPENAI,
+                    e.getMessage(),
+                    e);
+            throw handleChatException(e, dto);
         }
     }
 
@@ -210,28 +204,18 @@ public class ChatServiceImpl implements ChatService {
 
     private Object getFunctionData(String functionName, ChatDTO request) {
         try {
-            switch (functionName) {
-                case "BalanceOverTime":
-                    return executeBalanceFunction(request);
-                case "analyzeDebtRisk":
-                    return executeDebtAnalysisFunction(request);
-                case "analyzeUserSpendingPatterns":
-                    return executeSpendingPatternsFunction(request);
-                case "calculateFinancialHealthScore":
-                    return executeFinancialHealthFunction(request);
-                case "IncomesAndExpensesByPeriod":
-                    return executeIncomesAndExpensesFunction(request);
-                case "projectFinancialBalance":
-                    return executeProjectFinancialBalanceFunction(request);
-                case "suggestExpenseReductions":
-                    return executeSuggestExpenseReductionsFunction(request);
-                case "compareFinancialPeriods":
-                    return executeCompareFinancialPeriodsFunction(request);
-                case "financialStatement":
-                    return executeFinancialStatementFunction(request);
-                default:
-                    return null;
-            }
+            return switch (functionName) {
+                case "BalanceOverTime" -> executeBalanceFunction(request);
+                case "analyzeDebtRisk" -> executeDebtAnalysisFunction(request);
+                case "analyzeUserSpendingPatterns" -> executeSpendingPatternsFunction(request);
+                case "calculateFinancialHealthScore" -> executeFinancialHealthFunction(request);
+                case "IncomesAndExpensesByPeriod" -> executeIncomesAndExpensesFunction(request);
+                case "projectFinancialBalance" -> executeProjectFinancialBalanceFunction(request);
+                case "suggestExpenseReductions" -> executeSuggestExpenseReductionsFunction(request);
+                case "compareFinancialPeriods" -> executeCompareFinancialPeriodsFunction(request);
+                case "financialStatement" -> executeFinancialStatementFunction(request);
+                default -> null;
+            };
         } catch (Exception e) {
             LOGGER.error("Error executing function: {}", functionName, e);
             return null;
@@ -426,7 +410,11 @@ public class ChatServiceImpl implements ChatService {
             String fileContent = KuentecoChatUtil.convertFileToString(dto.getFile());
             return askToAI(dto, fileContent, request);
         } catch (Exception e) {
-            throw new AiProfileException(ApiError.BAD_FORMAT);
+            LOGGER.error("Error processing file upload: {}", e.getMessage(), e);
+            if (dto.getFile() == null || dto.getFile().isEmpty()) {
+                return handleFileException(new IllegalArgumentException("No file provided"));
+            }
+            return handleFileException(e);
         }
     }
 
@@ -435,14 +423,18 @@ public class ChatServiceImpl implements ChatService {
             String fileContent = KuentecoChatUtil.convertFilesToString(dto.getFiles());
             return askToAI(dto, fileContent, request);
         } catch (Exception e) {
-            throw new AiProfileException(ApiError.BAD_FORMAT);
+            LOGGER.error("Error processing files from URLs: {}", e.getMessage(), e);
+            if (dto.getFiles() == null || dto.getFiles().length == 0) {
+                return handleFileException(new IllegalArgumentException("No files provided"));
+            }
+            return handleFileException(e);
         }
     }
 
     @Cacheable(value = "history", key = "#conversationId")
-    public List<ChatHistoryDTO> getHistoryByConversationId(String conversationId) {
+    public List<ChatHistoryForConversationDTO> getHistoryByConversationId(String conversationId) {
         return repository.findByConversationId(conversationId).stream()
-                .map(chatHistoryMapper::toDTO)
+                .map(chatHistoryForConversationMapper::toDTO)
                 .toList();
     }
 
@@ -453,15 +445,17 @@ public class ChatServiceImpl implements ChatService {
 
         List<ChatHistory> allHistory = repository.findByEmail(email);
 
-        Map<String, Optional<ChatHistory>> latestByConversation =
+        // Agrupa por conversationId y obtiene el PRIMER mensaje de cada conversación (mensaje
+        // inicial)
+        Map<String, Optional<ChatHistory>> firstByConversation =
                 allHistory.stream()
                         .collect(
                                 Collectors.groupingBy(
                                         ChatHistory::getConversationId,
-                                        Collectors.maxBy(
+                                        Collectors.minBy(
                                                 Comparator.comparing(ChatHistory::getDate))));
 
-        return latestByConversation.values().stream()
+        return firstByConversation.values().stream()
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .map(chatHistoryMapper::toDTO)
@@ -481,7 +475,7 @@ public class ChatServiceImpl implements ChatService {
         LOGGER.info(prompt.getInstructions().toString());
 
         String response =
-                getChatClient(dto.getModel())
+                getChatClient()
                         .prompt()
                         .user(prompt.toString())
                         .advisors(
@@ -504,16 +498,16 @@ public class ChatServiceImpl implements ChatService {
 
     private Prompt getPrompt(ChatDTO request, String fileContent) {
         PromptTemplate promptTemplate =
-                new PromptTemplate(loadPromptFromClasspath("ai_prompt_template.txt"));
+                new PromptTemplate(loadPromptFromClasspath());
 
         Map<String, Object> params =
                 Map.of("fileContent", fileContent, "prompt", request.getPrompt());
         return promptTemplate.create(params);
     }
 
-    private String loadPromptFromClasspath(String filename) {
+    private String loadPromptFromClasspath() {
         try (InputStream inputStream =
-                getClass().getClassLoader().getResourceAsStream("prompts/" + filename)) {
+                getClass().getClassLoader().getResourceAsStream("prompts/" + "ai_prompt_template.txt")) {
             if (inputStream == null) throw new FileNotFoundException("Prompt file not found");
             return StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
@@ -541,18 +535,112 @@ public class ChatServiceImpl implements ChatService {
         return "PDF"; // Por defecto
     }
 
-    private ChatClient getChatClient(Model model) {
-        if (model == Model.DEEPSEEK) {
-            return deepseekChatClient;
-
-        } else if (model == Model.OPENAI) {
+    private ChatClient getChatClient() {
             return openaiChatClient;
-        }
-        return deepseekChatClient;
     }
 
     private KuentecoAppConnector getConnector() {
         return this.kuentecoAppConnector;
+    }
+
+    /**
+     * Maneja excepciones de manera inteligente para proporcionar errores más específicos
+     *
+     * @param e La excepción original
+     * @param dto El DTO de la request para contexto
+     * @return AiProfileException apropiada según el tipo de error
+     */
+    private AiProfileException handleChatException(Exception e, ChatDTO dto) {
+        // Desenrollar la cadena de excepciones para encontrar la causa raíz
+        Throwable rootCause = e;
+        while (rootCause.getCause() != null && rootCause.getCause() != rootCause) {
+            rootCause = rootCause.getCause();
+        }
+
+        // Manejo específico de timeouts
+        if (rootCause instanceof io.netty.handler.timeout.ReadTimeoutException) {
+            LOGGER.warn("Timeout calling {} model for prompt: {}", Model.OPENAI.name(), dto.getPrompt());
+            return new AiProfileException(
+                    ApiError.AI_PROVIDER_TIMEOUT.getHttpStatus(),
+                    ApiError.AI_PROVIDER_TIMEOUT.getMessage(),
+                    List.of(
+                            "The " + Model.OPENAI.name() + " model did not respond in time",
+                            "This often happens with complex prompts or report generation",
+                            "Try again or switch to a different model",
+                            "Consider simplifying your request"));
+        }
+
+        // Manejo de errores de conectividad
+        if (e instanceof org.springframework.web.client.ResourceAccessException
+                || rootCause instanceof java.net.ConnectException
+                || rootCause instanceof java.net.UnknownHostException) {
+            LOGGER.warn("Network error calling {} model: {}", Model.OPENAI.name(), rootCause.getMessage());
+            return new AiProfileException(
+                    ApiError.AI_PROVIDER_UNAVAILABLE.getHttpStatus(),
+                    ApiError.AI_PROVIDER_UNAVAILABLE.getMessage(),
+                    List.of(
+                            "Cannot connect to " + Model.OPENAI.name()+ " provider",
+                            "Check your internet connection",
+                            "The AI service may be temporarily unavailable",
+                            "Try again in a few minutes"));
+        }
+
+        // Validación de formato del mensaje
+        if (dto.getPrompt() == null || dto.getPrompt().trim().isEmpty()) {
+            LOGGER.warn("Empty or null prompt provided");
+            return new AiProfileException(
+                    ApiError.BAD_FORMAT.getHttpStatus(),
+                    ApiError.BAD_FORMAT.getMessage(),
+                    List.of("The message cannot be empty", "Please provide a valid prompt"));
+        }
+
+        // Errores de validación de Spring
+        if (e instanceof org.springframework.web.bind.MethodArgumentNotValidException) {
+            LOGGER.warn("Validation error in request: {}", e.getMessage());
+            return new AiProfileException(ApiError.VALIDATION_ERROR);
+        }
+
+        // Error genérico - no sabemos exactamente qué pasó
+        LOGGER.error("Unexpected error processing chat request with {} model", Model.OPENAI.name(), e);
+        return new AiProfileException(
+                ApiError.INTERNAL_ERROR.getHttpStatus(),
+                ApiError.INTERNAL_ERROR.getMessage(),
+                List.of(
+                        "An unexpected error occurred while processing your request",
+                        "Error type: " + e.getClass().getSimpleName(),
+                        "Please try again or contact support if the problem persists"));
+    }
+
+    /**
+     * Maneja excepciones relacionadas con el procesamiento de archivos
+     *
+     * @param e La excepción original
+     * @return String con mensaje de error (en lugar de lanzar excepción)
+     */
+    private String handleFileException(Exception e) {
+        if (e instanceof IllegalArgumentException && e.getMessage().contains("No file")) {
+            throw new AiProfileException(
+                    ApiError.BAD_FORMAT.getHttpStatus(),
+                    "Invalid file upload",
+                    List.of("No file was provided", "Please select a file to upload"));
+        }
+
+        if (e instanceof java.io.IOException) {
+            throw new AiProfileException(
+                    ApiError.BAD_FORMAT.getHttpStatus(),
+                    "File processing error",
+                    List.of(
+                            "Could not read the uploaded file",
+                            "File may be corrupted or in an unsupported format",
+                            "Please try uploading a different file"));
+        }
+
+        throw new AiProfileException(
+                ApiError.INTERNAL_ERROR.getHttpStatus(),
+                "Error processing file",
+                List.of(
+                        "An unexpected error occurred while processing your file",
+                        "Please try again or contact support"));
     }
 
     /**
@@ -735,7 +823,6 @@ public class ChatServiceImpl implements ChatService {
                                     userProfiles.getTotalTransactions());
                             return List.of(userProfiles);
                         }
-                        break;
                     }
                     case TRANSACTION_LIST -> {
                         // Para usuarios PERSONAL, devolver directamente la lista de transacciones
@@ -747,7 +834,6 @@ public class ChatServiceImpl implements ChatService {
                                     wrapper.getTransactionList().size());
                             return wrapper.getTransactionList();
                         }
-                        break;
                     }
                     case MESSAGE -> {
                         LOGGER.info(
@@ -796,21 +882,15 @@ public class ChatServiceImpl implements ChatService {
                 return null;
             }
 
-            switch (functionName) {
-                case "BalanceOverTime":
-                    return generateBalanceChart(functionData);
-                case "IncomesAndExpensesByPeriod":
-                    return generateIncomeExpenseChart(functionData);
-                case "analyzeUserSpendingPatterns":
-                case "calculateFinancialHealthScore":
-                    return generateTransactionChart(functionData);
-                case "analyzeDebtRisk":
-                    return generateDebtChart(functionData);
-                case "compareFinancialPeriods":
-                    return generateBudgetComparisonChart(functionData);
-                default:
-                    return null;
-            }
+            return switch (functionName) {
+                case "BalanceOverTime" -> generateBalanceChart(functionData);
+                case "IncomesAndExpensesByPeriod" -> generateIncomeExpenseChart(functionData);
+                case "analyzeUserSpendingPatterns", "calculateFinancialHealthScore" ->
+                        generateTransactionChart(functionData);
+                case "analyzeDebtRisk" -> generateDebtChart(functionData);
+                case "compareFinancialPeriods" -> generateBudgetComparisonChart(functionData);
+                default -> null;
+            };
         } catch (Exception e) {
             LOGGER.warn(
                     "Error generating chart data for function {}: {}",
@@ -1051,8 +1131,7 @@ public class ChatServiceImpl implements ChatService {
 
                 if (value != null && expectedType.isAssignableFrom(value.getClass())) {
                     return (T) value;
-                } else if (value != null
-                        && expectedType == Double.class
+                } else if (expectedType == Double.class
                         && value instanceof Number) {
                     return (T) Double.valueOf(((Number) value).doubleValue());
                 } else if (value != null && expectedType == String.class) {
@@ -1068,8 +1147,7 @@ public class ChatServiceImpl implements ChatService {
 
                     if (value != null && expectedType.isAssignableFrom(value.getClass())) {
                         return (T) value;
-                    } else if (value != null
-                            && expectedType == Double.class
+                    } else if (expectedType == Double.class
                             && value instanceof Number) {
                         return (T) Double.valueOf(((Number) value).doubleValue());
                     } else if (value != null && expectedType == String.class) {
