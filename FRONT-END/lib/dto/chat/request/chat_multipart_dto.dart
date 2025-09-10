@@ -6,7 +6,6 @@ class ChatMultipartDTO extends ChatDTO {
   final MultipartFile file;
 
   ChatMultipartDTO({
-    required super.model,
     required super.conversationId,
     required super.prompt,
     required this.file,

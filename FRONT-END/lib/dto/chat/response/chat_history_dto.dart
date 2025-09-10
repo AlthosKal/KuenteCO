@@ -1,13 +1,13 @@
 class ChatHistoryDTO {
   final String conversationId;
   final String prompt;
-  final String response;
+  final String? response;
   final DateTime date;
 
   ChatHistoryDTO({
     required this.conversationId,
     required this.prompt,
-    required this.response,
+    this.response,
     required this.date,
   });
 
@@ -24,7 +24,7 @@ class ChatHistoryDTO {
     return {
       'conversationId': conversationId,
       'prompt': prompt,
-      'response': response,
+      if (response != null) 'response': response,
       'date': date.toIso8601String(),
     };
   }

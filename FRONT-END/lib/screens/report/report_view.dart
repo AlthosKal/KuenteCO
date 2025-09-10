@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/chat_controller.dart';
 import '../../controllers/excel/excel_controller.dart';
@@ -9,7 +10,6 @@ import '../../widgets/components/report/excel/excel_controls_widget.dart';
 import '../../widgets/components/report/excel/excel_validation_results_widget.dart';
 import '../../widgets/components/chat/chat_message_widget.dart';
 import '../../widgets/components/chat/animated_typing_dots.dart';
-import '../../widgets/components/chat/model_selector_widget.dart';
 
 class ReportView extends StatefulWidget {
   const ReportView({Key? key}) : super(key: key);
@@ -259,18 +259,6 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
               ),
         ),
         
-        // Selector de modelo de IA
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border(top: BorderSide(color: Colors.grey[200]!)),
-          ),
-          child: const ModelSelectorWidget(
-            showLabel: false,
-            compact: true,
-          ),
-        ),
       ],
     );
   }
@@ -526,33 +514,51 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
       child: Row(
         children: [
           Expanded(
-            child: TextField(
-              controller: _messageController,
-              enabled: !chatController.isLoading && !chatController.isTyping, // Deshabilitar durante carga Y escritura
-              decoration: InputDecoration(
-                hintText: (chatController.isLoading || chatController.isTyping)
-                  ? 'Generando respuesta...' 
-                  : 'Escribe tu pregunta sobre finanzas...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
+            child: Focus(
+              onKeyEvent: (node, event) {
+                if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.enter) {
+                  if (HardwareKeyboard.instance.isShiftPressed) {
+                    // Shift+Enter: permite nueva línea (comportamiento por defecto)
+                    return KeyEventResult.ignored;
+                  } else {
+                    // Solo Enter: enviar mensaje
+                    if (!chatController.isLoading && !chatController.isTyping) {
+                      _sendMessage();
+                    }
+                    return KeyEventResult.handled;
+                  }
+                }
+                return KeyEventResult.ignored;
+              },
+              child: TextField(
+                controller: _messageController,
+                enabled: !chatController.isLoading && !chatController.isTyping,
+                decoration: InputDecoration(
+                  hintText: (chatController.isLoading || chatController.isTyping)
+                    ? 'Generando respuesta...' 
+                    : 'Escribe tu pregunta sobre finanzas (Enter para enviar, Shift+Enter para nueva línea)',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(color: Colors.blue[600]!),
+                  ),
+                  disabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(color: Colors.grey[400]!),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide(color: Colors.blue[600]!),
-                ),
-                disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide(color: Colors.grey[400]!),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                maxLines: null,
+                textCapitalization: TextCapitalization.sentences,
+                textInputAction: TextInputAction.newline,
               ),
-              maxLines: null,
-              textCapitalization: TextCapitalization.sentences,
             ),
           ),
           const SizedBox(width: 8),
@@ -810,8 +816,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
     _messageController.clear();
     
     try {
-      await chatController.sendMessageWithTypewriter(message, model: chatController.selectedModel);
-      _scrollToBottom();
+      await chatController.sendMessageWithTypewriter(message);
     } catch (e) {
       _showErrorMessage(context, 'Error enviando mensaje: $e');
     }
