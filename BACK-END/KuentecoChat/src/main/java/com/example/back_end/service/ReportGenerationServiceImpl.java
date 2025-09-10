@@ -1112,20 +1112,41 @@ public class ReportGenerationServiceImpl implements ReportGenerationService {
                     descText =
                             getFieldValue(
                                     description, "description", String.class, "Sin descripción");
-                    type = getFieldValue(description, "type", String.class, "UNKNOWN");
+                    // Intentar obtener el tipo como String primero
+                    type = getFieldValue(description, "type", String.class, null);
+                    if (type == null || type.isBlank()) {
+                        // Intentar como Enum y convertir a nombre
+                        Enum<?> enumType = getFieldValue(description, "type", Enum.class, null);
+                        if (enumType != null) {
+                            type = enumType.name();
+                        }
+                    }
+                    if (type == null || type.isBlank()) {
+                        type = "UNKNOWN";
+                    }
                 } else {
                     // Intentar obtener el tipo directamente de la transacción
-                    type = getFieldValue(transaction, "type", String.class, "UNKNOWN");
+                    type = getFieldValue(transaction, "type", String.class, null);
+                    if (type == null || type.isBlank()) {
+                        Enum<?> enumType = getFieldValue(transaction, "type", Enum.class, null);
+                        if (enumType != null) {
+                            type = enumType.name();
+                        }
+                    }
+                    if (type == null || type.isBlank()) {
+                        type = "UNKNOWN";
+                    }
                     descText =
                             getFieldValue(
                                     transaction, "description", String.class, "Sin descripción");
                 }
 
                 LOGGER.debug(
-                        "Procesando transacción: tipo={}, monto={}, descripción={}",
+                        "Procesando transacción: tipo={}, monto={}, descripción={}, structura description: {}",
                         type,
                         amount,
-                        descText);
+                        descText,
+                        description != null ? description.getClass().getSimpleName() + ":" + description.toString() : "null");
 
                 if ("INCOME".equals(type)) {
                     totalIncome += amount;
@@ -1336,6 +1357,16 @@ public class ReportGenerationServiceImpl implements ReportGenerationService {
     private <T> T getFieldValue(
             Object object, String fieldName, Class<T> expectedType, T defaultValue) {
         try {
+            // Manejar Map directamente (Jackson deserializa JSON a LinkedHashMap)
+            if (object instanceof Map) {
+                Map<?, ?> map = (Map<?, ?>) object;
+                Object value = map.get(fieldName);
+                if (value != null) {
+                    return convertValue(value, expectedType);
+                }
+                return defaultValue;
+            }
+
             Class<?> clazz = object.getClass();
 
             // Intentar primero con el campo directo
@@ -1344,20 +1375,8 @@ public class ReportGenerationServiceImpl implements ReportGenerationService {
                 field.setAccessible(true);
                 Object value = field.get(object);
 
-                if (value != null && expectedType.isAssignableFrom(value.getClass())) {
-                    return (T) value;
-                } else if (value != null
-                        && expectedType == Double.class
-                        && value instanceof Number) {
-                    return (T) Double.valueOf(((Number) value).doubleValue());
-                } else if (value != null
-                        && expectedType == Integer.class
-                        && value instanceof Number) {
-                    return (T) Integer.valueOf(((Number) value).intValue());
-                } else if (value != null
-                        && expectedType == BigDecimal.class
-                        && value instanceof Number) {
-                    return (T) new BigDecimal(value.toString());
+                if (value != null) {
+                    return convertValue(value, expectedType);
                 }
             } catch (NoSuchFieldException e) {
                 // Intentar con getter method
@@ -1367,20 +1386,8 @@ public class ReportGenerationServiceImpl implements ReportGenerationService {
                     java.lang.reflect.Method getter = clazz.getMethod(getterName);
                     Object value = getter.invoke(object);
 
-                    if (value != null && expectedType.isAssignableFrom(value.getClass())) {
-                        return (T) value;
-                    } else if (value != null
-                            && expectedType == Double.class
-                            && value instanceof Number) {
-                        return (T) Double.valueOf(((Number) value).doubleValue());
-                    } else if (value != null
-                            && expectedType == Integer.class
-                            && value instanceof Number) {
-                        return (T) Integer.valueOf(((Number) value).intValue());
-                    } else if (value != null
-                            && expectedType == BigDecimal.class
-                            && value instanceof Number) {
-                        return (T) new BigDecimal(value.toString());
+                    if (value != null) {
+                        return convertValue(value, expectedType);
                     }
                 } catch (Exception me) {
                     LOGGER.debug(
@@ -1391,6 +1398,57 @@ public class ReportGenerationServiceImpl implements ReportGenerationService {
             LOGGER.debug("No se pudo extraer el campo '{}': {}", fieldName, e.getMessage());
         }
         return defaultValue;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private <T> T convertValue(Object value, Class<T> expectedType) {
+        if (value == null) {
+            return null;
+        }
+        
+        // Si ya es del tipo esperado
+        if (expectedType.isAssignableFrom(value.getClass())) {
+            return (T) value;
+        }
+        
+        // Conversiones de números
+        if (expectedType == Double.class && value instanceof Number) {
+            return (T) Double.valueOf(((Number) value).doubleValue());
+        }
+        if (expectedType == Integer.class && value instanceof Number) {
+            return (T) Integer.valueOf(((Number) value).intValue());
+        }
+        if (expectedType == BigDecimal.class && value instanceof Number) {
+            return (T) new BigDecimal(value.toString());
+        }
+        
+        // Conversiones de String
+        if (expectedType == String.class) {
+            return (T) value.toString();
+        }
+        
+        // Manejo de Enums
+        if (expectedType == Enum.class && value instanceof Enum) {
+            return (T) value;
+        }
+        
+        // Si es un String que contiene un valor de enum
+        if (expectedType == String.class && value instanceof Enum) {
+            return (T) ((Enum<?>) value).name();
+        }
+        
+        // Intentar conversión de string a enum (útil para datos JSON)
+        if (Enum.class.isAssignableFrom(expectedType) && value instanceof String) {
+            try {
+                @SuppressWarnings("rawtypes")
+                Class<? extends Enum> enumClass = (Class<? extends Enum>) expectedType;
+                return (T) Enum.valueOf(enumClass, (String) value);
+            } catch (IllegalArgumentException e) {
+                LOGGER.debug("No se pudo convertir '{}' a enum {}", value, expectedType.getSimpleName());
+            }
+        }
+        
+        return null;
     }
 
     // Método para generar sección de puntuación de salud financiera
