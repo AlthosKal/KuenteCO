@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 import '../core/services/chat/chat_service.dart';
 import '../core/services/chat/chat_history_service.dart' as history;
 import '../dto/chat/request/chat_dto.dart';
@@ -16,6 +17,7 @@ class ChatMessage {
   final bool isUser;
   final DateTime timestamp;
   final bool isTyping;
+  final bool isNew; // Para distinguir mensajes nuevos de históricos
 
   ChatMessage({
     required this.id,
@@ -23,6 +25,7 @@ class ChatMessage {
     required this.isUser,
     required this.timestamp,
     this.isTyping = false,
+    this.isNew = true, // Por defecto es nuevo
   });
 }
 
@@ -51,8 +54,127 @@ class ChatController extends ChangeNotifier {
   final List<ChatMessage> _messages = [];
   String? _currentTypingMessage;
   bool _isTyping = false;
+  bool _isCancelled = false;
 
-  ChatController(this._chatService, this._historyService);
+  // Modelo de IA seleccionado y modelos disponibles  
+  Model _selectedModel = Model.OPENAI;
+  List<String> _availableModels = [];
+
+  ChatController(this._chatService, this._historyService) {
+    print('🏗️ ChatController: Constructor ejecutado, _currentConversationId: $_currentConversationId');
+    _loadAvailableModels();
+    // Cargar historial automáticamente sin await para no bloquear el constructor
+    _loadHistoryAsync();
+  }
+  
+  /// Cargar historial de forma asíncrona
+  void _loadHistoryAsync() async {
+    print('🚀 ChatController: Cargando historial automáticamente');
+    
+    final originalErrorMessage = _errorMessage;
+    await loadChatHistory();
+    
+    // Verificar si hubo un error después de cargar
+    if (_errorMessage != null && _errorMessage != originalErrorMessage) {
+      print('❌ ChatController: Error al cargar historial automáticamente');
+    } else {
+      print('✅ ChatController: Historial cargado automáticamente exitosamente');
+      
+      // Si hay conversaciones en el historial y no hay una conversación actual,
+      // usar la más reciente para continuar
+      if (_chatHistory.isNotEmpty && _currentConversationId == null) {
+        final latestConversation = _chatHistory.first;
+        _currentConversationId = latestConversation.conversationId;
+        print('💬 ChatController: Reanudando conversación más reciente: $_currentConversationId');
+      }
+    }
+  }
+
+  /// Convertir markdown a texto plano
+  String _markdownToPlainText(String markdown) {
+    if (markdown.isEmpty) return markdown;
+    
+    String plainText = markdown;
+    
+    // Remover encabezados (### ## #) - capturar y mantener solo el texto
+    plainText = plainText.replaceAllMapped(
+      RegExp(r'^#{1,6}\s*(.*)$', multiLine: true), 
+      (match) => match.group(1) ?? ''
+    );
+    
+    // Remover negritas (**texto** o __texto__)
+    plainText = plainText.replaceAllMapped(
+      RegExp(r'\*\*(.*?)\*\*'), 
+      (match) => match.group(1) ?? ''
+    );
+    plainText = plainText.replaceAllMapped(
+      RegExp(r'__(.*?)__'), 
+      (match) => match.group(1) ?? ''
+    );
+    
+    // Remover cursivas (*texto* o _texto_)
+    plainText = plainText.replaceAllMapped(
+      RegExp(r'\*([^*]+)\*'), 
+      (match) => match.group(1) ?? ''
+    );
+    plainText = plainText.replaceAllMapped(
+      RegExp(r'_([^_]+)_'), 
+      (match) => match.group(1) ?? ''
+    );
+    
+    // Remover código inline (`código`)
+    plainText = plainText.replaceAllMapped(
+      RegExp(r'`([^`]*)`'), 
+      (match) => match.group(1) ?? ''
+    );
+    
+    // Remover bloques de código (```código```)
+    plainText = plainText.replaceAll(RegExp(r'```[\s\S]*?```'), '');
+    
+    // Remover enlaces [texto](url) - mantener solo el texto
+    plainText = plainText.replaceAllMapped(
+      RegExp(r'\[([^\]]*)\]\([^)]*\)'), 
+      (match) => match.group(1) ?? ''
+    );
+    
+    // Remover listas con bullets (- * +) - mantener solo el contenido
+    plainText = plainText.replaceAllMapped(
+      RegExp(r'^[\s]*[-\*\+]\s*(.*)$', multiLine: true), 
+      (match) => match.group(1) ?? ''
+    );
+    
+    // Remover numeración de listas (1. 2. 3.) - mantener solo el contenido
+    plainText = plainText.replaceAllMapped(
+      RegExp(r'^\s*\d+\.\s*(.*)$', multiLine: true), 
+      (match) => match.group(1) ?? ''
+    );
+    
+    // Remover citas (> texto) - mantener solo el contenido
+    plainText = plainText.replaceAllMapped(
+      RegExp(r'^>\s*(.*)$', multiLine: true), 
+      (match) => match.group(1) ?? ''
+    );
+    
+    // Remover líneas de separación (---)
+    plainText = plainText.replaceAll(RegExp(r'^---+$', multiLine: true), '');
+    
+    // Remover tablas (|columna|columna|)
+    plainText = plainText.replaceAll(RegExp(r'^\|.*\|$', multiLine: true), '');
+    
+    // Limpiar múltiples saltos de línea consecutivos
+    plainText = plainText.replaceAll(RegExp(r'\n\s*\n\s*\n+'), '\n\n');
+    
+    // Limpiar espacios extra al inicio y final de líneas
+    plainText = plainText.replaceAll(RegExp(r'^[ \t]+|[ \t]+$', multiLine: true), '');
+    
+    // Limpiar cualquier $1, $2, etc. que pueda haber quedado
+    plainText = plainText.replaceAll(RegExp(r'\$\d+'), '');
+    
+    // Limpiar espacios extra
+    plainText = plainText.trim();
+    
+    return plainText;
+  }
 
   // Getters
   bool get isLoading => _isLoading;
@@ -70,6 +192,36 @@ class ChatController extends ChangeNotifier {
   List<ChatMessage> get messages => List.unmodifiable(_messages);
   bool get isTyping => _isTyping;
   String? get currentTypingMessage => _currentTypingMessage;
+  
+  // Getters y setters para modelo seleccionado
+  Model get selectedModel => _selectedModel;
+  List<String> get availableModels => List.unmodifiable(_availableModels);
+  
+  void setSelectedModel(Model model) {
+    print('🔄 ChatController: Cambiando modelo de ${_selectedModel.name} a ${model.name}');
+    _selectedModel = model;
+    notifyListeners();
+    print('✅ ChatController: Modelo cambiado a ${model.name}');
+  }
+
+  /// Cargar modelos disponibles desde el servidor
+  Future<void> _loadAvailableModels() async {
+    print('🤖 ChatController: Cargando modelos disponibles');
+    try {
+      _availableModels = await _chatService.getAllModels();
+      print('✅ ChatController: ${_availableModels.length} modelos cargados: $_availableModels');
+      notifyListeners();
+    } catch (e) {
+      print('❌ ChatController: Error cargando modelos: $e');
+      // Si falla, usar modelos por defecto del enum
+      _availableModels = Model.values.map((m) => m.name).toList();
+    }
+  }
+
+  /// Recargar modelos disponibles manualmente
+  Future<void> refreshAvailableModels() async {
+    await _loadAvailableModels();
+  }
 
   void _setLoading(bool loading) {
     _isLoading = loading;
@@ -97,6 +249,37 @@ class ChatController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Limpiar estado de escritura
+  void clearTyping() {
+    print('✏️ ChatController: Limpiando estado de escritura');
+    _setTyping(false);
+  }
+
+  /// Cancelar respuesta en progreso
+  void cancelCurrentResponse() {
+    print('🛑 ChatController: Cancelando respuesta en progreso');
+    _isCancelled = true;
+    _setLoading(false);
+    _setTyping(false);
+    
+    // Agregar mensaje de cancelación solo si estábamos realmente generando algo nuevo
+    if (_messages.isNotEmpty && _isLoading) {
+      final cancelMessage = 'Respuesta cancelada por el usuario.';
+      // Agregar directamente sin activar typewriter para cancelación
+      final message = ChatMessage(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        content: cancelMessage,
+        isUser: false,
+        timestamp: DateTime.now(),
+        isNew: false, // Mensaje de cancelación no es nuevo
+      );
+      _messages.add(message);
+    }
+    
+    notifyListeners();
+    print('✅ ChatController: Respuesta cancelada');
+  }
+
   /// Chat básico con AI
   Future<void> sendMessage(String message, {Model? model}) async {
     print('ð ChatController: Enviando mensaje básico');
@@ -105,15 +288,23 @@ class ChatController extends ChangeNotifier {
 
     try {
       final dto = ChatDTO(
-        model: model ?? Model.OPENAI,
+        model: model ?? _selectedModel,
         conversationId: _currentConversationId,
         prompt: message,
       );
 
       _lastChatResponse = await _chatService.askAi(dto);
-      _currentConversationId = _lastChatResponse!.conversationId;
       
-      await _addToHistory(message, _lastChatResponse!.analysis.response);
+      // Solo actualizar conversationId si no tenemos uno ya (primera vez)
+      if (_currentConversationId == null) {
+        _currentConversationId = _lastChatResponse!.conversationId;
+        print('ChatController: Nueva conversación iniciada con ID: $_currentConversationId');
+      } else {
+        print('ChatController: Continuando conversación con ID: $_currentConversationId');
+      }
+      
+      final plainTextResponse = _markdownToPlainText(_lastChatResponse!.analysis.response);
+      await _addToHistory(message, plainTextResponse);
       print('â ChatController: Mensaje enviado y respuesta recibida');
     } catch (e) {
       print('â ChatController: Error enviando mensaje: $e');
@@ -141,9 +332,10 @@ class ChatController extends ChangeNotifier {
         customMessage: customMessage,
       );
       
+      final plainTextAnalysis = _markdownToPlainText(_lastDebtAnalysis!.analysis ?? 'Análisis de deudas completado');
       await _addToHistory(
         customMessage ?? 'Analizar mis deudas',
-        _lastDebtAnalysis!.analysis ?? 'Análisis de deudas completado',
+        plainTextAnalysis,
       );
       
       print('â ChatController: Análisis de deudas completado');
@@ -173,9 +365,10 @@ class ChatController extends ChangeNotifier {
         debtIds: debtIds,
       );
       
+      final plainTextAnalysis = _markdownToPlainText(_lastDebtAnalysis!.analysis ?? 'Análisis de riesgo completado');
       await _addToHistory(
         'Análisis de riesgo de deudas',
-        _lastDebtAnalysis!.analysis ?? 'Análisis de riesgo completado',
+        plainTextAnalysis,
       );
       
       print('â ChatController: Análisis de riesgo completado');
@@ -205,9 +398,10 @@ class ChatController extends ChangeNotifier {
         priorityDebtIds: priorityDebtIds,
       );
       
+      final plainTextAnalysis = _markdownToPlainText(_lastDebtAnalysis!.analysis ?? 'Estrategia generada');
       await _addToHistory(
         'Estrategia de pago para deudas',
-        _lastDebtAnalysis!.analysis ?? 'Estrategia generada',
+        plainTextAnalysis,
       );
       
       print('â ChatController: Estrategia de pago generada');
@@ -227,15 +421,23 @@ class ChatController extends ChangeNotifier {
 
     try {
       final dto = ChatDTO(
-        model: model ?? Model.OPENAI,
+        model: model ?? _selectedModel,
         conversationId: _currentConversationId,
         prompt: message,
       );
 
       _lastDynamicAnalysis = await _chatService.getDynamicAnalysis(dto);
-      _currentConversationId = _lastDynamicAnalysis!.body.conversationId;
       
-      await _addToHistory(message, _lastDynamicAnalysis!.body.response);
+      // Solo actualizar conversationId si no tenemos uno ya (primera vez)
+      if (_currentConversationId == null) {
+        _currentConversationId = _lastDynamicAnalysis!.body.conversationId;
+        print('ChatController: Nueva conversación dinámica iniciada con ID: $_currentConversationId');
+      } else {
+        print('ChatController: Continuando conversación dinámica con ID: $_currentConversationId');
+      }
+      
+      final plainTextResponse = _markdownToPlainText(_lastDynamicAnalysis!.body.response);
+      await _addToHistory(message, plainTextResponse);
       print('â ChatController: Análisis dinámico completado');
     } catch (e) {
       print('â ChatController: Error en análisis dinámico: $e');
@@ -251,11 +453,81 @@ class ChatController extends ChangeNotifier {
     _setLoading(true);
 
     try {
-      // _chatHistory = await _historyService.getChatHistory();
-      // Por ahora usar historial local
-      print('â ChatController: Historial cargado: ${_chatHistory.length} mensajes');
+      final allMessages = await _historyService.getAllConversations();
+      print('ChatController: Obtenidos ${allMessages.length} mensajes del servidor');
+
+      // AGRUPAR POR CONVERSATION ID - MANTENER EL PRIMER MENSAJE DE CADA CONVERSACION
+      final Map<String, ChatHistoryDTO> conversationRepresentatives = {};
+      final Map<String, List<ChatHistoryDTO>> allMessagesByConversation = {};
+
+      print('📊 ChatController: Analizando ${allMessages.length} mensajes para agrupación:');
+      
+      for (final message in allMessages) {
+        final id = message.conversationId;
+        print('   - ID: $id, Prompt: "${message.prompt.substring(0, math.min(20, message.prompt.length))}..."');
+        
+        // Agrupar TODOS los mensajes por conversation ID
+        if (!allMessagesByConversation.containsKey(id)) {
+          allMessagesByConversation[id] = [];
+        }
+        allMessagesByConversation[id]!.add(message);
+
+        // Si no existe esta conversación, o si este mensaje es más antiguo (primer prompt histórico)
+        if (!conversationRepresentatives.containsKey(id) ||
+            message.date.isBefore(conversationRepresentatives[id]!.date)) {
+          conversationRepresentatives[id] = message;
+        }
+      }
+      
+      print('📊 ChatController: Resumen de agrupación:');
+      allMessagesByConversation.forEach((id, messages) {
+        print('   - Conversación $id: ${messages.length} mensajes');
+        print('     Primer mensaje: "${messages.first.prompt.substring(0, math.min(20, messages.first.prompt.length))}..."');
+      });
+
+      // Convertir a lista ordenada por fecha del último mensaje de cada conversación
+      _chatHistory = conversationRepresentatives.values.toList();
+      
+      // Ordenar por la fecha más reciente de cada conversación
+      for (int i = 0; i < _chatHistory.length; i++) {
+        final conversationId = _chatHistory[i].conversationId;
+        // Encontrar el mensaje más reciente de esta conversación para el ordenamiento
+        final latestMessageInConversation = allMessages
+            .where((msg) => msg.conversationId == conversationId)
+            .reduce((a, b) => a.date.isAfter(b.date) ? a : b);
+        
+        // Encontrar el primer mensaje (más antiguo) para conservar como título
+        final firstMessageInConversation = allMessages
+            .where((msg) => msg.conversationId == conversationId)
+            .reduce((a, b) => a.date.isBefore(b.date) ? a : b);
+        
+        // Actualizar manteniendo el primer prompt como título pero con fecha más reciente para ordenamiento
+        _chatHistory[i] = ChatHistoryDTO(
+          conversationId: _chatHistory[i].conversationId,
+          prompt: firstMessageInConversation.prompt, // SIEMPRE usar el primer prompt como título
+          response: latestMessageInConversation.response, // Última respuesta
+          date: latestMessageInConversation.date, // Fecha más reciente para ordenamiento
+        );
+      }
+      
+      // Ordenar por fecha más reciente
+      _chatHistory.sort((a, b) => b.date.compareTo(a.date));
+
+      print('ChatController: AGRUPAMIENTO COMPLETO - ${_chatHistory.length} conversaciones únicas de ${allMessages.length} mensajes totales');
+      
+      // Debug: Mostrar las primeras 3 conversaciones de la lista final
+      print('📝 DEBUG: Lista final de conversaciones (primeras 3):');
+      for (int i = 0; i < math.min(3, _chatHistory.length); i++) {
+        final conv = _chatHistory[i];
+        print('   ${i+1}. ID: ${conv.conversationId}');
+        print('      Title: "${conv.prompt.substring(0, math.min(30, conv.prompt.length))}..."');
+        print('      Fecha: ${conv.date}');
+      }
+
+      // FORZAR ACTUALIZACION DE UI
+      notifyListeners();
     } catch (e) {
-      print('â ChatController: Error cargando historial: $e');
+      print('ChatController: Error cargando historial: $e');
       _setError('Error al cargar historial: ${e.toString()}');
     } finally {
       _setLoading(false);
@@ -272,12 +544,32 @@ class ChatController extends ChangeNotifier {
         date: DateTime.now(),
       );
       
-      _chatHistory.insert(0, historyItem);
+      // Buscar si ya existe una entrada para esta conversación en el historial
+      final existingIndex = _chatHistory.indexWhere(
+        (item) => item.conversationId == _currentConversationId,
+      );
+      
+      if (existingIndex != -1) {
+        // Actualizar la conversación existente con el último mensaje y fecha más reciente
+        _chatHistory[existingIndex] = ChatHistoryDTO(
+          conversationId: _currentConversationId!,
+          prompt: _chatHistory[existingIndex].prompt, // Mantener el primer mensaje como título
+          response: response, // Actualizar con la última respuesta
+          date: DateTime.now(), // Fecha más reciente para ordenamiento
+        );
+        
+        // Mover al inicio de la lista (conversación más reciente)
+        final updatedItem = _chatHistory.removeAt(existingIndex);
+        _chatHistory.insert(0, updatedItem);
+      } else {
+        // Si es una conversación nueva, agregar al inicio
+        _chatHistory.insert(0, historyItem);
+      }
       notifyListeners();
       
       // Guardar en el servicio de historial (por implementar)
       try {
-        // await _historyService.saveChatHistory(historyItem);
+        // El servidor guarda automáticamente - no POST necesario
         print('ð ChatController: Historial guardado localmente');
       } catch (e) {
         print('â ï¸ ChatController: Error guardando en historial: $e');
@@ -285,16 +577,9 @@ class ChatController extends ChangeNotifier {
     }
   }
 
-  /// Limpiar conversación actual
+  /// Limpiar conversación actual (mantiene compatibilidad)
   void clearCurrentConversation() {
-    _currentConversationId = null;
-    _lastChatResponse = null;
-    _lastStringResponse = null;
-    _lastDynamicAnalysis = null;
-    _lastDebtAnalysis = null;
-    _lastDebtAnalysisType = null;
-    _setError(null);
-    notifyListeners();
+    startNewConversation();
     print('ð§¹ ChatController: Conversación actual limpiada');
   }
 
@@ -302,7 +587,7 @@ class ChatController extends ChangeNotifier {
   Future<void> clearAllHistory() async {
     print('ð ChatController: Limpiando todo el historial');
     try {
-      // await _historyService.clearAllHistory();
+      await _historyService.clearAllHistory();
       _chatHistory.clear();
       clearCurrentConversation();
       print('â ChatController: Historial limpiado completamente');
@@ -365,26 +650,32 @@ class ChatController extends ChangeNotifier {
   }
 
   /// Agregar mensaje del usuario
-  void _addUserMessage(String content) {
+  void _addUserMessage(String content, {bool isNew = true}) {
     final message = ChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       content: content,
       isUser: true,
       timestamp: DateTime.now(),
+      isNew: isNew,
     );
     _messages.add(message);
     notifyListeners();
   }
 
   /// Agregar mensaje de la IA
-  void _addAIMessage(String content) {
+  void _addAIMessage(String content, {bool isNew = true}) {
     final message = ChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       content: content,
       isUser: false,
       timestamp: DateTime.now(),
+      isNew: isNew,
     );
     _messages.add(message);
+    // Solo activar estado de escritura para mensajes nuevos
+    if (isNew) {
+      _setTyping(true, message: 'Mostrando respuesta...');
+    }
     notifyListeners();
   }
 
@@ -398,6 +689,8 @@ class ChatController extends ChangeNotifier {
   /// Actualizar método sendMessage para incluir manejo de mensajes
   Future<void> sendMessageWithTypewriter(String message, {Model? model}) async {
     print('🤖 ChatController: Enviando mensaje con efecto typewriter');
+    print('🔍 ChatController: _currentConversationId actual: $_currentConversationId');
+    _isCancelled = false; // Resetear estado de cancelación
     _setLoading(true);
     _setError(null);
     
@@ -406,32 +699,65 @@ class ChatController extends ChangeNotifier {
 
     try {
       final dto = ChatDTO(
-        model: model ?? Model.OPENAI,
+        model: model ?? _selectedModel,
         conversationId: _currentConversationId,
         prompt: message,
       );
+      
+      print('📤 ChatController: Enviando DTO - conversationId: ${dto.conversationId}');
 
       // Mostrar indicador de que la IA está escribiendo
       _setTyping(true, message: 'La IA está analizando tu consulta...');
 
       _lastChatResponse = await _chatService.askAi(dto);
       
+      print('📥 ChatController: Respuesta recibida - conversationId: ${_lastChatResponse?.conversationId}');
+      
+      // Verificar si fue cancelado antes de procesar la respuesta
+      if (_isCancelled) {
+        print('⚠️ ChatController: Respuesta cancelada, no procesando resultado');
+        return;
+      }
+      
       // Detener indicador de escritura
       _setTyping(false);
       
       // Manejo seguro de la respuesta
       if (_lastChatResponse != null) {
-        _currentConversationId = _lastChatResponse!.conversationId;
+        // IMPORTANTE: El backend ignora nuestro conversationId y devuelve uno nuevo
+        // Debemos usar el ID real que devuelve el backend
+        final realConversationId = _lastChatResponse!.conversationId;
+        
+        if (_currentConversationId != realConversationId) {
+          print('⚠️ ChatController: Backend devolvió un ID diferente!');
+          print('   Enviado: $_currentConversationId');
+          print('   Recibido: $realConversationId');
+          _currentConversationId = realConversationId;
+        }
+        
+        if (_currentConversationId == null) {
+          print('ChatController: Nueva conversación typewriter iniciada con ID: $_currentConversationId');
+        } else {
+          print('ChatController: Usando conversación real con ID: $_currentConversationId');
+        }
         
         // Validar que la respuesta tenga contenido antes de agregarlo
         final responseText = _lastChatResponse!.analysis.response;
         if (responseText.isNotEmpty) {
-          _addAIMessage(responseText);
-          await _addToHistory(message, responseText);
+          final plainTextResponse = _markdownToPlainText(responseText);
+          _addAIMessage(plainTextResponse);
+          await _addToHistory(message, plainTextResponse);
+          
+          // Refrescar historial desde el servidor después de enviar mensaje
+          print('🔄 ChatController: Refrescando historial después de enviar mensaje');
+          await loadChatHistory();
         } else {
           final fallbackMessage = 'La IA ha procesado tu consulta, pero no se pudo obtener una respuesta de texto.';
           _addAIMessage(fallbackMessage);
           await _addToHistory(message, fallbackMessage);
+          
+          // También refrescar en caso de fallback
+          await loadChatHistory();
         }
       } else {
         final errorMessage = 'No se pudo obtener respuesta del servidor.';
@@ -450,6 +776,191 @@ class ChatController extends ChangeNotifier {
       _setError('Error al enviar mensaje: ${e.toString()}');
     } finally {
       _setLoading(false);
+    }
+  }
+
+  /// Iniciar nueva conversación (limpia completamente el estado)
+  void startNewConversation() {
+    print('ChatController: Iniciando nueva conversación');
+    _currentConversationId = null;
+    _lastChatResponse = null;
+    _lastStringResponse = null;
+    _lastDynamicAnalysis = null;
+    _lastDebtAnalysis = null;
+    _lastDebtAnalysisType = null;
+    _messages.clear();
+    _setError(null);
+    _setTyping(false);
+    notifyListeners();
+    print('ChatController: Nueva conversación iniciada');
+  }
+
+  /// Cargar conversación existente por ID
+  Future<void> loadConversation(String conversationId) async {
+    print('💬 ChatController: Cargando conversación completa: $conversationId');
+    
+    // Validar que el conversationId no esté vacío o sea nulo
+    if (conversationId.trim().isEmpty) {
+      print('❌ ChatController: ConversationId vacío, cancelando carga');
+      _setError('ID de conversación inválido');
+      return;
+    }
+    
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      // Limpiar estado actual
+      _messages.clear();
+      _setTyping(false); // Asegurar que no esté en modo escritura
+      _currentConversationId = conversationId;
+      
+      // Cargar historial de la conversación desde el servidor
+      final history = await _historyService.getHistoryByConversationId(conversationId);
+      
+      print('📚 ChatController: Obtenidos ${history.length} mensajes para conversación $conversationId:');
+      
+      // Verificar si la conversación realmente existe
+      if (history.isEmpty) {
+        print('⚠️ ChatController: ADVERTENCIA - Conversación vacía o eliminada: $conversationId');
+        _setError('Esta conversación ya no existe o fue eliminada');
+        return;
+      }
+      
+      // Convertir historial a mensajes para mostrar en la UI (ordenados cronológicamente)
+      final sortedHistory = history..sort((a, b) => a.date.compareTo(b.date));
+      
+      for (final item in sortedHistory) {
+        print('   - ${item.date}: "${item.prompt.substring(0, math.min(30, item.prompt.length))}..."');
+        print('     ConversationID: ${item.conversationId}');
+        
+        // Validación adicional: asegurar que el mensaje pertenece a la conversación correcta
+        if (item.conversationId != conversationId) {
+          print('⚠️ ChatController: ADVERTENCIA - Mensaje con ID incorrecto!');
+          print('     Esperado: $conversationId, Recibido: ${item.conversationId}');
+          continue; // Saltar este mensaje
+        }
+        
+        _addUserMessage(item.prompt, isNew: false); // Marcar como histórico
+        final plainTextResponse = _markdownToPlainText(item.response);
+        _addAIMessage(plainTextResponse, isNew: false); // Marcar como histórico
+      }
+      
+      print('✅ ChatController: Conversación cargada exitosamente con ${history.length} mensajes');
+      notifyListeners();
+    } catch (e) {
+      print('❌ ChatController: Error cargando conversación: $e');
+      _setError('Error al cargar conversación: ${e.toString()}');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Obtener lista de conversaciones disponibles (desde el caché local)
+  List<ChatHistoryDTO> getAvailableConversations() {
+    print('ChatController: Devolviendo ${_chatHistory.length} conversaciones del caché local');
+    return List.unmodifiable(_chatHistory);
+  }
+
+  /// Refrescar historial de conversaciones desde el servidor
+  Future<void> refreshChatHistory() async {
+    print('ChatController: Refrescando historial desde el servidor');
+    await loadChatHistory();
+  }
+
+  /// Método público para inicializar manualmente (útil para debugging)
+  Future<void> initializeManually() async {
+    print('ChatController: Inicialización manual solicitada');
+    await loadChatHistory();
+  }
+
+  /// Verificar si hay conversaciones en el historial
+  bool get hasConversations => _chatHistory.isNotEmpty;
+
+  /// Obtener el número total de conversaciones
+  int get conversationsCount => _chatHistory.length;
+
+  /// Eliminar conversación específica
+  Future<void> deleteConversation(String conversationId) async {
+    print('ChatController: Eliminando conversación: $conversationId');
+    _setLoading(true);
+    _setError(null);
+    
+    try {
+      // Eliminar del servidor
+      await _historyService.deleteConversation(conversationId);
+      
+      // Si es la conversación actual, limpiarla
+      if (_currentConversationId == conversationId) {
+        startNewConversation();
+      }
+      
+      // Forzar recarga completa desde el servidor para evitar inconsistencias
+      print('ChatController: Conversación eliminada, recargando historial desde servidor');
+      await loadChatHistory();
+      
+      print('ChatController: Conversación eliminada exitosamente');
+      
+    } catch (e) {
+      print('ChatController: Error eliminando conversación: $e');
+      _setError('Error al eliminar conversación: ${e.toString()}');
+      
+      // En caso de error, recargar el historial para sincronizar
+      try {
+        await loadChatHistory();
+      } catch (reloadError) {
+        print('ChatController: Error recargando historial después de fallo: $reloadError');
+      }
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Obtener título de conversación basado en el primer mensaje
+  String getConversationTitle(ChatHistoryDTO conversation) {
+    // Usar el prompt como título, truncado si es muy largo
+    String title = conversation.prompt.trim();
+    if (title.length > 50) {
+      title = '${title.substring(0, 50)}...';
+    }
+    return title.isNotEmpty ? title : 'Conversación sin título';
+  }
+  
+  /// Obtener subtítulo con información de la conversación (fecha + número de mensajes)
+  Future<String> getConversationSubtitle(ChatHistoryDTO conversation) async {
+    try {
+      // Obtener el número real de mensajes en esta conversación
+      final messages = await _historyService.getHistoryByConversationId(conversation.conversationId);
+      final messageCount = messages.length;
+      final dateStr = '${conversation.date.day}/${conversation.date.month}/${conversation.date.year}';
+      
+      if (messageCount > 1) {
+        return '$dateStr • $messageCount mensajes';
+      } else {
+        return dateStr;
+      }
+    } catch (e) {
+      // Si falla, mostrar solo la fecha
+      return '${conversation.date.day}/${conversation.date.month}/${conversation.date.year}';
+    }
+  }
+
+  /// Obtener resumen de una conversación específica
+  Future<String> getConversationSummary(String conversationId) async {
+    try {
+      final messages = await _historyService.getHistoryByConversationId(conversationId);
+      if (messages.isEmpty) return 'Conversación vacía';
+      
+      // Usar el primer mensaje como resumen
+      final firstMessage = messages.first;
+      String summary = firstMessage.prompt.trim();
+      if (summary.length > 100) {
+        summary = '${summary.substring(0, 100)}...';
+      }
+      return summary.isNotEmpty ? summary : 'Sin descripción';
+    } catch (e) {
+      print('ChatController: Error obteniendo resumen de conversación: $e');
+      return 'Error cargando resumen';
     }
   }
 }

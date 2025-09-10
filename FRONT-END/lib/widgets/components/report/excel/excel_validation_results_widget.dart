@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../controllers/excel_controller.dart';
+import '../../../../controllers/excel/excel_controller.dart';
 import '../../../../dto/app/excel/debt_excel_validation_result_dto.dart';
 
 class ExcelValidationResultsWidget extends StatelessWidget {

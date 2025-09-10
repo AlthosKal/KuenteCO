@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/chat_controller.dart';
-import '../../controllers/excel_controller.dart';
+import '../../controllers/excel/excel_controller.dart';
 import '../../controllers/business_logic/debt_controller.dart';
 import '../../widgets/components/report/chat/ai_analysis_controls_widget.dart';
 import '../../widgets/components/report/chat/debt_analysis_results_widget.dart';
@@ -9,6 +9,7 @@ import '../../widgets/components/report/excel/excel_controls_widget.dart';
 import '../../widgets/components/report/excel/excel_validation_results_widget.dart';
 import '../../widgets/components/chat/chat_message_widget.dart';
 import '../../widgets/components/chat/animated_typing_dots.dart';
+import '../../widgets/components/chat/model_selector_widget.dart';
 
 class ReportView extends StatefulWidget {
   const ReportView({Key? key}) : super(key: key);
@@ -28,6 +29,8 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
     _tabController = TabController(length: 2, vsync: this);
     _messageController = TextEditingController();
     _chatScrollController = ScrollController();
+    
+    // El historial se carga automáticamente desde el constructor del ChatController
   }
 
   @override
@@ -187,38 +190,85 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
                   ),
                 ),
               ),
-              IconButton(
-                onPressed: () => _startNewConversation(chatController),
-                icon: const Icon(Icons.add, size: 18),
-                tooltip: 'Nueva conversación',
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    onPressed: () async {
+                      print('🔄 Refrescando historial manualmente');
+                      await chatController.refreshChatHistory();
+                    },
+                    icon: const Icon(Icons.refresh, size: 18),
+                    tooltip: 'Refrescar conversaciones',
+                  ),
+                  IconButton(
+                    onPressed: () => _startNewConversation(chatController),
+                    icon: const Icon(Icons.add, size: 18),
+                    tooltip: 'Nueva conversación',
+                  ),
+                ],
               ),
             ],
           ),
         ),
         // Lista de conversaciones
         Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.all(8),
-            itemCount: chatController.chatHistory.length + 1,
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return _buildConversationTile(
-                  context: context,
-                  title: 'Conversación actual',
-                  subtitle: 'Análisis financiero',
-                  isActive: true,
-                  onTap: () {},
-                );
-              }
-              final historyItem = chatController.chatHistory[index - 1];
-              return _buildConversationTile(
-                context: context,
-                title: _truncateText(historyItem.prompt, 30),
-                subtitle: _formatDate(historyItem.date),
-                isActive: false,
-                onTap: () => _loadConversation(chatController, historyItem),
-              );
-            },
+          child: chatController.isLoading
+            ? const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text(
+                      'Cargando conversaciones...',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              )
+            : ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: chatController.chatHistory.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return _buildConversationTile(
+                      context: context,
+                      title: 'Conversación actual',
+                      subtitle: 'Análisis financiero',
+                      isActive: true,
+                      onTap: () {},
+                    );
+                  }
+                  final historyItem = chatController.chatHistory[index - 1];
+                  return FutureBuilder<String>(
+                    future: chatController.getConversationSubtitle(historyItem),
+                    builder: (context, subtitleSnapshot) {
+                      final subtitle = subtitleSnapshot.data ?? _formatDate(historyItem.date);
+                      return _buildConversationTile(
+                        context: context,
+                        title: _truncateText(historyItem.prompt, 30),
+                        subtitle: subtitle,
+                        isActive: false,
+                        onTap: () => _loadConversation(chatController, historyItem),
+                        onDelete: () => _deleteConversation(chatController, historyItem.conversationId),
+                      );
+                    },
+                  );
+                },
+              ),
+        ),
+        
+        // Selector de modelo de IA
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(top: BorderSide(color: Colors.grey[200]!)),
+          ),
+          child: const ModelSelectorWidget(
+            showLabel: false,
+            compact: true,
           ),
         ),
       ],
@@ -231,6 +281,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
     required String subtitle,
     required bool isActive,
     required VoidCallback onTap,
+    VoidCallback? onDelete,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 4),
@@ -244,27 +295,50 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
             borderRadius: BorderRadius.circular(8),
             border: isActive ? Border.all(color: Colors.blue[200]!) : null,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-                  color: isActive ? Colors.blue[800] : Colors.grey[800],
-                  fontSize: 13,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                        color: isActive ? Colors.blue[800] : Colors.grey[800],
+                        fontSize: 13,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Colors.grey[600],
+              if (onDelete != null && !isActive) ...[
+                const SizedBox(width: 8),
+                InkWell(
+                  onTap: () {
+                    onDelete();
+                  },
+                  borderRadius: BorderRadius.circular(4),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(
+                      Icons.delete_outline,
+                      size: 16,
+                      color: Colors.grey[600],
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
         ),
@@ -298,8 +372,13 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
                   message: message.content,
                   type: message.isUser ? MessageType.user : MessageType.ai,
                   timestamp: message.timestamp,
-                  enableTypewriter: !message.isUser, // Solo para mensajes de IA
+                  enableTypewriter: !message.isUser && message.isNew && index == chatController.messages.length - 1, // Solo para mensajes nuevos de IA
                   onTypewriterComplete: () {
+                    // Cuando termina el typewriter del último mensaje, desactivar isTyping
+                    if (!message.isUser && message.isNew && index == chatController.messages.length - 1) {
+                      final chatController = context.read<ChatController>();
+                      chatController.clearTyping();
+                    }
                     // Scroll automático cuando termina la animación
                     _scrollToBottom();
                   },
@@ -449,8 +528,11 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
           Expanded(
             child: TextField(
               controller: _messageController,
+              enabled: !chatController.isLoading && !chatController.isTyping, // Deshabilitar durante carga Y escritura
               decoration: InputDecoration(
-                hintText: 'Escribe tu pregunta sobre finanzas...',
+                hintText: (chatController.isLoading || chatController.isTyping)
+                  ? 'Generando respuesta...' 
+                  : 'Escribe tu pregunta sobre finanzas...',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
                   borderSide: BorderSide(color: Colors.grey[300]!),
@@ -463,6 +545,10 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
                   borderRadius: BorderRadius.circular(24),
                   borderSide: BorderSide(color: Colors.blue[600]!),
                 ),
+                disabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24),
+                  borderSide: BorderSide(color: Colors.grey[400]!),
+                ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
               maxLines: null,
@@ -472,22 +558,15 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
           const SizedBox(width: 8),
           Container(
             decoration: BoxDecoration(
-              color: Colors.blue[600],
+              color: (chatController.isLoading || chatController.isTyping) ? Colors.red[600] : Colors.blue[600],
               borderRadius: BorderRadius.circular(24),
             ),
             child: IconButton(
-              onPressed: chatController.isLoading ? null : _sendMessage,
-              icon: chatController.isLoading
-                ? SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
+              onPressed: (chatController.isLoading || chatController.isTyping) ? _cancelMessage : _sendMessage,
+              icon: (chatController.isLoading || chatController.isTyping)
+                ? const Icon(Icons.stop, color: Colors.white)
                 : const Icon(Icons.send, color: Colors.white),
-              tooltip: 'Enviar mensaje',
+              tooltip: (chatController.isLoading || chatController.isTyping) ? 'Cancelar respuesta' : 'Enviar mensaje',
             ),
           ),
         ],
@@ -670,12 +749,57 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
 
   // Chat Helper Methods
   void _startNewConversation(ChatController chatController) {
-    chatController.clearCurrentConversation();
+    chatController.startNewConversation();
+    chatController.clearMessages();
     _messageController.clear();
   }
 
   void _loadConversation(ChatController chatController, dynamic historyItem) {
-    // Implementar carga de conversación específica
+    // Debug: Verificar qué conversación se está cargando
+    print('🔍 DEBUG: Cargando conversación desde lista');
+    print('   - Title mostrado: "${historyItem.prompt}"');
+    print('   - Conversation ID: ${historyItem.conversationId}');
+    print('   - Fecha: ${historyItem.date}');
+    
+    // Cargar la conversación específica
+    chatController.loadConversation(historyItem.conversationId);
+  }
+
+  void _deleteConversation(ChatController chatController, String conversationId) async {
+    // Mostrar confirmación antes de eliminar
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Eliminar conversación'),
+          content: const Text('¿Estás seguro de que quieres eliminar esta conversación? Esta acción no se puede deshacer.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      try {
+        await chatController.deleteConversation(conversationId);
+        if (mounted) {
+          _showSuccessMessage(context, 'Conversación eliminada correctamente');
+        }
+      } catch (e) {
+        if (mounted) {
+          _showErrorMessage(context, 'Error al eliminar conversación: $e');
+        }
+      }
+    }
   }
 
   void _sendMessage() async {
@@ -686,11 +810,16 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
     _messageController.clear();
     
     try {
-      await chatController.sendMessageWithTypewriter(message);
+      await chatController.sendMessageWithTypewriter(message, model: chatController.selectedModel);
       _scrollToBottom();
     } catch (e) {
       _showErrorMessage(context, 'Error enviando mensaje: $e');
     }
+  }
+
+  void _cancelMessage() {
+    final chatController = context.read<ChatController>();
+    chatController.cancelCurrentResponse();
   }
 
   void _scrollToBottom() {

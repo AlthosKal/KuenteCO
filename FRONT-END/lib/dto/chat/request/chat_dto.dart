@@ -7,7 +7,7 @@ class ChatDTO {
 
   ChatDTO({
     required this.model,
-    required this.conversationId,
+    this.conversationId,
     required this.prompt,
   });
 
@@ -16,10 +16,12 @@ class ChatDTO {
   }
 
   Map<String, dynamic> toJson() {
-    return {
+    final json = {
       'model': model.name,
       if (conversationId != null) 'conversationId': conversationId,
       'prompt': prompt,
     };
+    print('📤 ChatDTO: Enviando al backend: $json');
+    return json;
   }
 }

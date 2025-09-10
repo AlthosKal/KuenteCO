@@ -19,4 +19,13 @@ class ChatHistoryDTO {
       date: DateTime.parse(json['date']),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'conversationId': conversationId,
+      'prompt': prompt,
+      'response': response,
+      'date': date.toIso8601String(),
+    };
+  }
 }

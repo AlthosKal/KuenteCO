@@ -158,4 +158,56 @@ class ChatService {
       rethrow;
     }
   }
+
+  // ENDPOINT DE MODELOS
+
+  /// Obtener todos los modelos disponibles
+  Future<List<String>> getAllModels() async {
+    print('🤖 ChatService: Obteniendo todos los modelos');
+    try {
+      final response = await _api.getChat('/model');
+      final data = response.data;
+      
+      print('📊 ChatService: Tipo de respuesta modelos: ${data.runtimeType}');
+      print('📊 ChatService: Contenido de respuesta modelos: $data');
+      
+      if (data is Map<String, dynamic>) {
+        // El servidor devuelve: {success: true, data: [...]}
+        if (data['success'] == true && data['data'] is List) {
+          final models = (data['data'] as List).cast<String>();
+          print('✅ ChatService: ${models.length} modelos obtenidos');
+          return models;
+        } else {
+          throw Exception('Error del servidor: ${data['message'] ?? 'Sin mensaje'}');
+        }
+      } else if (data is List) {
+        // Soporte para respuesta directa como lista (por compatibilidad)
+        final models = data.cast<String>();
+        print('✅ ChatService: ${models.length} modelos obtenidos');
+        return models;
+      } else if (data == null) {
+        print('ℹ️ ChatService: Sin modelos (respuesta nula)');
+        return [];
+      }
+      throw Exception('Respuesta inesperada del servidor. Tipo: ${data.runtimeType}, Contenido: $data');
+    } catch (e) {
+      print('❌ ChatService: Error obteniendo modelos: $e');
+      rethrow;
+    }
+  }
+
+  // ENDPOINT DE REPORTES
+
+  /// Descargar reporte por ID
+  Future<Map<String, dynamic>> downloadReport(String reportId) async {
+    print('📥 ChatService: Descargando reporte: $reportId');
+    try {
+      final response = await _api.getChat('/reports/download/$reportId');
+      print('✅ ChatService: Reporte descargado');
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      print('❌ ChatService: Error descargando reporte: $e');
+      rethrow;
+    }
+  }
 }
