@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -918,12 +919,17 @@ public class ReportGenerationServiceImpl implements ReportGenerationService {
             List<?> userProfiles = (List<?>) data;
             if (!userProfiles.isEmpty()
                     && userProfiles.get(0).getClass().getSimpleName().contains("UserProfiles")) {
-                generateFormattedUserProfilesExcel(sheet, userProfiles, headerStyle);
+        generateFormattedUserProfilesExcel(sheet, userProfiles, headerStyle);
                 return;
             }
         }
         // Fallback a formato genérico si no es el tipo esperado
         generateGenericDataExcel(sheet, data);
+    }
+    
+    private void generateFormattedUserProfilesExcel(Sheet sheet, List<?> userProfiles, CellStyle headerStyle) {
+        // Usar el método existente pero con el nombre correcto
+        addUserProfileDataToSheet(sheet, userProfiles, headerStyle);
     }
 
     private void generateFormattedUserProfilesPDF(Document document, List<?> userProfiles)
@@ -1246,12 +1252,36 @@ public class ReportGenerationServiceImpl implements ReportGenerationService {
             LOGGER.warn("Error generando gráfico de transacciones: {}", e.getMessage());
         }
 
-        // Agregar análisis de salud financiera
+        // Generar resumen ejecutivo en texto plano
+        generateExecutiveSummary(document, totalIncome, totalExpenses, transactions.size(), incomesByCategory, expensesByCategory);
+        document.add(new Paragraph("\n"));
+        
+        // Agregar análisis por categorías
+        generateCategoryAnalysis(document, incomesByCategory, expensesByCategory, totalIncome, totalExpenses);
+        document.add(new Paragraph("\n"));
+        
+        // Agregar dashboard de KPIs financieros
+        generateKPIDashboard(document, totalIncome, totalExpenses, transactions.size());
+        document.add(new Paragraph("\n"));
+        
+        // Agregar alertas y oportunidades
+        generateAlertsAndOpportunities(document, totalIncome, totalExpenses, expensesByCategory);
+        document.add(new Paragraph("\n"));
+        
+        // Agregar métricas avanzadas
+        generateAdvancedMetrics(document, totalIncome, totalExpenses, transactions.size());
+        document.add(new Paragraph("\n"));
+        
+        // Agregar comparación con benchmarks
+        generateBenchmarkComparison(document, totalIncome, totalExpenses, transactions.size());
+        document.add(new Paragraph("\n"));
+        
+        // Agregar análisis de salud financiera final
         generateHealthScoreSection(document, totalIncome, totalExpenses, transactions.size());
         document.add(new Paragraph("\n"));
     }
-
-    private void generateFormattedUserProfilesExcel(
+    
+    private void addUserProfileDataToSheet(
             Sheet sheet, List<?> userProfiles, CellStyle headerStyle) {
         int rowNum = 3;
 
@@ -1451,6 +1481,894 @@ public class ReportGenerationServiceImpl implements ReportGenerationService {
         return null;
     }
 
+    // Método para generar resumen ejecutivo en texto plano
+    private void generateExecutiveSummary(Document document, double totalIncome, double totalExpenses, 
+                                         int transactionCount, Map<String, Double> incomesByCategory, 
+                                         Map<String, Double> expensesByCategory) throws DocumentException {
+        
+        // Título de la sección
+        com.itextpdf.text.Font titleFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 18, com.itextpdf.text.Font.BOLD);
+        Paragraph title = new Paragraph("📈 RESUMEN EJECUTIVO FINANCIERO", titleFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        title.setSpacingBefore(20);
+        title.setSpacingAfter(20);
+        document.add(title);
+        
+        double balance = totalIncome - totalExpenses;
+        double savingsRate = totalIncome > 0 ? (balance / totalIncome) * 100 : 0;
+        int healthScore = calculateFinancialHealthScore(totalIncome, totalExpenses, transactionCount);
+        
+        // Crear tabla de resumen con estilo
+        PdfPTable summaryTable = new PdfPTable(1);
+        summaryTable.setWidthPercentage(100);
+        
+        com.itextpdf.text.Font contentFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 11);
+        
+        StringBuilder summary = new StringBuilder();
+        summary.append("💰 SITUACIÓN FINANCIERA ACTUAL\n");
+        summary.append("=================================\n\n");
+        
+        summary.append("💵 Ingresos Totales: $").append(String.format("%.2f", totalIncome)).append("\n");
+        summary.append("💸 Gastos Totales: $").append(String.format("%.2f", totalExpenses)).append("\n");
+        summary.append("💹 Balance Neto: $").append(String.format("%.2f", balance));
+        if (balance >= 0) {
+            summary.append(" (✅ Positivo)");
+        } else {
+            summary.append(" (⚠️ Déficit)");
+        }
+        summary.append("\n");
+        summary.append("📈 Tasa de Ahorro: ").append(String.format("%.1f%%", savingsRate)).append("\n");
+        summary.append("🏆 Puntuación de Salud Financiera: ").append(healthScore).append("/10\n\n");
+        
+        // Categoría de mayor gasto
+        String topExpenseCategory = expensesByCategory.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("N/A");
+        double topExpenseAmount = expensesByCategory.getOrDefault(topExpenseCategory, 0.0);
+        
+        summary.append("🔍 ANÁLISIS RÁPIDO\n");
+        summary.append("===================\n\n");
+        summary.append("➡️ Mayor categoría de gasto: ").append(topExpenseCategory)
+                .append(" ($").append(String.format("%.2f", topExpenseAmount)).append(")\n\n");
+        
+        double expenseRatio = totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0;
+        summary.append("➡️ Porcentaje de gastos vs ingresos: ").append(String.format("%.1f%%", expenseRatio)).append("\n\n");
+        
+        if (expenseRatio > 90) {
+            summary.append("⚠️ Estado: CRÍTICO - Gastos excesivos\n");
+        } else if (expenseRatio > 70) {
+            summary.append("🟡 Estado: PRECAUCIÓN - Control de gastos necesario\n");
+        } else {
+            summary.append("✅ Estado: SALUDABLE - Buen control financiero\n");
+        }
+        
+        summary.append("\n🏁 ACCIONES PRIORITARIAS\n");
+        summary.append("========================\n\n");
+        
+        if (balance < 0) {
+            summary.append("• 🔴 URGENTE: Reducir gastos inmediatamente\n\n");
+            summary.append("• 💵 Buscar fuentes adicionales de ingresos\n\n");
+        } else if (savingsRate < 10) {
+            summary.append("• 🟡 Aumentar tasa de ahorro al menos al 10%\n\n");
+            summary.append("• 💰 Revisar gastos no esenciales\n\n");
+        } else {
+            summary.append("• ✅ Mantener hábitos financieros actuales\n\n");
+            summary.append("• 📈 Considerar oportunidades de inversión\n\n");
+        }
+        
+        if (expenseRatio > 80) {
+            summary.append("• 📈 Implementar presupuesto estricto\n\n");
+        }
+        
+        summary.append("• 📅 Revisar este análisis mensualmente");
+        
+        PdfPCell summaryCell = new PdfPCell(new Phrase(summary.toString(), contentFont));
+        summaryCell.setBorder(Rectangle.BOX);
+        summaryCell.setPadding(15);
+        summaryCell.setBackgroundColor(new BaseColor(248, 249, 250));
+        summaryTable.addCell(summaryCell);
+        
+        document.add(summaryTable);
+    }
+
+    // Método para generar análisis por categorías
+    private void generateCategoryAnalysis(Document document, Map<String, Double> incomesByCategory, 
+                                        Map<String, Double> expensesByCategory, 
+                                        double totalIncome, double totalExpenses) throws DocumentException {
+        
+        // Título de la sección
+        com.itextpdf.text.Font titleFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 14, com.itextpdf.text.Font.BOLD);
+        Paragraph title = new Paragraph("🎯 ANÁLISIS POR CATEGORÍAS", titleFont);
+        title.setAlignment(Element.ALIGN_LEFT);
+        title.setSpacingAfter(10);
+        document.add(title);
+        
+        // Top 5 categorías de gastos
+        List<Map.Entry<String, Double>> topExpenses = expensesByCategory.entrySet().stream()
+                .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+                .limit(5)
+                .collect(Collectors.toList());
+        
+        // Crear tabla para categorías
+        PdfPTable categoryTable = new PdfPTable(3);
+        categoryTable.setWidthPercentage(100);
+        categoryTable.setWidths(new float[]{3f, 2f, 2f});
+        
+        com.itextpdf.text.Font headerFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 11, com.itextpdf.text.Font.BOLD);
+        com.itextpdf.text.Font dataFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 10);
+        
+        // Headers
+        PdfPCell header1 = new PdfPCell(new Phrase("Top 5 Categorías de Gasto", headerFont));
+        header1.setBackgroundColor(PRIMARY_COLOR);
+        header1.setHorizontalAlignment(Element.ALIGN_CENTER);
+        header1.setPadding(12);
+        header1.setPaddingTop(8);
+        header1.setPaddingBottom(8);
+        categoryTable.addCell(header1);
+        
+        PdfPCell header2 = new PdfPCell(new Phrase("Monto", headerFont));
+        header2.setBackgroundColor(PRIMARY_COLOR);
+        header2.setHorizontalAlignment(Element.ALIGN_CENTER);
+        header2.setPadding(12);
+        header2.setPaddingTop(8);
+        header2.setPaddingBottom(8);
+        categoryTable.addCell(header2);
+        
+        PdfPCell header3 = new PdfPCell(new Phrase("% del Total", headerFont));
+        header3.setBackgroundColor(PRIMARY_COLOR);
+        header3.setHorizontalAlignment(Element.ALIGN_CENTER);
+        header3.setPadding(12);
+        header3.setPaddingTop(8);
+        header3.setPaddingBottom(8);
+        categoryTable.addCell(header3);
+        
+        // Datos de categorías
+        boolean alternate = false;
+        for (Map.Entry<String, Double> entry : topExpenses) {
+            BaseColor rowColor = alternate ? BaseColor.LIGHT_GRAY : BaseColor.WHITE;
+            double percentage = totalExpenses > 0 ? (entry.getValue() / totalExpenses) * 100 : 0;
+            
+            PdfPCell categoryCell = new PdfPCell(new Phrase(entry.getKey(), dataFont));
+            categoryCell.setBackgroundColor(rowColor);
+            categoryCell.setPadding(10);
+            categoryCell.setPaddingTop(8);
+            categoryCell.setPaddingBottom(8);
+            categoryTable.addCell(categoryCell);
+            
+            PdfPCell amountCell = new PdfPCell(new Phrase("$" + String.format("%.2f", entry.getValue()), dataFont));
+            amountCell.setBackgroundColor(rowColor);
+            amountCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            amountCell.setPadding(10);
+            amountCell.setPaddingTop(8);
+            amountCell.setPaddingBottom(8);
+            categoryTable.addCell(amountCell);
+            
+            PdfPCell percentCell = new PdfPCell(new Phrase(String.format("%.1f%%", percentage), dataFont));
+            percentCell.setBackgroundColor(rowColor);
+            percentCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            percentCell.setPadding(10);
+            percentCell.setPaddingTop(8);
+            percentCell.setPaddingBottom(8);
+            categoryTable.addCell(percentCell);
+            
+            alternate = !alternate;
+        }
+        
+        document.add(categoryTable);
+        document.add(new Paragraph("\n"));
+        
+        // Análisis de la regla 50/30/20
+        generateBudgetRuleAnalysis(document, expensesByCategory, totalIncome);
+    }
+    
+    // Método para analizar la regla 50/30/20
+    private void generateBudgetRuleAnalysis(Document document, Map<String, Double> expensesByCategory, 
+                                          double totalIncome) throws DocumentException {
+        
+        com.itextpdf.text.Font subtitleFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 12, com.itextpdf.text.Font.BOLD);
+        Paragraph subtitle = new Paragraph("📊 Comparación con Regla 50/30/20", subtitleFont);
+        subtitle.setSpacingAfter(8);
+        document.add(subtitle);
+        
+        // Categorizar gastos (simplificado)
+        double essentialExpenses = 0;
+        double entertainmentExpenses = 0;
+        double otherExpenses = 0;
+        
+        for (Map.Entry<String, Double> entry : expensesByCategory.entrySet()) {
+            String category = entry.getKey().toLowerCase();
+            double amount = entry.getValue();
+            
+            if (category.contains("arriendo") || category.contains("renta") || 
+                category.contains("supermercado") || category.contains("comida") ||
+                category.contains("servicios") || category.contains("agua") ||
+                category.contains("luz") || category.contains("internet") ||
+                category.contains("medicamentos") || category.contains("transporte")) {
+                essentialExpenses += amount;
+            } else if (category.contains("entretenimiento") || category.contains("netflix") ||
+                      category.contains("spotify") || category.contains("café") ||
+                      category.contains("restaurante") || category.contains("comer") ||
+                      category.contains("ropa") || category.contains("compras")) {
+                entertainmentExpenses += amount;
+            } else {
+                otherExpenses += amount;
+            }
+        }
+        
+        // Crear tabla de comparación
+        PdfPTable ruleTable = new PdfPTable(4);
+        ruleTable.setWidthPercentage(90);
+        ruleTable.setWidths(new float[]{2f, 1.5f, 1.5f, 1.5f});
+        
+        com.itextpdf.text.Font headerFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 10, com.itextpdf.text.Font.BOLD);
+        com.itextpdf.text.Font dataFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 9);
+        
+        // Headers
+        String[] headers = {"Categoría", "Tu Gasto", "Recomendado", "Estado"};
+        for (String header : headers) {
+            PdfPCell headerCell = new PdfPCell(new Phrase(header, headerFont));
+            headerCell.setBackgroundColor(SECONDARY_COLOR);
+            headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            headerCell.setPadding(6);
+            ruleTable.addCell(headerCell);
+        }
+        
+        // Datos de la regla 50/30/20
+        addRuleRow(ruleTable, "Gastos Esenciales (50%)", essentialExpenses, totalIncome * 0.5, dataFont);
+        addRuleRow(ruleTable, "Entretenimiento (30%)", entertainmentExpenses, totalIncome * 0.3, dataFont);
+        addRuleRow(ruleTable, "Ahorro/Inversión (20%)", otherExpenses, totalIncome * 0.2, dataFont);
+        
+        document.add(ruleTable);
+    }
+    
+    private void addRuleRow(PdfPTable table, String category, double actual, double recommended, 
+                           com.itextpdf.text.Font font) {
+        table.addCell(new PdfPCell(new Phrase(category, font)));
+        
+        PdfPCell actualCell = new PdfPCell(new Phrase("$" + String.format("%.2f", actual), font));
+        actualCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        table.addCell(actualCell);
+        
+        PdfPCell recommendedCell = new PdfPCell(new Phrase("$" + String.format("%.2f", recommended), font));
+        recommendedCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        table.addCell(recommendedCell);
+        
+        String status;
+        BaseColor statusColor;
+        if (actual <= recommended * 1.1) {
+            status = "✅ Bien";
+            statusColor = new BaseColor(144, 238, 144);
+        } else if (actual <= recommended * 1.3) {
+            status = "🟡 Atención";
+            statusColor = new BaseColor(255, 255, 224);
+        } else {
+            status = "⚠️ Exceso";
+            statusColor = new BaseColor(255, 182, 193);
+        }
+        
+        PdfPCell statusCell = new PdfPCell(new Phrase(status, font));
+        statusCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        statusCell.setBackgroundColor(statusColor);
+        table.addCell(statusCell);
+    }
+    
+    // Método para generar Dashboard de KPIs Financieros
+    private void generateKPIDashboard(Document document, double totalIncome, double totalExpenses, 
+                                    int transactionCount) throws DocumentException {
+        
+        // Título de la sección
+        com.itextpdf.text.Font titleFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 14, com.itextpdf.text.Font.BOLD);
+        Paragraph title = new Paragraph("💡 DASHBOARD DE KPIS FINANCIEROS", titleFont);
+        title.setAlignment(Element.ALIGN_LEFT);
+        title.setSpacingAfter(10);
+        document.add(title);
+        
+        double balance = totalIncome - totalExpenses;
+        double savingsRate = totalIncome > 0 ? (balance / totalIncome) * 100 : 0;
+        double expenseRatio = totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0;
+        double liquidityRatio = totalIncome > 0 ? balance / (totalExpenses / 12) : 0; // meses de cobertura
+        
+        // Crear tabla de KPIs principal
+        PdfPTable kpiTable = new PdfPTable(2);
+        kpiTable.setWidthPercentage(100);
+        kpiTable.setWidths(new float[]{1f, 1f});
+        
+        // KPI 1: Ratio de Liquidez
+        addKPIBox(kpiTable, "💰 Ratio de Liquidez", 
+                  String.format("%.1f meses", liquidityRatio), 
+                  "Cobertura de gastos con balance actual", 
+                  getKPIColor(liquidityRatio, 6, 3));
+        
+        // KPI 2: Tasa de Ahorro
+        addKPIBox(kpiTable, "📈 Tasa de Ahorro", 
+                  String.format("%.1f%%", savingsRate), 
+                  "Porcentaje de ingresos ahorrados", 
+                  getKPIColor(savingsRate, 20, 10));
+        
+        // KPI 3: Índice de Eficiencia de Gastos
+        double efficiencyIndex = 100 - expenseRatio;
+        addKPIBox(kpiTable, "⚙️ Índice de Eficiencia", 
+                  String.format("%.1f%%", efficiencyIndex), 
+                  "Eficiencia en el manejo de gastos", 
+                  getKPIColor(efficiencyIndex, 30, 20));
+        
+        // KPI 4: Estabilidad Financiera
+        double stabilityScore = calculateStabilityScore(totalIncome, totalExpenses, transactionCount);
+        addKPIBox(kpiTable, "🎯 Estabilidad Financiera", 
+                  String.format("%.0f/100", stabilityScore), 
+                  "Puntuación de estabilidad general", 
+                  getKPIColor(stabilityScore, 80, 60));
+        
+        document.add(kpiTable);
+        document.add(new Paragraph("\n"));
+        
+        // Tabla de métricas adicionales
+        generateAdditionalMetrics(document, totalIncome, totalExpenses, transactionCount);
+    }
+    
+    private void addKPIBox(PdfPTable table, String title, String value, String description, BaseColor color) {
+        // Crear celda para el KPI
+        PdfPTable innerTable = new PdfPTable(1);
+        innerTable.setWidthPercentage(100);
+        
+        com.itextpdf.text.Font titleFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 11, com.itextpdf.text.Font.BOLD);
+        com.itextpdf.text.Font valueFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 20, com.itextpdf.text.Font.BOLD);
+        com.itextpdf.text.Font descFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 9);
+        
+        // Título
+        PdfPCell titleCell = new PdfPCell(new Phrase(title, titleFont));
+        titleCell.setBorder(Rectangle.NO_BORDER);
+        titleCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        titleCell.setPadding(6);
+        titleCell.setPaddingTop(8);
+        titleCell.setPaddingBottom(4);
+        innerTable.addCell(titleCell);
+        
+        // Valor principal
+        PdfPCell valueCell = new PdfPCell(new Phrase(value, valueFont));
+        valueCell.setBorder(Rectangle.NO_BORDER);
+        valueCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        valueCell.setPadding(12);
+        valueCell.setPaddingTop(10);
+        valueCell.setPaddingBottom(10);
+        valueCell.setBackgroundColor(color);
+        innerTable.addCell(valueCell);
+        
+        // Descripción
+        PdfPCell descCell = new PdfPCell(new Phrase(description, descFont));
+        descCell.setBorder(Rectangle.NO_BORDER);
+        descCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        descCell.setPadding(6);
+        descCell.setPaddingTop(4);
+        descCell.setPaddingBottom(8);
+        innerTable.addCell(descCell);
+        
+        PdfPCell containerCell = new PdfPCell(innerTable);
+        containerCell.setBorder(Rectangle.BOX);
+        containerCell.setPadding(8);
+        table.addCell(containerCell);
+    }
+    
+    private BaseColor getKPIColor(double value, double good, double average) {
+        if (value >= good) {
+            return new BaseColor(144, 238, 144); // Verde
+        } else if (value >= average) {
+            return new BaseColor(255, 255, 224); // Amarillo
+        } else {
+            return new BaseColor(255, 182, 193); // Rojo
+        }
+    }
+    
+    private double calculateStabilityScore(double totalIncome, double totalExpenses, int transactionCount) {
+        double score = 50; // Base
+        
+        // Factor de balance
+        double balance = totalIncome - totalExpenses;
+        if (balance > 0) {
+            score += 25;
+        } else {
+            score -= 25;
+        }
+        
+        // Factor de ratio de gastos
+        double expenseRatio = totalIncome > 0 ? totalExpenses / totalIncome : 1;
+        if (expenseRatio < 0.7) {
+            score += 15;
+        } else if (expenseRatio > 0.9) {
+            score -= 15;
+        }
+        
+        // Factor de actividad (número de transacciones indica regularidad)
+        if (transactionCount >= 20) {
+            score += 10;
+        } else if (transactionCount < 10) {
+            score -= 5;
+        }
+        
+        return Math.max(0, Math.min(100, score));
+    }
+    
+    private void generateAdditionalMetrics(Document document, double totalIncome, double totalExpenses, 
+                                         int transactionCount) throws DocumentException {
+        
+        com.itextpdf.text.Font subtitleFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 12, com.itextpdf.text.Font.BOLD);
+        Paragraph subtitle = new Paragraph("📉 Métricas Complementarias", subtitleFont);
+        subtitle.setSpacingAfter(8);
+        document.add(subtitle);
+        
+        PdfPTable metricsTable = new PdfPTable(2);
+        metricsTable.setWidthPercentage(80);
+        metricsTable.setWidths(new float[]{2f, 1f});
+        
+        com.itextpdf.text.Font labelFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 10, com.itextpdf.text.Font.BOLD);
+        com.itextpdf.text.Font valueFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 10);
+        
+        // Calcular métricas
+        double avgTransactionAmount = transactionCount > 0 ? (totalIncome + totalExpenses) / transactionCount : 0;
+        double monthlyBurn = totalExpenses / 3; // Asumiendo 3 meses de data
+        double incomeStability = totalIncome > 0 ? (totalIncome / transactionCount) * 10 : 0; // Simplificado
+        
+        addMetricRow(metricsTable, "Promedio por transacción:", "$" + String.format("%.2f", avgTransactionAmount), labelFont, valueFont);
+        addMetricRow(metricsTable, "Gasto mensual promedio:", "$" + String.format("%.2f", monthlyBurn), labelFont, valueFont);
+        addMetricRow(metricsTable, "Total de transacciones:", String.valueOf(transactionCount), labelFont, valueFont);
+        addMetricRow(metricsTable, "Índice de diversificación:", String.format("%.0f%%", Math.min(100, transactionCount * 3.33)), labelFont, valueFont);
+        
+        document.add(metricsTable);
+    }
+    
+    private void addMetricRow(PdfPTable table, String label, String value, 
+                             com.itextpdf.text.Font labelFont, com.itextpdf.text.Font valueFont) {
+        PdfPCell labelCell = new PdfPCell(new Phrase(label, labelFont));
+        labelCell.setBorder(Rectangle.NO_BORDER);
+        labelCell.setPadding(5);
+        table.addCell(labelCell);
+        
+        PdfPCell valueCell = new PdfPCell(new Phrase(value, valueFont));
+        valueCell.setBorder(Rectangle.NO_BORDER);
+        valueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        valueCell.setPadding(5);
+        table.addCell(valueCell);
+    }
+    
+    // Método para generar sección de Alertas y Oportunidades
+    private void generateAlertsAndOpportunities(Document document, double totalIncome, double totalExpenses, 
+                                              Map<String, Double> expensesByCategory) throws DocumentException {
+        
+        // Título de la sección
+        com.itextpdf.text.Font titleFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 14, com.itextpdf.text.Font.BOLD);
+        Paragraph title = new Paragraph("🔍 ALERTAS Y OPORTUNIDADES", titleFont);
+        title.setAlignment(Element.ALIGN_LEFT);
+        title.setSpacingAfter(10);
+        document.add(title);
+        
+        // Crear tabla principal
+        PdfPTable alertsTable = new PdfPTable(1);
+        alertsTable.setWidthPercentage(100);
+        
+        com.itextpdf.text.Font contentFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 10);
+        com.itextpdf.text.Font headerFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 11, com.itextpdf.text.Font.BOLD);
+        
+        StringBuilder alerts = new StringBuilder();
+        StringBuilder opportunities = new StringBuilder();
+        
+        double balance = totalIncome - totalExpenses;
+        double expenseRatio = totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0;
+        double savingsRate = totalIncome > 0 ? (balance / totalIncome) * 100 : 0;
+        
+        // ALERTAS CRÍTICA
+        alerts.append("⚠️ ALERTAS CRÍTICAS\n");
+        alerts.append("==================\n\n");
+        
+        boolean hasAlerts = false;
+        
+        if (balance < 0) {
+            alerts.append("• 🔴 DÉFICIT FINANCIERO: Gastos superan ingresos por $")
+                  .append(String.format("%.2f", Math.abs(balance))).append("\n\n");
+            hasAlerts = true;
+        }
+        
+        if (expenseRatio > 95) {
+            alerts.append("• 🔴 GASTOS EXCESIVOS: ").append(String.format("%.1f%%", expenseRatio))
+                  .append(" de ingresos gastados (recomendado <80%)\n\n");
+            hasAlerts = true;
+        } else if (expenseRatio > 85) {
+            alerts.append("• 🟡 PRECAUCIÓN: ").append(String.format("%.1f%%", expenseRatio))
+                  .append(" de ingresos gastados (zona de riesgo)\n\n");
+            hasAlerts = true;
+        }
+        
+        // Alerta por categoría dominante
+        String topCategory = expensesByCategory.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("N/A");
+        double topCategoryAmount = expensesByCategory.getOrDefault(topCategory, 0.0);
+        double topCategoryPercentage = totalExpenses > 0 ? (topCategoryAmount / totalExpenses) * 100 : 0;
+        
+        if (topCategoryPercentage > 50) {
+            alerts.append("• 🟡 CONCENTRACIÓN DE GASTOS: ")
+                  .append(String.format("%.1f%%", topCategoryPercentage))
+                  .append(" del gasto en '").append(topCategory).append("'\n\n");
+            hasAlerts = true;
+        }
+        
+        if (savingsRate < 5 && balance > 0) {
+            alerts.append("• 🟡 AHORRO INSUFICIENTE: Tasa de ahorro muy baja (")
+                  .append(String.format("%.1f%%", savingsRate)).append(")\n\n");
+            hasAlerts = true;
+        }
+        
+        if (!hasAlerts) {
+            alerts.append("✅ No se detectaron alertas críticas.\n");
+            alerts.append("Tu situación financiera está en buen estado.\n");
+        }
+        
+        alerts.append("\n");
+        
+        // OPORTUNIDADES DE MEJORA
+        opportunities.append("🚀 OPORTUNIDADES DE MEJORA\n");
+        opportunities.append("==========================\n\n");
+        
+        // Análisis de oportunidades
+        if (balance > totalExpenses * 0.1) { // Si tiene más del 10% de sus gastos como balance
+            opportunities.append("• 📈 OPORTUNIDAD DE INVERSIÓN: Tienes $")
+                         .append(String.format("%.2f", balance))
+                         .append(" disponibles para invertir\n\n");
+        }
+        
+        if (expenseRatio < 70) {
+            opportunities.append("• ✨ EXCELENTE CONTROL: Gastos bien controlados, considera aumentar inversiones\n\n");
+        }
+        
+        // Sugerencias por categorías
+        List<Map.Entry<String, Double>> sortedExpenses = expensesByCategory.entrySet().stream()
+                .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+                .limit(3)
+                .collect(Collectors.toList());
+        
+        if (!sortedExpenses.isEmpty()) {
+            opportunities.append("• 💰 REVISA ESTAS CATEGORÍAS:\n");
+            for (int i = 0; i < Math.min(3, sortedExpenses.size()); i++) {
+                Map.Entry<String, Double> entry = sortedExpenses.get(i);
+                double categoryPercent = totalExpenses > 0 ? (entry.getValue() / totalExpenses) * 100 : 0;
+                opportunities.append("   - ").append(entry.getKey())
+                             .append(": $").append(String.format("%.2f", entry.getValue()))
+                             .append(" (").append(String.format("%.1f%%", categoryPercent)).append(")\n");
+            }
+            opportunities.append("\n");
+        }
+        
+        // Sugerencias específicas
+        if (expensesByCategory.containsKey("Café diario") || expensesByCategory.containsKey("Capuccino diario")) {
+            double coffeeExpenses = expensesByCategory.getOrDefault("Café diario", 0.0) + 
+                                   expensesByCategory.getOrDefault("Capuccino diario", 0.0);
+            if (coffeeExpenses > 50) {
+                opportunities.append("• ☕ AHORRO EN CAFÉ: $").append(String.format("%.2f", coffeeExpenses))
+                             .append(" gastados. Considera preparar café en casa\n\n");
+            }
+        }
+        
+        if (balance > 0 && savingsRate > 15) {
+            opportunities.append("• 🏆 EXCELENTE AHORRO: Considera diversificar en inversiones de bajo riesgo\n\n");
+        }
+        
+        opportunities.append("• 📅 REVISIÓN MENSUAL: Programa revisiones regulares de este reporte\n\n");
+        opportunities.append("• 🎯 METAS SMART: Define objetivos financieros específicos y medibles");
+        
+        // Agregar contenido a la tabla
+        String fullContent = alerts.toString() + opportunities.toString();
+        
+        PdfPCell contentCell = new PdfPCell(new Phrase(fullContent, contentFont));
+        contentCell.setBorder(Rectangle.BOX);
+        contentCell.setPadding(15);
+        contentCell.setBackgroundColor(new BaseColor(249, 251, 253));
+        alertsTable.addCell(contentCell);
+        
+        document.add(alertsTable);
+    }
+    
+    // Método para generar métricas avanzadas
+    private void generateAdvancedMetrics(Document document, double totalIncome, double totalExpenses, 
+                                       int transactionCount) throws DocumentException {
+        
+        // Título de la sección
+        com.itextpdf.text.Font titleFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 14, com.itextpdf.text.Font.BOLD);
+        Paragraph title = new Paragraph("📈 MÉTRICAS AVANZADAS", titleFont);
+        title.setAlignment(Element.ALIGN_LEFT);
+        title.setSpacingAfter(10);
+        document.add(title);
+        
+        // Crear tabla de métricas avanzadas
+        PdfPTable metricsTable = new PdfPTable(2);
+        metricsTable.setWidthPercentage(100);
+        metricsTable.setWidths(new float[]{1f, 1f});
+        
+        com.itextpdf.text.Font headerFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 11, com.itextpdf.text.Font.BOLD);
+        com.itextpdf.text.Font contentFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 9);
+        
+        double balance = totalIncome - totalExpenses;
+        double monthlyExpenses = totalExpenses / 3; // Asumiendo 3 meses de data
+        double monthlyIncome = totalIncome / 3;
+        
+        // Métrica 1: Flujo de Caja Proyectado
+        StringBuilder cashFlowText = new StringBuilder();
+        cashFlowText.append("📉 FLUJO DE CAJA PROYECTADO\n");
+        cashFlowText.append("============================\n\n");
+        
+        cashFlowText.append("Próximos 3 meses:\n");
+        for (int month = 1; month <= 3; month++) {
+            double projectedBalance = balance + (monthlyIncome - monthlyExpenses) * month;
+            cashFlowText.append("Mes ").append(month).append(": $")
+                       .append(String.format("%.2f", projectedBalance))
+                       .append(projectedBalance >= 0 ? " ✅" : " ⚠️")
+                       .append("\n");
+        }
+        
+        double runwayMonths = monthlyExpenses > 0 ? Math.max(0, balance / monthlyExpenses) : 0;
+        cashFlowText.append("\nRunway financiero: ").append(String.format("%.1f", runwayMonths)).append(" meses\n");
+        
+        if (runwayMonths < 3) {
+            cashFlowText.append("⚠️ Riesgo: Menos de 3 meses de cobertura");
+        } else if (runwayMonths >= 6) {
+            cashFlowText.append("✅ Excelente: Más de 6 meses de cobertura");
+        } else {
+            cashFlowText.append("🟡 Aceptable: Entre 3-6 meses de cobertura");
+        }
+        
+        PdfPCell cashFlowCell = new PdfPCell(new Phrase(cashFlowText.toString(), contentFont));
+        cashFlowCell.setBorder(Rectangle.BOX);
+        cashFlowCell.setPadding(15);
+        cashFlowCell.setPaddingTop(12);
+        cashFlowCell.setPaddingBottom(12);
+        cashFlowCell.setBackgroundColor(new BaseColor(240, 248, 255));
+        metricsTable.addCell(cashFlowCell);
+        
+        // Métrica 2: Análisis de Volatilidad y Capacidad
+        StringBuilder volatilityText = new StringBuilder();
+        volatilityText.append("⚙️ ANÁLISIS DE CAPACIDAD\n");
+        volatilityText.append("=======================\n\n");
+        
+        // Volatilidad de gastos (simplificada)
+        double expenseVolatility = calculateExpenseVolatility(totalExpenses, transactionCount);
+        volatilityText.append("Volatilidad de gastos: ").append(String.format("%.1f%%", expenseVolatility));
+        
+        if (expenseVolatility < 15) {
+            volatilityText.append(" ✅ Estable\n");
+        } else if (expenseVolatility < 30) {
+            volatilityText.append(" 🟡 Moderada\n");
+        } else {
+            volatilityText.append(" ⚠️ Alta\n");
+        }
+        
+        // Capacidad de endeudamiento
+        double debtCapacity = monthlyIncome * 0.3; // Máximo 30% de ingresos para deuda
+        volatilityText.append("\nCapacidad de endeudamiento:\n");
+        volatilityText.append("Máximo mensual: $").append(String.format("%.2f", debtCapacity)).append("\n");
+        volatilityText.append("Máximo total: $").append(String.format("%.2f", debtCapacity * 36)).append(" (3 años)\n");
+        
+        // Tiempo para objetivos
+        volatilityText.append("\nTiempo para objetivos:\n");
+        double monthlySavings = Math.max(0, monthlyIncome - monthlyExpenses);
+        if (monthlySavings > 0) {
+            double emergencyFund = monthlyExpenses * 6;
+            double monthsToEmergency = emergencyFund / monthlySavings;
+            volatilityText.append("Fondo emergencia (6 meses): ")
+                          .append(String.format("%.0f", monthsToEmergency)).append(" meses\n");
+        } else {
+            volatilityText.append("Fondo emergencia: No aplica (déficit)\n");
+        }
+        
+        PdfPCell volatilityCell = new PdfPCell(new Phrase(volatilityText.toString(), contentFont));
+        volatilityCell.setBorder(Rectangle.BOX);
+        volatilityCell.setPadding(15);
+        volatilityCell.setPaddingTop(12);
+        volatilityCell.setPaddingBottom(12);
+        volatilityCell.setBackgroundColor(new BaseColor(255, 250, 240));
+        metricsTable.addCell(volatilityCell);
+        
+        document.add(metricsTable);
+    }
+    
+    private double calculateExpenseVolatility(double totalExpenses, int transactionCount) {
+        // Simplificación: basado en el número de transacciones vs monto promedio
+        if (transactionCount <= 0) return 50;
+        
+        double avgTransaction = totalExpenses / transactionCount;
+        double volatilityFactor = Math.min(50, Math.max(5, 100 - (transactionCount * 2)));
+        
+        return volatilityFactor;
+    }
+    
+    // Método para generar comparación con benchmarks
+    private void generateBenchmarkComparison(Document document, double totalIncome, double totalExpenses, 
+                                           int transactionCount) throws DocumentException {
+        
+        // Título de la sección
+        com.itextpdf.text.Font titleFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 14, com.itextpdf.text.Font.BOLD);
+        Paragraph title = new Paragraph("🎨 COMPARACIÓN CON BENCHMARKS", titleFont);
+        title.setAlignment(Element.ALIGN_LEFT);
+        title.setSpacingAfter(10);
+        document.add(title);
+        
+        double balance = totalIncome - totalExpenses;
+        double savingsRate = totalIncome > 0 ? (balance / totalIncome) * 100 : 0;
+        double expenseRatio = totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0;
+        
+        // Crear tabla de comparación
+        PdfPTable benchmarkTable = new PdfPTable(4);
+        benchmarkTable.setWidthPercentage(100);
+        benchmarkTable.setWidths(new float[]{2.5f, 1.5f, 1.5f, 1.5f});
+        
+        com.itextpdf.text.Font headerFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 10, com.itextpdf.text.Font.BOLD);
+        com.itextpdf.text.Font dataFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 9);
+        
+        // Headers
+        String[] headers = {"Métrica", "Tu Valor", "Promedio", "Evaluación"};
+        for (String header : headers) {
+            PdfPCell headerCell = new PdfPCell(new Phrase(header, headerFont));
+            headerCell.setBackgroundColor(PRIMARY_COLOR);
+            headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            headerCell.setPadding(6);
+            benchmarkTable.addCell(headerCell);
+        }
+        
+        // Datos de comparación con estándares de la industria
+        addBenchmarkRow(benchmarkTable, "Tasa de Ahorro", 
+                       String.format("%.1f%%", savingsRate), "20%", 
+                       getBenchmarkStatus(savingsRate, 20, 10), dataFont);
+        
+        addBenchmarkRow(benchmarkTable, "Ratio de Gastos", 
+                       String.format("%.1f%%", expenseRatio), "70%", 
+                       getBenchmarkStatus(100 - expenseRatio, 30, 20), dataFont);
+        
+        int healthScore = calculateFinancialHealthScore(totalIncome, totalExpenses, transactionCount);
+        addBenchmarkRow(benchmarkTable, "Salud Financiera", 
+                       healthScore + "/10", "7/10", 
+                       getBenchmarkStatus(healthScore, 7, 5), dataFont);
+        
+        double monthlyIncome = totalIncome / 3;
+        String incomeLevel;
+        String avgIncome;
+        double incomeScore;
+        
+        if (monthlyIncome >= 5000) {
+            incomeLevel = "Alto";
+            avgIncome = "$3,500";
+            incomeScore = 100;
+        } else if (monthlyIncome >= 2500) {
+            incomeLevel = "Medio-Alto";
+            avgIncome = "$2,000";
+            incomeScore = 80;
+        } else if (monthlyIncome >= 1200) {
+            incomeLevel = "Medio";
+            avgIncome = "$1,500";
+            incomeScore = 60;
+        } else {
+            incomeLevel = "Bajo";
+            avgIncome = "$1,000";
+            incomeScore = 40;
+        }
+        
+        addBenchmarkRow(benchmarkTable, "Nivel de Ingresos", 
+                       incomeLevel, avgIncome, 
+                       getBenchmarkStatus(incomeScore, 70, 50), dataFont);
+        
+        document.add(benchmarkTable);
+        document.add(new Paragraph("\n"));
+        
+        // Agregar recomendaciones basadas en benchmarks
+        generateBenchmarkRecommendations(document, savingsRate, expenseRatio, healthScore, monthlyIncome);
+    }
+    
+    private void addBenchmarkRow(PdfPTable table, String metric, String userValue, String benchmark, 
+                                String status, com.itextpdf.text.Font font) {
+        table.addCell(new PdfPCell(new Phrase(metric, font)));
+        
+        PdfPCell userCell = new PdfPCell(new Phrase(userValue, font));
+        userCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(userCell);
+        
+        PdfPCell benchmarkCell = new PdfPCell(new Phrase(benchmark, font));
+        benchmarkCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(benchmarkCell);
+        
+        PdfPCell statusCell = new PdfPCell(new Phrase(status, font));
+        statusCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        
+        if (status.contains("✅")) {
+            statusCell.setBackgroundColor(new BaseColor(144, 238, 144));
+        } else if (status.contains("🟡")) {
+            statusCell.setBackgroundColor(new BaseColor(255, 255, 224));
+        } else {
+            statusCell.setBackgroundColor(new BaseColor(255, 182, 193));
+        }
+        
+        table.addCell(statusCell);
+    }
+    
+    private String getBenchmarkStatus(double value, double good, double average) {
+        if (value >= good) {
+            return "✅ Excelente";
+        } else if (value >= average) {
+            return "🟡 Promedio";
+        } else {
+            return "⚠️ Mejora";
+        }
+    }
+    
+    private void generateBenchmarkRecommendations(Document document, double savingsRate, double expenseRatio, 
+                                                 int healthScore, double monthlyIncome) throws DocumentException {
+        
+        com.itextpdf.text.Font subtitleFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 12, com.itextpdf.text.Font.BOLD);
+        Paragraph subtitle = new Paragraph("🎯 Recomendaciones Basadas en Benchmarks", subtitleFont);
+        subtitle.setSpacingAfter(8);
+        document.add(subtitle);
+        
+        com.itextpdf.text.Font contentFont = new com.itextpdf.text.Font(
+                com.itextpdf.text.Font.FontFamily.HELVETICA, 10);
+        
+        StringBuilder recommendations = new StringBuilder();
+        
+        if (savingsRate < 10) {
+            recommendations.append("• Aumenta tu tasa de ahorro al 10-20% para estar en el promedio nacional\n");
+        } else if (savingsRate >= 20) {
+            recommendations.append("• ¡Felicidades! Tu tasa de ahorro supera el promedio recomendado\n");
+        }
+        
+        if (expenseRatio > 80) {
+            recommendations.append("• Reduce gastos al 70% de ingresos para alcanzar el estándar recomendado\n");
+        }
+        
+        if (healthScore >= 8) {
+            recommendations.append("• Tu salud financiera es excelente, considera estrategias de inversión avanzadas\n");
+        } else if (healthScore < 6) {
+            recommendations.append("• Enfocarse en mejorar la salud financiera general es prioritario\n");
+        }
+        
+        if (monthlyIncome < 2000) {
+            recommendations.append("• Considera desarrollar habilidades para aumentar ingresos a largo plazo\n");
+        }
+        
+        recommendations.append("• Revisa estas métricas cada trimestre para mantener el progreso\n");
+        
+        PdfPTable recTable = new PdfPTable(1);
+        recTable.setWidthPercentage(90);
+        
+        PdfPCell recCell = new PdfPCell(new Phrase(recommendations.toString(), contentFont));
+        recCell.setBorder(Rectangle.BOX);
+        recCell.setPadding(12);
+        recCell.setBackgroundColor(new BaseColor(245, 245, 250));
+        recTable.addCell(recCell);
+        
+        document.add(recTable);
+    }
+
     // Método para generar sección de puntuación de salud financiera
     private void generateHealthScoreSection(
             Document document, double totalIncome, double totalExpenses, int transactionCount)
@@ -1464,38 +2382,44 @@ public class ReportGenerationServiceImpl implements ReportGenerationService {
         com.itextpdf.text.Font sectionFont =
                 new com.itextpdf.text.Font(
                         com.itextpdf.text.Font.FontFamily.HELVETICA,
-                        12,
+                        16,
                         com.itextpdf.text.Font.BOLD);
-        Paragraph healthTitle = new Paragraph("Evaluación de Salud Financiera", sectionFont);
-        healthTitle.setAlignment(Element.ALIGN_LEFT);
+        Paragraph healthTitle = new Paragraph("🎆 EVALUACIÓN DE SALUD FINANCIERA", sectionFont);
+        healthTitle.setAlignment(Element.ALIGN_CENTER);
+        healthTitle.setSpacingBefore(20);
+        healthTitle.setSpacingAfter(20);
         document.add(healthTitle);
-        document.add(new Paragraph("\n"));
 
         // Crear tabla de puntuación
         PdfPTable scoreTable = new PdfPTable(2);
-        scoreTable.setWidthPercentage(60);
-        scoreTable.setWidths(new float[] {1.2f, 0.8f});
+        scoreTable.setWidthPercentage(70);
+        scoreTable.setHorizontalAlignment(Element.ALIGN_CENTER);
+        scoreTable.setWidths(new float[] {1.5f, 1f});
 
         com.itextpdf.text.Font labelFont =
                 new com.itextpdf.text.Font(
                         com.itextpdf.text.Font.FontFamily.HELVETICA,
-                        10,
+                        11,
                         com.itextpdf.text.Font.BOLD);
         com.itextpdf.text.Font valueFont =
-                new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 10);
+                new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 11, com.itextpdf.text.Font.BOLD);
 
         // Score
         PdfPCell scoreLabelCell =
                 new PdfPCell(new Phrase("Puntuación de Salud Financiera:", labelFont));
         scoreLabelCell.setBorder(Rectangle.BOX);
-        scoreLabelCell.setPadding(5);
-        scoreLabelCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        scoreLabelCell.setPadding(10);
+        scoreLabelCell.setPaddingTop(8);
+        scoreLabelCell.setPaddingBottom(8);
+        scoreLabelCell.setBackgroundColor(PRIMARY_COLOR);
         scoreTable.addCell(scoreLabelCell);
 
         PdfPCell scoreValueCell =
                 new PdfPCell(new Phrase(healthScore + "/10 (" + healthGrade + ")", valueFont));
         scoreValueCell.setBorder(Rectangle.BOX);
-        scoreValueCell.setPadding(5);
+        scoreValueCell.setPadding(10);
+        scoreValueCell.setPaddingTop(8);
+        scoreValueCell.setPaddingBottom(8);
         scoreValueCell.setHorizontalAlignment(Element.ALIGN_CENTER);
         scoreTable.addCell(scoreValueCell);
 
@@ -1504,22 +2428,28 @@ public class ReportGenerationServiceImpl implements ReportGenerationService {
         PdfPCell ratioLabelCell =
                 new PdfPCell(new Phrase("Porcentaje de Gastos vs Ingresos:", labelFont));
         ratioLabelCell.setBorder(Rectangle.BOX);
-        ratioLabelCell.setPadding(5);
-        ratioLabelCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        ratioLabelCell.setPadding(10);
+        ratioLabelCell.setPaddingTop(8);
+        ratioLabelCell.setPaddingBottom(8);
+        ratioLabelCell.setBackgroundColor(PRIMARY_COLOR);
         scoreTable.addCell(ratioLabelCell);
 
         PdfPCell ratioValueCell =
                 new PdfPCell(new Phrase(String.format("%.1f%%", expenseRatio), valueFont));
         ratioValueCell.setBorder(Rectangle.BOX);
-        ratioValueCell.setPadding(5);
+        ratioValueCell.setPadding(10);
+        ratioValueCell.setPaddingTop(8);
+        ratioValueCell.setPaddingBottom(8);
         ratioValueCell.setHorizontalAlignment(Element.ALIGN_CENTER);
         scoreTable.addCell(ratioValueCell);
 
         // Ahorro estimado
         PdfPCell savingsLabelCell = new PdfPCell(new Phrase("Capacidad de Ahorro:", labelFont));
         savingsLabelCell.setBorder(Rectangle.BOX);
-        savingsLabelCell.setPadding(5);
-        savingsLabelCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        savingsLabelCell.setPadding(10);
+        savingsLabelCell.setPaddingTop(8);
+        savingsLabelCell.setPaddingBottom(8);
+        savingsLabelCell.setBackgroundColor(PRIMARY_COLOR);
         scoreTable.addCell(savingsLabelCell);
 
         PdfPCell savingsValueCell =
@@ -1528,11 +2458,14 @@ public class ReportGenerationServiceImpl implements ReportGenerationService {
                                 balance >= 0 ? "$" + String.format("%.2f", balance) : "Déficit",
                                 valueFont));
         savingsValueCell.setBorder(Rectangle.BOX);
-        savingsValueCell.setPadding(5);
+        savingsValueCell.setPadding(10);
+        savingsValueCell.setPaddingTop(8);
+        savingsValueCell.setPaddingBottom(8);
         savingsValueCell.setHorizontalAlignment(Element.ALIGN_CENTER);
         scoreTable.addCell(savingsValueCell);
 
         document.add(scoreTable);
+        document.add(new Paragraph("\n"));
         document.add(new Paragraph("\n"));
 
         // Recomendaciones

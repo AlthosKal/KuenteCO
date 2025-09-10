@@ -123,8 +123,8 @@ http-connector:
 # Configuración de logging
 logging:
   level:
-    com.example.back_end.connector: DEBUG
-    com.example.back_end.service: DEBUG
-    org.springframework.web.reactive.function.client: DEBUG
-    org.springframework.ai: DEBUG
+    com.example.back_end.connector: INFO
+    com.example.back_end.service: INFO
+    org.springframework.web.reactive.function.client: INFO
+    org.springframework.ai: INFO
     org.springframework: INFO
