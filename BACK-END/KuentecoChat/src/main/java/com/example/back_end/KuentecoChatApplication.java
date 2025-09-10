@@ -16,6 +16,7 @@ public class KuentecoChatApplication {
         // Conexión al modelo de OpenAI
         System.setProperty("OPENAI_KEY", dotenv.get("OPENAI_KEY"));
         System.setProperty("OPENAI_MODEL", dotenv.get("OPENAI_MODEL"));
+        System.setProperty("OPENAI_BASE_URL", dotenv.get("OPENAI_BASE_URL"));
 
         // Conexión al modelo de DeepSeek
         System.setProperty("DEEPSEEK_KEY", dotenv.get("DEEPSEEK_KEY"));
@@ -27,7 +28,6 @@ public class KuentecoChatApplication {
 
         // Secret de Jwt
         System.setProperty("JWT_SECRET", dotenv.get("JWT_SECRET"));
-
 
         System.setProperty("WEB_URL", dotenv.get("WEB_URL"));
         System.setProperty("MOBILE_URL", dotenv.get("MOBILE_URL"));

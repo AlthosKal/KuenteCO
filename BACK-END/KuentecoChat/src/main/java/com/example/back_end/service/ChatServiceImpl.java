@@ -63,7 +63,7 @@ public class ChatServiceImpl implements ChatService {
     private final ReportGenerationService reportGenerationService;
 
     public ChatServiceImpl(
-            @Qualifier(value = "openAiChatModel") ChatModel deepseekChatClient,
+            @Qualifier(value = "deepSeekChatModel") ChatModel deepseekChatClient,
             @Qualifier(value = "openAiChatModel") ChatModel openaiChatClient,
             JwtUtil jwtUtil,
             AiHistoryRepository repository,
