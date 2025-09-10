@@ -69,7 +69,7 @@ services:
 
 # API KUENTECO-CHAT DEL BACKEND DE LA APLICACION :D
   kuenteco-chat:
-    image: yefff/image-backend-kuenteco-chat:1.0.3
+    image: yefff/image-backend-kuenteco-chat:1.0.4
     container_name: KuentecoChat
     ports:
       - "7070:7070"
