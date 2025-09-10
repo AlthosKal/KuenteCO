@@ -4,7 +4,7 @@ import 'package:KuenteCO/controllers/profile_controller.dart';
 import 'package:KuenteCO/controllers/subscription_controller.dart';
 import 'package:KuenteCO/controllers/user_controller.dart';
 import 'package:KuenteCO/controllers/chat_controller.dart';
-import 'package:KuenteCO/controllers/excel_controller.dart';
+import 'package:KuenteCO/controllers/excel/excel_controller.dart';
 import 'package:KuenteCO/controllers/business_logic/debt_controller.dart';
 import 'package:KuenteCO/core/config/is_autenticated.dart';
 import 'package:KuenteCO/core/services/api_client.dart';

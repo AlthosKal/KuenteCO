@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
-import '../core/services/app/excel_service.dart';
-import '../dto/app/excel/debt_excel_validation_result_dto.dart';
+import '../../core/services/app/excel_service.dart';
+import '../../dto/app/excel/debt_excel_validation_result_dto.dart';
 import 'dart:typed_data';
 import 'dart:convert';
 
