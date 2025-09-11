@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../controllers/chat_controller.dart';
 import 'typewriter_text_widget.dart';
 
 enum MessageType { user, ai }
@@ -9,6 +11,8 @@ class ChatMessageWidget extends StatefulWidget {
   final DateTime timestamp;
   final bool enableTypewriter;
   final VoidCallback? onTypewriterComplete;
+  final String? reportId; // ID del reporte para descarga
+  final String? fileName; // Nombre del archivo del reporte
 
   const ChatMessageWidget({
     Key? key,
@@ -17,6 +21,8 @@ class ChatMessageWidget extends StatefulWidget {
     required this.timestamp,
     this.enableTypewriter = false,
     this.onTypewriterComplete,
+    this.reportId,
+    this.fileName,
   }) : super(key: key);
 
   @override
@@ -106,17 +112,41 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (widget.type == MessageType.ai && widget.enableTypewriter)
-                            TypewriterTextWidget(
-                              text: widget.message,
-                              speed: const Duration(milliseconds: 10),
-                              textStyle: _getTextStyle(context),
-                              onComplete: widget.onTypewriterComplete,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TypewriterTextWidget(
+                                  text: widget.message,
+                                  speed: const Duration(milliseconds: 10),
+                                  textStyle: _getTextStyle(context),
+                                  onComplete: widget.onTypewriterComplete,
+                                ),
+                                // Mostrar botón de descarga también en typewriter
+                                if (widget.reportId != null && widget.reportId!.isNotEmpty) ...[
+                                  const SizedBox(height: 12),
+                                  Container(
+                                    width: double.infinity,
+                                    child: ElevatedButton.icon(
+                                      onPressed: () => _downloadReport(context, widget.reportId!),
+                                      icon: const Icon(Icons.file_download, size: 18),
+                                      label: Text(widget.fileName != null ? 
+                                        'Descargar ${widget.fileName}' : 
+                                        'Descargar Reporte'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.green[600],
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             )
                           else
-                            Text(
-                              widget.message,
-                              style: _getTextStyle(context),
-                            ),
+                            _buildMessageContent(),
                           if (widget.type == MessageType.ai) ...[
                             const SizedBox(height: 8),
                             Row(
@@ -210,6 +240,51 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       fontSize: 14,
       height: 1.4,
     );
+  }
+
+  Widget _buildMessageContent() {
+    List<Widget> widgets = [];
+    
+    // Agregar texto del mensaje
+    widgets.add(Text(
+      widget.message,
+      style: _getTextStyle(context),
+    ));
+    
+    // Si hay un reporte disponible, agregar botón de descarga
+    if (widget.reportId != null && widget.reportId!.isNotEmpty) {
+      widgets.add(const SizedBox(height: 12));
+      widgets.add(
+        Container(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: () => _downloadReport(context, widget.reportId!),
+            icon: const Icon(Icons.file_download, size: 18),
+            label: Text(widget.fileName != null ? 
+              'Descargar ${widget.fileName}' : 
+              'Descargar Reporte'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green[600],
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: widgets,
+    );
+  }
+  
+  void _downloadReport(BuildContext context, String reportId) {
+    final chatController = context.read<ChatController>();
+    chatController.downloadReport(reportId);
   }
 
   String _formatTimestamp(DateTime timestamp) {

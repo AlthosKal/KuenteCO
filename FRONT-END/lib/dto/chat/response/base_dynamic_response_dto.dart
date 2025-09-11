@@ -21,7 +21,9 @@ abstract class BaseDynamicResponseDTO {
 
   /// Factory method para crear instancias basadas en el tipo
   static BaseDynamicResponseDTO fromJson(Map<String, dynamic> json) {
-    final type = json['type'] as String;
+    print('🔍 BaseDynamicResponseDTO: Parsing JSON: $json');
+    final type = json['type'] as String? ?? 'SIMPLE_TEXT';
+    print('🔍 BaseDynamicResponseDTO: Detected type: "$type"');
     
     switch (type) {
       case 'SIMPLE_TEXT':
@@ -43,7 +45,8 @@ abstract class BaseDynamicResponseDTO {
       case 'BUDGET_COMPARISON':
         return BudgetComparisonResponseDTO.fromJson(json);
       default:
-        throw ArgumentError('Unknown response type: $type');
+        print('⚠️ BaseDynamicResponseDTO: Tipo desconocido "$type", usando SIMPLE_TEXT por defecto');
+        return SimpleTextResponseDTO.fromJson(json);
     }
   }
 }
@@ -53,8 +56,8 @@ class SimpleTextResponseDTO extends BaseDynamicResponseDTO {
   final String message;
 
   SimpleTextResponseDTO({
-    required String summary,
-    required String analysis,
+    String? summary,
+    String? analysis,
     required this.message,
   }) : super(type: 'SIMPLE_TEXT', summary: summary, analysis: analysis);
 

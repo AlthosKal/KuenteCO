@@ -8,6 +8,8 @@ import '../dto/chat/response/string_chat_response_dto.dart';
 import '../dto/chat/response/dynamic_analysis_response_dto.dart';
 import '../dto/chat/response/debt_analysis_response_dto.dart';
 import '../dto/chat/response/chat_history_dto.dart';
+import '../dto/chat/response/base_dynamic_response_dto.dart';
+import '../dto/chat/response/report_download_response_dto.dart';
 
 // Modelo para mensajes de chat
 class ChatMessage {
@@ -17,6 +19,8 @@ class ChatMessage {
   final DateTime timestamp;
   final bool isTyping;
   final bool isNew; // Para distinguir mensajes nuevos de históricos
+  final String? reportId; // ID del reporte para descarga
+  final String? fileName; // Nombre del archivo del reporte
 
   ChatMessage({
     required this.id,
@@ -25,6 +29,8 @@ class ChatMessage {
     required this.timestamp,
     this.isTyping = false,
     this.isNew = true, // Por defecto es nuevo
+    this.reportId,
+    this.fileName,
   });
 }
 
@@ -124,11 +130,13 @@ class ChatController extends ChangeNotifier {
     // Remover bloques de código (```código```)
     plainText = plainText.replaceAll(RegExp(r'```[\s\S]*?```'), '');
     
-    // Remover enlaces [texto](url) - mantener solo el texto
+    // Remover enlaces normales [texto](url) - mantener solo el texto, pero preservar enlaces de descarga
     plainText = plainText.replaceAllMapped(
-      RegExp(r'\[([^\]]*)\]\([^)]*\)'), 
+      RegExp(r'\[([^\]]*)\]\((?!#download:)([^)]*)\)'), 
       (match) => match.group(1) ?? ''
     );
+    
+    // Los enlaces de descarga [texto](#download:id) se mantienen intactos
     
     // Remover listas con bullets (- * +) - mantener solo el contenido
     plainText = plainText.replaceAllMapped(
@@ -668,9 +676,10 @@ class ChatController extends ChangeNotifier {
       // Mostrar indicador de que la IA está escribiendo
       _setTyping(true, message: 'La IA está analizando tu consulta...');
 
-      _lastChatResponse = await _chatService.askAi(dto);
+      // Usar análisis dinámico que puede manejar todos los tipos de respuesta
+      _lastDynamicAnalysis = await _chatService.getDynamicAnalysis(dto);
       
-      print('📥 ChatController: Respuesta recibida - conversationId: ${_lastChatResponse?.conversationId}');
+      print('📥 ChatController: Respuesta dinámica recibida - conversationId: ${_lastDynamicAnalysis?.body.conversationId}');
       
       // Verificar si fue cancelado antes de procesar la respuesta
       if (_isCancelled) {
@@ -681,17 +690,27 @@ class ChatController extends ChangeNotifier {
       // Detener indicador de escritura
       _setTyping(false);
       
-      // Manejo seguro de la respuesta
-      if (_lastChatResponse != null) {
+      // Manejo seguro de la respuesta dinámica
+      if (_lastDynamicAnalysis != null) {
         // IMPORTANTE: El backend ignora nuestro conversationId y devuelve uno nuevo
         // Debemos usar el ID real que devuelve el backend
-        final realConversationId = _lastChatResponse!.conversationId;
+        final realConversationId = _lastDynamicAnalysis!.body.conversationId;
         
-        if (_currentConversationId != realConversationId) {
-          print('⚠️ ChatController: Backend devolvió un ID diferente!');
-          print('   Enviado: $_currentConversationId');
-          print('   Recibido: $realConversationId');
-          _currentConversationId = realConversationId;
+        print('🔍 ChatController: Analizando conversationId...');
+        print('   ConversationId actual: $_currentConversationId');
+        print('   ConversationId del backend: "$realConversationId"');
+        print('   ConversationId está vacío: ${realConversationId.isEmpty}');
+        
+        // Solo actualizar si no está vacío
+        if (realConversationId.isNotEmpty) {
+          if (_currentConversationId != realConversationId) {
+            print('⚠️ ChatController: Backend devolvió un ID diferente!');
+            print('   Enviado: $_currentConversationId');
+            print('   Recibido: $realConversationId');
+            _currentConversationId = realConversationId;
+          }
+        } else {
+          print('⚠️ ChatController: Backend devolvió conversationId vacío, manteniendo el actual');
         }
         
         if (_currentConversationId == null) {
@@ -700,24 +719,8 @@ class ChatController extends ChangeNotifier {
           print('ChatController: Usando conversación real con ID: $_currentConversationId');
         }
         
-        // Validar que la respuesta tenga contenido antes de agregarlo
-        final responseText = _lastChatResponse!.analysis.response;
-        if (responseText.isNotEmpty) {
-          final plainTextResponse = _markdownToPlainText(responseText);
-          _addAIMessage(plainTextResponse);
-          await _addToHistory(message, plainTextResponse);
-          
-          // Refrescar historial desde el servidor después de enviar mensaje
-          print('🔄 ChatController: Refrescando historial después de enviar mensaje');
-          await loadChatHistory();
-        } else {
-          final fallbackMessage = 'La IA ha procesado tu consulta, pero no se pudo obtener una respuesta de texto.';
-          _addAIMessage(fallbackMessage);
-          await _addToHistory(message, fallbackMessage);
-          
-          // También refrescar en caso de fallback
-          await loadChatHistory();
-        }
+        // Procesar respuesta según su tipo
+        await _processAnalysisResponse(_lastDynamicAnalysis!, message);
       } else {
         final errorMessage = 'No se pudo obtener respuesta del servidor.';
         _addAIMessage(errorMessage);
@@ -736,6 +739,201 @@ class ChatController extends ChangeNotifier {
     } finally {
       _setLoading(false);
     }
+  }
+
+  /// Procesar respuesta de análisis dinámico según su tipo
+  Future<void> _processAnalysisResponse(DynamicAnalysisResponseDTO analysis, String originalMessage) async {
+    print('🔍 ChatController: Procesando respuesta tipo: ${analysis.analysisType}');
+    print('🔍 ChatController: ConversationId: "${analysis.body.conversationId}"');
+    print('🔍 ChatController: Response text length: ${analysis.body.response.length}');
+    print('🔍 ChatController: Response text: "${analysis.body.response}"');
+    
+    // Para REPORT_DOWNLOAD, el manejo se hace en _handleReportDownload
+    // Para otros tipos, agregar mensaje de texto normal
+    if (analysis.analysisType != 'REPORT_DOWNLOAD') {
+      final responseText = analysis.body.response;
+      if (responseText.isNotEmpty) {
+        final plainTextResponse = _markdownToPlainText(responseText);
+        _addAIMessage(plainTextResponse);
+        await _addToHistory(originalMessage, plainTextResponse);
+      } else {
+        // Fallback cuando la respuesta está vacía
+        print('⚠️ ChatController: Respuesta vacía del backend, mostrando mensaje de fallback');
+        final fallbackMessage = 'He procesado tu solicitud pero no se pudo obtener la respuesta completa del servidor. Por favor, intenta nuevamente.';
+        _addAIMessage(fallbackMessage);
+        await _addToHistory(originalMessage, fallbackMessage);
+      }
+    }
+    
+    // Manejar tipos específicos de respuesta
+    switch (analysis.analysisType) {
+      case 'REPORT_DOWNLOAD':
+        await _handleReportDownload(analysis, originalMessage);
+        break;
+      case 'CHART_DATA':
+        _handleChartData(analysis);
+        break;
+      case 'DEBT_ANALYSIS':
+        _handleDebtAnalysis(analysis);
+        break;
+      case 'SPENDING_PATTERNS':
+        _handleSpendingPatterns(analysis);
+        break;
+      case 'FINANCIAL_HEALTH':
+        _handleFinancialHealth(analysis);
+        break;
+      case 'EXPENSE_SUGGESTIONS':
+        _handleExpenseSuggestions(analysis);
+        break;
+      case 'FINANCIAL_PROJECTION':
+        _handleFinancialProjection(analysis);
+        break;
+      case 'BUDGET_COMPARISON':
+        _handleBudgetComparison(analysis);
+        break;
+      case 'SIMPLE_TEXT':
+      default:
+        // Ya se manejó el texto arriba
+        print('📝 ChatController: Respuesta de texto simple procesada');
+        break;
+    }
+  }
+
+  /// Manejar descarga de reportes (PDFs)
+  Future<void> _handleReportDownload(DynamicAnalysisResponseDTO analysis, String originalMessage) async {
+    print('📄 ChatController: Iniciando _handleReportDownload');
+    print('📄 ChatController: analysis.response type: ${analysis.response.runtimeType}');
+    print('📄 ChatController: analysis.response is ReportDownloadResponseWrapperDTO: ${analysis.response is ReportDownloadResponseWrapperDTO}');
+    
+    if (analysis.response is ReportDownloadResponseWrapperDTO) {
+      final reportWrapper = analysis.response as ReportDownloadResponseWrapperDTO;
+      final reportData = reportWrapper.reportDownload;
+      
+      print('📄 ChatController: Reporte disponible para descarga:');
+      print('   - ID: ${reportData.reportId}');
+      print('   - Archivo: ${reportData.fileName}');
+      print('   - Tipo: ${reportData.reportType}');
+      print('   - Tamaño: ${reportData.fileSizeBytes} bytes');
+      
+      // Usar respuesta del servidor directamente, sin enlaces
+      final serverResponse = analysis.body.response.isNotEmpty 
+          ? analysis.body.response 
+          : 'Tu reporte ha sido generado exitosamente.';
+      
+      final plainTextMessage = _markdownToPlainText(serverResponse);
+      
+      // Crear mensaje con información del reporte para descarga
+      final message = ChatMessage(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        content: plainTextMessage,
+        isUser: false,
+        timestamp: DateTime.now(),
+        isNew: true,
+        reportId: reportData.reportId,
+        fileName: reportData.fileName,
+      );
+      
+      print('📄 ChatController: Creando mensaje con reportId: ${message.reportId}');
+      print('📄 ChatController: Creando mensaje con fileName: ${message.fileName}');
+      print('📄 ChatController: Total de mensajes antes de agregar: ${_messages.length}');
+      
+      _messages.add(message);
+      print('📄 ChatController: Total de mensajes después de agregar: ${_messages.length}');
+      print('📄 ChatController: Último mensaje reportId: ${_messages.last.reportId}');
+      notifyListeners();
+      
+      await _addToHistory(originalMessage, plainTextMessage);
+    } else {
+      print('❌ ChatController: analysis.response NO es ReportDownloadResponseWrapperDTO');
+      print('❌ ChatController: Tipo real: ${analysis.response.runtimeType}');
+      
+      // Agregar mensaje normal como fallback
+      final serverResponse = analysis.body.response.isNotEmpty 
+          ? analysis.body.response 
+          : 'Error procesando reporte.';
+      final plainTextMessage = _markdownToPlainText(serverResponse);
+      _addAIMessage(plainTextMessage);
+      await _addToHistory(originalMessage, plainTextMessage);
+    }
+  }
+
+  /// Manejar datos de gráficos
+  void _handleChartData(DynamicAnalysisResponseDTO analysis) {
+    print('📊 ChatController: Datos de gráfico disponibles');
+    // Aquí puedes agregar lógica para mostrar gráficos
+    // Por ejemplo, notificar a widgets que muestren gráficos
+  }
+
+  /// Manejar análisis de deudas
+  void _handleDebtAnalysis(DynamicAnalysisResponseDTO analysis) {
+    print('💳 ChatController: Análisis de deudas disponible');
+    // Lógica específica para análisis de deudas
+  }
+
+  /// Manejar patrones de gasto
+  void _handleSpendingPatterns(DynamicAnalysisResponseDTO analysis) {
+    print('💰 ChatController: Patrones de gasto analizados');
+    // Lógica específica para patrones de gasto
+  }
+
+  /// Manejar salud financiera
+  void _handleFinancialHealth(DynamicAnalysisResponseDTO analysis) {
+    print('🏥 ChatController: Análisis de salud financiera disponible');
+    // Lógica específica para salud financiera
+  }
+
+  /// Manejar sugerencias de reducción de gastos
+  void _handleExpenseSuggestions(DynamicAnalysisResponseDTO analysis) {
+    print('💡 ChatController: Sugerencias de reducción de gastos disponibles');
+    // Lógica específica para sugerencias
+  }
+
+  /// Manejar proyecciones financieras
+  void _handleFinancialProjection(DynamicAnalysisResponseDTO analysis) {
+    print('🔮 ChatController: Proyecciones financieras disponibles');
+    // Lógica específica para proyecciones
+  }
+
+  /// Manejar comparación de presupuestos
+  void _handleBudgetComparison(DynamicAnalysisResponseDTO analysis) {
+    print('📈 ChatController: Comparación de presupuestos disponible');
+    // Lógica específica para comparación de presupuestos
+  }
+
+  /// Descargar reporte por ID
+  Future<void> downloadReport(String reportId) async {
+    print('📥 ChatController: Iniciando descarga de reporte: $reportId');
+    _setLoading(true);
+    
+    try {
+      await _chatService.downloadReport(reportId);
+      print('✅ ChatController: Reporte descargado exitosamente');
+      
+      // Mostrar mensaje de éxito
+      _addAIMessage('✅ Descarga iniciada. El archivo se descargará automáticamente.');
+      
+    } catch (e) {
+      print('❌ ChatController: Error descargando reporte: $e');
+      _setError('Error al descargar reporte: ${e.toString()}');
+      _addAIMessage('❌ Error al descargar el reporte. Por favor, intenta nuevamente.');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Verificar si hay un reporte disponible para descarga en la última respuesta
+  bool get hasReportToDownload {
+    return _lastDynamicAnalysis?.analysisType == 'REPORT_DOWNLOAD';
+  }
+
+  /// Obtener información del reporte disponible para descarga
+  ReportDownloadResponseDTO? get availableReport {
+    if (_lastDynamicAnalysis?.analysisType == 'REPORT_DOWNLOAD' &&
+        _lastDynamicAnalysis?.response is ReportDownloadResponseWrapperDTO) {
+      final wrapper = _lastDynamicAnalysis!.response as ReportDownloadResponseWrapperDTO;
+      return wrapper.reportDownload;
+    }
+    return null;
   }
 
   /// Iniciar nueva conversación (limpia completamente el estado)

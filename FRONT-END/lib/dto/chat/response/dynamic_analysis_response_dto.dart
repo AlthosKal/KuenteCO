@@ -12,9 +12,17 @@ class DynamicAnalysisResponseDTO {
   });
 
   factory DynamicAnalysisResponseDTO.fromJson(Map<String, dynamic> json) {
+    print('🔍 DynamicAnalysisResponseDTO: Parsing JSON: $json');
+    
+    final bodyData = json['body'] ?? {};
+    final responseData = json['response'] ?? {};
+    
+    print('🔍 DynamicAnalysisResponseDTO: Body data: $bodyData');
+    print('🔍 DynamicAnalysisResponseDTO: Response data: $responseData');
+    
     return DynamicAnalysisResponseDTO(
-      body: StringChatResponseDTO.fromJson(json['body'] ?? {}),
-      response: BaseDynamicResponseDTO.fromJson(json['response'] ?? {}),
+      body: StringChatResponseDTO.fromJson(bodyData),
+      response: BaseDynamicResponseDTO.fromJson(responseData),
     );
   }
 
