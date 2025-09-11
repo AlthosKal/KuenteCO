@@ -66,7 +66,7 @@ class UserButtomPersonalWidget extends StatelessWidget {
           value: 'logout',
           child: const ListTile(
             leading: Icon(Icons.logout, size: 20),
-            title: Text('Cerrar sesión'),
+            title: Text('Cerrar sesión', style: TextStyle(color: Colors.purpleAccent)),
             dense: true,
             contentPadding: EdgeInsets.zero,
           ),

@@ -1,3 +1,11 @@
+import 'dart:convert';
+import 'dart:html' as html;
+import 'dart:math' as math;
+import 'dart:typed_data';
+
+import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import '../../../dto/chat/request/chat_dto.dart';
 import '../../../dto/chat/request/chat_files_dto.dart';
 import '../../../dto/chat/request/chat_multipart_dto.dart';
@@ -70,7 +78,17 @@ class ChatService {
     try {
       final response = await _api.postChat('/chat', dto.toJson());
       print('â ChatService: Análisis dinámico recibido');
-      return DynamicAnalysisResponseDTO.fromJson(response.data);
+      // Log de la estructura completa para debugging
+      print('📊 ChatService: Estructura completa de respuesta: ${response.data}');
+      
+      // La respuesta real está en response.data['data']
+      final actualData = response.data['data'];
+      if (actualData == null) {
+        throw Exception('No se encontraron datos en la respuesta del backend');
+      }
+      
+      print('📊 ChatService: Datos reales: $actualData');
+      return DynamicAnalysisResponseDTO.fromJson(actualData);
     } catch (e) {
       print('â ChatService: Error en análisis dinámico: $e');
       rethrow;
@@ -163,15 +181,67 @@ class ChatService {
   // ENDPOINT DE REPORTES
 
   /// Descargar reporte por ID
-  Future<Map<String, dynamic>> downloadReport(String reportId) async {
-    print('📥 ChatService: Descargando reporte: $reportId');
+  Future<void> downloadReport(String reportId) async {
+    print('📄 ChatService: Iniciando descarga de reporte con ID: $reportId');
     try {
-      final response = await _api.getChat('/reports/download/$reportId');
-      print('✅ ChatService: Reporte descargado');
-      return response.data as Map<String, dynamic>;
+      final endpoint = '/reports/download/$reportId';
+      print('📄 ChatService: Endpoint de descarga: $endpoint');
+      
+      final response = await _api.getChat(
+        endpoint,
+        options: Options(
+          responseType: ResponseType.bytes,
+          headers: {
+            'Accept': 'application/pdf',
+          },
+        ),
+      );
+      
+      if (response.statusCode == 200) {
+        final pdfData = response.data;
+        
+        if (pdfData == null) {
+          throw Exception('Los datos del PDF están vacíos');
+        }
+        
+        Uint8List bytes;
+        if (pdfData is Uint8List) {
+          bytes = pdfData;
+        } else if (pdfData is List<int>) {
+          bytes = Uint8List.fromList(pdfData);
+        } else if (pdfData is String) {
+          bytes = Uint8List.fromList(latin1.encode(pdfData));
+        } else {
+          throw Exception('Formato de datos no soportado: ${pdfData.runtimeType}. Esperado String, Uint8List o List<int>');
+        }
+        
+        final blob = html.Blob([bytes]);
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        
+        final anchor = html.AnchorElement(href: url)
+          ..setAttribute('download', 'reporte_$reportId.pdf')
+          ..click();
+        
+        html.Url.revokeObjectUrl(url);
+      } else {
+        throw Exception('Error en respuesta del servidor: ${response.statusCode}');
+      }
     } catch (e) {
-      print('❌ ChatService: Error descargando reporte: $e');
       rethrow;
     }
+  }
+
+  /// Verificar si los datos parecen ser un PDF válido
+  bool _isPdfData(List<int> bytes) {
+    if (bytes.length < 4) return false;
+    
+    // Los PDFs empiezan con "%PDF"
+    final pdfHeader = [37, 80, 68, 70]; // "%PDF" en ASCII
+    for (int i = 0; i < 4; i++) {
+      if (bytes[i] != pdfHeader[i]) {
+        return false;
+      }
+    }
+    return true;
   }
 }
