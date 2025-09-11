@@ -182,48 +182,39 @@ class ChatService {
 
   /// Descargar reporte por ID
   Future<void> downloadReport(String reportId) async {
+    print('📄 ChatService: Iniciando descarga de reporte con ID: $reportId');
     try {
-      // Hacer la request directamente con configuración para PDF binario
-      final token = await const FlutterSecureStorage().read(key: 'Authorization');
-      final headers = {
-        'Accept': 'application/pdf',
-        'Content-Type': 'application/json',
-      };
-      if (token != null) {
-        headers['Authorization'] = 'Bearer $token';
-      }
+      final endpoint = '/reports/download/$reportId';
+      print('📄 ChatService: Endpoint de descarga: $endpoint');
       
-      final response = await Dio().get(
-        '${_api.baseUrlChat}/reports/download/$reportId',
+      final response = await _api.getChat(
+        endpoint,
         options: Options(
           responseType: ResponseType.bytes,
-          headers: headers,
+          headers: {
+            'Accept': 'application/pdf',
+          },
         ),
       );
       
       if (response.statusCode == 200) {
         final pdfData = response.data;
-        print('📊 PDF DEBUG: Response data type: ${pdfData.runtimeType}');
-        print('📊 PDF DEBUG: Data length: ${pdfData is List ? pdfData.length : 'N/A'}');
         
         if (pdfData == null) {
           throw Exception('Los datos del PDF están vacíos');
         }
         
-        // Convertir a Uint8List siguiendo el patrón de Excel
         Uint8List bytes;
-        if (pdfData is String) {
-          // El servidor está devolviendo un string binario directo
-          bytes = Uint8List.fromList(pdfData.codeUnits);
-        } else if (pdfData is Uint8List) {
+        if (pdfData is Uint8List) {
           bytes = pdfData;
         } else if (pdfData is List<int>) {
           bytes = Uint8List.fromList(pdfData);
+        } else if (pdfData is String) {
+          bytes = Uint8List.fromList(latin1.encode(pdfData));
         } else {
           throw Exception('Formato de datos no soportado: ${pdfData.runtimeType}. Esperado String, Uint8List o List<int>');
         }
         
-        // Usar el mismo patrón de descarga que Excel
         final blob = html.Blob([bytes]);
         final url = html.Url.createObjectUrlFromBlob(blob);
         

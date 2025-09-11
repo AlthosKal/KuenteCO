@@ -8,8 +8,8 @@ import '../../widgets/components/report/chat/ai_analysis_controls_widget.dart';
 import '../../widgets/components/report/chat/debt_analysis_results_widget.dart';
 import '../../widgets/components/report/excel/excel_controls_widget.dart';
 import '../../widgets/components/report/excel/excel_validation_results_widget.dart';
-import '../../widgets/components/chat/chat_message_widget.dart';
-import '../../widgets/components/chat/animated_typing_dots.dart';
+import '../../widgets/components/report/chat/chat_message_widget.dart';
+import '../../widgets/components/report/chat/animated_typing_dots.dart';
 
 class ReportView extends StatefulWidget {
   const ReportView({Key? key}) : super(key: key);

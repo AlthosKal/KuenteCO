@@ -906,6 +906,10 @@ class ChatController extends ChangeNotifier {
     _setLoading(true);
     
     try {
+      // Pequeño delay para asegurar que el reporte esté completamente procesado
+      print('⏱️ ChatController: Esperando a que el reporte esté listo...');
+      await Future.delayed(const Duration(milliseconds: 1500));
+      
       await _chatService.downloadReport(reportId);
       print('✅ ChatController: Reporte descargado exitosamente');
       

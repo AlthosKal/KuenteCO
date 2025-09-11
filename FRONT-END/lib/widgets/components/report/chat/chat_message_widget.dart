@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../controllers/chat_controller.dart';
+import '../../../../controllers/chat_controller.dart';
 import 'typewriter_text_widget.dart';
 
 enum MessageType { user, ai }
