@@ -13,8 +13,8 @@ class StringChatResponseDTO {
 
   factory StringChatResponseDTO.fromJson(Map<String, dynamic> json) {
     return StringChatResponseDTO(
-      conversationId: json['conversationId'],
-      response: json['response'],
+      conversationId: json['conversationId'] ?? '',
+      response: json['response'] ?? '',
       chartData: json['chartData'] != null 
           ? ChartDataResponseDTO.fromJson(json['chartData'])
           : null,

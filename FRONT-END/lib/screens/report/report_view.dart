@@ -8,8 +8,8 @@ import '../../widgets/components/report/chat/ai_analysis_controls_widget.dart';
 import '../../widgets/components/report/chat/debt_analysis_results_widget.dart';
 import '../../widgets/components/report/excel/excel_controls_widget.dart';
 import '../../widgets/components/report/excel/excel_validation_results_widget.dart';
-import '../../widgets/components/chat/chat_message_widget.dart';
-import '../../widgets/components/chat/animated_typing_dots.dart';
+import '../../widgets/components/report/chat/chat_message_widget.dart';
+import '../../widgets/components/report/chat/animated_typing_dots.dart';
 
 class ReportView extends StatefulWidget {
   const ReportView({Key? key}) : super(key: key);
@@ -361,6 +361,8 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
                   type: message.isUser ? MessageType.user : MessageType.ai,
                   timestamp: message.timestamp,
                   enableTypewriter: !message.isUser && message.isNew && index == chatController.messages.length - 1, // Solo para mensajes nuevos de IA
+                  reportId: message.reportId,
+                  fileName: message.fileName,
                   onTypewriterComplete: () {
                     // Cuando termina el typewriter del último mensaje, desactivar isTyping
                     if (!message.isUser && message.isNew && index == chatController.messages.length - 1) {

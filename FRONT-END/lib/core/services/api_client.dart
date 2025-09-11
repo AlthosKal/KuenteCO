@@ -165,9 +165,17 @@ class ApiClient {
   }
 
   // Métodos para la API del chat
-  Future<Response> getChat(String path) async {
+  Future<Response> getChat(
+      String path, {
+        Map<String, dynamic>? queryParameters,
+        Options? options,
+      }) async {
     try {
-      return await _dioChat.get(path);
+      return await _dioChat.get(
+        path, 
+        queryParameters: queryParameters,
+        options: options,
+      );
     } on DioException catch (e) {
       final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al obtener datos del chat.';
       throw Exception(mensaje);
