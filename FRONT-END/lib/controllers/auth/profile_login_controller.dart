@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/exceptions/global_exception_handler.dart';
 import '../../core/services/app/profile_service.dart';
 import '../../dto/app/auth/request/login_user_dto.dart';
 import '../../provider/toast_helper.dart';
 import '../../routes/app_routes.dart';
+import '../chat_controller.dart';
 
 class ProfileLoginController {
   final ProfileService _profileService;
@@ -32,6 +34,18 @@ class ProfileLoginController {
           () async {
         /// â 1ï¸â£ Hacer login directo con el perfil usando /profile/login
         await _profileService.profileLogin(dto.nameOrEmail, dto.password);
+
+        /// 🔄 Notificar al ChatController sobre el cambio de usuario
+        if (context.mounted) {
+          try {
+            final chatController = Provider.of<ChatController>(context, listen: false);
+            await chatController.onUserChanged();
+            print('✅ ProfileLoginController: ChatController notificado del cambio de perfil');
+          } catch (e) {
+            print('⚠️ ProfileLoginController: Error notificando cambio de perfil al ChatController: $e');
+            // Continuar con el login incluso si falla la notificación
+          }
+        }
 
         if (context.mounted) {
           /// â 2ï¸â£ Mostrar mensaje de éxito

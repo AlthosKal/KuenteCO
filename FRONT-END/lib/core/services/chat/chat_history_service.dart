@@ -37,10 +37,14 @@ class ChatService {
   }
 
   /// Obtener todas las conversaciones (lista de conversaciones únicas)
-  Future<List<ChatHistoryDTO>> getAllConversations() async {
-    print('📚 ChatHistoryService: Obteniendo todas las conversaciones');
+  Future<List<ChatHistoryDTO>> getAllConversations({String? userType}) async {
+    print('📚 ChatHistoryService: Obteniendo todas las conversaciones${userType != null ? ' para tipo de usuario: $userType' : ''}');
     try {
-      final response = await _api.getChat('/chat/history/user');
+      String endpoint = '/chat/history/user';
+      if (userType != null) {
+        endpoint += '?userType=$userType';
+      }
+      final response = await _api.getChat(endpoint);
       final data = response.data;
 
       print('📊 ChatHistoryService: Tipo de respuesta: ${data.runtimeType}');
