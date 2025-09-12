@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../controllers/chat_controller.dart';
+import '../../chart/bar_chart_widget.dart';
 import 'typewriter_text_widget.dart';
 
 enum MessageType { user, ai }
@@ -13,6 +14,7 @@ class ChatMessageWidget extends StatefulWidget {
   final VoidCallback? onTypewriterComplete;
   final String? reportId; // ID del reporte para descarga
   final String? fileName; // Nombre del archivo del reporte
+  final bool showChart; // Si debe mostrar el gráfico
 
   const ChatMessageWidget({
     Key? key,
@@ -23,6 +25,7 @@ class ChatMessageWidget extends StatefulWidget {
     this.onTypewriterComplete,
     this.reportId,
     this.fileName,
+    this.showChart = false,
   }) : super(key: key);
 
   @override
@@ -250,6 +253,31 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       widget.message,
       style: _getTextStyle(context),
     ));
+    
+    // Si se debe mostrar el gráfico y es un mensaje de AI
+    if (widget.type == MessageType.ai) {
+      final chatController = Provider.of<ChatController>(context, listen: true);
+      
+      // Mostrar gráfico si hay datos disponibles, independientemente del flag showChart
+      if (chatController.lastChartData != null) {
+        final chartData = chatController.lastChartData!;
+        
+        // Solo mostrar gráficos de barras por ahora (también doughnut se renderiza como barras)
+        if (chartData['chartType'] == 'bar' || chartData['chartType'] == 'doughnut') {
+          widgets.add(const SizedBox(height: 16));
+          widgets.add(
+            Container(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: BarChartWidget(
+                chartData: chartData,
+                height: 300,
+                primaryColor: Colors.blue[600],
+              ),
+            ),
+          );
+        }
+      }
+    }
     
     // Si hay un reporte disponible, agregar botón de descarga
     if (widget.reportId != null && widget.reportId!.isNotEmpty) {

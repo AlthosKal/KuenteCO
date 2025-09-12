@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/services/app/auth_service.dart';
+import '../../../controllers/chat_controller.dart';
 import '../../../routes/app_routes.dart';
 import '../notification/notification_widget.dart';
 import '../exchange_rate/currency_converter_widget.dart';
@@ -65,7 +67,7 @@ class UserButtomPersonalWidget extends StatelessWidget {
         PopupMenuItem<String>(
           value: 'logout',
           child: const ListTile(
-            leading: Icon(Icons.logout, size: 20),
+            leading: Icon(Icons.logout, size: 20, color: Colors.purpleAccent),
             title: Text('Cerrar sesión', style: TextStyle(color: Colors.purpleAccent)),
             dense: true,
             contentPadding: EdgeInsets.zero,
@@ -111,10 +113,23 @@ class UserButtomPersonalWidget extends StatelessWidget {
   Future<void> _logout(BuildContext context) async {
     try {
       final authService = AuthService();
+      
+      // Limpiar estado del chat antes del logout
+      try {
+        final chatController = Provider.of<ChatController>(context, listen: false);
+        chatController.clearAllChatData();
+      } catch (e) {
+        print("⚠️ Error limpiando chat: $e");
+        // Continuar con el logout incluso si falla la limpieza del chat
+      }
+      
+      // Realizar logout completo (incluye limpieza de cookies)
       await authService.logout();
+      
+      // Navegar a pantalla de invitado
       Navigator.pushReplacementNamed(context, AppRoutes.homeGuest);
     } catch (e) {
-      print("â Error al cerrar sesión: $e");
+      print("Error al cerrar sesión: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al cerrar sesión: $e')),
       );

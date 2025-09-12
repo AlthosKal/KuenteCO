@@ -363,6 +363,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
                   enableTypewriter: !message.isUser && message.isNew && index == chatController.messages.length - 1, // Solo para mensajes nuevos de IA
                   reportId: message.reportId,
                   fileName: message.fileName,
+                  showChart: message.showChart,
                   onTypewriterComplete: () {
                     // Cuando termina el typewriter del último mensaje, desactivar isTyping
                     if (!message.isUser && message.isNew && index == chatController.messages.length - 1) {

@@ -1,10 +1,12 @@
 class ChatDTO {
   final String? conversationId;
   final String prompt;
+  final String? userType;
 
   ChatDTO({
     this.conversationId,
     required this.prompt,
+    this.userType,
   });
 
   bool needsConversationId() {
@@ -15,6 +17,7 @@ class ChatDTO {
     final json = {
       if (conversationId != null) 'conversationId': conversationId,
       'prompt': prompt,
+      if (userType != null) 'userType': userType,
     };
     print('📤 ChatDTO: Enviando al backend: $json');
     return json;
