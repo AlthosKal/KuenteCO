@@ -1,11 +1,14 @@
 # KuenteCO Database System 📊
 
 <p align="center">
-  <img src="https://www.postgresql.org/media/img/about/press/elephant.png" alt="PostgreSQL Logo" height="120">
+  <img src="https://www.postgresql.org/media/img/about/press/elephant.png" alt="PostgreSQL Logo" height="100">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://webassets.mongodb.com/_com_assets/cms/mongodb_logo1-76twgcu2dm.png" alt="MongoDB Logo" height="100">
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/PostgreSQL-15+-blue?style=flat-square&logo=postgresql" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/MongoDB-7.0+-green?style=flat-square&logo=mongodb" alt="MongoDB">
   <img src="https://img.shields.io/badge/Docker-Ready-blue?style=flat-square&logo=docker" alt="Docker">
   <img src="https://img.shields.io/badge/Replication-Master%2FSlave-green?style=flat-square" alt="Replication">
   <img src="https://img.shields.io/badge/High%20Availability-99.9%25-green?style=flat-square" alt="HA">
@@ -13,18 +16,29 @@
 
 ## 📝 Descripción
 
-Sistema de **alta disponibilidad** para KuenteCO basado en **PostgreSQL 15+** con arquitectura **Master-Slave** para garantizar escalabilidad, rendimiento y tolerancia a fallos. Implementado completamente con **Docker** para facilitar el despliegue y mantenimiento.
+Sistema de **bases de datos híbridas** para la arquitectura de microservicios de KuenteCO, combinando **PostgreSQL 15+** (datos financieros) y **MongoDB 7.0+** (IA y documentos). Diseñado con **alta disponibilidad**, replicación Master-Slave para PostgreSQL, y completamente contenerizado con **Docker**.
 
 ### ✨ Características Principales
 
+#### 🐘 **PostgreSQL (KuentecoApp)**
 - 📊 **Replicación en tiempo real** Master-Slave
 - 🚀 **Alta disponibilidad** con failover automático
-- 🐳 **Contenerización completa** con Docker
 - 🔄 **Sincronización automática** de tasas de cambio
 - 💾 **Backups automatizados** y versionados
-- 🔐 **Seguridad robusta** con usuarios especializados
 - 📊 **Extensiones avanzadas** (pg_cron, pg_http)
+- 🔐 **Seguridad robusta** con usuarios especializados
+
+#### 🍃 **MongoDB (KuentecoChat)**
+- 🤖 **Almacenamiento de IA** y historial de chat
+- 📄 **Documentos JSON** nativos para flexibility
+- 🚀 **Escalabilidad horizontal** optimizada
+- 📊 **Índices inteligentes** para búsquedas rápidas
+- 🔍 **Agregaciones complejas** para analytics
+
+#### 🎯 **General**
+- 🐳 **Contenerización completa** con Docker
 - 🔍 **Monitoring integrado** con health checks
+- 🔄 **Orquestación inteligente** con Docker Compose
 
 > 📍 **Imágenes Docker Oficiales**  
 > 👉 [MasterKuenteCO](https://hub.docker.com/repository/docker/yefff/image-master-kuenteco/general)  
@@ -51,45 +65,53 @@ Sistema de **alta disponibilidad** para KuenteCO basado en **PostgreSQL 15+** co
 - Conceptos de replicación de bases de datos
 
 ---
-
 ## 🏢 Arquitectura del Sistema
 
-### 📊 Topología Master-Slave
+### 🌐 Topología de Microservicios Híbridos
 
 ```
-┌─────────────────────────────────────┐
-│                APLICACIÓN                    │
-│        (Spring Boot Backend)             │
-└─────────────┬───────────────────────┘
-             │                      │
-             │                      │
-         ESCRITURA                   LECTURA
-             │                      │
-             ▼                      ▼
-┌──────────────────┐    ┌──────────────────┐
-│   MASTER DATABASE   │    │   SLAVE DATABASE    │
-│   PostgreSQL 15+    │    │   PostgreSQL 15+    │
-│      :5432          │    │      :5433          │
-│                    │    │                    │
-│ • Escritura/Lectura │    │ • Solo Lectura     │
-│ • Extensiones      │    │ • Réplica Síncrona │
-│ • Backups          │    │ • Balanceo Carga   │
-└──────────┬─────────┘    └──────────────────┘
-           │
-    REPLICACIÓN STREAMING
-           │
-    ┌───────▶◀───────────────────────────────────────┐
+┌───────────────────────────────────────────────────────────────────┐
+│                        ARQUITECTURA DE MICROSERVICIOS                        │
+└────────────────────────────────┬───────────────────────────────────┘
+                               │                                │
+                     🏦 KuentecoApp                 🤖 KuentecoChat
+                      (Core Financiero)              (Asistente IA)
+                           :8080                           :7070
+                               │                                │
+                               ▼                                ▼
+
+   ┌────────────────────────────────┐      ┌────────────────────────────────┐
+   │         POSTGRESQL CLUSTER         │      │        MONGODB STANDALONE        │
+   │                                │      │                                │
+   │  ┌─────────────┐ ┌─────────────┐  │      │  ┌───────────────────────────┐  │
+   │  │   MASTER    │ │   SLAVE     │  │      │  │       MONGO DB        │  │
+   │  │  :5432     │ │  :5433     │  │      │  │        :27017          │  │
+   │  │           │ │           │  │      │  │                        │  │
+   │  │ • R/W      │ │ • R Only  │  │      │  │ • Chat History       │  │
+   │  │ • Backup   │ │ • Replica │  │      │  │ • AI Models Data     │  │
+   │  │ • Tasks    │ │ • LB      │  │      │  │ • Document Storage   │  │
+   │  └────────┬─────┘ └─────────────┘  │      │  └───────────────────────────┘  │
+   │           │         REPLICATION      │      └────────────────────────────────┘
+   │           └──────▶◀───────────────┘      
+   └────────────────────────────────┘      
+
+   🐘 Datos Relacionales                     🍃 Documentos NoSQL
+   • Usuarios, Perfiles, Finanzas            • Historial Conversacional
+   • Transacciones, Presupuestos             • Respuestas IA, Analytics
+   • Categorías, Deudas, Tipos Cambio         • Configuraciones ML
+```
 ```
 
-### 🔧 Beneficios de la Arquitectura
+### 🔧 Beneficios de la Arquitectura Híbrida
 
-| Aspecto | Master | Slave | Beneficio |
-|---------|--------|-------|----------|
-| **Escritura** | ✅ Sí | ❌ No | Consistencia de datos |
-| **Lectura** | ✅ Sí | ✅ Sí | Distribución de carga |
-| **Backup** | ✅ Sí | ✅ Sí | Redundancia |
-| **Escalabilidad** | Vertical | Horizontal | Más lecturas simultáneas |
-| **Disponibilidad** | 99.9% | 99.9% | Tolerancia a fallos |
+| Componente | PostgreSQL Master | PostgreSQL Slave | MongoDB | Beneficio |
+|------------|------------------|------------------|---------|----------|
+| **Escritura** | ✅ Sí | ❌ No | ✅ Sí | Consistencia financiera + Flexibilidad IA |
+| **Lectura** | ✅ Sí | ✅ Sí | ✅ Sí | Distribución óptima de carga |
+| **Backup** | ✅ Sí | ✅ Sí | ✅ Sí | Redundancia completa |
+| **Escalabilidad** | Vertical | Horizontal | Horizontal | Crecimiento adaptável |
+| **Disponibilidad** | 99.9% | 99.9% | 99.9% | Tolerancia a fallos múltiple |
+| **Especialización** | Finanzas | Analytics | IA/Docs | Rendimiento optimizado |
 
 ---
 
@@ -99,7 +121,7 @@ Sistema de **alta disponibilidad** para KuenteCO basado en **PostgreSQL 15+** co
 
 ```bash
 git clone https://github.com/AlthosKal/KuenteCO.git
-cd KuenteCO/Database
+cd KuenteCO/DB
 ```
 
 ### 2️⃣ Verificar Docker
@@ -118,8 +140,12 @@ netstat -tuln | grep -E ':5432|:5433'
 
 ### 3️⃣ Desplegar el Stack de Bases de Datos
 
+#### 🐘 PostgreSQL (KuentecoApp)
 ```bash
-# Levantar servicios en background
+# Navegar al directorio PostgreSQL
+cd PostgreSQL
+
+# Levantar cluster PostgreSQL
 docker compose up -d
 
 # Verificar estado de contenedores
@@ -128,8 +154,28 @@ docker compose ps
 # Ver logs en tiempo real
 docker compose logs -f
 
-# Ver logs de un servicio específico
+# Ver logs de servicios específicos
 docker compose logs -f postgres-master
+docker compose logs -f postgres-slave
+```
+
+#### 🍃 MongoDB (KuentecoChat)
+```bash
+# Volver al directorio principal y navegar a MongoDB
+cd ../MongoDB
+
+# Construir y levantar MongoDB
+docker build -t kuenteco-mongo .
+docker run -d --name mongo-kuenteco \
+  -p 27017:27017 \
+  -v mongo-data:/data/db \
+  kuenteco-mongo
+
+# Verificar estado
+docker ps | grep mongo-kuenteco
+
+# Ver logs
+docker logs mongo-kuenteco
 ```
 
 ---
@@ -207,30 +253,36 @@ docker exec -it SlaveKuenteCO psql -U replicator -d KuenteCO -c \
 ## 📁 Estructura de Archivos
 
 ```
-Database/
-├── 🐋 compose.yaml              # Orquestación de contenedores
-├── 📝 README.md                # Esta documentación
-├── 💾 backupMasterKuenteCO.sql.gz # Backup inicial
+DB/
+├── 📝 README.md                    # Esta documentación
+├── 🚫 .gitignore                   # Archivos ignorados
 │
-├── 🏗️ master/                   # Configuración Master
-│   ├── Dockerfile               # Imagen personalizada
-│   ├── init-master.sh           # Script de inicialización
-│   ├── postgresql.conf          # Configuración PostgreSQL
-│   └── pg_hba.conf              # Configuración de acceso
+├── 🐘 PostgreSQL/                  # Cluster PostgreSQL
+│   ├── 🐋 compose.yaml              # Orquestación Master-Slave
+│   ├── 💾 backupMasterKuenteCO.sql.gz # Backup inicial
+│   │
+│   ├── 🏗️ master/                   # Configuración Master
+│   │   ├── Dockerfile               # Imagen personalizada
+│   │   ├── init-master.sh           # Script de inicialización
+│   │   ├── postgresql.conf          # Configuración PostgreSQL
+│   │   └── pg_hba.conf              # Configuración de acceso
+│   │
+│   ├── 📂 slave/                    # Configuración Slave
+│   │   ├── Dockerfile               # Imagen personalizada
+│   │   └── init-slave.sh            # Script de inicialización
+│   │
+│   ├── ⚙️ config/                   # Configuraciones compartidas
+│   │   ├── postgresql.conf          # Configuración optimizada
+│   │   └── pg_hba.conf              # Reglas de autenticación
+│   │
+│   └── 📜 db/                       # Scripts SQL
+│       ├── kuenteco_schema_dump.sql     # Esquema completo
+│       ├── DatabaseFunctionsKuenteCO.sql # Funciones y triggers
+│       ├── DatabaseTriggersKuenteCO.sql  # Triggers específicos
+│       └── DatabaseViewsKuenteCO.sql     # Vistas materializadas
 │
-├── 📂 slave/                    # Configuración Slave
-│   ├── Dockerfile               # Imagen personalizada
-│   └── init-slave.sh            # Script de inicialización
-│
-├── ⚙️ config/                   # Configuraciones compartidas
-│   ├── postgresql.conf          # Configuración optimizada
-│   └── pg_hba.conf              # Reglas de autenticación
-│
-└── 📜 db/                       # Scripts SQL
-    ├── schema.sql               # Esquema de base de datos
-    ├── DatabaseFunctionsKuenteCO.sql # Funciones y triggers
-    ├── DatabaseTriggersKuenteCO.sql  # Triggers específicos
-    └── DatabaseViewsKuenteCO.sql     # Vistas materializadas
+└── 🍃 MongoDB/                     # Base NoSQL para IA
+    └── Dockerfile                   # Imagen personalizada MongoDB
 ```
 
 ---
@@ -239,8 +291,10 @@ Database/
 
 ### 🔍 Verificar Estado del Sistema
 
+#### 🐘 PostgreSQL Health Checks
 ```bash
-# Estado general de contenedores
+# Estado general del cluster PostgreSQL
+cd PostgreSQL
 docker compose ps
 
 # Health check de Master
@@ -252,6 +306,22 @@ docker exec SlaveKuenteCO pg_isready -U replicator -d KuenteCO
 # Ver métricas de conexiones
 docker exec -it MasterKuenteCO psql -U master -d KuenteCO -c \
   "SELECT datname, numbackends, xact_commit, xact_rollback FROM pg_stat_database WHERE datname='KuenteCO';"
+```
+
+#### 🍃 MongoDB Health Checks
+```bash
+# Estado de MongoDB
+docker ps | grep mongo-kuenteco
+
+# Health check de MongoDB
+docker exec mongo-kuenteco mongosh --eval "db.adminCommand('ping')"
+
+# Ver métricas de MongoDB
+docker exec mongo-kuenteco mongosh --eval \
+  "db.adminCommand({serverStatus: 1}).connections"
+
+# Ver bases de datos
+docker exec mongo-kuenteco mongosh --eval "show dbs"
 ```
 
 ### 📊 Métricas de Rendimiento
@@ -357,6 +427,7 @@ docker exec -it MasterKuenteCO psql -U master -d KuenteCO -c \
 
 ### 🔧 Comandos Útiles
 
+#### 🐘 PostgreSQL
 ```bash
 # Backup completo
 docker exec MasterKuenteCO pg_dump -U master KuenteCO > backup_$(date +%Y%m%d).sql
@@ -365,6 +436,7 @@ docker exec MasterKuenteCO pg_dump -U master KuenteCO > backup_$(date +%Y%m%d).s
 docker exec -i MasterKuenteCO psql -U master KuenteCO < backup_20240101.sql
 
 # Limpiar datos de prueba
+cd PostgreSQL
 docker compose down -v && docker compose up -d
 
 # Acceso directo a psql
@@ -374,6 +446,67 @@ docker exec -it MasterKuenteCO psql -U master -d KuenteCO
 docker exec -it MasterKuenteCO psql -U master -d KuenteCO -c "SHOW ALL;"
 ```
 
+#### 🍃 MongoDB
+```bash
+# Backup de MongoDB
+docker exec mongo-kuenteco mongodump --out /backup/$(date +%Y%m%d)
+
+# Restaurar backup de MongoDB
+docker exec mongo-kuenteco mongorestore /backup/20240101/
+
+# Acceso directo a MongoDB shell
+docker exec -it mongo-kuenteco mongosh
+
+# Ver configuración de MongoDB
+docker exec mongo-kuenteco mongosh --eval "db.adminCommand('getCmdLineOpts')"
+
+# Limpiar datos de MongoDB
+docker stop mongo-kuenteco
+docker rm mongo-kuenteco
+docker volume rm mongo-data
+# Volver a crear
+docker build -t kuenteco-mongo .
+docker run -d --name mongo-kuenteco -p 27017:27017 -v mongo-data:/data/db kuenteco-mongo
+```
+
+---
+
+## 🎯 Uso por Microservicio
+
+### 🏦 KuentecoApp (Puerto :8080)
+**Base de Datos:** PostgreSQL Master-Slave  
+**Propósito:** Almacenamiento de datos financieros relacionales
+
+**Tablas principales:**
+- 👤 **Usuarios y Perfiles**: Autenticación, roles, configuraciones
+- 💰 **Transacciones**: Movimientos financieros, categorias, presupuestos
+- 📊 **Deudas**: Obligaciones, vencimientos, pagos
+- 💱 **Tipos de Cambio**: Monedas, tasas actualizadas automáticamente
+- 🔔 **Notificaciones**: Alertas de presupuesto, vencimientos
+
+**Características:**
+- 🔄 **ACID Compliance**: Transacciones consistentes
+- 🔗 **Relaciones Complejas**: FK, joins optimizados
+- 📈 **Agregaciones**: Reportes financieros complejos
+- 🔐 **Seguridad**: Cifrado, roles granulares
+
+### 🤖 KuentecoChat (Puerto :7070)
+**Base de Datos:** MongoDB Standalone  
+**Propósito:** Almacenamiento de documentos de IA y chat
+
+**Colecciones principales:**
+- 💬 **ChatHistory**: Historial completo de conversaciones
+- 🤖 **AIResponses**: Respuestas generadas por modelos IA
+- 📄 **DocumentAnalysis**: Análisis de documentos financieros
+- ⚙️ **ModelConfigurations**: Configuraciones de modelos OpenAI/DeepSeek
+- 📊 **Analytics**: Métricas de uso y rendimiento
+
+**Características:**
+- 🚀 **Esquema Flexible**: Documentos JSON dinámicos
+- 📝 **Texto Completo**: Búsquedas en contenido de chat
+- 📈 **Agregaciones**: Analytics complejos de conversaciones
+- ⚡ **Alto Rendimiento**: Índices optimizados para IA
+
 ---
 
 ## 📧 Contacto y Soporte
@@ -381,11 +514,13 @@ docker exec -it MasterKuenteCO psql -U master -d KuenteCO -c "SHOW ALL;"
 - 🐛 **Issues**: [GitHub Issues](https://github.com/AlthosKal/KuenteCO/issues)
 - 📧 **Email**: database@kuenteco.com
 - 📄 **Documentación PostgreSQL**: [Oficial](https://www.postgresql.org/docs/)
+- 🍃 **Documentación MongoDB**: [Oficial](https://www.mongodb.com/docs/)
 - 🐋 **Docker Hub**: [Imágenes KuenteCO](https://hub.docker.com/u/yefff)
 
 ---
 
 <p align="center">
-  <b>📊 Sistema de base de datos desarrollado con ❤️</b><br>
-  <i>Alta disponibilidad y rendimiento para KuenteCO</i>
+  <b>📊 Sistema de bases de datos híbridas desarrollado con ❤️</b><br>
+  <i>PostgreSQL + MongoDB - Alta disponibilidad y rendimiento para KuenteCO</i><br>
+  <small>🐘 Datos relacionales financieros + 🍃 Documentos de IA</small>
 </p>

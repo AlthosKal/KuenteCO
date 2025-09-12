@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../screens/home/logged_home_business_view.dart';
 import '../../../screens/home/logged_home_personal_view.dart';
@@ -6,6 +7,7 @@ import '../../core/exceptions/global_exception_handler.dart';
 import '../../core/services/app/auth_service.dart';
 import '../../dto/app/auth/request/login_user_dto.dart';
 import '../../provider/toast_helper.dart';
+import '../chat_controller.dart';
 
 class LoginController {
   final AuthService _authService;
@@ -38,6 +40,18 @@ class LoginController {
 
         /// â 2ï¸â£ Obtener detalles del usuario (nombre, imagen, etc.)
         final user = await _authService.getAuthenticatedUser();
+
+        /// 🔄 Notificar al ChatController sobre el cambio de usuario
+        if (context.mounted) {
+          try {
+            final chatController = Provider.of<ChatController>(context, listen: false);
+            await chatController.onUserChanged();
+            print('✅ LoginController: ChatController notificado del cambio de usuario');
+          } catch (e) {
+            print('⚠️ LoginController: Error notificando cambio de usuario al ChatController: $e');
+            // Continuar con el login incluso si falla la notificación
+          }
+        }
 
         if (context.mounted) {
           /// â 3ï¸â£ Mostrar mensaje de éxito

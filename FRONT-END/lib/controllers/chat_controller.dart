@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../core/services/chat/chat_service.dart';
 import '../core/services/chat/chat_history_service.dart' as history;
+import '../core/services/app/auth_service.dart';
 import '../dto/chat/request/chat_dto.dart';
 import '../dto/chat/response/chat_response_dto.dart';
 import '../dto/chat/response/string_chat_response_dto.dart';
@@ -21,6 +22,7 @@ class ChatMessage {
   final bool isNew; // Para distinguir mensajes nuevos de históricos
   final String? reportId; // ID del reporte para descarga
   final String? fileName; // Nombre del archivo del reporte
+  final bool showChart; // Si debe mostrar el gráfico
 
   ChatMessage({
     required this.id,
@@ -31,12 +33,14 @@ class ChatMessage {
     this.isNew = true, // Por defecto es nuevo
     this.reportId,
     this.fileName,
+    this.showChart = false,
   });
 }
 
 class ChatController extends ChangeNotifier {
   final ChatService _chatService;
   final history.ChatService _historyService;
+  final AuthService _authService = AuthService();
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -55,6 +59,9 @@ class ChatController extends ChangeNotifier {
   bool _isAnalyzingDebts = false;
   String? _lastDebtAnalysisType;
   
+  // Datos de gráfico
+  Map<String, dynamic>? _lastChartData;
+  
   // Control de mensajes en tiempo real
   final List<ChatMessage> _messages = [];
   String? _currentTypingMessage;
@@ -63,7 +70,6 @@ class ChatController extends ChangeNotifier {
 
 
   ChatController(this._chatService, this._historyService) {
-    print('🏗️ ChatController: Constructor ejecutado, _currentConversationId: $_currentConversationId');
     // Inicializar con una conversación nueva y limpia
     startNewConversation();
     // Cargar historial automáticamente sin await para no bloquear el constructor
@@ -71,21 +77,28 @@ class ChatController extends ChangeNotifier {
   }
   
   /// Cargar historial de forma asíncrona
-  void _loadHistoryAsync() async {
+  Future<void> _loadHistoryAsync() async {
     print('🚀 ChatController: Cargando historial automáticamente');
     
     final originalErrorMessage = _errorMessage;
-    await loadChatHistory();
     
-    // Verificar si hubo un error después de cargar
-    if (_errorMessage != null && _errorMessage != originalErrorMessage) {
-      print('❌ ChatController: Error al cargar historial automáticamente');
-    } else {
-      print('✅ ChatController: Historial cargado automáticamente exitosamente');
+    try {
+      await loadChatHistory();
       
-      // Ya no seleccionamos automáticamente la conversación más reciente
-      // El usuario debe seleccionar explícitamente una conversación del historial
-      print('📚 ChatController: Historial cargado. Esperando selección manual de conversación.');
+      // Verificar si hubo un error después de cargar
+      if (_errorMessage != null && _errorMessage != originalErrorMessage) {
+        print('❌ ChatController: Error al cargar historial automáticamente');
+      } else {
+        print('✅ ChatController: Historial cargado automáticamente exitosamente');
+        
+        // Ya no seleccionamos automáticamente la conversación más reciente
+        // El usuario debe seleccionar explícitamente una conversación del historial
+        print('📚 ChatController: Historial cargado. Esperando selección manual de conversación.');
+      }
+    } catch (e) {
+      print('⚠️ ChatController: Error en carga asíncrona de historial: $e');
+      // No establecer error aquí porque podría ser debido a que el usuario aún no está autenticado
+      // El error se manejará cuando el usuario intente usar el chat
     }
   }
 
@@ -188,6 +201,7 @@ class ChatController extends ChangeNotifier {
   DebtAnalysisResponseDTO? get lastDebtAnalysis => _lastDebtAnalysis;
   List<ChatHistoryDTO> get chatHistory => List.unmodifiable(_chatHistory);
   String? get lastDebtAnalysisType => _lastDebtAnalysisType;
+  Map<String, dynamic>? get lastChartData => _lastChartData;
   
   // Getters para mensajes en tiempo real
   List<ChatMessage> get messages => List.unmodifiable(_messages);
@@ -260,9 +274,13 @@ class ChatController extends ChangeNotifier {
     _setError(null);
 
     try {
+      // Obtener el tipo de usuario para incluir en el contexto del mensaje
+      final userType = await _getCurrentUserType();
+      
       final dto = ChatDTO(
         conversationId: _currentConversationId,
         prompt: message,
+        userType: userType,
       );
 
       _lastChatResponse = await _chatService.askAi(dto);
@@ -392,9 +410,13 @@ class ChatController extends ChangeNotifier {
     _setError(null);
 
     try {
+      // Obtener el tipo de usuario para incluir en el contexto del mensaje
+      final userType = await _getCurrentUserType();
+      
       final dto = ChatDTO(
         conversationId: _currentConversationId,
         prompt: message,
+        userType: userType,
       );
 
       _lastDynamicAnalysis = await _chatService.getDynamicAnalysis(dto);
@@ -418,13 +440,28 @@ class ChatController extends ChangeNotifier {
     }
   }
 
+  /// Obtener el tipo de usuario actual
+  Future<String?> _getCurrentUserType() async {
+    try {
+      final user = await _authService.getAuthenticatedUser();
+      return user.userType;
+    } catch (e) {
+      print('⚠️ ChatController: Error obteniendo tipo de usuario: $e');
+      return null;
+    }
+  }
+
   /// Cargar historial de chat
   Future<void> loadChatHistory() async {
     print('ð ChatController: Cargando historial de chat');
     _setLoading(true);
 
     try {
-      final allMessages = await _historyService.getAllConversations();
+      // Obtener el tipo de usuario actual para filtrar el historial
+      final userType = await _getCurrentUserType();
+      print('🔍 ChatController: Tipo de usuario: $userType');
+      
+      final allMessages = await _historyService.getAllConversations(userType: userType);
       print('ChatController: Obtenidos ${allMessages.length} mensajes del servidor');
 
       // AGRUPAR POR CONVERSATION ID - MANTENER EL PRIMER MENSAJE DE CADA CONVERSACION
@@ -631,15 +668,25 @@ class ChatController extends ChangeNotifier {
   }
 
   /// Agregar mensaje de la IA
-  void _addAIMessage(String content, {bool isNew = true}) {
+  void _addAIMessage(String content, {bool isNew = true, String? reportId, String? fileName}) {
+    print('🤖 ChatController: Creando mensaje AI');
+    print('   - _lastChartData != null: ${_lastChartData != null}');
+    print('   - content length: ${content.length}');
+    
     final message = ChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       content: content,
       isUser: false,
       timestamp: DateTime.now(),
       isNew: isNew,
+      reportId: reportId,
+      fileName: fileName,
+      showChart: false, // El widget se encargará de mostrar gráficos automáticamente
     );
     _messages.add(message);
+    
+    print('✅ ChatController: Mensaje AI creado');
+    
     // Solo activar estado de escritura para mensajes nuevos
     if (isNew) {
       _setTyping(true, message: 'Mostrando respuesta...');
@@ -666,9 +713,13 @@ class ChatController extends ChangeNotifier {
     _addUserMessage(message);
 
     try {
+      // Obtener el tipo de usuario para incluir en el contexto del mensaje
+      final userType = await _getCurrentUserType();
+      
       final dto = ChatDTO(
         conversationId: _currentConversationId,
         prompt: message,
+        userType: userType,
       );
       
       print('📤 ChatController: Enviando DTO - conversationId: ${dto.conversationId}');
@@ -743,10 +794,28 @@ class ChatController extends ChangeNotifier {
 
   /// Procesar respuesta de análisis dinámico según su tipo
   Future<void> _processAnalysisResponse(DynamicAnalysisResponseDTO analysis, String originalMessage) async {
-    print('🔍 ChatController: Procesando respuesta tipo: ${analysis.analysisType}');
-    print('🔍 ChatController: ConversationId: "${analysis.body.conversationId}"');
-    print('🔍 ChatController: Response text length: ${analysis.body.response.length}');
-    print('🔍 ChatController: Response text: "${analysis.body.response}"');
+    print('🔍 ChatController: Procesando respuesta de análisis...');
+    
+    // Verificar si hay chartData en el body
+    if (analysis.body.chartData != null) {
+      final chartData = analysis.body.chartData!;
+      print('📊 ChatController: Datos de gráfico encontrados - tipo: ${chartData.chartType}');
+      _lastChartData = {
+        'chartType': chartData.chartType,
+        'summary': chartData.summary,
+        'analysis': chartData.analysis,
+        'xAxisLabel': chartData.xAxisLabel ?? 'Categorías',
+        'yAxisLabel': chartData.yAxisLabel ?? 'Valores',
+        'data': chartData.data.map((item) => {
+          'label': item.label,
+          'value': item.value,
+        }).toList(),
+      };
+      print('✅ ChatController: Datos de gráfico procesados: ${_lastChartData!['data'].length} elementos');
+    } else {
+      print('⚠️ ChatController: No se encontraron datos de gráfico en la respuesta');
+      // No reiniciar _lastChartData a null aquí para mantener gráficos previos
+    }
     
     // Para REPORT_DOWNLOAD, el manejo se hace en _handleReportDownload
     // Para otros tipos, agregar mensaje de texto normal
@@ -754,11 +823,10 @@ class ChatController extends ChangeNotifier {
       final responseText = analysis.body.response;
       if (responseText.isNotEmpty) {
         final plainTextResponse = _markdownToPlainText(responseText);
+        // El widget se encargará automáticamente de mostrar gráficos si hay datos
         _addAIMessage(plainTextResponse);
         await _addToHistory(originalMessage, plainTextResponse);
       } else {
-        // Fallback cuando la respuesta está vacía
-        print('⚠️ ChatController: Respuesta vacía del backend, mostrando mensaje de fallback');
         final fallbackMessage = 'He procesado tu solicitud pero no se pudo obtener la respuesta completa del servidor. Por favor, intenta nuevamente.';
         _addAIMessage(fallbackMessage);
         await _addToHistory(originalMessage, fallbackMessage);
@@ -801,19 +869,9 @@ class ChatController extends ChangeNotifier {
 
   /// Manejar descarga de reportes (PDFs)
   Future<void> _handleReportDownload(DynamicAnalysisResponseDTO analysis, String originalMessage) async {
-    print('📄 ChatController: Iniciando _handleReportDownload');
-    print('📄 ChatController: analysis.response type: ${analysis.response.runtimeType}');
-    print('📄 ChatController: analysis.response is ReportDownloadResponseWrapperDTO: ${analysis.response is ReportDownloadResponseWrapperDTO}');
-    
     if (analysis.response is ReportDownloadResponseWrapperDTO) {
       final reportWrapper = analysis.response as ReportDownloadResponseWrapperDTO;
       final reportData = reportWrapper.reportDownload;
-      
-      print('📄 ChatController: Reporte disponible para descarga:');
-      print('   - ID: ${reportData.reportId}');
-      print('   - Archivo: ${reportData.fileName}');
-      print('   - Tipo: ${reportData.reportType}');
-      print('   - Tamaño: ${reportData.fileSizeBytes} bytes');
       
       // Usar respuesta del servidor directamente, sin enlaces
       final serverResponse = analysis.body.response.isNotEmpty 
@@ -831,22 +889,14 @@ class ChatController extends ChangeNotifier {
         isNew: true,
         reportId: reportData.reportId,
         fileName: reportData.fileName,
+        showChart: false, // Los reportes no necesitan flag de gráfico, el widget lo manejará
       );
       
-      print('📄 ChatController: Creando mensaje con reportId: ${message.reportId}');
-      print('📄 ChatController: Creando mensaje con fileName: ${message.fileName}');
-      print('📄 ChatController: Total de mensajes antes de agregar: ${_messages.length}');
-      
       _messages.add(message);
-      print('📄 ChatController: Total de mensajes después de agregar: ${_messages.length}');
-      print('📄 ChatController: Último mensaje reportId: ${_messages.last.reportId}');
       notifyListeners();
       
       await _addToHistory(originalMessage, plainTextMessage);
     } else {
-      print('❌ ChatController: analysis.response NO es ReportDownloadResponseWrapperDTO');
-      print('❌ ChatController: Tipo real: ${analysis.response.runtimeType}');
-      
       // Agregar mensaje normal como fallback
       final serverResponse = analysis.body.response.isNotEmpty 
           ? analysis.body.response 
@@ -860,8 +910,16 @@ class ChatController extends ChangeNotifier {
   /// Manejar datos de gráficos
   void _handleChartData(DynamicAnalysisResponseDTO analysis) {
     print('📊 ChatController: Datos de gráfico disponibles');
-    // Aquí puedes agregar lógica para mostrar gráficos
-    // Por ejemplo, notificar a widgets que muestren gráficos
+    
+    // Extraer chartData desde la respuesta dinámica
+    if (analysis.response is Map<String, dynamic>) {
+      final responseMap = analysis.response as Map<String, dynamic>;
+      if (responseMap.containsKey('chartData')) {
+        _lastChartData = responseMap['chartData'] as Map<String, dynamic>?;
+        print('✅ ChatController: Datos de gráfico almacenados: ${_lastChartData?['chartType']}');
+        notifyListeners();
+      }
+    }
   }
 
   /// Manejar análisis de deudas
@@ -942,18 +1000,54 @@ class ChatController extends ChangeNotifier {
 
   /// Iniciar nueva conversación (limpia completamente el estado)
   void startNewConversation() {
-    print('ChatController: Iniciando nueva conversación');
+    print('🆕 ChatController: Iniciando nueva conversación');
     _currentConversationId = null;
     _lastChatResponse = null;
     _lastStringResponse = null;
     _lastDynamicAnalysis = null;
     _lastDebtAnalysis = null;
     _lastDebtAnalysisType = null;
+    _lastChartData = null; // Limpiar datos de gráfico
     _messages.clear();
     _setError(null);
     _setTyping(false);
     notifyListeners();
-    print('ChatController: Nueva conversación iniciada');
+    print('✅ ChatController: Nueva conversación iniciada - estado limpiado');
+  }
+
+  /// Limpiar completamente el estado del chat (para logout)
+  void clearAllChatData() {
+    print('🧹 ChatController: Limpiando todos los datos del chat para logout');
+    
+    // Limpiar conversación actual
+    _currentConversationId = null;
+    
+    // Limpiar todas las respuestas
+    _lastChatResponse = null;
+    _lastStringResponse = null;
+    _lastDynamicAnalysis = null;
+    _lastDebtAnalysis = null;
+    _lastDebtAnalysisType = null;
+    _lastChartData = null;
+    
+    // Limpiar historial de conversaciones
+    _chatHistory.clear();
+    
+    // Limpiar mensajes actuales
+    _messages.clear();
+    
+    // Limpiar estados
+    _setError(null);
+    _setTyping(false);
+    _setLoading(false);
+    _setDebtAnalyzing(false);
+    
+    // Resetear variables de control
+    _isCancelled = false;
+    _currentTypingMessage = null;
+    
+    notifyListeners();
+    print('✅ ChatController: Estado del chat completamente limpiado');
   }
 
   /// Cargar conversación existente por ID
@@ -1035,6 +1129,19 @@ class ChatController extends ChangeNotifier {
   Future<void> initializeManually() async {
     print('ChatController: Inicialización manual solicitada');
     await loadChatHistory();
+  }
+
+  /// Método para recargar completamente después de cambio de usuario
+  Future<void> onUserChanged() async {
+    print('🔄 ChatController: Usuario ha cambiado, recargando estado completamente');
+    
+    // Limpiar todo el estado actual
+    clearAllChatData();
+    
+    // Recargar el historial para el nuevo usuario
+    await _loadHistoryAsync();
+    
+    print('✅ ChatController: Estado recargado para nuevo usuario');
   }
 
   /// Verificar si hay conversaciones en el historial
@@ -1124,6 +1231,56 @@ class ChatController extends ChangeNotifier {
     } catch (e) {
       print('ChatController: Error obteniendo resumen de conversación: $e');
       return 'Error cargando resumen';
+    }
+  }
+  
+  /// Parsear string de datos del chartData embebido
+  List<Map<String, dynamic>> _parseDataString(String dataString) {
+    try {
+      print('🔍 ChatController: Parseando dataString: $dataString');
+      
+      // Remover corchetes externos
+      String cleanData = dataString.replaceAll(RegExp(r'^\[|\]$'), '').trim();
+      
+      // Dividir por objetos (buscar patrones como {label: ..., value: ...})
+      final objectMatches = RegExp(r'\{([^}]*)\}').allMatches(cleanData);
+      
+      List<Map<String, dynamic>> result = [];
+      
+      for (final match in objectMatches) {
+        final objectString = match.group(1);
+        if (objectString != null) {
+          print('🔍 ChatController: Parseando objeto: {$objectString}');
+          
+          // Extraer label y value
+          final labelMatch = RegExp(r'label:\s*([^,}]+)').firstMatch(objectString);
+          final valueMatch = RegExp(r'value:\s*([^,}]+)').firstMatch(objectString);
+          
+          if (labelMatch != null && valueMatch != null) {
+            final labelStr = labelMatch.group(1)?.trim();
+            final valueStr = valueMatch.group(1)?.trim();
+            
+            if (labelStr != null && valueStr != null) {
+              // Intentar convertir value a número
+              final value = double.tryParse(valueStr) ?? 0.0;
+              
+              result.add({
+                'label': labelStr,
+                'value': value,
+              });
+              
+              print('✅ ChatController: Objeto parseado - label: $labelStr, value: $value');
+            }
+          }
+        }
+      }
+      
+      print('✅ ChatController: Total de objetos parseados: ${result.length}');
+      return result;
+      
+    } catch (e) {
+      print('⚠️ ChatController: Error parseando dataString: $e');
+      return [];
     }
   }
 }

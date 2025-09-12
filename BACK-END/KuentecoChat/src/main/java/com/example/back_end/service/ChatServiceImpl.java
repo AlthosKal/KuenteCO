@@ -431,7 +431,6 @@ public class ChatServiceImpl implements ChatService {
         }
     }
 
-    @Cacheable(value = "history", key = "#conversationId")
     public List<ChatHistoryForConversationDTO> getHistoryByConversationId(String conversationId) {
         return repository.findByConversationId(conversationId).stream()
                 .map(chatHistoryForConversationMapper::toDTO)

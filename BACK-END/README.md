@@ -1,26 +1,51 @@
-# 🏦 Funcionalidades del KuenteCO
+# 🏦 Backend KuenteCO - Microservicios Financieros
 
-> **Sistema de gestión financiera personal y empresarial con API REST completa**
+> **Arquitectura de microservicios para gestión financiera personal y empresarial con IA integrada**
 
-## 📋 Índice
+<p align="center">
+  <img src="https://img.shields.io/badge/Spring%20Boot-3.5.0-green?style=flat-square&logo=spring-boot" alt="Spring Boot">
+  <img src="https://img.shields.io/badge/Java-17+-orange?style=flat-square&logo=java" alt="Java">
+  <img src="https://img.shields.io/badge/PostgreSQL-15+-blue?style=flat-square&logo=postgresql" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/MongoDB-blue?style=flat-square&logo=mongodb" alt="MongoDB">
+  <img src="https://img.shields.io/badge/Docker-Ready-blue?style=flat-square&logo=docker" alt="Docker">
+</p>
 
-- [🔐 Endpoints de Autenticación](#-endpoints-de-autenticación)
-- [👤 Endpoints de Perfiles](#-endpoints-de-perfiles)
-- [📊 Endpoints de Categorías](#-endpoints-de-categorías)
-- [💰 Endpoints de Transacciones](#-endpoints-de-transacciones)
-- [💵 Endpoints de Presupuestos](#-endpoints-de-presupuestos)
-- [💳 Endpoints de Deudas](#-endpoints-de-deudas)
-- [📄 Endpoints de Excel](#-endpoints-de-excel)
-- [💱 Endpoints de Tipos de Cambio](#-endpoints-de-tipos-de-cambio)
-- [🔔 Endpoints de Notificaciones](#-endpoints-de-notificaciones)
-- [💳 Endpoints de Suscripciones](#-endpoints-de-suscripciones)
+## 💭 Arquitectura de Microservicios
 
-## 🤖 KuentecoChat - Sistema de IA
+El backend de KuenteCO está compuesto por **dos microservicios especializados**:
 
-- [💬 Endpoints de Chat](#-endpoints-de-chat)
-- [📜 Endpoints de Historial de Chat](#-endpoints-de-historial-de-chat)
-- [🤖 Endpoints de Modelos de IA](#-endpoints-de-modelos-de-ia)
-- [✨ Características Especiales](#-características-especiales)
+### 🏦 **KuentecoApp** - Core Financiero
+- **Puerto**: `:8080`
+- **Base de Datos**: PostgreSQL (Master-Slave)
+- **Función**: Gestión financiera completa, autenticación, transacciones
+
+### 🤖 **KuentecoChat** - Asistente IA
+- **Puerto**: `:7070` 
+- **Base de Datos**: MongoDB
+- **Función**: Inteligencia artificial, procesamiento de documentos, chat financiero
+
+---
+
+## 📋 Índice de Funcionalidades
+
+### 🏦 **KuentecoApp (Core Financiero)**
+- [🔐 Autenticación y Usuarios](#-endpoints-de-autenticación)
+- [👤 Gestión de Perfiles](#-endpoints-de-perfiles)
+- [📊 Categorías Financieras](#-endpoints-de-categorías)
+- [💰 Transacciones](#-endpoints-de-transacciones)
+- [💵 Presupuestos](#-endpoints-de-presupuestos)
+- [💳 Deudas y Obligaciones](#-endpoints-de-deudas)
+- [📄 Importación/Exportación Excel](#-endpoints-de-excel)
+- [💱 Tipos de Cambio](#-endpoints-de-tipos-de-cambio)
+- [🔔 Notificaciones](#-endpoints-de-notificaciones)
+- [💳 Suscripciones y Pagos](#-endpoints-de-suscripciones)
+
+### 🤖 **KuentecoChat (Asistente IA)**
+- [💬 Chat con IA Financiera](#-endpoints-de-chat)
+- [📜 Historial de Conversaciones](#-endpoints-de-historial-de-chat)
+- [✨ Características Avanzadas de IA](#-características-especiales)
+
+---
 
 ---
 
@@ -295,124 +320,149 @@
 
 ### `CategoryController.java` - Gestión de categorías financieras
 
-> **Base URL:** `/api/app/v1/category`
+> **Base URL:** `/api/app/v1/category`  
+> **Autenticación:** ✅ Requerida  
+> **Microservicio:** KuentecoApp (:8080)
 
 #### 1. 📋 **GET**
 
 **Descripción:** Obtiene todas las categorías del usuario autenticado  
-**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros  
+**Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Response:** Lista de categorías disponibles  
-**Status:** `200 OK` si se listarón correctamente `401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `200 OK` - Categorías obtenidas correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 2. 📝 **GET** `/enroll`
 
 **Descripción:** Obtiene todas las asignaciones de categorías (enrollments)  
-**Query Params (opcionales):** `from`, `to`, `kind`  
+**Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Response:** Lista de todas las asignaciones de categorías a perfiles  
-**Status:** `200 OK` Se listó correctamente las categorias
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `200 OK` - Categorías obtenidas correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 3. 📊 **GET** `/report/{categoryId}`
 
 **Descripción:** Genera un reporte detallado de una categoría específica  
+**Autenticación:** ✅ Requerida  
 **Path Variable:** `categoryId` (Integer) - ID de la categoría  
-**Query Params (opcionales):** `from`, `to`, `kind`  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Response:** `CategoryReportDTO` - Estadísticas y detalles de la categoría  
-**Status:** `200 OK` Se litó correctamente el reporte `400 BAD REQUEST`
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `200 OK` - Reporte de categoría generado exitosamente  
+**Errores:** `400 BAD REQUEST` - ID inválido | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Categoría no encontrada | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 4. 📈 **GET** `/report/summary`
 
 **Descripción:** Obtiene un resumen de todas las transacciones agrupadas por categoría  
-**Query Params (opcionales):** `from`, `to`, `kind`  
+**Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Response:** Resumen estadístico de transacciones por categoría  
-**Status:** `200 OK` se listó correctamente el resumen
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `200 OK` - Resumen de transacciones por categoría obtenido correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 5. 🏢 **GET** `/enroll/user`
 
 **Descripción:** Obtiene las asignaciones de categorías específicas para usuarios de tipo business  
-**Query Params (opcionales):** `from`, `to`, `kind`  
+**Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Response:** Lista de asignaciones de categorías para usuarios comerciales  
-**Status:** `200 OK` Se listó correctamente las asiganciones `401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `200 OK` - Resumen de transacciones por categoría obtenido correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `403 FORBIDDEN` - No es usuario business | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 6. ➕ **POST** `/add`
 
 **Descripción:** Crea una nueva categoría  
+**Autenticación:** ✅ Requerida  
 **Body:** `NewCategoryDTO` - Datos de la nueva categoría  
 **Funcionalidad:** Crea una categoría con presupuesto asignado y fechas  
-**Status:** `201 CREATED` se creó correctamente la categoría `400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `201 CREATED` - Categoría creada correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `409 CONFLICT` - Categoría ya existe | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 7. 📦 **POST** `/batch/add`
 
 **Descripción:** Crea múltiples categorías en una sola operación  
+**Autenticación:** ✅ Requerida  
 **Body:** `List<NewCategoryDTO>` - Lista de categorías a crear  
-**Funcionalidad:** Creación masiva de categorías  
-**Status:** `201 CREATED` se crearón correctamente las categorías `400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Funcionalidad:** Creación masiva de categorías (itera sobre cada elemento)  
+**Status:** `201 CREATED` - Categorías creadas correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `409 CONFLICT` - Algunas categorías ya existen | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 8. 🔄 **PATCH** `/update`
 
 **Descripción:** Actualiza una categoría existente  
-**Body:** `CategoryDTO` - Datos actualizados de la categoría  
-**Funcionalidad:** Modifica nombre, presupuesto, fechas y estado de la categoría  
-**Status:** `201 CREATED` se actualizo correctamente la categoría `400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Autenticación:** ✅ Requerida  
+**Body:** `UpdateCategoryDTO` - Datos actualizados de la categoría  
+**Funcionalidad:** Modifica los datos de la categoría existente  
+**Status:** `201 CREATED` - Categoría actualizada correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Categoría no encontrada | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 9. 📦 **PUT** `/batch/update`
 
 **Descripción:** Actualiza múltiples categorías en una sola operación  
-**Body:** `List<CategoryDTO>` - Lista de categorías a actualizar  
-**Funcionalidad:** Actualización masiva de categorías  
-**Status:** `201 CREATED` Si las categorías se crearon correctamente `400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Autenticación:** ✅ Requerida  
+**Body:** `List<UpdateCategoryDTO>` - Lista de categorías a actualizar  
+**Funcionalidad:** Actualización masiva de categorías (itera sobre cada elemento)  
+**Status:** `201 CREATED` - Categorías actualizadas correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Algunas categorías no encontradas | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 10. 🔗 **POST** `/enroll/add`
 
 **Descripción:** Asigna una categoría a un perfil específico  
+**Autenticación:** ✅ Requerida  
 **Query Params:**
 - `profileId` (Integer) - ID del perfil
 - `categoryId` (Integer) - ID de la categoría
 
 **Response:** `CategoryEnrollmentDTO` - Detalles de la asignación  
-**Status:** `201 CREATED` si se asigno correctamente la categoría `400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `201 CREATED` - Categoría asignada correctamente  
+**Errores:** `400 BAD REQUEST` - IDs inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Perfil o categoría no encontrados | `409 CONFLICT` - Asignación ya existe | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 11. 🗑️ **DELETE** `/{id}`
+#### 11. 🔗 **POST** `/enroll/add/batch`
+
+**Descripción:** Asigna múltiples categorías a perfiles en una sola operación  
+**Autenticación:** ✅ Requerida  
+**Body:** `List<BatchEnrollmentRequestDTO>` - Lista de asignaciones a crear  
+**Response:** Lista de `CategoryEnrollmentDTO` - Detalles de las asignaciones  
+**Status:** `201 CREATED` - Categorías asignadas correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Algunos perfiles/categorías no encontrados | `409 CONFLICT` - Algunas asignaciones ya existen | `500 INTERNAL SERVER ERROR` - Error del servidor
+
+#### 12. 🗑️ **DELETE** `/{id}`
 
 **Descripción:** Elimina una categoría específica  
+**Autenticación:** ✅ Requerida  
 **Path Variable:** `id` (Integer) - ID de la categoría  
-**Funcionalidad:** Eliminación lógica o física de la categoría  
-**Status:** `204 NO CONTENT` se eliminó correctamente la categoría
-`400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Funcionalidad:** Eliminación de la categoría  
+**Status:** `204 NO CONTENT` - Categoría eliminada correctamente  
+**Errores:** `400 BAD REQUEST` - ID inválido | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Categoría no encontrada | `409 CONFLICT` - Categoría en uso | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 12. 📦 **DELETE** `/batch`
+#### 13. 📦 **DELETE** `/batch`
 
 **Descripción:** Elimina múltiples categorías en una sola operación  
+**Autenticación:** ✅ Requerida  
 **Query Param:** `id` (`List<Integer>`) - IDs de las categorías a eliminar  
-**Funcionalidad:** Eliminación masiva de categorías  
+**Funcionalidad:** Eliminación masiva de categorías (itera sobre cada ID)  
 **Response:** Mensaje con el número de categorías eliminadas  
-**Status:** `204 NO CONTENT`  
+**Status:** `204 NO CONTENT` - X Categorías eliminadas correctamente  
+**Errores:** `400 BAD REQUEST` - IDs inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Algunas categorías no encontradas | `409 CONFLICT` - Algunas categorías en uso | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 13. 🔗 **DELETE** `/enroll/{id}`
+#### 14. 🔗 **DELETE** `/enroll/{id}`
 
 **Descripción:** Elimina una asignación de categoría a perfil  
+**Autenticación:** ✅ Requerida  
 **Path Variable:** `id` (Integer) - ID de la asignación  
 **Funcionalidad:** Desvincula una categoría de un perfil específico  
-**Status:** `204 NO CONTENT`  
+**Status:** `204 NO CONTENT` - Asignación eliminada correctamente  
+**Errores:** `400 BAD REQUEST` - ID inválido | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Asignación no encontrada | `500 INTERNAL SERVER ERROR` - Error del servidor
+
+#### 15. 📦 **DELETE** `/enroll/batch`
+
+**Descripción:** Elimina múltiples asignaciones de categoría en una sola operación  
+**Autenticación:** ✅ Requerida  
+**Query Param:** `id` (`List<Integer>`) - IDs de las asignaciones a eliminar  
+**Funcionalidad:** Eliminación masiva de asignaciones (itera sobre cada ID)  
+**Status:** `204 NO CONTENT` - Asignaciones eliminadas correctamente  
+**Errores:** `400 BAD REQUEST` - IDs inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Algunas asignaciones no encontradas | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 ---
 
@@ -420,122 +470,118 @@
 
 ### `TransactionController.java` - Gestión de transacciones financieras
 
-> **Base URL:** `/api/app/v1/transaction`
+> **Base URL:** `/api/app/v1/transaction`  
+> **Autenticación:** ✅ Requerida  
+> **Microservicio:** KuentecoApp (:8080)
 
 #### 1. 📋 **GET**
 
 **Descripción:** Obtiene transacciones basadas en los parámetros proporcionados  
-**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros  
+**Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Funcionalidad:** 
 - 👤 Para usuarios **PERSONAL**: Retorna sus transacciones directas
 - 🏢 Para usuarios **BUSINESS**: Retorna transacciones de todos sus perfiles
 - 👥 Para **PERFILES**: Retorna transacciones específicas del perfil
 
 **Response:** Lista de transacciones o mensaje informativo  
-**Status:** `200 OK`  se listó correctamente
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `200 OK` - Transacciones obtenidas correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `403 FORBIDDEN` - Acceso denegado al perfil/usuario | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 2. 📈 **GET** `/report/summary`
 
 **Descripción:** Obtiene un resumen estadístico de todas las transacciones  
-**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros  
+**Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Funcionalidad:** Solo disponible para usuarios (no perfiles)  
-**Response:** `TransactionSummaryDTO` - Resumen estadístico agrupado  
-**Status:** `200 OK` Se listó correctamente
-`400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Response:** Resumen estadístico agrupado  
+**Status:** `200 OK` - Resumen de transacciones obtenido correctamente  
+**Errores:** `400 BAD REQUEST` - Solicitud inválida | `401 UNAUTHORIZED` - Sin autorización | `403 FORBIDDEN` - Solo usuarios | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 3. 🏥 **GET** `/bancolombia/health`
 
 **Descripción:** Verifica el estado de salud del servicio de Bancolombia  
+**Autenticación:** 🔓 No requerida  
 **Funcionalidad:** Monitoreo del servicio externo de transacciones  
 **Response:** Estado del servicio con timestamp  
-**Status:** `200 OK` (UP) / `503 SERVICE_UNAVAILABLE` (DOWN)  
+**Status:** `200 OK` - Servicio UP | `503 SERVICE_UNAVAILABLE` - Servicio DOWN  
+**Errores:** `500 INTERNAL SERVER ERROR` - Error al verificar estado
 
 #### 4. 🏦 **POST** `/bancolombia`
 
 **Descripción:** Obtiene transacciones desde Bancolombia mediante filtros específicos  
+**Autenticación:** ✅ Requerida  
 **Body:** `BancolombiaTransactionRequestDTO` - Criterios de filtrado de Bancolombia  
 **Funcionalidad:** 
 - 🔗 Integración con API de Bancolombia
 - 📄 Genera URL de archivo con transacciones filtradas
 
 **Response:** URL del archivo generado  
-**Status:** `200 OK` Funciono correctamente `400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `200 OK` - URL de archivo de transacciones obtenida  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `503 SERVICE_UNAVAILABLE` - Servicio Bancolombia no disponible | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 5. ➕ **POST** `/add`
 
 **Descripción:** Registra una nueva transacción en el sistema  
-**Body:** `NewTransactionDTO` - Datos de la nueva transacción  
 **Autenticación:** ✅ Requerida  
+**Body:** `NewTransactionDTO` - Datos de la nueva transacción  
 **Funcionalidad:**
 - 👤 Usuarios **PERSONAL**: Pueden crear transacciones directamente
 - 🏢 Usuarios **BUSINESS**: Solo perfiles pueden crear transacciones
 - 🔗 Asociación automática con categorías, presupuestos y deudas
 
-**Status:** `201 CREATED` Se creó correctamente
- `400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `201 CREATED` - Transacción registrada correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `403 FORBIDDEN` - Permisos insuficientes | `404 NOT FOUND` - Categoría/presupuesto no encontrado | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 6. 📦 **POST** `/batch/add`
 
 **Descripción:** Registra múltiples transacciones en una sola operación  
-**Body:** `List<NewTransactionDTO>` - Lista de transacciones a crear  
 **Autenticación:** ✅ Requerida  
-**Funcionalidad:** Creación masiva de transacciones para mayor eficiencia  
+**Body:** `List<NewTransactionDTO>` - Lista de transacciones a crear  
+**Funcionalidad:** Creación masiva de transacciones (itera sobre cada elemento)  
 **Response:** Mensaje con número de transacciones creadas  
-**Status:** `201 CREATED` Se crearón correctamente `400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `201 CREATED` - X transacciones creadas exitosamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `403 FORBIDDEN` - Permisos insuficientes | `404 NOT FOUND` - Algunas categorías/presupuestos no encontrados | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 7. 🔄 **PATCH** `/update`
 
 **Descripción:** Actualiza una transacción existente en el sistema  
-**Body:** `UpdateTransactionDTO` - Datos actualizados de la transacción  
 **Autenticación:** ✅ Requerida  
+**Body:** `UpdateTransactionDTO` - Datos actualizados de la transacción  
 **Funcionalidad:** 
 - 📝 Modifica campos de transacciones existentes
 - 🔗 Actualiza asociaciones con categorías, presupuestos y deudas
 
-**Status:** `201 CREATED` Se actualizo correctamente `400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `201 CREATED` - Transacción actualizada correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `403 FORBIDDEN` - Permisos insuficientes | `404 NOT FOUND` - Transacción no encontrada | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 8. 📦 **PUT** `/batch/update`
 
 **Descripción:** Actualiza múltiples transacciones en una sola operación  
-**Body:** `List<UpdateTransactionDTO>` - Lista de transacciones a actualizar  
 **Autenticación:** ✅ Requerida  
-**Funcionalidad:** Actualización masiva de transacciones  
-**Status:** `201 CREATED` se actualizaron correctamente `400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Body:** `List<UpdateTransactionDTO>` - Lista de transacciones a actualizar  
+**Funcionalidad:** Actualización masiva de transacciones (itera sobre cada elemento)  
+**Status:** `201 CREATED` - Transacciones actualizadas correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `403 FORBIDDEN` - Permisos insuficientes | `404 NOT FOUND` - Algunas transacciones no encontradas | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 9. 🗑️ **DELETE** `/{id}`
 
 **Descripción:** Elimina una transacción específica por su ID  
-**Path Variable:** `id` (Integer) - ID de la transacción  
 **Autenticación:** ✅ Requerida  
+**Path Variable:** `id` (Integer) - ID de la transacción  
 **Funcionalidad:** Eliminación física de la transacción  
-**Status:** `204 NO CONTENT` se eliminó correctamente
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `204 NO CONTENT` - Transacción eliminada correctamente  
+**Errores:** `400 BAD REQUEST` - ID inválido | `401 UNAUTHORIZED` - Sin autorización | `403 FORBIDDEN` - Permisos insuficientes | `404 NOT FOUND` - Transacción no encontrada | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 10. 📦 **DELETE** `/batch`
 
 **Descripción:** Elimina múltiples transacciones en una sola operación  
-**Query Param:** `id` (`List<Integer>`) - IDs de las transacciones a eliminar  
 **Autenticación:** ✅ Requerida  
-**Funcionalidad:** Eliminación masiva de transacciones  
+**Query Param:** `id` (`List<Integer>`) - IDs de las transacciones a eliminar  
+**Funcionalidad:** Eliminación masiva de transacciones (itera sobre cada ID)  
 **Response:** Mensaje con número de transacciones eliminadas  
-**Status:** `204 NO CONTENT`  `400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `204 NO CONTENT` - X transacciones eliminadas correctamente  
+**Errores:** `400 BAD REQUEST` - IDs inválidos | `401 UNAUTHORIZED` - Sin autorización | `403 FORBIDDEN` - Permisos insuficientes | `404 NOT FOUND` - Algunas transacciones no encontradas | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 ### 🌟 **Características Especiales de Transacciones**
 
@@ -555,48 +601,56 @@
 
 ### `BudgetController.java` - Gestión de presupuestos financieros
 
-> **Base URL:** `/api/app/v1/budget`
+> **Base URL:** `/api/app/v1/budget`  
+> **Autenticación:** ✅ Requerida  
+> **Microservicio:** KuentecoApp (:8080)
 
-#### 1. 📋 **GET** 
+#### 1. 📋 **GET**
 
 **Descripción:** Obtiene todos los presupuestos del usuario autenticado  
-**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros  
 **Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Response:** Lista de presupuestos con detalles completos  
-**Status:** `200 OK` se listó correctamente
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `200 OK` - Presupuestos obtenidas correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 2. 📝 **GET** `/enroll`
 
 **Descripción:** Obtiene todas las asignaciones de presupuestos (enrollments)  
-**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros  
 **Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Response:** `BudgetEnrollmentDTO` - Lista de asignaciones presupuesto-perfil  
-**Status:** `200 OK` si se listo correctamente
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `200 OK` - Presupuestos obtenidos correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 3. 📈 **GET** `/report/comparison`
+#### 3. 🏢 **GET** `/enroll/user`
+
+**Descripción:** Obtiene las asignaciones de presupuestos para usuarios tipo business  
+**Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
+**Response:** Lista de asignaciones de presupuestos para usuarios comerciales  
+**Status:** `200 OK` - Resumen de transacciones por presupuesto obtenido correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `403 FORBIDDEN` - No es usuario business | `500 INTERNAL SERVER ERROR` - Error del servidor
+
+#### 4. 📈 **GET** `/report/comparison`
 
 **Descripción:** Genera reporte comparativo de presupuesto vs gastos reales  
-**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros  
 **Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Funcionalidad:** 
 - 📉 Compara presupuesto asignado vs gasto real
 - 📈 Análisis de desviaciones y tendencias
 - 📊 Identificación de categorías con mayor impacto
 
 **Response:** `BudgetVsActualDTO` - Reporte comparativo detallado  
-**Status:** `200 OK` si se listo correctamente
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `200 OK` - Reporte generado correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 4. 📆 **GET** `/report/summary`
+#### 5. 📆 **GET** `/report/summary`
 
 **Descripción:** Obtiene resumen ejecutivo de todos los presupuestos  
-**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros  
 **Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Funcionalidad:**
 - 💰 Total de presupuesto asignado
 - 📉 Presupuesto utilizado
@@ -604,105 +658,111 @@
 - 📈 Porcentajes de utilización
 
 **Response:** `BudgetSummaryDTO` - Resumen ejecutivo consolidado  
-**Status:** `200 OK` si se listó correctamente`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `200 OK` - Resumen de presupuestos generado correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 5. ➕ **POST** `/add`
+#### 6. ➕ **POST** `/add`
 
 **Descripción:** Crea un nuevo presupuesto en el sistema  
-**Body:** `NewBudgetDTO` - Datos del nuevo presupuesto  
 **Autenticación:** ✅ Requerida  
+**Body:** `NewBudgetDTO` - Datos del nuevo presupuesto  
 **Funcionalidad:**
 - 📅 Definición de períodos presupuestarios
 - 💰 Asignación de montos por categoría
 - 🎨 Configuración de alertas y límites
 
-**Status:** `201 CREATED` si se creo correctamente `400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `201 CREATED` - Presupuesto creado correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `409 CONFLICT` - Presupuesto ya existe | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 6. 📦 **POST** `/batch/add`
+#### 7. 📦 **POST** `/batch/add`
 
 **Descripción:** Crea múltiples presupuestos en una sola operación  
-**Body:** `List<NewBudgetDTO>` - Lista de presupuestos a crear  
 **Autenticación:** ✅ Requerida  
-**Funcionalidad:** Creación masiva de presupuestos para planificación anual  
-**Response:** Mensaje con número de presupuestos creados  
-**Status:** `201 CREATED` si se crearón correctamente `400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Body:** `List<NewBudgetDTO>` - Lista de presupuestos a crear  
+**Funcionalidad:** Creación masiva de presupuestos para planificación anual (itera sobre cada elemento)  
+**Response:** Lista de presupuestos creados  
+**Status:** `201 CREATED` - Presupuestos creados correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `409 CONFLICT` - Algunos presupuestos ya existen | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 7. 🔄 **PATCH** `/update`
+#### 8. 🔄 **PATCH** `/update`
 
 **Descripción:** Actualiza un presupuesto existente  
-**Body:** `BudgetDTO` - Datos actualizados del presupuesto  
 **Autenticación:** ✅ Requerida  
+**Body:** `BudgetDTO` - Datos actualizados del presupuesto  
 **Funcionalidad:**
 - 📝 Modificación de montos y períodos
 - 🎨 Ajuste de configuraciones y alertas
 - 🔄 Recalculo automático de métricas
 
-**Status:** `201 CREATED` si se actualizo correctamente `400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `201 CREATED` - Presupuesto actualizado correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Presupuesto no encontrado | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 8. 📦 **PUT** `/batch/update`
+#### 9. 📦 **PUT** `/batch/update`
 
 **Descripción:** Actualiza múltiples presupuestos en una sola operación  
-**Body:** `List<BudgetDTO>` - Lista de presupuestos a actualizar  
 **Autenticación:** ✅ Requerida  
-**Funcionalidad:** Actualización masiva para ajustes estacionales  
-**Status:** `201 CREATED` si se actualizaron correctamente `400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Body:** `List<BudgetDTO>` - Lista de presupuestos a actualizar  
+**Funcionalidad:** Actualización masiva para ajustes estacionales (itera sobre cada elemento)  
+**Status:** `201 CREATED` - Presupuestos actualizados correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Algunos presupuestos no encontrados | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 9. 🔗 **POST** `/enroll/add`
+#### 10. 🔗 **POST** `/enroll/add`
 
 **Descripción:** Asigna un presupuesto a un perfil específico  
+**Autenticación:** ✅ Requerida  
 **Query Params:**
 - `profileId` (Integer) - ID del perfil
 - `budgetId` (Integer) - ID del presupuesto
 
-**Autenticación:** ✅ Requerida  
-**Funcionalidad:**
-- 👥 Vinculación presupuesto-perfil
-- 🔒 Control de acceso granular
-- 📈 Seguimiento individualizado
-
 **Response:** `BudgetEnrollmentDTO` - Detalles de la asignación  
-**Status:** `201 CREATED` si se creo correctamente `400 BAD REQUEST` si los datos ingresados tienen un algun error
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `201 CREATED` - Presupuesto asignado correctamente  
+**Errores:** `400 BAD REQUEST` - IDs inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Perfil o presupuesto no encontrados | `409 CONFLICT` - Asignación ya existe | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 10. 🗑️ **DELETE** `/{id}`
+#### 11. 🔗 **POST** `/enroll/add/batch`
+
+**Descripción:** Asigna múltiples presupuestos a perfiles en una sola operación  
+**Autenticación:** ✅ Requerida  
+**Body:** `List<BatchEnrollmentRequestDTO>` - Lista de asignaciones a crear  
+**Response:** Lista de `BudgetEnrollmentDTO` - Detalles de las asignaciones  
+**Status:** `201 CREATED` - Presupuestos asignados correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Algunos perfiles/presupuestos no encontrados | `409 CONFLICT` - Algunas asignaciones ya existen | `500 INTERNAL SERVER ERROR` - Error del servidor
+
+#### 12. 🗑️ **DELETE** `/{id}`
 
 **Descripción:** Elimina un presupuesto específico por su ID  
-**Path Variable:** `id` (Integer) - ID del presupuesto  
 **Autenticación:** ✅ Requerida  
+**Path Variable:** `id` (Integer) - ID del presupuesto  
 **Funcionalidad:** Eliminación completa del presupuesto y sus asignaciones  
-**Status:** `204 NO CONTENT`  si se elimino correctamente `401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `204 NO CONTENT` - Presupuesto eliminado correctamente  
+**Errores:** `400 BAD REQUEST` - ID inválido | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Presupuesto no encontrado | `409 CONFLICT` - Presupuesto en uso | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 11. 📦 **DELETE** `/batch`
+#### 13. 📦 **DELETE** `/batch`
 
 **Descripción:** Elimina múltiples presupuestos en una sola operación  
-**Query Param:** `id` (`List<Integer>`) - IDs de los presupuestos a eliminar  
 **Autenticación:** ✅ Requerida  
-**Funcionalidad:** Eliminación masiva de presupuestos obsoletos  
+**Query Param:** `id` (`List<Integer>`) - IDs de los presupuestos a eliminar  
+**Funcionalidad:** Eliminación masiva de presupuestos obsoletos (itera sobre cada ID)  
 **Response:** Mensaje con número de presupuestos eliminados  
-**Status:** `204 NO CONTENT`  si se elimino correctamente
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `204 NO CONTENT` - X presupuestos eliminados correctamente  
+**Errores:** `400 BAD REQUEST` - IDs inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Algunos presupuestos no encontrados | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 12. 🔗 **DELETE** `/enroll/{id}`
+#### 14. 🔗 **DELETE** `/enroll/{id}`
 
 **Descripción:** Elimina una asignación de presupuesto a perfil  
-**Path Variable:** `id` (Integer) - ID de la asignación  
 **Autenticación:** ✅ Requerida  
+**Path Variable:** `id` (Integer) - ID de la asignación  
 **Funcionalidad:** Desvincula un presupuesto de un perfil específico  
-**Status:** `204 NO CONTENT`  si se eliminarón correctamente
-`401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `204 NO CONTENT` - Asignación eliminada correctamente  
+**Errores:** `400 BAD REQUEST` - ID inválido | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Asignación no encontrada | `500 INTERNAL SERVER ERROR` - Error del servidor
+
+#### 15. 📦 **DELETE** `/enroll/batch`
+
+**Descripción:** Elimina múltiples asignaciones de presupuesto en una sola operación  
+**Autenticación:** ✅ Requerida  
+**Query Param:** `id` (`List<Integer>`) - IDs de las asignaciones a eliminar  
+**Funcionalidad:** Eliminación masiva de asignaciones (itera sobre cada ID)  
+**Status:** `204 NO CONTENT` - Asignaciones eliminadas correctamente  
+**Errores:** `400 BAD REQUEST` - IDs inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Algunas asignaciones no encontradas | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 ### 🌟 **Características Especiales de Presupuestos**
 
@@ -722,77 +782,103 @@
 
 ### `DebtController.java` - Gestión de deudas y obligaciones financieras
 
-> **Base URL:** `/api/app/v1/debt`
+> **Base URL:** `/api/app/v1/debt`  
+> **Autenticación:** ✅ Requerida  
+> **Microservicio:** KuentecoApp (:8080)
 
 #### 1. 📋 **GET**
 
 **Descripción:** Obtiene todas las deudas del usuario autenticado  
-**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros  
 **Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Response:** Lista completa de deudas con detalles y estado  
-**Status:** `200 OK`  si se listó correctamente `401 UNAUTHORIZED` si no está autorizado y
-`500 INTERNAL SERVER ERROR` problemas en el servidor
+**Status:** `200 OK` - Deudas obtenidas correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 2. 🏷️ **GET** `/state/{state}`
+#### 2. 📝 **GET** `/enroll`
+
+**Descripción:** Obtiene todas las asignaciones de deudas (enrollments)  
+**Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
+**Response:** Lista de todas las asignaciones de deudas a perfiles  
+**Status:** `200 OK` - Presupuestos obtenidos correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `500 INTERNAL SERVER ERROR` - Error del servidor
+
+#### 3. 🏢 **GET** `/enroll/user`
+
+**Descripción:** Obtiene las asignaciones de deudas específicas para usuarios de tipo business  
+**Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
+**Response:** Lista de asignaciones de deudas para usuarios comerciales  
+**Status:** `200 OK` - Resumen de transacciones por presupuesto obtenido correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `403 FORBIDDEN` - No es usuario business | `500 INTERNAL SERVER ERROR` - Error del servidor
+
+#### 4. 🏷️ **GET** `/state/{state}`
 
 **Descripción:** Obtiene deudas filtradas por estado específico  
-**Path Variable:** `state` (StateDebt) - Estado de la deuda  
-**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros  
 **Autenticación:** ✅ Requerida  
+**Path Variable:** `state` (StateDebt) - Estado de la deuda  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Estados disponibles:**
 - ✅ `ACTIVE` - Deudas activas
-- ⏸️ `PAUSED` - Deudas pausadas
 - ✅ `PAID` - Deudas pagadas
+- ⚠️ `DEFEATED` - Deudas vencidas
+- 🔄 `REFINANCED` - Deudas refinanciadas
+- ⏸️ `IN_MORATIUM` - Deudas en moratoria
 - ❌ `CANCELLED` - Deudas canceladas
 
 **Response:** Lista de deudas filtradas por estado  
-**Status:** `200 OK`  
+**Status:** `200 OK` - Deudas filtradas por estado obtenidas correctamente  
+**Errores:** `400 BAD REQUEST` - Estado inválido | `401 UNAUTHORIZED` - Sin autorización | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 3. ⚠️ **GET** `/overdue`
+#### 5. ⚠️ **GET** `/overdue`
 
 **Descripción:** Obtiene todas las deudas vencidas (con fecha límite superada)  
-**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros  
 **Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Funcionalidad:**
 - 📅 Identifica deudas con fecha de vencimiento pasada
 - ⚠️ Genera alertas de cobro prioritario
 - 📈 Calcula intereses por mora
 
 **Response:** Lista de deudas vencidas con detalles de mora  
-**Status:** `200 OK`  
+**Status:** `200 OK` - Deudas vencidas obtenidas correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 4. ⏰ **GET** `/expiring-soon`
+#### 6. ⏰ **GET** `/expiring-soon`
 
 **Descripción:** Obtiene deudas que vencerán en los próximos días especificados  
-**Query Param:** `days` (Integer) - Número de días para el filtro  
-**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros adicionales  
 **Autenticación:** ✅ Requerida  
+**Query Param:** `days` (Integer) - Número de días para el filtro (**REQUERIDO**)  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Funcionalidad:**
 - 📅 Planificación de pagos futuros
 - 🔔 Sistema de alertas preventivas
 - 📊 Gestión de flujo de caja
 
 **Response:** Lista de deudas próximas a vencer  
-**Status:** `200 OK`  
+**Status:** `200 OK` - Deudas próximas a vencer obtenidas correctamente  
+**Errores:** `400 BAD REQUEST` - Parámetro days inválido | `401 UNAUTHORIZED` - Sin autorización | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 5. 💰 **GET** `/total-pending`
+#### 7. 💰 **GET** `/total-pending`
 
 **Descripción:** Calcula el monto total pendiente de todas las deudas activas  
-**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros  
 **Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Funcionalidad:**
 - 💵 Suma de todas las deudas pendientes
 - 📈 Indicador de salud financiera
 - 📏 Resumen para presupuesto
 
 **Response:** `BigDecimal` - Monto total pendiente  
-**Status:** `200 OK`  
+**Status:** `200 OK` - Total pendiente del usuario obtenido correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 6. 📈 **GET** `/report/summary`
+#### 8. 📈 **GET** `/report/summary`
 
 **Descripción:** Genera reporte resumen completo de todas las deudas  
-**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros  
 **Autenticación:** ✅ Requerida  
+**Query Params (opcionales):** `from`, `to`, `kind` - Para filtros (sin implementar funcionalidad)  
 **Funcionalidad:**
 - 📉 Distribución por estados
 - 📈 Tendencias de pago
@@ -800,96 +886,144 @@
 - 💰 Métricas financieras clave
 
 **Response:** Reporte ejecutivo de deudas consolidado  
-**Status:** `200 OK`  
+**Status:** `200 OK` - Resumen de deudas generado correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 7. ➕ **POST** `/add`
+#### 9. ➕ **POST** `/add`
 
 **Descripción:** Registra una nueva deuda en el sistema  
-**Body:** `NewDebtDTO` - Datos de la nueva deuda  
 **Autenticación:** ✅ Requerida  
+**Body:** `NewDebtDTO` - Datos de la nueva deuda  
 **Funcionalidad:**
 - 📅 Definición de fechas de vencimiento
 - 💵 Configuración de montos e intereses
 - 🔔 Configuración de alertas automáticas
 - 🏷️ Categorización y etiquetado
 
-**Status:** `201 CREATED`  
+**Status:** `201 CREATED` - Deuda creada correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `409 CONFLICT` - Deuda ya existe | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 8. 📦 **POST** `/batch/add`
+#### 10. 📦 **POST** `/batch/add`
 
 **Descripción:** Registra múltiples deudas en una sola operación  
-**Body:** `List<NewDebtDTO>` - Lista de deudas a crear  
 **Autenticación:** ✅ Requerida  
-**Funcionalidad:** Importación masiva de deudas desde hojas de cálculo  
-**Response:** Mensaje con número de deudas creadas  
-**Status:** `201 CREATED`  
+**Body:** `List<NewDebtDTO>` - Lista de deudas a crear  
+**Funcionalidad:** Importación masiva de deudas (itera sobre cada elemento)  
+**Response:** Lista de deudas creadas  
+**Status:** `201 CREATED` - Deudas creadas correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `409 CONFLICT` - Algunas deudas ya existen | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 9. 🔄 **PATCH** `/update`
+#### 11. 🔄 **PATCH** `/update`
 
 **Descripción:** Actualiza una deuda existente  
-**Body:** `DebtDTO` - Datos actualizados de la deuda  
 **Autenticación:** ✅ Requerida  
+**Body:** `DebtDTO` - Datos actualizados de la deuda  
 **Funcionalidad:**
 - 📝 Modificación de montos y fechas
 - 🏷️ Cambio de categorías y etiquetas
 - 🔔 Ajuste de configuraciones de alerta
 - 📈 Recalculo automático de intereses
 
-**Status:** `200 OK`  
+**Status:** `200 OK` - Deuda actualizada correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Deuda no encontrada | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 10. 📦 **PUT** `/batch/update`
+#### 12. 📦 **PUT** `/batch/update`
 
 **Descripción:** Actualiza múltiples deudas en una sola operación  
-**Body:** `List<DebtDTO>` - Lista de deudas a actualizar  
 **Autenticación:** ✅ Requerida  
-**Funcionalidad:** Actualización masiva para renegociaciones o cambios globales  
-**Status:** `200 OK`  
+**Body:** `List<DebtDTO>` - Lista de deudas a actualizar  
+**Funcionalidad:** Actualización masiva para renegociaciones (itera sobre cada elemento)  
+**Status:** `200 OK` - Deudas actualizadas correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Algunas deudas no encontradas | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 11. 💳 **POST** `/payment`
+#### 13. 🔗 **POST** `/enroll/add`
+
+**Descripción:** Asigna una deuda a un perfil específico  
+**Autenticación:** ✅ Requerida  
+**Query Params:**
+- `profileId` (Integer) - ID del perfil
+- `debtId` (Integer) - ID de la deuda
+
+**Response:** `DebtEnrollmentDTO` - Detalles de la asignación  
+**Status:** `201 CREATED` - Deuda asignado correctamente  
+**Errores:** `400 BAD REQUEST` - IDs inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Perfil o deuda no encontrados | `409 CONFLICT` - Asignación ya existe | `500 INTERNAL SERVER ERROR` - Error del servidor
+
+#### 14. 🔗 **POST** `/enroll/add/batch`
+
+**Descripción:** Asigna múltiples deudas a perfiles en una sola operación  
+**Autenticación:** ✅ Requerida  
+**Body:** `List<BatchEnrollmentRequestDTO>` - Lista de asignaciones a crear  
+**Response:** Lista de `DebtEnrollmentDTO` - Detalles de las asignaciones  
+**Status:** `201 CREATED` - Deudas asignadas correctamente  
+**Errores:** `400 BAD REQUEST` - Datos inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Algunos perfiles/deudas no encontrados | `409 CONFLICT` - Algunas asignaciones ya existen | `500 INTERNAL SERVER ERROR` - Error del servidor
+
+#### 15. 💳 **POST** `/payment`
 
 **Descripción:** Registra un pago hacia una deuda específica  
-**Body:** `DebtPaymentDTO` - Detalles del pago realizado  
 **Autenticación:** ✅ Requerida  
+**Body:** `DebtPaymentDTO` - Detalles del pago realizado  
 **Funcionalidad:**
 - 💵 Registro de pagos parciales o totales
 - 📅 Actualización automática de saldos
 - 📈 Cálculo de intereses y penalizaciones
 - 🏷️ Cambio automático de estado si es necesario
 
-**Status:** `200 OK`  
+**Status:** `200 OK` - Pago realizado correctamente  
+**Errores:** `400 BAD REQUEST` - Datos de pago inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Deuda no encontrada | `409 CONFLICT` - Pago ya registrado | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 12. 🏷️ **PATCH** `/{id}/state/{state}`
+#### 16. 🏷️ **PATCH** `/{id}/state/{state}`
 
 **Descripción:** Actualiza el estado de una deuda específica  
+**Autenticación:** ✅ Requerida  
 **Path Variables:**
 - `id` (Integer) - ID de la deuda
 - `state` (StateDebt) - Nuevo estado
 
-**Autenticación:** ✅ Requerida  
 **Funcionalidad:**
 - ✅ Activar deudas pausadas
 - ⏸️ Pausar deudas temporalmente
 - ❌ Cancelar deudas
 - ✅ Marcar como pagadas
 
-**Status:** `200 OK`  
+**Status:** `200 OK` - Estado de la deuda actualizado correctamente  
+**Errores:** `400 BAD REQUEST` - ID o estado inválido | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Deuda no encontrada | `409 CONFLICT` - Cambio de estado inválido | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 13. 🗑️ **DELETE** `/{id}`
+#### 17. 🗑️ **DELETE** `/{id}`
 
 **Descripción:** Elimina una deuda específica por su ID  
-**Path Variable:** `id` (Integer) - ID de la deuda  
 **Autenticación:** ✅ Requerida  
+**Path Variable:** `id` (Integer) - ID de la deuda  
 **Funcionalidad:** Eliminación completa de la deuda y su historial  
-**Status:** `204 NO CONTENT`  
+**Status:** `204 NO CONTENT` - Deuda eliminada correctamente  
+**Errores:** `400 BAD REQUEST` - ID inválido | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Deuda no encontrada | `409 CONFLICT` - Deuda con pagos asociados | `500 INTERNAL SERVER ERROR` - Error del servidor
 
-#### 14. 📦 **DELETE** `/batch`
+#### 18. 📦 **DELETE** `/batch`
 
 **Descripción:** Elimina múltiples deudas en una sola operación  
-**Query Param:** `id` (`List<Integer>`) - IDs de las deudas a eliminar  
 **Autenticación:** ✅ Requerida  
-**Funcionalidad:** Limpieza masiva de deudas canceladas u obsoletas  
+**Query Param:** `id` (`List<Integer>`) - IDs de las deudas a eliminar  
+**Funcionalidad:** Limpieza masiva de deudas canceladas (itera sobre cada ID)  
 **Response:** Mensaje con número de deudas eliminadas  
-**Status:** `204 NO CONTENT`  
+**Status:** `204 NO CONTENT` - X deudas eliminadas correctamente  
+**Errores:** `400 BAD REQUEST` - IDs inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Algunas deudas no encontradas | `409 CONFLICT` - Algunas deudas con pagos asociados | `500 INTERNAL SERVER ERROR` - Error del servidor
+
+#### 19. 🔗 **DELETE** `/enroll/{id}`
+
+**Descripción:** Elimina una asignación de deuda a perfil  
+**Autenticación:** ✅ Requerida  
+**Path Variable:** `id` (Integer) - ID de la asignación  
+**Funcionalidad:** Desvincula una deuda de un perfil específico  
+**Status:** `204 NO CONTENT` - Asignación eliminada correctamente  
+**Errores:** `400 BAD REQUEST` - ID inválido | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Asignación no encontrada | `500 INTERNAL SERVER ERROR` - Error del servidor
+
+#### 20. 📦 **DELETE** `/enroll/batch`
+
+**Descripción:** Elimina múltiples asignaciones de deuda en una sola operación  
+**Autenticación:** ✅ Requerida  
+**Query Param:** `id` (`List<Integer>`) - IDs de las asignaciones a eliminar  
+**Funcionalidad:** Eliminación masiva de asignaciones (itera sobre cada ID)  
+**Status:** `204 NO CONTENT` - Asignaciónes eliminadas correctamente  
+**Errores:** `400 BAD REQUEST` - IDs inválidos | `401 UNAUTHORIZED` - Sin autorización | `404 NOT FOUND` - Algunas asignaciones no encontradas | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 ### 🌟 **Características Especiales de Deudas**
 
@@ -1034,11 +1168,13 @@ Todas las registradas en OpenExchangeRates
 | ⚠️ **Validación Robusta** | Verificación completa de datos y límites de conversión |
 
 ---
-### 🔔 Endpoints de Notificaciones
+## 🔔 Endpoints de Notificaciones
 
 ### `NotificationController.java` - Sistema de notificaciones y alertas
 
-> **Base URL:** `api/app/v1/notification`
+> **Base URL:** `/api/app/v1/notification`  
+> **Autenticación:** ✅ Requerida  
+> **Microservicio:** KuentecoApp (:8080)
 
 #### 1. 📋 **GET**
 
@@ -1051,64 +1187,32 @@ Todas las registradas en OpenExchangeRates
 - ⚠️ Notificaciones de seguridad y cambios de cuenta
 - 📈 Actualizaciones de transacciones y movimientos
 
-**Response:** Lista completa de notificaciones del usuario  
-**Status:** `200 OK`  
-
-**Tipos de notificaciones:**
-- 💰 **Financieras**: Movimientos, presupuestos, límites
-- 📅 **Vencimientos**: Deudas próximas a vencer, recordatorios
-- 🔒 **Seguridad**: Cambios de contraseña, inicios de sesión
-- 📈 **Reportes**: Resúmenes mensuales, actualizaciones
-- ⚠️ **Alertas**: Gastos excesivos, actividad inusual
+**Response:** `List<NotificationDTO>` - Lista completa de notificaciones del usuario  
+**Status:** `200 OK` - Notificaciones obtenidas correctamente  
+**Errores:** `401 UNAUTHORIZED` - Sin autorización | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 #### 2. 📅 **GET** `/range`
 
 **Descripción:** Obtiene notificaciones del usuario filtradas por rango de fechas  
-**Query Params:**
-- `fromDate` (LocalDateTime) - Fecha de inicio (formato: yyyy-MM-dd'T'HH:mm:ss)
-- `toDate` (LocalDateTime) - Fecha final (formato: yyyy-MM-dd'T'HH:mm:ss)
-
 **Autenticación:** ✅ Requerida  
+**Query Params (requeridos):**
+- `fromDate` (LocalDateTime) - Fecha de inicio (**REQUERIDO**) - Formato: `yyyy-MM-dd'T'HH:mm:ss`
+- `toDate` (LocalDateTime) - Fecha final (**REQUERIDO**) - Formato: `yyyy-MM-dd'T'HH:mm:ss`
+
 **Funcionalidad:**
 - 📅 Filtrado preciso por rango temporal
 - 🗓️ Consultas históricas de notificaciones
 - 📈 Análisis de patrones de notificación
 - 🔍 Búsqueda eficiente en grandes volúmenes
 
-**Response:** Lista de notificaciones en el rango especificado  
-**Status:** `200 OK`  
+**Response:** `List<NotificationDTO>` - Lista de notificaciones en el rango especificado  
+**Status:** `200 OK` - Notificaciones del usuario en rango de fechas obtenidas correctamente  
+**Errores:** `400 BAD REQUEST` - Parámetros de fecha inválidos | `401 UNAUTHORIZED` - Sin autorización | `500 INTERNAL SERVER ERROR` - Error del servidor
 
 **Ejemplo de Query:**
+```http
+GET /api/app/v1/notification/range?fromDate=2024-01-01T00:00:00&toDate=2024-01-31T23:59:59
 ```
-GET /v1/notification/range?fromDate=2024-01-01T00:00:00&toDate=2024-01-31T23:59:59
-```
-
-#### 3. 🔍 **GET** `/search`
-
-**Descripción:** Busca notificaciones del usuario por palabra clave  
-**Query Param:** `keyword` (String) - Palabra clave para buscar  
-**Autenticación:** ✅ Requerida  
-**Funcionalidad:**
-- 🔎 Búsqueda de texto completo en notificaciones
-- 📝 Coincidencias en título, contenido y metadatos
-- ⚡ Búsqueda rápida con indexación optimizada
-- 🎯 Resultados relevantes y ordenados por coincidencia
-- 🔄 Sugerencias automáticas y corrección de texto
-
-**Response:** Lista de notificaciones que coinciden con la búsqueda  
-**Status:** `200 OK`  
-
-**Ejemplo de Query:**
-```
-GET /v1/notification/search?keyword=presupuesto
-```
-
-**Capacidades de búsqueda:**
-- 📝 **Búsqueda parcial**: Encuentra coincidencias parciales
-- 🔤 **Case-insensitive**: No distingue mayúsculas/minúsculas
-- 🌐 **Múltiples idiomas**: Soporte para caracteres especiales
-- 🔢 **Operadores**: AND, OR para búsquedas complejas
-- 📅 **Filtros adicionales**: Combinable con filtros de fecha
 
 ### 🌟 **Características Especiales de Notificaciones**
 
@@ -1116,12 +1220,55 @@ GET /v1/notification/search?keyword=presupuesto
 |----------------|-------------|
 | 🔔 **Sistema Inteligente** | Notificaciones personalizadas basadas en comportamiento del usuario |
 | 📅 **Filtrado Temporal** | Búsqueda precisa por rangos de fechas con formatos flexibles |
-| 🔍 **Búsqueda Avanzada** | Motor de búsqueda de texto completo con coincidencias inteligentes |
 | ⚡ **Tiempo Real** | Notificaciones instantáneas para eventos críticos |
 | 🎯 **Categorización** | Clasificación automática por tipo y prioridad |
-| 📈 **Analytics** | Métricas de engagement y efectividad de notificaciones |
+| 👥 **Soporte Multi-perfil** | Compatible con usuarios individuales (ROLE_USER) y perfiles empresariales (ROLE_PROFILE) |
+| 📊 **Estructura Consistente** | Formato uniforme con ContentNotification (title, body, date) |
 | 🔒 **Seguridad** | Notificaciones de seguridad y auditoría de acceso |
-| 🎨 **Personalización** | Configuración de preferencias y canales de notificación |
+| 🎨 **Personalización** | Configuración avanzada de preferencias mediante NotificationPreferencesDTO |
+
+### 📊 **DTOs de Notificaciones**
+
+#### 📧 **NotificationDTO**
+**Estructura principal para notificaciones:**
+- `id` (Integer) - Identificador único de la notificación
+- `content` (ContentNotification) - Contenido estructurado de la notificación
+- `dateSend` (LocalDateTime) - Fecha y hora de envío
+
+#### 📝 **ContentNotification**
+**Contenido de la notificación:**
+- `title` (String) - Título de la notificación
+- `body` (String) - Cuerpo o mensaje principal
+- `date` (String) - Fecha como texto legible
+
+#### ⚙️ **NotificationPreferencesDTO**
+**Configuración avanzada de preferencias del usuario:**
+
+**Identificación:**
+- `userId` (String) - ID del usuario
+- `profileId` (Integer) - ID del perfil específico
+
+**Preferencias de Presupuestos:**
+- `budgetExceededEnabled` (boolean) - Alertas de presupuesto excedido (default: true)
+- `budgetNearLimitEnabled` (boolean) - Alertas de presupuesto cerca del límite (default: true)
+
+**Preferencias de Deudas:**
+- `debtReminderEnabled` (boolean) - Recordatorios de deudas (default: true)
+- `debtOverdueEnabled` (boolean) - Alertas de deudas vencidas (default: true)
+- `debtReminderDaysBefore` (int) - Días de anticipación para recordatorios (default: 3)
+
+**Preferencias de Transacciones:**
+- `transactionAlertEnabled` (boolean) - Alertas de transacciones (default: false)
+- `unusualActivityEnabled` (boolean) - Detección de actividad inusual (default: true)
+
+**Canales de Notificación:**
+- `emailEnabled` (boolean) - Notificaciones por email (default: true)
+- `pushEnabled` (boolean) - Notificaciones push (default: true)
+- `smsEnabled` (boolean) - Notificaciones SMS (default: false)
+
+**Configuración de Contacto:**
+- `notificationEmail` (String) - Email alternativo para notificaciones
+- `phoneNumber` (String) - Número de teléfono para SMS
 
 ### 📊 **Tipos de Notificaciones Soportadas**
 
@@ -1148,21 +1295,6 @@ GET /v1/notification/search?keyword=presupuesto
 - Reportes de gastos por categoría
 - Actualizaciones de rendimiento financiero
 - Alertas de tendencias y patrones
-
-### ⚙️ **Configuración de Notificaciones**
-
-- 🔔 **Canales**: Email, Push, SMS, In-App
-- ⏰ **Horarios**: Configuración de horarios preferidos
-- 🎯 **Prioridades**: Filtrado por nivel de importancia
-- 🔇 **Modo Silencioso**: Desactivación temporal
-- 🎨 **Plantillas**: Personalización de formato y estilo
-
-### 📈 **Métricas y Analytics**
-
-- 📈 **Tasa de Apertura**: Porcentaje de notificaciones leídas
-- ⏱️ **Tiempo de Respuesta**: Velocidad de reacción del usuario
-- 🎯 **Relevancia**: Efectividad de las notificaciones enviadas
-- 🔄 **Frecuencia Óptima**: Análisis de patrones de engagement
 
 ---
 
@@ -1245,11 +1377,22 @@ GET /v1/notification/search?keyword=presupuesto
 
 ---
 
+---
+
+# 🤖 **KuentecoChat** - Microservicio de IA Financiera
+
+> **Microservicio especializado en inteligencia artificial para análisis financiero y procesamiento de documentos**
+
+**🔗 Puerto:** `:7070`  
+**📊 Base de Datos:** MongoDB  
+**🐳 Imagen Docker:** `yefff/image-backend-kuenteco-chat:1.0.4`  
+
 ## 💬 Endpoints de Chat
 
 ### `ChatController.java` - Sistema de inteligencia artificial para procesamiento de documentos financieros
 
-> **Base URL:** `/api/chat/v1`
+> **Base URL:** `/api/chat/v1`  
+> **Microservicio:** KuentecoChat (:7070)
 
 #### 1. 🤖 **POST** `/chat`
 
@@ -1280,8 +1423,8 @@ GET /v1/notification/search?keyword=presupuesto
 - 📊 Análisis automatizado de transacciones y reportes
 - 🔄 Contexto conversacional mantenido entre archivos
 
+**Response:** `StringChatResponseDTO` - Respuesta de chat con string  
 **Status:** `200 OK` / `400 BAD REQUEST` / `404 NOT FOUND`  
-
 
 #### 3. 📁 **POST** `/chat-with-file`
 
@@ -1296,7 +1439,8 @@ GET /v1/notification/search?keyword=presupuesto
 - 📈 Generación de insights y recomendaciones
 - 🔍 Análisis contextual del contenido 
 
-**Status:** `200 OK` / `400 BAD REQUEST` / `404 NOT FOUND`  
+**Response:** `StringChatResponseDTO` - Respuesta de chat con string  
+**Status:** `200 OK` / `400 BAD REQUEST` / `404 NOT FOUND`
 
 
 #### 4. 📄 **GET** `/reports/download/{reportId}`
@@ -1509,141 +1653,6 @@ Funcionalidades de limpieza:
 - 💭 Análisis de satisfacción del usuario
 - 🔄 Mejoras en modelos de respuesta
 
----
-
-## 🤖 Endpoints de Modelos de IA
-
-### `ModelController.java` - Gestión de modelos de inteligencia artificial disponibles
-
-> **Base URL:** `/api/chat/v1/model`
-
-#### 1. 🌐 **GET**
-
-**Descripción:** Obtiene la lista completa de modelos de IA disponibles en el sistema  
-**Autenticación:** 🔓 No requerida (sistema interno)  
-**Funcionalidad:**
-- 📋 Lista de todos los modelos de IA soportados
-- 🎯 Identificadores únicos de cada modelo
-- 📊 Información sobre capacidades disponibles
-- ⚡ Verificación rápida de modelos activos
-- 🔄 Actualización dinámica de disponibilidad
-
-**Status:** `200 OK`  
-
-
-### 🤖 **Modelos de IA Disponibles**
-
-#### 🌌 **OPENAI**
-- **Proveedor**: OpenAI (GPT-4 / GPT-3.5 Turbo)
-- **Especialidades**:
-  - 📝 **Procesamiento de Lenguaje Natural**: Comprensión avanzada de consultas complejas
-  - 📊 **Análisis Financiero**: Interpretación de estados financieros y métricas
-  - 📈 **Generación de Insights**: Recomendaciones estratégicas y análisis predictivo
-  - 🌍 **Soporte Multi-idioma**: Procesamiento en español, inglés y otros idiomas
-  - 📄 **Documentos Complejos**: Análisis de reportes financieros detallados
-
-**Casos de uso ideales:**
-- 📊 Análisis financiero complejo y detallado
-- 📈 Generación de reportes narrativos
-- 🔍 Consultas de planificación estratégica
-- 🌐 Interacciones en múltiples idiomas
-
-#### 🚀 **DEEPSEEK**
-- **Proveedor**: DeepSeek (DeepSeek-Coder)
-- **Especialidades**:
-  - 📊 **Análisis Numérico**: Procesamiento eficiente de datos cuantitativos
-  - 📄 **Documentos Estructurados**: Extracción rápida de datos de hojas de cálculo
-  - ⚡ **Respuestas Optimizadas**: Procesamiento rápido con menor latencia
-  - 💰 **Eficiencia de Costos**: Operación con costos reducidos
-  - 📈 **Patrones de Datos**: Identificación de tendencias en grandes volúmenes
-
-**Casos de uso ideales:**
-- 📊 Cálculos financieros rápidos
-- 📈 Análisis de tendencias y patrones
-- 📄 Procesamiento masivo de transacciones
-- ⚡ Respuestas en tiempo real
-
-### 🌟 **Características Especiales de Modelos**
-
-| Característica | Descripción |
-|----------------|-------------|
-| 🔄 **Disponibilidad Dinámica** | Lista actualizada en tiempo real de modelos activos |
-| 🎯 **Selección Inteligente** | Recomendación automática del modelo óptimo según el tipo de consulta |
-| 📊 **Especialización por Dominio** | Cada modelo optimizado para casos de uso específicos |
-| ⚡ **Balanceador de Carga** | Distribución inteligente de consultas entre modelos disponibles |
-| 💰 **Optimización de Costos** | Selección automática basada en eficiencia de costos |
-| 🔍 **Monitoreo de Estado** | Verificación continua de disponibilidad y rendimiento |
-| 🔄 **Fallback Automático** | Cambio automático a modelo alternativo en caso de fallas |
-| 📈 **Métricas de Rendimiento** | Seguimiento de velocidad, precisión y satisfacción |
-
-### 🎯 **Selección Automática de Modelos**
-
-El sistema selecciona automáticamente el modelo más adecuado basado en:
-
-#### 📊 **Tipo de Consulta**
-- **Consultas Analíticas Complejas** → OpenAI (GPT-4)
-- **Cálculos Numéricos Rápidos** → DeepSeek
-- **Procesamiento de Documentos** → Modelo según formato y complejidad
-- **Generación de Reportes** → OpenAI para narrativa, DeepSeek para datos
-
-#### 🕰️ **Factores de Rendimiento**
-- **Latencia Requerida**: Prioriza modelos rápidos para respuestas inmediatas
-- **Precisión Necesaria**: Selecciona modelos con mayor exactitud para análisis críticos
-- **Volumen de Datos**: Optimiza para procesamiento eficiente de grandes datasets
-- **Complejidad de Contexto**: Utiliza modelos con mayor capacidad contextual
-
-#### 💰 **Optimización de Recursos**
-- **Costo por Consulta**: Balancea calidad vs costo operativo
-- **Disponibilidad de API**: Selecciona modelos con mayor uptime
-- **Límites de Rate**: Distribuye carga según límites de cada proveedor
-- **Eficiencia Energética**: Considera impacto ambiental en la selección
-
-### 📈 **Métricas y Monitoreo**
-
-#### 📊 **Métricas de Rendimiento**
-- **Tiempo de Respuesta Promedio**: Latencia por modelo y tipo de consulta
-- **Tasa de Éxito**: Porcentaje de consultas procesadas exitosamente
-- **Precisión de Respuestas**: Calidad y relevancia de las respuestas generadas
-- **Satisfacción del Usuario**: Feedback y ratings de usuarios
-
-#### 🔍 **Monitoreo de Disponibilidad**
-- **Estado de APIs**: Verificación continua de conectividad
-- **Health Checks**: Validación periódica de funcionalidad
-- **Alertas Proactivas**: Notificaciones automáticas de fallos
-- **Recuperación Automática**: Reintentos y fallbacks inteligentes
-
-#### 💰 **Análisis de Costos**
-- **Costo por Consulta**: Tracking detallado de gastos por modelo
-- **Optimización de Uso**: Identificación de oportunidades de ahorro
-- **Proyecciones de Gasto**: Estimaciones basadas en patrones de uso
-- **ROI por Modelo**: Análisis de retorno de inversión
-
-### 🔧 **Configuración Avanzada**
-
-
-#### 🎯 **Estrategias de Fallback**
-1. **Modelo Primario Falla** → Intenta modelo secundario
-2. **Rate Limit Alcanzado** → Cambia a modelo alternativo
-3. **Latencia Excesiva** → Escala a modelo más rápido
-4. **Error de API** → Implementa retry con backoff exponencial
-
-### 🔮 **Casos de Uso Específicos**
-
-#### 📈 **Análisis Financiero Complejo**
-**Modelo Recomendado**: OpenAI  
-**Razón**: Mayor capacidad de razonamiento financiero y generación de insights estratégicos
-
-#### ⚡ **Procesamiento Rápido de Transacciones**
-**Modelo Recomendado**: DeepSeek  
-**Razón**: Optimizado para cálculos numéricos y respuestas de baja latencia
-
-#### 📄 **Análisis de Documentos Mixtos**
-**Estrategia**: Híbrida  
-**Enfoque**: DeepSeek para extracción de datos, OpenAI para interpretación y síntesis
-
-#### 🌍 **Consultas Multi-idioma**
-**Modelo Recomendado**: OpenAI  
-**Razón**: Superior capacidad de procesamiento de lenguaje natural en múltiples idiomas
 
 ---
 
