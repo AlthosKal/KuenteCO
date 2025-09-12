@@ -39,7 +39,7 @@ services:
     networks:
       - kuenteco-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U master -d KuenteCO|| exit 1"]
+      test: ["CMD-SHELL", "pg_isready -U replicator -d KuenteCO|| exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -60,7 +60,7 @@ services:
       postgres-master-database:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U master -d KuenteCO|| exit 1"]
+      test: ["CMD-SHELL", "pg_isready -U replicator -d KuenteCO|| exit 1"]
       interval: 15s
       timeout: 10s
       retries: 10
