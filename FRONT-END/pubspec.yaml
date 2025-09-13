@@ -40,6 +40,9 @@ dependencies:
   image_picker_web: ^3.0.4
   file_selector: ^1.0.3
   fl_chart: ^1.1.0
+  
+  # WebView for reCAPTCHA
+  webview_flutter: ^4.8.0
 
 dev_dependencies:
   flutter_test:
@@ -64,3 +67,4 @@ flutter:
     - assets/img/Logo 1.png
     - assets/img/Logo 2.png
     - assets/templates/Finanzas.xlsx
+    - assets/recaptcha.html

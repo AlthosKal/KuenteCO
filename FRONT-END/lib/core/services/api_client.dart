@@ -19,6 +19,7 @@ class ApiClient {
 
   late final Dio _dioApp;
   late final Dio _dioChat;
+  late final Dio _dioPublic;
 
   late final String baseUrlApp;
   late final String baseUrlChat;
@@ -29,6 +30,7 @@ class ApiClient {
     _initializeUrls();
     _dioApp = _createDio(baseUrlApp);
     _dioChat = _createDio(baseUrlChat);
+    _dioPublic = _createPublicDio(baseUrlApp);
     _isInitialized = true;
   }
 
@@ -79,6 +81,33 @@ class ApiClient {
             }
           }
           return handler.next(e);
+        },
+      ),
+    );
+
+    return dio;
+  }
+
+  Dio _createPublicDio(String baseUrl) {
+    final Dio dio = Dio(
+      BaseOptions(
+        baseUrl: baseUrl,
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 10),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ),
+    );
+
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          if (kIsWeb) {
+            options.headers['X-Requested-With'] = 'XMLHttpRequest';
+          }
+          return handler.next(options);
         },
       ),
     );
@@ -148,6 +177,39 @@ class ApiClient {
     } on DioException catch (e) {
       final mensaje = e.response?.data?['message'] ?? e.message ?? 'Error al eliminar datos.';
       throw Exception(mensaje);
+    }
+  }
+
+  Future<Response<dynamic>> postPublic(String path, dynamic data) async {
+    try {
+      print('🌐 ApiClient.postPublic() iniciado');
+      print('📍 Base URL: ${_dioPublic.options.baseUrl}');
+      print('📍 Path completo: ${_dioPublic.options.baseUrl}$path');
+      print('📦 Data a enviar: $data');
+      
+      final Options? options = data is FormData 
+          ? Options(headers: <String, String>{'Accept': 'application/json'}) 
+          : null;
+      
+      print('🚀 Enviando request...');
+      final response = await _dioPublic.post(path, data: data, options: options);
+      
+      print('✅ Response exitoso desde ApiClient');
+      return response;
+    } on DioException catch (e) {
+      print('❌ DioException en ApiClient:');
+      print('   Type: ${e.type}');
+      print('   Message: ${e.message}');
+      print('   Response: ${e.response?.data}');
+      print('   Status Code: ${e.response?.statusCode}');
+      
+      final String mensaje = e.response?.data?['message'] ?? 
+                            e.message ?? 
+                            'Error al enviar datos públicos.';
+      throw Exception(mensaje);
+    } catch (e) {
+      print('❌ Error general en ApiClient: $e');
+      throw Exception('Error inesperado: $e');
     }
   }
 

@@ -2,6 +2,9 @@ jwt:
   secret: ${JWT_SECRET}
   expiration: 86400
 
+recaptcha:
+  secret-key: ${RECAPTCHA_SECRET_KEY"}
+  google-url: ${RECAPTCHA_GOOGLE_URL"}
 management:
   endpoint:
     health:
