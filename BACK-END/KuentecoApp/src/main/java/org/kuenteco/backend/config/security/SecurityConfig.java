@@ -39,6 +39,7 @@ public class SecurityConfig {
                                 auth.requestMatchers(
                                                 "/v1/auth/login",
                                                 "/v1/auth/register",
+                                                "/v1/recaptcha/verify",
                                                 "/v1/auth/validate-verification-code",
                                                 "/v1/auth/send-verification-code",
                                                 "/v1/auth/activate-user",

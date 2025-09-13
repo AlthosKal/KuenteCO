@@ -104,9 +104,8 @@ class ApiClient {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          if (kIsWeb) {
-            options.headers['X-Requested-With'] = 'XMLHttpRequest';
-          }
+          // Removed X-Requested-With header for public endpoints
+          // to avoid CORS preflight issues
           return handler.next(options);
         },
       ),
