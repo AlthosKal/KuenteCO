@@ -4,12 +4,14 @@ import 'package:KuenteCO/widgets/common/form/custom_form_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../controllers/auth/login_controller.dart';
+import '../../controllers/auth/recaptcha_controller.dart';
 import '../../routes/app_routes.dart';
 import '../../widgets/common/background/animated_background_scaffold_widget.dart';
 import '../../widgets/common/blurred_card_widget.dart';
 import '../../widgets/common/buttoms/primary_buttom_widget.dart';
 import '../../widgets/common/form/form_title_text_widget.dart';
 import '../../widgets/common/form/password_form_widget.dart';
+import '../../widgets/components/recaptcha/recaptcha_widget.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -35,6 +37,7 @@ class _LoginFormState extends State<LoginForm> {
   final _passwordController = TextEditingController();
   final _nameOrEmailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
+  final _recaptchaController = RecaptchaController();
   
   /// â Estado del tipo de login usando enum
   final ValueNotifier<LoginType> _selectedLoginType =
@@ -48,12 +51,24 @@ class _LoginFormState extends State<LoginForm> {
     _passwordFocusNode.dispose();
     _loginController.dispose();
     _profileLoginController.dispose();
+    _recaptchaController.dispose();
     _selectedLoginType.dispose();
     super.dispose();
   }
 
   void _submitLogin() {
     if (!_formKey.currentState!.validate()) return;
+
+    // Verificar que el reCAPTCHA esté completado
+    if (!_recaptchaController.isVerified.value) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('❌ Por favor completa el reCAPTCHA antes de continuar'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
     // Decidir qué tipo de login usar basado en la selección
     if (_selectedLoginType.value == LoginType.USER) {
@@ -165,6 +180,18 @@ class _LoginFormState extends State<LoginForm> {
                     ),
                   ],
                 );
+              },
+            ),
+            const SizedBox(height: 20),
+
+            /// 🤖 Widget de reCAPTCHA
+            RecaptchaWidget(
+              controller: _recaptchaController,
+              onVerified: () {
+                // Callback opcional cuando se verifica correctamente
+              },
+              onError: () {
+                // Callback opcional cuando hay error
               },
             ),
             const SizedBox(height: 20),

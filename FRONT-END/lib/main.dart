@@ -13,7 +13,6 @@ import 'package:KuenteCO/core/services/app/category_service.dart';
 import 'package:KuenteCO/core/services/app/profile_service.dart';
 import 'package:KuenteCO/core/services/app/subscription_service.dart';
 import 'package:KuenteCO/core/services/app/user_service.dart';
-import 'package:KuenteCO/core/services/app/excel_service.dart';
 import 'package:KuenteCO/core/services/chat/chat_service.dart';
 import 'package:KuenteCO/core/services/chat/chat_history_service.dart' as history;
 import 'package:KuenteCO/core/services/app/debt_service.dart';
@@ -23,6 +22,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+
+import 'core/services/chat/excel_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

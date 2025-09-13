@@ -1,0 +1,150 @@
+<!--<!DOCTYPE html>-->
+<!--<html>-->
+<!--<head>-->
+<!--    <meta charset="utf-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>reCAPTCHA v2</title>-->
+<!--    <script src="https://www.google.com/recaptcha/api.js" async defer></script>-->
+<!--    <style>-->
+<!--        body {-->
+<!--            margin: 0;-->
+<!--            padding: 20px;-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);-->
+<!--            min-height: 100vh;-->
+<!--            display: flex;-->
+<!--            justify-content: center;-->
+<!--            align-items: center;-->
+<!--        }-->
+<!--        -->
+<!--        .container {-->
+<!--            background: white;-->
+<!--            padding: 30px;-->
+<!--            border-radius: 12px;-->
+<!--            box-shadow: 0 8px 32px rgba(0,0,0,0.1);-->
+<!--            text-align: center;-->
+<!--            max-width: 400px;-->
+<!--        }-->
+<!--        -->
+<!--        .title {-->
+<!--            color: #333;-->
+<!--            margin-bottom: 20px;-->
+<!--            font-size: 24px;-->
+<!--            font-weight: bold;-->
+<!--        }-->
+<!--        -->
+<!--        .subtitle {-->
+<!--            color: #666;-->
+<!--            margin-bottom: 30px;-->
+<!--            font-size: 14px;-->
+<!--        }-->
+<!--        -->
+<!--        .recaptcha-container {-->
+<!--            display: flex;-->
+<!--            justify-content: center;-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+<!--        -->
+<!--        .success-message {-->
+<!--            display: none;-->
+<!--            color: #4CAF50;-->
+<!--            font-weight: bold;-->
+<!--            margin-top: 15px;-->
+<!--        }-->
+<!--        -->
+<!--        .loading {-->
+<!--            display: none;-->
+<!--            color: #9C27B0;-->
+<!--            margin-top: 15px;-->
+<!--        }-->
+<!--        -->
+<!--        @media (max-width: 400px) {-->
+<!--            .container {-->
+<!--                padding: 20px;-->
+<!--                margin: 10px;-->
+<!--            }-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <div class="container">-->
+<!--        <div class="title">🔒 Verificación de Seguridad</div>-->
+<!--        <div class="subtitle">Por favor completa el reCAPTCHA para continuar</div>-->
+<!--        -->
+<!--        <div class="recaptcha-container">-->
+<!--            <div class="g-recaptcha"-->
+<!--                 data-sitekey="6LfbyMcrAAAAAN8Nfx-wqa0o-LcPzH0X8_p2CHFV"-->
+<!--                 data-callback="onRecaptchaSuccess"-->
+<!--                 data-expired-callback="onRecaptchaExpired"-->
+<!--                 data-error-callback="onRecaptchaError">-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        -->
+<!--        <div class="loading" id="loading">-->
+<!--            <div>🔄 Verificando...</div>-->
+<!--        </div>-->
+<!--        -->
+<!--        <div class="success-message" id="success">-->
+<!--            ✅ Verificación completada exitosamente-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    <script>-->
+<!--        // Callback cuando el reCAPTCHA se resuelve exitosamente-->
+<!--        function onRecaptchaSuccess(token) {-->
+<!--            console.log("reCAPTCHA token received:", token);-->
+<!--            -->
+<!--            // Mostrar loading-->
+<!--            document.getElementById('loading').style.display = 'block';-->
+<!--            -->
+<!--            // Enviar el token de vuelta a Flutter a través del JavaScriptChannel-->
+<!--            if (window.RecaptchaChannel) {-->
+<!--                window.RecaptchaChannel.postMessage(JSON.stringify({-->
+<!--                    status: 'success',-->
+<!--                    token: token,-->
+<!--                    timestamp: Date.now()-->
+<!--                }));-->
+<!--            }-->
+<!--            -->
+<!--            // Mostrar mensaje de éxito después de un breve delay-->
+<!--            setTimeout(() => {-->
+<!--                document.getElementById('loading').style.display = 'none';-->
+<!--                document.getElementById('success').style.display = 'block';-->
+<!--            }, 1000);-->
+<!--        }-->
+<!--        -->
+<!--        // Callback cuando el reCAPTCHA expira-->
+<!--        function onRecaptchaExpired() {-->
+<!--            console.log("reCAPTCHA expired");-->
+<!--            -->
+<!--            if (window.RecaptchaChannel) {-->
+<!--                window.RecaptchaChannel.postMessage(JSON.stringify({-->
+<!--                    status: 'expired',-->
+<!--                    message: 'reCAPTCHA expirado. Por favor intenta nuevamente.'-->
+<!--                }));-->
+<!--            }-->
+<!--        }-->
+<!--        -->
+<!--        // Callback cuando hay un error en el reCAPTCHA-->
+<!--        function onRecaptchaError() {-->
+<!--            console.log("reCAPTCHA error");-->
+<!--            -->
+<!--            if (window.RecaptchaChannel) {-->
+<!--                window.RecaptchaChannel.postMessage(JSON.stringify({-->
+<!--                    status: 'error',-->
+<!--                    message: 'Error al cargar reCAPTCHA. Verifica tu conexión a internet.'-->
+<!--                }));-->
+<!--            }-->
+<!--        }-->
+<!--        -->
+<!--        // Función para resetear el reCAPTCHA (llamada desde Flutter si es necesario)-->
+<!--        function resetRecaptcha() {-->
+<!--            if (typeof grecaptcha !== 'undefined') {-->
+<!--                grecaptcha.reset();-->
+<!--                document.getElementById('success').style.display = 'none';-->
+<!--                document.getElementById('loading').style.display = 'none';-->
+<!--            }-->
+<!--        }-->
+<!--    </script>-->
+<!--</body>-->
+<!--</html>-->
