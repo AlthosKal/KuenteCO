@@ -1,7 +1,14 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../../dto/app/auth/request/recaptcha_request_dto.dart';
 import '../../../dto/app/auth/response/recaptcha_response_dto.dart';
 import '../api_client.dart';
+import 'dart:convert';
+import 'dart:async';
+
+// Importación condicional para web
+import 'dart:html' as html;
 
 class RecaptchaService {
   final _api = ApiClient();
@@ -13,30 +20,60 @@ class RecaptchaService {
 
   /// Verificar token de reCAPTCHA con el backend usando endpoint público
   Future<bool> verifyRecaptcha(String token) async {
+    if (kIsWeb) {
+      return _verifyRecaptchaWeb(token);
+    } else {
+      return _verifyRecaptchaMobile(token);
+    }
+  }
+
+  /// Verificación usando dart:html para web
+  Future<bool> _verifyRecaptchaWeb(String token) async {
     try {
-      print('🔍 Iniciando verificación de reCAPTCHA...');
-      print('🎯 Token a verificar: ${token.substring(0, 20)}...');
-      
       final dto = RecaptchaRequestDTO(token: token);
-      print('📦 DTO creado: ${dto.toJson()}');
+      final jsonData = json.encode(dto.toJson());
       
-      print('🌐 Enviando request a: /recaptcha/verify');
-      print('🔧 Usando endpoint público (sin autenticación)');
-      final response = await _api.postPublic('/recaptcha/verify', dto.toJson());
+      final url = 'http://localhost:8080/api/app/v1/recaptcha/verify';
       
-      print('📡 Response recibido:');
-      print('   Status Code: ${response.statusCode}');
-      print('   Response Data: ${response.data}');
-      print('   Response Headers: ${response.headers}');
+      final request = html.HttpRequest();
+      request.open('POST', url);
+      request.setRequestHeader('Content-Type', 'application/json');
       
-      // Si la respuesta es exitosa (200), el reCAPTCHA es válido
-      final isValid = response.statusCode == 200;
-      print('✅ reCAPTCHA ${isValid ? 'válido' : 'inválido'}');
-      return isValid;
+      final completer = Completer<bool>();
+      
+      request.onLoad.listen((event) {
+        if (request.status == 200) {
+          completer.complete(true);
+        } else {
+          completer.complete(false);
+        }
+      });
+      
+      request.onError.listen((event) {
+        completer.complete(false);
+      });
+      
+      request.send(jsonData);
+      return await completer.future;
+      
     } catch (e) {
-      // Si hay algún error, considerar el reCAPTCHA como inválido
-      print('❌ Error verificando reCAPTCHA: $e');
-      print('🔍 Tipo de error: ${e.runtimeType}');
+      return false;
+    }
+  }
+
+  /// Verificación usando Dio para móvil
+  Future<bool> _verifyRecaptchaMobile(String token) async {
+    try {
+      final dto = RecaptchaRequestDTO(token: token);
+      final response = await _api.postPublic('/recaptcha/verify', dto.toJson());
+      return response.statusCode == 200;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 400 || e.response?.statusCode == 401) {
+        return false;
+      } else {
+        return false;
+      }
+    } catch (e) {
       return false;
     }
   }
@@ -48,21 +85,24 @@ class RecaptchaService {
       final response = await _api.postPublic('/recaptcha/verify', dto.toJson());
       
       if (response.statusCode == 200) {
-        // Parsear respuesta exitosa
         return RecaptchaResponseDTO(success: true);
       } else {
-        // Parsear respuesta de error si está disponible
         final errorData = response.data;
         if (errorData is Map<String, dynamic>) {
           return RecaptchaResponseDTO.fromJson(errorData);
         }
         return RecaptchaResponseDTO(success: false);
       }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 400 || e.response?.statusCode == 401) {
+        return RecaptchaResponseDTO(success: false, errorCodes: ['invalid-recaptcha']);
+      } else {
+        return RecaptchaResponseDTO(success: false, errorCodes: ['network-error']);
+      }
     } catch (e) {
-      print('❌ Error detallado verificando reCAPTCHA: $e');
       return RecaptchaResponseDTO(
         success: false, 
-        errorCodes: ['network-error']
+        errorCodes: ['unknown-error']
       );
     }
   }
