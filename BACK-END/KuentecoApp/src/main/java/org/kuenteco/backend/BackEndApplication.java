@@ -73,6 +73,8 @@ public class BackEndApplication {
 
         System.setProperty("WEB_URL", dotenv.get("WEB_URL"));
         System.setProperty("MOBILE_URL", dotenv.get("MOBILE_URL"));
+        System.setProperty("RECAPTCHA_SECRET_KEY", dotenv.get("RECAPTCHA_SECRET_KEY"));
+        System.setProperty("RECAPTCHA_GOOGLE_URL", dotenv.get("RECAPTCHA_GOOGLE_URL"));
 
         SpringApplication.run(BackEndApplication.class, args);
     }
