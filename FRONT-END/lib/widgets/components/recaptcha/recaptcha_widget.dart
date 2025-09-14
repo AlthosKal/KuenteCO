@@ -82,7 +82,7 @@ class _RecaptchaWidgetState extends State<RecaptchaWidget> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          isVerified ? 'Verificado' : "I'm not a robot",
+                          isVerified ? 'Verificado' : "No soy un robot",
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
