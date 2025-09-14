@@ -41,7 +41,7 @@ class ProfileButtonBusiness extends StatelessWidget {
           value: 'currency_converter',
           child: ListTile(
             leading: Icon(Icons.currency_exchange, size: 20),
-            title: Text(''),
+            title: Text('Divisa'),
             dense: true,
             contentPadding: EdgeInsets.zero,
           ),

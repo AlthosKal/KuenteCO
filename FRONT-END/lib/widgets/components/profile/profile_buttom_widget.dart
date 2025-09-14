@@ -43,7 +43,7 @@ class ProfileButtonWidget extends StatelessWidget {
             children: [
               Icon(Icons.currency_exchange, size: 20),
               SizedBox(width: 8),
-              Text('Conversor de Monedas'),
+              Text('Divisa'),
             ],
           ),
         ),
