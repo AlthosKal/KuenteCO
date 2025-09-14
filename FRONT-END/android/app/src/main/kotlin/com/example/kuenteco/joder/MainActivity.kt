@@ -1,4 +1,4 @@
-package com.example.joder
+package com.example.kuenteco
 
 import io.flutter.embedding.android.FlutterActivity
 
