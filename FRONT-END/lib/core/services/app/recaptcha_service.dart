@@ -33,7 +33,9 @@ class RecaptchaService {
       final dto = RecaptchaRequestDTO(token: token);
       final jsonData = json.encode(dto.toJson());
       
-      final url = 'http://localhost:8080/api/app/v1/recaptcha/verify';
+      // Usar la misma base URL que el ApiClient
+      final baseUrl = kIsWeb ? dotenv.env['APP_URL_WEB'] ?? '' : dotenv.env['APP_URL_ANDROID'] ?? '';
+      final url = '$baseUrl/recaptcha/verify';
       
       final request = html.HttpRequest();
       request.open('POST', url);
