@@ -52,6 +52,20 @@ class ExchangeRateController {
     required String targetCurrency,
     BuildContext? context,
   }) async {
+    // Validate amount range
+    if (amount <= Decimal.zero || amount > Decimal.parse('999999999.99')) {
+      final error = 'El valor debe estar entre 0.01 y 999999999.99';
+      errorMessage.value = error;
+      if (context != null && context.mounted) {
+        ToastHelper.showError(
+          context,
+          title: 'Monto inválido',
+          description: error,
+        );
+      }
+      return;
+    }
+
     isConverting.value = true;
     errorMessage.value = null;
     conversionResult.value = null;

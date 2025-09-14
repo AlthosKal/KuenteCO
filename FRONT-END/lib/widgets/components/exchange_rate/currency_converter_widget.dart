@@ -170,17 +170,17 @@ class _CurrencyConverterWidgetState extends State<CurrencyConverterWidget> {
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-        ),
       ),
       child: TextField(
         controller: _amountController,
         style: const TextStyle(color: Colors.white, fontSize: 18),
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
         ],
+        cursorColor: Colors.white,
+        cursorWidth: 2.0,
+        showCursor: true,
         decoration: InputDecoration(
           hintText: 'Ingresa el monto a convertir',
           hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
@@ -190,6 +190,20 @@ class _CurrencyConverterWidgetState extends State<CurrencyConverterWidget> {
           ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+              color: Colors.white.withOpacity(0.5),
+              width: 1.5,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+              color: Colors.white.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
         ),
       ),
     );
