@@ -9,10 +9,10 @@ class CreateDebtWidget extends StatefulWidget {
   final bool isLoading;
 
   const CreateDebtWidget({
-    Key? key,
+    super.key,
     required this.onCreateDebt,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   State<CreateDebtWidget> createState() => _CreateDebtWidgetState();

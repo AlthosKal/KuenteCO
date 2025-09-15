@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../controllers/business_logic/category_controller.dart';
-import '../../../controllers/business_logic/budget_controller.dart';
-import '../../../controllers/business_logic/debt_controller.dart';
 import '../../../controllers/transactions/transaction_controller.dart';
 import '../../../dto/app/category/category_enrollment_dto.dart';
-import '../../../dto/app/budget/budget_enrollment_dto.dart';
-import '../../../dto/app/debt/debt_dto.dart';
 import '../../../dto/app/extra/description_transaction_extra.dart';
 import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 import '../../../dto/app/transaction/kuenteco/update_transaction_dto.dart';
@@ -18,10 +14,10 @@ class EditMultipleTransactionsWidget extends StatefulWidget {
   final List<TransactionDetailDTO> transactionsToEdit;
 
   const EditMultipleTransactionsWidget({
-    Key? key,
+    super.key,
     required this.controller,
     required this.transactionsToEdit,
-  }) : super(key: key);
+  });
 
   @override
   State<EditMultipleTransactionsWidget> createState() => _EditMultipleTransactionsWidgetState();
@@ -35,7 +31,6 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
   static final CategoryEnrollmentDTO _noCategoryOption = CategoryEnrollmentDTO(
     id: -1,
     profileId: -1,
-    categoryId: null,
     categoryName: 'Sin categoría',
     userEmail: '',
     profileEmail: '',
@@ -303,7 +298,7 @@ class _EditMultipleTransactionsWidgetState extends State<EditMultipleTransaction
                                 final enrollments = [_noCategoryOption, ...categoryController.enrollments];
                                 
                                 // Find current enrollment
-                                CategoryEnrollmentDTO? currentEnrollment = enrollments.firstWhere(
+                                final CategoryEnrollmentDTO currentEnrollment = enrollments.firstWhere(
                                   (e) => e.categoryId == editableTransactions[index].categoryId,
                                   orElse: () => _noCategoryOption,
                                 );

@@ -47,7 +47,7 @@ class _ContactoPageState extends State<ContactView> {
       body: Background(
         child: Column(
           children: [
-            KuentecoNavbar(
+            const KuentecoNavbar(
               currentRoute: '/contacto',
             ),
             Expanded(
@@ -59,7 +59,7 @@ class _ContactoPageState extends State<ContactView> {
                       padding: const EdgeInsets.symmetric(horizontal: 32.0),
                       child: Center(
                         child: ConstrainedBox(
-                          constraints: BoxConstraints(
+                          constraints: const BoxConstraints(
                             maxWidth: formMaxWidth,
                           ),
                           child: Container(
@@ -102,7 +102,7 @@ class _ContactoPageState extends State<ContactView> {
         Text(
           'Contáctanos',
           style: theme.textTheme.headlineMedium?.copyWith(
-            color: Color(0xFF890cac),
+            color: const Color(0xFF890cac),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -111,7 +111,7 @@ class _ContactoPageState extends State<ContactView> {
           'Estamos aquí para ayudarte. Completa el formulario y nos pondremos en contacto contigo lo antes posible.',
           textAlign: TextAlign.center,
           style: theme.textTheme.bodyLarge?.copyWith(
-            color: Color(0xFF890cac),
+            color: const Color(0xFF890cac),
           ),
         ),
       ],
@@ -232,11 +232,11 @@ class _ContactoPageState extends State<ContactView> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: Color(0xFF890cac), size: 20),
+            Icon(icon, color: const Color(0xFF890cac), size: 20),
             const SizedBox(width: 8),
             Text(
               text,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Color(0xFF890cac),
                 fontWeight: FontWeight.w500,
               ),
@@ -266,18 +266,18 @@ class _ContactoPageState extends State<ContactView> {
         }
         return null;
       },
-      style: TextStyle(color: Color(0xFF890cac)),
+      style: const TextStyle(color: Color(0xFF890cac)),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Color(0xFF890cac)),
-        prefixIcon: Icon(icon, color: Color(0xFF890cac)),
+        labelStyle: const TextStyle(color: Color(0xFF890cac)),
+        prefixIcon: Icon(icon, color: const Color(0xFF890cac)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Color(0xFF890cac)),
+          borderSide: const BorderSide(color: Color(0xFF890cac)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Color(0xFF890cac), width: 2),
+          borderSide: const BorderSide(color: Color(0xFF890cac), width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -296,13 +296,13 @@ class _ContactoPageState extends State<ContactView> {
   void _submitForm() {
     if (_formKey.currentState?.validate() ?? false) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text(
+        const SnackBar(
+          content: Text(
             '¡Mensaje enviado correctamente!',
             style: TextStyle(color: Colors.white),
           ),
           backgroundColor: kPrimaryPurple,
-          duration: const Duration(seconds: 3),
+          duration: Duration(seconds: 3),
         ),
       );
       _nombreController.clear();

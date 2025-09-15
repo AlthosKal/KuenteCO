@@ -57,11 +57,9 @@ class CategoryEnrollmentSummaryDTO {
     }
     
     return CategoryEnrollmentSummaryDTO(
-      categoryId: null, // El backend no envía categoryId en la proyección
       categoryName: json['categoryName'],
       categoryOwnerId: json['ownerUserId']?.toString(),
       ownerUserId: json['ownerUserId']?.toString(),
-      enrolledUsersCount: null, // No disponible en la proyección
       enrolledProfilesCount: json['totalEnrollments']?.toInt(),
       totalEnrollments: json['totalEnrollments']?.toInt(),
       firstEnrollmentDate: json['firstEnrollmentDate'] != null
@@ -73,7 +71,6 @@ class CategoryEnrollmentSummaryDTO {
       categoryStartDate: json['categoryRegisterDate'] != null
           ? DateTime.parse(json['categoryRegisterDate'])
           : null,
-      categoryFinishDate: null, // No disponible en la proyección
       categoryStatus: _mapCategoryState(json['categoryState']),
       categoryEnrollmentIds: enrollmentIds,
       enrolledProfiles: profiles,
@@ -125,12 +122,12 @@ class CategoryEnrollmentSummaryDTO {
         .toList();
 
     // Crear perfiles basados en los enrollments individuales
-    List<EnrolledProfileSummaryDTO> profiles = relevantEnrollments
+    final List<EnrolledProfileSummaryDTO> profiles = relevantEnrollments
         .map((e) => EnrolledProfileSummaryDTO.fromEnrollmentJson(e))
         .toList();
 
     // Obtener IDs de enrollments
-    List<int> enrollmentIds = relevantEnrollments
+    final List<int> enrollmentIds = relevantEnrollments
         .map((e) => e['id'] as int)
         .toList();
 

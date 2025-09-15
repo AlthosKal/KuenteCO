@@ -17,7 +17,7 @@ class TransactionListWidget extends StatefulWidget {
   final bool compact; // true para mostrar como ListItems, false para Cards
 
   const TransactionListWidget({
-    Key? key,
+    super.key,
     this.filterType,
     this.onTransactionTap,
     this.onTransactionEdit,
@@ -26,7 +26,7 @@ class TransactionListWidget extends StatefulWidget {
     this.showFab = true,
     this.onAddTransaction,
     this.compact = false,
-  }) : super(key: key);
+  });
 
   @override
   State<TransactionListWidget> createState() => _TransactionListWidgetState();
@@ -426,10 +426,10 @@ class TransactionListItemWidget extends StatelessWidget {
   final VoidCallback? onTap;
 
   const TransactionListItemWidget({
-    Key? key,
+    super.key,
     required this.transaction,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

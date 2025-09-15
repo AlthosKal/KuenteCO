@@ -32,7 +32,7 @@ class ExchangeRateService {
         throw Exception(apiResponse.message);
       }
 
-      return apiResponse.data!;
+      return apiResponse.data;
     } else if (json is List) {
       // Direct list response
       return json
@@ -67,7 +67,7 @@ class ExchangeRateService {
           throw Exception(apiResponse.message);
         }
 
-        return apiResponse.data!;
+        return apiResponse.data;
       } else {
         // Handle direct response or error response without success field
         if (json.containsKey('message') && json.containsKey('errors')) {

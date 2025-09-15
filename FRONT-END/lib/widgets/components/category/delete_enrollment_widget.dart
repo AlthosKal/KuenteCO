@@ -9,11 +9,11 @@ class EnrollmentDeleteWidget extends StatefulWidget {
   final bool isSingleMode;
 
   const EnrollmentDeleteWidget({
-    Key? key,
+    super.key,
     required this.controller,
     required this.enrollmentsToDelete,
     this.isSingleMode = false,
-  }) : super(key: key);
+  });
 
   // Método estático para eliminación individual
   static Future<bool?> showDeleteSingleDialog(
@@ -42,7 +42,6 @@ class EnrollmentDeleteWidget extends StatefulWidget {
       builder: (context) => EnrollmentDeleteWidget(
         controller: controller,
         enrollmentsToDelete: enrollments,
-        isSingleMode: false,
       ),
     );
   }
@@ -316,9 +315,9 @@ class _EnrollmentDeleteWidgetState extends State<EnrollmentDeleteWidget> {
     
     try {
       int deletedCount = 0;
-      List<String> errors = [];
+      final List<String> errors = [];
       
-      for (var enrollment in enrollments) {
+      for (final enrollment in enrollments) {
         try {
           await widget.controller.deleteEnrollment(enrollment.id!);
           deletedCount++;

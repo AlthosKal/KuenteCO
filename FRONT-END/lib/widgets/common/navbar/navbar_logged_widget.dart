@@ -113,7 +113,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
     children: [
       Center(child: _buildLogo(context, true)),
       const SizedBox(height: 10),
-      SingleChildScrollView(
+      const SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -128,7 +128,7 @@ class _KuentecoLoggedNavbarState extends State<KuentecoLoggedNavbar> {
   Widget _buildDesktopLayout(BuildContext context) => Row(
     children: [
       _buildLogo(context, false),
-      Expanded(
+      const Expanded(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
         ),

@@ -266,13 +266,12 @@ class _AssignmentListWidgetState extends State<AssignmentListWidget> with MultiS
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Container(
+          child: DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: Colors.blueAccent.withValues(alpha: 0.3),
                 width: 1.5,
-                style: BorderStyle.solid,
               ),
             ),
             child: Padding(

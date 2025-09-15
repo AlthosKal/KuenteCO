@@ -10,11 +10,11 @@ class DeleteBudgetWidget {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
+        title: const Row(
           children: [
-            const Icon(Icons.warning, color: Colors.red),
-            const SizedBox(width: 8),
-            const Text('Eliminar Presupuesto'),
+            Icon(Icons.warning, color: Colors.red),
+            SizedBox(width: 8),
+            Text('Eliminar Presupuesto'),
           ],
         ),
         content: Column(

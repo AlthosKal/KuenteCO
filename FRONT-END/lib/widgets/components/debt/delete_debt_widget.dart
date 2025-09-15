@@ -8,11 +8,11 @@ class DeleteDebtWidget extends StatelessWidget {
   final bool isLoading;
 
   const DeleteDebtWidget({
-    Key? key,
+    super.key,
     required this.debt,
     required this.onDeleteDebt,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -249,9 +249,9 @@ class DeleteDebtWidget extends StatelessWidget {
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
-                : Row(
+                : const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       Icon(Icons.delete_forever, size: 18),
                       SizedBox(width: 8),
                       Text('Eliminar'),

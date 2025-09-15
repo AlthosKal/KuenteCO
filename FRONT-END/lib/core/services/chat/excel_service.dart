@@ -55,7 +55,7 @@ class ExcelService {
         });
       } else {
         // Manejar File (legacy)
-        String fileName = file.path.split('/').last;
+        final String fileName = file.path.split('/').last;
         formData = FormData.fromMap({
           'file': await MultipartFile.fromFile(
             file.path,
@@ -92,8 +92,8 @@ class ExcelService {
         fileSize = await file.length();
       }
       
-      List<String> errors = [];
-      List<String> warnings = [];
+      final List<String> errors = [];
+      final List<String> warnings = [];
       
       // Validaciones básicas
       if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {

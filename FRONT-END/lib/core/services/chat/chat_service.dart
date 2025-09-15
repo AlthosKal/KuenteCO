@@ -1,20 +1,18 @@
 import 'dart:convert';
 import 'dart:html' as html;
-import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../../dto/chat/request/chat_dto.dart';
 import '../../../dto/chat/request/chat_files_dto.dart';
 import '../../../dto/chat/request/chat_multipart_dto.dart';
 import '../../../dto/chat/request/debt_chat_request_dto.dart';
-import '../../../dto/chat/response/chat_response_dto.dart';
-import '../../../dto/chat/response/string_chat_response_dto.dart';
-import '../../../dto/chat/response/dynamic_analysis_response_dto.dart';
-import '../../../dto/chat/response/debt_analysis_response_dto.dart';
 import '../../../dto/chat/response/base_dynamic_response_dto.dart';
+import '../../../dto/chat/response/chat_response_dto.dart';
+import '../../../dto/chat/response/debt_analysis_response_dto.dart';
+import '../../../dto/chat/response/dynamic_analysis_response_dto.dart';
+import '../../../dto/chat/response/string_chat_response_dto.dart';
 import '../api_client.dart';
 
 class ChatService {

@@ -15,7 +15,7 @@ class TransactionCardWidget extends StatelessWidget {
   final bool isHomeCard; // Para mostrar como card del home
 
   const TransactionCardWidget({
-    Key? key,
+    super.key,
     this.transaction,
     this.onTap,
     this.onEdit,
@@ -23,7 +23,7 @@ class TransactionCardWidget extends StatelessWidget {
     this.showActions = true,
     this.customColor,
     this.isHomeCard = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class TransactionCardWidget extends StatelessWidget {
             Colors.blue.shade600.withOpacity(0.1),
           ],
         ),
-        borderGradient: LinearGradient(
+        borderGradient: const LinearGradient(
           colors: [
             Colors.transparent,
             Colors.transparent,
@@ -114,11 +114,11 @@ class TransactionCardWidget extends StatelessWidget {
     final theme = Theme.of(context);
     
     // Determinar el tipo de transacción usando lógica híbrida
-    TransactionType transactionType = _determineTransactionType(transaction!);
+    final TransactionType transactionType = _determineTransactionType(transaction!);
     
     // Determinar color e icono basado en el tipo de transacción
-    Color cardColor = customColor ?? _getTransactionColorByType(transactionType);
-    IconData transactionIcon = _getTransactionIconByType(transactionType);
+    final Color cardColor = customColor ?? _getTransactionColorByType(transactionType);
+    final IconData transactionIcon = _getTransactionIconByType(transactionType);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -307,7 +307,7 @@ class TransactionCardWidget extends StatelessWidget {
     // Priorizar descriptionExtra.description si existe
     if (transaction!.descriptionExtra != null) {
       final desc = transaction!.descriptionExtra!.description;
-      return (desc != null && desc != 'No description') ? desc : '';
+      return (desc != 'No description') ? desc : '';
     }
     
     // Fallback al campo description simple
@@ -326,21 +326,21 @@ class TransactionListItemWidget extends StatelessWidget {
   final bool showCategory;
 
   const TransactionListItemWidget({
-    Key? key,
+    super.key,
     required this.transaction,
     this.onTap,
     this.showCategory = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     
     // Determinar el tipo de transacción usando lógica híbrida
-    TransactionType transactionType = _determineTransactionType(transaction);
+    final TransactionType transactionType = _determineTransactionType(transaction);
     
-    Color transactionColor = _getTransactionColorByType(transactionType);
-    IconData transactionIcon = _getTransactionIconByType(transactionType);
+    final Color transactionColor = _getTransactionColorByType(transactionType);
+    final IconData transactionIcon = _getTransactionIconByType(transactionType);
 
     return ListTile(
       onTap: onTap,
@@ -451,7 +451,7 @@ class TransactionListItemWidget extends StatelessWidget {
     // Priorizar descriptionExtra.description si existe
     if (transaction.descriptionExtra != null) {
       final desc = transaction.descriptionExtra!.description;
-      return (desc != null && desc != 'No description') ? desc : '';
+      return (desc != 'No description') ? desc : '';
     }
     
     // Fallback al campo description simple

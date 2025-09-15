@@ -84,7 +84,7 @@ class _RegisterFormState extends State<RegisterForm> {
         key: _formKey,
         child: Column(
           children: [
-            FormTitleText(text: 'Registro'),
+            const FormTitleText(text: 'Registro'),
             const SizedBox(height: 20),
 
             /// ð Nombre Completo
@@ -93,7 +93,6 @@ class _RegisterFormState extends State<RegisterForm> {
               focusNode: _usernameFocusNode,
               labelText: 'Usuario',
               keyboardType: TextInputType.name,
-              textInputAction: TextInputAction.next,
               validator: (value) =>
               value == null || value.isEmpty ? 'Campo requerido' : null,
               onFieldSubmitted: (_) {

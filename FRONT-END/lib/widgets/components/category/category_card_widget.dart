@@ -111,15 +111,15 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
         
         // ESTRATEGIA MÃS AGRESIVA: Priorizar el estado correcto sobre el error
         // Si tenemos datos válidos (aunque sea una lista vacía), mostrar el estado correcto
-        bool hasValidData = role != null && !categoryController.isLoading;
-        bool hasCategories = role != 'ROLE_PROFILE' && categoryController.categories.isNotEmpty;
-        bool hasEnrollments = role == 'ROLE_PROFILE' && categoryController.enrollments.isNotEmpty;
-        bool hasEmptyValidState = role != null && 
+        final bool hasValidData = role != null && !categoryController.isLoading;
+        final bool hasCategories = role != 'ROLE_PROFILE' && categoryController.categories.isNotEmpty;
+        final bool hasEnrollments = role == 'ROLE_PROFILE' && categoryController.enrollments.isNotEmpty;
+        final bool hasEmptyValidState = role != null && 
             ((role == 'ROLE_PROFILE' && categoryController.enrollments.isEmpty) ||
              (role != 'ROLE_PROFILE' && categoryController.categories.isEmpty));
 
         // Solo mostrar error si realmente no podemos mostrar una interfaz válida
-        bool shouldShowError = categoryController.errorMessage != null && 
+        final bool shouldShowError = categoryController.errorMessage != null && 
             categoryController.errorMessage!.isNotEmpty &&
             !hasValidData &&
             !hasCategories &&
@@ -171,7 +171,7 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
               const Color(0xFF4CAF50).withOpacity(0.1),
             ],
           ),
-          borderGradient: LinearGradient(
+          borderGradient: const LinearGradient(
             colors: [
               Colors.transparent,
               Colors.transparent,
@@ -311,7 +311,7 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
   Widget _buildEnrollmentCard(CategoryController categoryController) {
     // ð¹ Si no hay enrollments â mostrar mensaje sin navegación
     if (categoryController.enrollments.isEmpty) {
-      return Container(
+      return DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -330,7 +330,7 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
               const Color(0xFF890cac).withOpacity(0.3),
             ],
           ),
-          borderGradient: LinearGradient(
+          borderGradient: const LinearGradient(
             colors: [
               Colors.transparent,
               Colors.transparent,
@@ -381,7 +381,7 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
 
     // ð¹ Si hay enrollments â mostrar información del primero
     final enrollment = categoryController.enrollments.first;
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF56AB2F), Color(0xFFA8E6CF)],
@@ -432,9 +432,9 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
-                Text(
+                const Text(
                   'Categorías asignadas',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: Colors.purpleAccent,
                     fontWeight: FontWeight.w500,
@@ -469,7 +469,7 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
     required String errorMessage,
     required VoidCallback onRetry,
   }) {
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],

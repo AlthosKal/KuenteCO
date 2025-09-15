@@ -46,7 +46,6 @@ class BudgetEnrollmentDTO {
         id: id,
         userEmail: '', // No disponible en la respuesta agrupada
         profileEmail: profileName,
-        budgetId: null, // No disponible en la respuesta agrupada
         budgetName: budgetName,
       );
     }).toList();

@@ -17,7 +17,7 @@ class DebtListWidget extends StatefulWidget {
   final bool compact;
 
   const DebtListWidget({
-    Key? key,
+    super.key,
     this.onDebtTap,
     this.onDebtEdit,
     this.onDebtDelete,
@@ -27,14 +27,14 @@ class DebtListWidget extends StatefulWidget {
     this.showFab = true,
     this.onAddDebt,
     this.compact = false,
-  }) : super(key: key);
+  });
 
   @override
   State<DebtListWidget> createState() => _DebtListWidgetState();
 }
 
 class _DebtListWidgetState extends State<DebtListWidget> {
-  bool _showFilters = false;
+  final bool _showFilters = false;
   String _searchQuery = '';
   final _searchController = TextEditingController();
 
@@ -312,9 +312,9 @@ class _DebtListWidgetState extends State<DebtListWidget> {
                       ),
                     ),
                   if (widget.onMarkAsPaid != null)
-                    PopupMenuItem(
+                    const PopupMenuItem(
                       value: 'pay',
-                      child: const Row(
+                      child: Row(
                         children: [
                           Icon(Icons.check, size: 18, color: Colors.green),
                           SizedBox(width: 12),
@@ -334,9 +334,9 @@ class _DebtListWidgetState extends State<DebtListWidget> {
                       ),
                     ),
                   if (widget.onDebtDelete != null)
-                    PopupMenuItem(
+                    const PopupMenuItem(
                       value: 'delete',
-                      child: const Row(
+                      child: Row(
                         children: [
                           Icon(Icons.delete, size: 18, color: Colors.red),
                           SizedBox(width: 12),

@@ -17,7 +17,7 @@ import '../../widgets/components/transaction/transaction_header_widget.dart';
 import '../../widgets/components/transaction/transactions_tab_widget.dart';
 
 class TransactionView extends StatefulWidget {
-  const TransactionView({Key? key}) : super(key: key);
+  const TransactionView({super.key});
 
   @override
   State<TransactionView> createState() => _TransactionViewState();
@@ -137,7 +137,7 @@ class _TransactionViewState extends State<TransactionView> with SingleTickerProv
                 /// CONTENIDO DE TABS
                 Expanded(
                   child: TabBarView(
-                    controller: _tabController!,
+                    controller: _tabController,
                     children: _buildTabViews(),
                   ),
                 ),

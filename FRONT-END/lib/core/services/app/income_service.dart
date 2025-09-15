@@ -13,7 +13,7 @@ class IncomeService {
 
   // â Get all income transactions
   Future<List<TransactionDetailDTO>> getAllIncomes() async {
-    return await _transactionService.getTransactionsWithFilters(
+    return _transactionService.getTransactionsWithFilters(
       type: 'INCOME',
     );
   }
@@ -35,7 +35,7 @@ class IncomeService {
 
   // â Get incomes by category
   Future<List<TransactionDetailDTO>> getIncomesByCategory(int categoryId) async {
-    return await _transactionService.getTransactionsWithFilters(
+    return _transactionService.getTransactionsWithFilters(
       categoryId: categoryId,
       type: 'INCOME',
     );
@@ -43,7 +43,7 @@ class IncomeService {
 
   // â Get incomes by budget
   Future<List<TransactionDetailDTO>> getIncomesByBudget(int budgetId) async {
-    return await _transactionService.getTransactionsWithFilters(
+    return _transactionService.getTransactionsWithFilters(
       budgetId: budgetId,
       type: 'INCOME',
     );
@@ -51,7 +51,7 @@ class IncomeService {
 
   // â Get incomes by profile
   Future<List<TransactionDetailDTO>> getIncomesByProfile(int profileId) async {
-    return await _transactionService.getTransactionsWithFilters(
+    return _transactionService.getTransactionsWithFilters(
       profileId: profileId,
       type: 'INCOME',
     );
@@ -62,7 +62,7 @@ class IncomeService {
     required String from,
     required String to,
   }) async {
-    return await _transactionService.getTransactionsWithFilters(
+    return _transactionService.getTransactionsWithFilters(
       from: from,
       to: to,
       type: 'INCOME',
@@ -74,7 +74,7 @@ class IncomeService {
     double? minAmount,
     double? maxAmount,
   }) async {
-    return await _transactionService.getTransactionsWithFilters(
+    return _transactionService.getTransactionsWithFilters(
       minAmount: minAmount,
       maxAmount: maxAmount,
       type: 'INCOME',
@@ -86,25 +86,25 @@ class IncomeService {
   // â Create new income
   Future<TransactionDetailDTO> addIncome(NewTransactionDTO dto) async {
     print('ð IncomeService: Creating income transaction');
-    return await _transactionService.addTransaction(dto);
+    return _transactionService.addTransaction(dto);
   }
 
   // â Create multiple incomes
   Future<List<TransactionDetailDTO>> addIncomesBatch(List<NewTransactionDTO> dtos) async {
     print('ð IncomeService: Creating ${dtos.length} income transactions in batch');
-    return await _transactionService.addTransactionsBatch(dtos);
+    return _transactionService.addTransactionsBatch(dtos);
   }
 
   // â Update income
   Future<TransactionDetailDTO> updateIncome(UpdateTransactionDTO dto) async {
     print('ð IncomeService: Updating income transaction ID: ${dto.id}');
-    return await _transactionService.updateTransaction(dto);
+    return _transactionService.updateTransaction(dto);
   }
 
   // â Update multiple incomes
   Future<List<TransactionDetailDTO>> updateIncomesBatch(List<UpdateTransactionDTO> dtos) async {
     print('ð IncomeService: Updating ${dtos.length} income transactions in batch');
-    return await _transactionService.updateTransactionsBatch(dtos);
+    return _transactionService.updateTransactionsBatch(dtos);
   }
 
   // â Delete income
@@ -219,7 +219,7 @@ class IncomeService {
     double? minAmount,
     double? maxAmount,
   }) async {
-    return await _transactionService.getTransactionsWithFilters(
+    return _transactionService.getTransactionsWithFilters(
       categoryId: categoryId,
       budgetId: budgetId,
       profileId: profileId,

@@ -34,7 +34,7 @@ class CategoryListWidget extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: isSelected 
-              ? BorderSide(color: Colors.blue, width: 2) 
+              ? const BorderSide(color: Colors.blue, width: 2) 
               : BorderSide.none,
         ),
         color: isSelected ? Colors.blue.withOpacity(0.1) : null,
@@ -76,7 +76,7 @@ class CategoryListWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "Presupuesto: \$${category.description.assignedBudget}",
+                      'Presupuesto: \$${category.description.assignedBudget}',
                       style: TextStyle(
                         color: isSelected ? Colors.blue[600] : null,
                       ),

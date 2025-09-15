@@ -25,12 +25,12 @@ class TransactionsTabWidget extends StatefulWidget {
   final Function() onRefresh;
 
   const TransactionsTabWidget({
-    Key? key,
+    super.key,
     required this.userRole,
     required this.transactionController,
     required this.categoryController,
     required this.onRefresh,
-  }) : super(key: key);
+  });
 
   @override
   State<TransactionsTabWidget> createState() => _TransactionsTabWidgetState();
@@ -102,9 +102,6 @@ class _TransactionsTabWidgetState extends State<TransactionsTabWidget> {
       onTransactionEdit: (transaction) => _editTransaction(context, transaction),
       onTransactionDelete: (transaction) => _deleteTransaction(context, transaction),
       onAddTransaction: () => _showCreateTransactionModal(context),
-      showFilters: true,
-      showFab: true,
-      compact: false,
     );
   }
   
@@ -117,9 +114,7 @@ class _TransactionsTabWidgetState extends State<TransactionsTabWidget> {
       onTransactionEdit: canManageTransactions ? (transaction) => _editTransaction(context, transaction) : null,
       onTransactionDelete: canManageTransactions ? (transaction) => _deleteTransaction(context, transaction) : null,
       onAddTransaction: canManageTransactions ? () => _showCreateTransactionModal(context) : null,
-      showFilters: true,
       showFab: canManageTransactions,
-      compact: false,
     );
   }
 
@@ -158,7 +153,7 @@ class _TransactionsTabWidgetState extends State<TransactionsTabWidget> {
       }
     }
 
-    List<DetailItem> details = [];
+    final List<DetailItem> details = [];
     
     if (_getTransactionDescription(transaction).isNotEmpty) {
       details.add(DetailItem(label: 'Descripción', value: _getTransactionDescription(transaction)));
@@ -174,7 +169,7 @@ class _TransactionsTabWidgetState extends State<TransactionsTabWidget> {
       details.add(DetailItem(label: 'Presupuesto ID', value: transaction.budgetId.toString()));
     }
 
-    List<ActionButton> actions = [];
+    final List<ActionButton> actions = [];
     
     if (widget.userRole == 'ROLE_PROFILE') {
       actions.addAll([
@@ -212,7 +207,7 @@ class _TransactionsTabWidgetState extends State<TransactionsTabWidget> {
   String _getTransactionDescription(TransactionDetailDTO transaction) {
     if (transaction.descriptionExtra != null) {
       final desc = transaction.descriptionExtra!.description;
-      return (desc != null && desc != 'No description') ? desc : '';
+      return (desc != 'No description') ? desc : '';
     }
     
     if (transaction.description != null && transaction.description != 'No description') {

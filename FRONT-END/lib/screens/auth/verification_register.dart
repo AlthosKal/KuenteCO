@@ -45,7 +45,7 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
 
   @override
   void dispose() {
-    for (var node in _focusNodes) {
+    for (final node in _focusNodes) {
       node.dispose();
     }
     _controller.dispose();
@@ -124,7 +124,7 @@ class _ValidateCodeFormState extends State<ValidateCodeForm> {
         key: _formKey,
         child: Column(
           children: [
-            FormTitleText(text: 'Ingresa el código de 6 dígitos enviado a:'),
+            const FormTitleText(text: 'Ingresa el código de 6 dígitos enviado a:'),
             const SizedBox(height: 10),
             FormTitleText(text: widget.email),
             const SizedBox(height: 30),

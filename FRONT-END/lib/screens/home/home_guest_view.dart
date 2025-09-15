@@ -19,8 +19,8 @@ class HomeGuestPage extends StatelessWidget {
       body: Background(
         child: Column(
           children: [
-            KuentecoNavbar(
-              currentRoute: '/',
+            const KuentecoNavbar(
+              
             ),
             Expanded(
               child: Center(
@@ -41,7 +41,7 @@ class HomeGuestPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Color(0xFFEDE7F6).withOpacity(0.5),
+        color: const Color(0xFFEDE7F6).withOpacity(0.5),
         borderRadius: BorderRadius.circular(15),
       ),
       child: Column(
@@ -50,7 +50,7 @@ class HomeGuestPage extends StatelessWidget {
           Text(
             'Bienvenido a Kuenteco',
             style: theme.textTheme.headlineMedium?.copyWith(
-              color: Color(0xFF890cac),
+              color: const Color(0xFF890cac),
               shadows: [
                 Shadow(
                   color: Colors.black.withOpacity(0.3),
@@ -67,7 +67,7 @@ class HomeGuestPage extends StatelessWidget {
                 'nuestra plataforma está diseñada para ayudarte a alcanzar tus metas financieras de manera sencilla y efectiva.',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyLarge?.copyWith(
-              color: Color(0xFF890cac),
+              color: const Color(0xFF890cac),
             ),
           ),
         ],

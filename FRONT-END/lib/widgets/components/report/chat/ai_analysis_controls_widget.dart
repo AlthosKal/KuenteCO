@@ -8,11 +8,11 @@ class AIAnalysisControlsWidget extends StatelessWidget {
   final VoidCallback? onGenerateStrategy;
 
   const AIAnalysisControlsWidget({
-    Key? key,
+    super.key,
     this.onAnalyzeGeneral,
     this.onAnalyzeRisk,
     this.onGenerateStrategy,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

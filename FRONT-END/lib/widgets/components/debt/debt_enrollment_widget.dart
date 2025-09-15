@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../../controllers/business_logic/debt_controller.dart';
 import '../../../controllers/profile_controller.dart';
-import '../../../dto/app/debt/debt_dto.dart';
 import '../../../dto/app/debt/debt_enrollment_dto.dart';
 
 class DebtEnrollmentWidget extends StatefulWidget {
@@ -12,11 +11,11 @@ class DebtEnrollmentWidget extends StatefulWidget {
   final Function(List<DebtEnrollmentDTO>)? onEnrollmentsLoaded;
 
   const DebtEnrollmentWidget({
-    Key? key,
+    super.key,
     this.title = 'Asignaciones de Deudas',
     this.subtitle = 'Administra las deudas asignadas al perfil',
     this.onEnrollmentsLoaded,
-  }) : super(key: key);
+  });
 
   @override
   State<DebtEnrollmentWidget> createState() => _DebtEnrollmentWidgetState();
@@ -72,7 +71,7 @@ class _DebtEnrollmentWidgetState extends State<DebtEnrollmentWidget> {
         _selectedEnrollmentIds.clear();
       } else {
         _selectedEnrollmentIds.clear();
-        _selectedEnrollmentIds.addAll(debtController.enrollments.map((e) => e.enrollmentId?.toString() ?? "${e.userEmail}-${e.debtId}"));
+        _selectedEnrollmentIds.addAll(debtController.enrollments.map((e) => e.enrollmentId?.toString() ?? '${e.userEmail}-${e.debtId}'));
       }
     });
   }
@@ -314,7 +313,7 @@ class _DebtEnrollmentWidgetState extends State<DebtEnrollmentWidget> {
                   itemCount: debtController.enrollments.length,
                   itemBuilder: (context, index) {
                     final enrollment = debtController.enrollments[index];
-                    final enrollmentKey = enrollment.enrollmentId?.toString() ?? "${enrollment.userEmail}-${enrollment.debtId}";
+                    final enrollmentKey = enrollment.enrollmentId?.toString() ?? '${enrollment.userEmail}-${enrollment.debtId}';
                     final isSelected = _selectedEnrollmentIds.contains(enrollmentKey);
 
                     return Card(
@@ -360,9 +359,9 @@ class _DebtEnrollmentWidgetState extends State<DebtEnrollmentWidget> {
                             ? null
                             : PopupMenuButton(
                                 itemBuilder: (context) => [
-                                  PopupMenuItem(
+                                  const PopupMenuItem(
                                     value: 'remove',
-                                    child: const Row(
+                                    child: Row(
                                       children: [
                                         Icon(Icons.remove_circle, color: Colors.red),
                                         SizedBox(width: 8),
@@ -529,7 +528,7 @@ class _DebtEnrollmentDialogState extends State<_DebtEnrollmentDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
+      child: SizedBox(
         width: MediaQuery.of(context).size.width * 0.9,
         height: MediaQuery.of(context).size.height * 0.7,
         child: Column(
@@ -537,9 +536,9 @@ class _DebtEnrollmentDialogState extends State<_DebtEnrollmentDialog> {
             // Header
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.orange,
-                borderRadius: const BorderRadius.only(
+                borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(16),
                   topRight: Radius.circular(16),
                 ),

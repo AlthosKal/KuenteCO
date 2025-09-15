@@ -70,7 +70,7 @@ class _CreateProfileWidgetState extends State<CreateProfileWidget> {
           key: _formKey,
           child: Column(
             children: [
-              Text("Crear nuevo perfil", style: theme.titleLarge),
+              Text('Crear nuevo perfil', style: theme.titleLarge),
 
               const SizedBox(height: 16),
               TextFormField(

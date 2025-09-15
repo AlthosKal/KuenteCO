@@ -14,7 +14,7 @@ class GlobalExceptionHandler {
       print('ð Stack trace: $stack');
 
       // Resuelve mensaje amigable
-      String userMessage = _resolveMessage(e);
+      final String userMessage = _resolveMessage(e);
 
       if (onError != null) {
         onError(Exception(userMessage));

@@ -10,7 +10,7 @@ class MultipleOperationsWidget extends StatelessWidget {
   final String singleOperationLabel;
 
   const MultipleOperationsWidget({
-    Key? key,
+    super.key,
     required this.title,
     required this.color,
     this.onCreateMultiple,
@@ -18,7 +18,7 @@ class MultipleOperationsWidget extends StatelessWidget {
     this.onDeleteMultiple,
     this.onSingleOperation,
     this.singleOperationLabel = 'Nueva Operación',
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +109,7 @@ class MultipleOperationsWidget extends StatelessWidget {
                       icon: const Icon(Icons.delete_sweep, size: 20),
                       label: const Text('Eliminar Múltiples'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red[700]!,
+                        backgroundColor: Colors.red[700],
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),

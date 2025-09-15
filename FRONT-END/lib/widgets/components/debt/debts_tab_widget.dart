@@ -21,10 +21,10 @@ class DebtsTabWidget extends StatelessWidget {
   final DebtController debtController;
 
   const DebtsTabWidget({
-    Key? key,
+    super.key,
     required this.userRole,
     required this.debtController,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -63,9 +63,6 @@ class DebtsTabWidget extends StatelessWidget {
       onMarkAsPaid: (debtId) => _markDebtAsPaid(context, debtId),
       onDebtAssign: (debt) => _assignDebtToProfile(context, debt),
       onAddDebt: () => _showCreateDebtModal(context),
-      showFilters: true,
-      showFab: true,  // â Habilitado FloatingActionButton como en transacciones
-      compact: false,
     );
   }
 
@@ -452,7 +449,7 @@ class _ProfileSelectionDialogState extends State<_ProfileSelectionDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
+      child: SizedBox(
         width: MediaQuery.of(context).size.width * 0.9,
         height: MediaQuery.of(context).size.height * 0.6,
         child: Column(
@@ -460,16 +457,16 @@ class _ProfileSelectionDialogState extends State<_ProfileSelectionDialog> {
             // Header
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.orange,
-                borderRadius: const BorderRadius.only(
+                borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(16),
                   topRight: Radius.circular(16),
                 ),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.person_add, color: Colors.white),
+                  const Icon(Icons.person_add, color: Colors.white),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -609,7 +606,7 @@ class _ProfileSelectionDialogState extends State<_ProfileSelectionDialog> {
                                       ],
                                     ),
                                     trailing: isSelected
-                                        ? Icon(Icons.check_circle, color: Colors.orange)
+                                        ? const Icon(Icons.check_circle, color: Colors.orange)
                                         : null,
                                     onTap: () {
                                       setState(() {

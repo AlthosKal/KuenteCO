@@ -47,7 +47,7 @@ class BarChartWidget extends StatelessWidget {
       );
     }
 
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: backgroundColor ?? Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -109,12 +109,11 @@ class BarChartWidget extends StatelessWidget {
                     ),
                   ),
                   titlesData: FlTitlesData(
-                    show: true,
                     topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
+                      
                     ),
                     rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
+                      
                     ),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
@@ -141,13 +140,11 @@ class BarChartWidget extends StatelessWidget {
                   ),
                   barGroups: _createBarGroups(),
                   gridData: FlGridData(
-                    show: true,
-                    drawHorizontalLine: true,
                     drawVerticalLine: false,
                     horizontalInterval: _getYInterval(),
                     getDrawingHorizontalLine: (value) {
                       return FlLine(
-                        color: Colors.grey[200]!,
+                        color: Colors.grey[200],
                         strokeWidth: 1,
                         dashArray: [5, 5],
                       );

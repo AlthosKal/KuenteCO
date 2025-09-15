@@ -59,7 +59,6 @@ class _CreateCategoryWidgetState extends State<CreateCategoryWidget> {
       );
       
       final newCategory = NewCategoryDTO(
-        budgetId: null,
         name: nameController.text,
         description: descriptionCategory,
       );

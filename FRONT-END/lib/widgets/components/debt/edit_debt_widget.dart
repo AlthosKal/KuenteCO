@@ -1,8 +1,7 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 
-import 'package:decimal/decimal.dart';
 import '../../../dto/app/debt/debt_dto.dart';
-import '../../../utils/enum/state_debt_enum.dart';
 
 class EditDebtWidget extends StatefulWidget {
   final DebtDTO debt;
@@ -10,11 +9,11 @@ class EditDebtWidget extends StatefulWidget {
   final bool isLoading;
 
   const EditDebtWidget({
-    Key? key,
+    super.key,
     required this.debt,
     required this.onUpdateDebt,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   State<EditDebtWidget> createState() => _EditDebtWidgetState();

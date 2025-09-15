@@ -6,9 +6,9 @@ class StatisticsTabWidget extends StatelessWidget {
   final String? userRole;
 
   const StatisticsTabWidget({
-    Key? key,
+    super.key,
     required this.userRole,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:decimal/decimal.dart';
+import 'package:flutter/material.dart';
+
 import '../../../controllers/business_logic/debt_controller.dart';
 import '../../../dto/app/debt/debt_dto.dart';
 
@@ -8,10 +9,10 @@ class EditMultipleDebtsWidget extends StatefulWidget {
   final List<DebtDTO> debtsToEdit;
 
   const EditMultipleDebtsWidget({
-    Key? key,
+    super.key,
     required this.controller,
     required this.debtsToEdit,
-  }) : super(key: key);
+  });
 
   @override
   State<EditMultipleDebtsWidget> createState() => _EditMultipleDebtsWidgetState();
@@ -183,7 +184,7 @@ class _EditMultipleDebtsWidgetState extends State<EditMultipleDebtsWidget> {
           return Card(
             margin: const EdgeInsets.only(bottom: 12),
             elevation: isSelected ? 4 : 1,
-            child: Container(
+            child: DecoratedBox(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 border: isSelected
