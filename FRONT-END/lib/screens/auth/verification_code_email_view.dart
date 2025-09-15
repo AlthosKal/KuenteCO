@@ -12,7 +12,7 @@ class VerificationCodeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBackgroundScaffold(child: const VerificationCodeForm());
+    return const AnimatedBackgroundScaffold(child: VerificationCodeForm());
   }
 }
 
@@ -57,7 +57,7 @@ class _VerificationCodeFormState extends State<VerificationCodeForm> {
         key: _formKey,
         child: Column(
           children: [
-            FormTitleText(
+            const FormTitleText(
               text:
               'Ingresa tu correo electrónico para recibir un código de verificación',
             ),

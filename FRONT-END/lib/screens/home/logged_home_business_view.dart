@@ -65,7 +65,7 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "¡Hola, ${widget.userName}!",
+                                '¡Hola, ${widget.userName}!',
                                 style: Theme.of(context)
                                     .textTheme
                                     .headlineSmall
@@ -76,7 +76,7 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                "Bienvenido de nuevo a Kuenteco",
+                                'Bienvenido de nuevo a Kuenteco',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium

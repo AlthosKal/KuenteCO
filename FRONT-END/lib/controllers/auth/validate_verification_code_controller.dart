@@ -122,7 +122,7 @@ class ValidateVerificationCodeController {
 
   void dispose() {
     isLoading.dispose();
-    for (var c in codeControllers) {
+    for (final c in codeControllers) {
       c.dispose();
     }
     _timer?.cancel();

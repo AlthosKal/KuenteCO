@@ -1,7 +1,5 @@
 import 'package:KuenteCO/screens/transactions/transaction_view.dart';
 import 'package:flutter/material.dart';
-
-import '../screens/account_view.dart';
 import '../screens/auth/code_recovery_view.dart';
 import '../screens/auth/login_view.dart';
 import '../screens/auth/password_recovery_view.dart';
@@ -20,8 +18,6 @@ import '../screens/legal/privacy_logged_view.dart';
 import '../screens/legal/privacy_view.dart';
 import '../screens/legal/terms_logged_view.dart';
 import '../screens/legal/terms_view.dart';
-import '../screens/profile/profiles_view.dart';
-import '../screens/suscription/subscriptions_view.dart';
 import 'app_routes.dart';
 
 class RouteGenerator {
@@ -122,8 +118,8 @@ class RouteGenerator {
         );
 
     // â SUSCRIPCIONES
-      case AppRoutes.suscriptions:
-        return MaterialPageRoute(builder: (_) => const SubscriptionPlansView());
+    //   case AppRoutes.suscriptions:
+    //     return MaterialPageRoute(builder: (_) => const SubscriptionPlansView());
 
     // â RUTAS LOGGED
       case AppRoutes.contactLogged:
@@ -149,10 +145,6 @@ class RouteGenerator {
         );
 
     // â PANTALLA DE PERFILES
-      case AppRoutes.profileScreen:
-        return MaterialPageRoute(builder: (_) => ProfileScreen());
-      case AppRoutes.accountScreen:
-        return MaterialPageRoute(builder: (_) => AccountScreen());
       case AppRoutes.categoryView:
         return MaterialPageRoute(builder: (_) => const CategoryView());
       case AppRoutes.budgetView:

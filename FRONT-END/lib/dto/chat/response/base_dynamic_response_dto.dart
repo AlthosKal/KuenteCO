@@ -3,8 +3,8 @@ import 'debt_analysis_response_dto.dart';
 import 'expense_reduction_suggestion_dto.dart';
 import 'financial_health_score_dto.dart';
 import 'financial_projection_dto.dart';
-import 'spending_pattern_response_dto.dart';
 import 'report_download_response_dto.dart';
+import 'spending_pattern_response_dto.dart';
 
 abstract class BaseDynamicResponseDTO {
   final String type;
@@ -56,10 +56,10 @@ class SimpleTextResponseDTO extends BaseDynamicResponseDTO {
   final String message;
 
   SimpleTextResponseDTO({
-    String? summary,
-    String? analysis,
+    super.summary,
+    super.analysis,
     required this.message,
-  }) : super(type: 'SIMPLE_TEXT', summary: summary, analysis: analysis);
+  }) : super(type: 'SIMPLE_TEXT');
 
   factory SimpleTextResponseDTO.fromJson(Map<String, dynamic> json) {
     return SimpleTextResponseDTO(
@@ -85,10 +85,10 @@ class SpendingPatternResponseWrapperDTO extends BaseDynamicResponseDTO {
   final SpendingPatternResponseDTO spendingPatterns;
 
   SpendingPatternResponseWrapperDTO({
-    required String? summary,
-    required String? analysis,
+    required super.summary,
+    required super.analysis,
     required this.spendingPatterns,
-  }) : super(type: 'SPENDING_PATTERNS', summary: summary, analysis: analysis);
+  }) : super(type: 'SPENDING_PATTERNS');
   
   factory SpendingPatternResponseWrapperDTO.fromJson(Map<String, dynamic> json) {
     return SpendingPatternResponseWrapperDTO(
@@ -113,10 +113,10 @@ class FinancialHealthResponseWrapperDTO extends BaseDynamicResponseDTO {
   final FinancialHealthScoreDTO healthScore;
 
   FinancialHealthResponseWrapperDTO({
-    required String? summary,
-    required String? analysis,
+    required super.summary,
+    required super.analysis,
     required this.healthScore,
-  }) : super(type: 'FINANCIAL_HEALTH', summary: summary, analysis: analysis);
+  }) : super(type: 'FINANCIAL_HEALTH');
   
   factory FinancialHealthResponseWrapperDTO.fromJson(Map<String, dynamic> json) {
     return FinancialHealthResponseWrapperDTO(
@@ -142,11 +142,11 @@ class ExpenseReductionResponseWrapperDTO extends BaseDynamicResponseDTO {
   final double totalPotentialSavings;
 
   ExpenseReductionResponseWrapperDTO({
-    required String? summary,
-    required String? analysis,
+    required super.summary,
+    required super.analysis,
     required this.suggestions,
     required this.totalPotentialSavings,
-  }) : super(type: 'EXPENSE_SUGGESTIONS', summary: summary, analysis: analysis);
+  }) : super(type: 'EXPENSE_SUGGESTIONS');
   
   factory ExpenseReductionResponseWrapperDTO.fromJson(Map<String, dynamic> json) {
     return ExpenseReductionResponseWrapperDTO(
@@ -175,10 +175,10 @@ class FinancialProjectionResponseWrapperDTO extends BaseDynamicResponseDTO {
   final FinancialProjectionDTO projection;
 
   FinancialProjectionResponseWrapperDTO({
-    required String? summary,
-    required String? analysis,
+    required super.summary,
+    required super.analysis,
     required this.projection,
-  }) : super(type: 'FINANCIAL_PROJECTION', summary: summary, analysis: analysis);
+  }) : super(type: 'FINANCIAL_PROJECTION');
   
   factory FinancialProjectionResponseWrapperDTO.fromJson(Map<String, dynamic> json) {
     return FinancialProjectionResponseWrapperDTO(
@@ -203,10 +203,10 @@ class ReportDownloadResponseWrapperDTO extends BaseDynamicResponseDTO {
   final ReportDownloadResponseDTO reportDownload;
 
   ReportDownloadResponseWrapperDTO({
-    required String? summary,
-    required String? analysis,
+    required super.summary,
+    required super.analysis,
     required this.reportDownload,
-  }) : super(type: 'REPORT_DOWNLOAD', summary: summary, analysis: analysis);
+  }) : super(type: 'REPORT_DOWNLOAD');
   
   factory ReportDownloadResponseWrapperDTO.fromJson(Map<String, dynamic> json) {
     return ReportDownloadResponseWrapperDTO(
@@ -231,10 +231,10 @@ class BudgetComparisonResponseDTO extends BaseDynamicResponseDTO {
   final Map<String, dynamic> comparisonData;
 
   BudgetComparisonResponseDTO({
-    required String? summary,
-    required String? analysis,
+    required super.summary,
+    required super.analysis,
     required this.comparisonData,
-  }) : super(type: 'BUDGET_COMPARISON', summary: summary, analysis: analysis);
+  }) : super(type: 'BUDGET_COMPARISON');
   
   factory BudgetComparisonResponseDTO.fromJson(Map<String, dynamic> json) {
     return BudgetComparisonResponseDTO(

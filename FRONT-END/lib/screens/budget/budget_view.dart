@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 import '../../controllers/business_logic/budget_controller.dart';
 import '../../core/services/app/auth_service.dart';
 import '../../mixins/multi_selection_mixin.dart';
+import '../../widgets/common/background/background_widget.dart';
+import '../../widgets/common/footer/footer_logged_widget.dart';
+import '../../widgets/common/navbar/navbar_logged_widget.dart';
 import '../../widgets/components/budget/assign_budget_to_profiles_widget.dart';
 import '../../widgets/components/budget/assignment_management_widget.dart';
 import '../../widgets/components/budget/budget_list_widget.dart';
@@ -13,9 +16,6 @@ import '../../widgets/components/budget/delete_budget_widget.dart';
 import '../../widgets/components/budget/delete_multiple_budgets_widget.dart';
 import '../../widgets/components/budget/edit_budget_widget.dart';
 import '../../widgets/components/budget/edit_multiple_budgets_widget.dart';
-import '../../widgets/common/background/background_widget.dart';
-import '../../widgets/common/navbar/navbar_logged_widget.dart';
-import '../../widgets/common/footer/footer_logged_widget.dart';
 
 class BudgetView extends StatefulWidget {
   const BudgetView({super.key});
@@ -110,7 +110,7 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
   }
 
   void _showBudgetDetail(BuildContext context, budget) {
-    final registerDateStr = "${budget.creationDate.day}/${budget.creationDate.month}/${budget.creationDate.year}";
+    final registerDateStr = '${budget.creationDate.day}/${budget.creationDate.month}/${budget.creationDate.year}';
 
     showModalBottomSheet(
       context: context,
@@ -142,11 +142,11 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
                 ),
               ),
               const Divider(),
-              Text("Fecha de creación: $registerDateStr"),
-              Text("Monto total: \$${budget.totalAmount}"),
-              Text("Estado: ${budget.status}"),
+              Text('Fecha de creación: $registerDateStr'),
+              Text('Monto total: \$${budget.totalAmount}'),
+              Text('Estado: ${budget.status}'),
               if (budget.description != null)
-                Text("Descripción: ${budget.description}"),
+                Text('Descripción: ${budget.description}'),
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 onPressed: () {
@@ -154,7 +154,7 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
                   // Aquí podrías navegar a un reporte detallado si lo deseas
                 },
                 icon: const Icon(Icons.bar_chart),
-                label: const Text("Ver reporte completo"),
+                label: const Text('Ver reporte completo'),
               ),
             ],
           ),
@@ -284,7 +284,7 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
     } else {
       // Normal AppBar para perfiles (sin acciones) y usuarios regulares
       return AppBar(
-        title: Text(isProfile ? "Mis Presupuestos Asignados" : "Presupuestos"),
+        title: Text(isProfile ? 'Mis Presupuestos Asignados' : 'Presupuestos'),
         actions: [
           // Assignment management button (only for business users)
           if (!isProfile && _isBusinessUser)
@@ -412,13 +412,12 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Container(
+          child: DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: Colors.blueAccent.withValues(alpha: 0.3),
                 width: 1.5,
-                style: BorderStyle.solid,
               ),
             ),
             child: Padding(
@@ -668,13 +667,12 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Container(
+                    child: DecoratedBox(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: Colors.blue.withValues(alpha: 0.3),
                           width: 1.5,
-                          style: BorderStyle.solid,
                         ),
                       ),
                       child: Padding(

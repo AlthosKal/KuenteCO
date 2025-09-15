@@ -5,7 +5,7 @@ import '../../../controllers/transactions/transaction_controller.dart';
 import '../../../utils/formatters.dart';
 
 class TransactionStatisticsWidget extends StatefulWidget {
-  const TransactionStatisticsWidget({Key? key}) : super(key: key);
+  const TransactionStatisticsWidget({super.key});
 
   @override
   State<TransactionStatisticsWidget> createState() => _TransactionStatisticsWidgetState();
@@ -295,7 +295,7 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
   }
 
   Widget _buildDistributionRow(String label, int count, int total, Color color, IconData icon) {
-    final percentage = (count / total * 100);
+    final percentage = count / total * 100;
     
     return Row(
       children: [
@@ -450,7 +450,7 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
                     ],
                   ),
                 );
-              }).toList(),
+              }),
             ],
           ),
         );
@@ -461,7 +461,7 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
 
 // Widget compacto para mostrar estadísticas en dashboard
 class TransactionStatsCompactWidget extends StatelessWidget {
-  const TransactionStatsCompactWidget({Key? key}) : super(key: key);
+  const TransactionStatsCompactWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

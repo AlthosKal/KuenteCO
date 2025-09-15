@@ -5,7 +5,7 @@ import '../services/app/auth_service.dart';
 import '../services/app/profile_service.dart';
 
 Future<String?> getRoleIfAuthenticated() async {
-  final storage = FlutterSecureStorage();
+  const storage = FlutterSecureStorage();
   final token = await storage.read(key: 'Authorization');
 
   if (token == null || token.isEmpty) return null;

@@ -118,7 +118,7 @@ class CategoryService {
     print('ð CategoryService: /enroll/user data list length: ${dataList.length}');
     
     // PASO 1: Agrupar por categoría ya que el backend envía un elemento por perfil
-    Map<String, List<Map<String, dynamic>>> groupedByCategory = {};
+    final Map<String, List<Map<String, dynamic>>> groupedByCategory = {};
     
     for (final item in dataList) {
       final itemMap = item as Map<String, dynamic>;
@@ -133,14 +133,14 @@ class CategoryService {
     print('ð CategoryService: Grouped into ${groupedByCategory.length} categories');
     
     // PASO 2: Crear CategoryEnrollmentSummaryDTO agrupados
-    List<CategoryEnrollmentSummaryDTO> result = [];
+    final List<CategoryEnrollmentSummaryDTO> result = [];
     
     groupedByCategory.forEach((categoryName, categoryItems) {
       print('ð CategoryService: Processing category "$categoryName" with ${categoryItems.length} profiles');
       
       // Combinar todos los enrollmentIds de esta categoría
-      List<int> allEnrollmentIds = [];
-      List<EnrolledProfileSummaryDTO> enrolledProfiles = [];
+      final List<int> allEnrollmentIds = [];
+      final List<EnrolledProfileSummaryDTO> enrolledProfiles = [];
       
       // Usar el primer item para obtener información base de la categoría
       final firstItem = categoryItems.first;
@@ -171,11 +171,9 @@ class CategoryService {
       
       // Crear el DTO agrupado
       final groupedDTO = CategoryEnrollmentSummaryDTO(
-        categoryId: null,
         categoryName: categoryName,
         categoryOwnerId: firstItem['ownerUserId']?.toString(),
         ownerUserId: firstItem['ownerUserId']?.toString(),
-        enrolledUsersCount: null,
         enrolledProfilesCount: categoryItems.length,
         totalEnrollments: allEnrollmentIds.length,
         firstEnrollmentDate: _getEarliestDate(categoryItems, 'firstEnrollmentDate'),
@@ -183,7 +181,6 @@ class CategoryService {
         categoryStartDate: firstItem['categoryRegisterDate'] != null
             ? DateTime.parse(firstItem['categoryRegisterDate'])
             : null,
-        categoryFinishDate: null,
         categoryStatus: _mapCategoryState(firstItem['categoryState']),
         categoryEnrollmentIds: allEnrollmentIds,
         enrolledProfiles: enrolledProfiles,

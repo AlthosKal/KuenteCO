@@ -9,14 +9,14 @@ class DetailModalWidget extends StatelessWidget {
   final List<ActionButton> actions;
 
   const DetailModalWidget({
-    Key? key,
+    super.key,
     required this.title,
     required this.amount,
     required this.color,
     required this.icon,
     this.details = const [],
     this.actions = const [],
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +78,7 @@ class DetailModalWidget extends StatelessWidget {
               ...details.map((detail) => Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: _buildDetailRow(context, detail.label, detail.value),
-              )).toList(),
+              )),
             ],
 
             if (actions.isNotEmpty) ...[

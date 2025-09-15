@@ -18,14 +18,14 @@ class TransactionFormWidget extends StatefulWidget {
   final bool isLoading;
 
   const TransactionFormWidget({
-    Key? key,
+    super.key,
     this.transaction,
     required this.onCreateTransaction,
     this.onUpdateTransaction,
     this.categories = const [],
     this.selectedTransactionType,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   State<TransactionFormWidget> createState() => _TransactionFormWidgetState();
@@ -139,11 +139,11 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
           // Campo de monto
           TextFormField(
             controller: _amountController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Monto *',
               hintText: '0',
-              prefixIcon: const Icon(Icons.attach_money),
-              border: const OutlineInputBorder(),
+              prefixIcon: Icon(Icons.attach_money),
+              border: OutlineInputBorder(),
               suffixText: 'COP',
             ),
             keyboardType: TextInputType.number,
@@ -293,7 +293,6 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
       ),
       items: [
         const DropdownMenuItem<int>(
-          value: null,
           child: Text('Sin categoría'),
         ),
         ...widget.categories.asMap().entries.map((entry) {
@@ -355,7 +354,6 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
         id: widget.transaction!.id,
         categoryId: _selectedCategoryId ?? 1, // Valor por defecto si es requerido
         budgetId: _selectedBudgetId ?? 1, // Valor por defecto si es requerido
-        debtId: null, // Campo opcional
         name: name,
         description: DescriptionTransaction(
           description: description.isEmpty ? 'Sin descripción' : description,
@@ -369,7 +367,6 @@ class _TransactionFormWidgetState extends State<TransactionFormWidget> {
       final createDto = NewTransactionDTO(
         categoryId: _selectedCategoryId,
         budgetId: _selectedBudgetId,
-        debtId: null, // Campo opcional
         name: name,
         description: DescriptionTransaction(
           description: description.isEmpty ? 'Sin descripción' : description,

@@ -1,13 +1,13 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:decimal/decimal.dart';
 
-import '../../../controllers/business_logic/category_controller.dart';
 import '../../../controllers/business_logic/budget_controller.dart';
+import '../../../controllers/business_logic/category_controller.dart';
 import '../../../controllers/business_logic/debt_controller.dart';
 import '../../../controllers/transactions/transaction_controller.dart';
-import '../../../dto/app/category/category_enrollment_dto.dart';
 import '../../../dto/app/budget/budget_enrollment_dto.dart';
+import '../../../dto/app/category/category_enrollment_dto.dart';
 import '../../../dto/app/debt/debt_dto.dart';
 import '../../../dto/app/extra/description_transaction_extra.dart';
 import '../../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
@@ -91,7 +91,6 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
   static final CategoryEnrollmentDTO _noCategoryOption = CategoryEnrollmentDTO(
     id: -1,
     profileId: -1,
-    categoryId: null,
     categoryName: 'Sin categoría',
     userEmail: '',
     profileEmail: '',
@@ -114,7 +113,7 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
 
   @override
   void dispose() {
-    for (var transaction in _transactions) {
+    for (final transaction in _transactions) {
       transaction.dispose();
     }
     super.dispose();
@@ -466,7 +465,6 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
                   ),
                   items: [
                     const DropdownMenuItem(
-                      value: null,
                       child: Text('Sin presupuesto'),
                     ),
                     ...budgetController.enrollments.map((budget) {
@@ -474,7 +472,7 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
                         value: budget,
                         child: Text(budget.budgetName),
                       );
-                    }).toList(),
+                    }),
                   ],
                   onChanged: _isLoading ? null : (value) {
                     setState(() {
@@ -503,7 +501,6 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
                   ),
                   items: [
                     const DropdownMenuItem(
-                      value: null,
                       child: Text('Sin deuda'),
                     ),
                     ...debtController.debts.map((debt) {
@@ -511,7 +508,7 @@ class _CreateMultipleTransactionsWidgetState extends State<CreateMultipleTransac
                         value: debt,
                         child: Text(debt.name),
                       );
-                    }).toList(),
+                    }),
                   ],
                   onChanged: _isLoading ? null : (value) {
                     setState(() {

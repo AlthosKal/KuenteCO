@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:provider/provider.dart';
 import 'package:file_selector/file_selector.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import '../../../../controllers/excel/excel_controller.dart';
 
 class ExcelControlsWidget extends StatelessWidget {
@@ -10,11 +10,11 @@ class ExcelControlsWidget extends StatelessWidget {
   final Function(XFile)? onImport;
 
   const ExcelControlsWidget({
-    Key? key,
+    super.key,
     this.onExport,
     this.onDownloadTemplate,
     this.onImport,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -405,7 +405,7 @@ class ExcelControlsWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('¿Deseas importar el siguiente archivo?'),
+            const Text('¿Deseas importar el siguiente archivo?'),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),

@@ -8,11 +8,11 @@ class DeleteTransactionWidget extends StatelessWidget {
   final bool isLoading;
 
   const DeleteTransactionWidget({
-    Key? key,
+    super.key,
     required this.transaction,
     required this.onDeleteTransaction,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +103,7 @@ class DeleteTransactionWidget extends StatelessWidget {
                       color: Colors.red.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.warning_rounded,
                       size: 48,
                       color: Colors.red,
@@ -220,7 +220,7 @@ class DeleteTransactionWidget extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.info_outline,
                         color: Colors.red,
                         size: 20,
@@ -305,7 +305,7 @@ class DeleteTransactionWidget extends StatelessWidget {
     // Priorizar descriptionExtra.description si existe
     if (transaction.descriptionExtra != null) {
       final desc = transaction.descriptionExtra!.description;
-      return (desc != null && desc != 'No description') ? desc : '';
+      return (desc != 'No description') ? desc : '';
     }
     
     // Fallback al campo description simple

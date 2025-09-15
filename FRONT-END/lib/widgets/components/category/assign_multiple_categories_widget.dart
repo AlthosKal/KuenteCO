@@ -28,8 +28,8 @@ class _BatchAssignCategoryWidgetState extends State<BatchAssignCategoryWidget> {
   String? _errorMessage;
 
   // Selecciones
-  Set<int> _selectedCategoryIds = {};
-  Set<int> _selectedProfileIds = {};
+  final Set<int> _selectedCategoryIds = {};
+  final Set<int> _selectedProfileIds = {};
 
   // Datos
   List<CategoryDTO> _availableCategories = [];
@@ -130,9 +130,9 @@ class _BatchAssignCategoryWidgetState extends State<BatchAssignCategoryWidget> {
     }
 
     // Crear lista de asignaciones
-    List<BatchEnrollmentRequestDTO> enrollments = [];
-    for (int categoryId in _selectedCategoryIds) {
-      for (int profileId in _selectedProfileIds) {
+    final List<BatchEnrollmentRequestDTO> enrollments = [];
+    for (final int categoryId in _selectedCategoryIds) {
+      for (final int profileId in _selectedProfileIds) {
         enrollments.add(BatchEnrollmentRequestDTO(
           profileId: profileId,
           categoryId: categoryId,
@@ -323,7 +323,7 @@ class _BatchAssignCategoryWidgetState extends State<BatchAssignCategoryWidget> {
                           ),
                           const SizedBox(height: 8),
                           Expanded(
-                            child: Container(
+                            child: DecoratedBox(
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey[300]!),
                                 borderRadius: BorderRadius.circular(8),
@@ -407,7 +407,7 @@ class _BatchAssignCategoryWidgetState extends State<BatchAssignCategoryWidget> {
                           ),
                           const SizedBox(height: 8),
                           Expanded(
-                            child: Container(
+                            child: DecoratedBox(
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey[300]!),
                                 borderRadius: BorderRadius.circular(8),

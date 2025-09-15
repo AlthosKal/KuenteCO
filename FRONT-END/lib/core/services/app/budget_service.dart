@@ -230,7 +230,7 @@ class BudgetService {
     }
     
     // Convert grouped backend response to individual DTOs
-    List<BudgetEnrollmentDTO> result = [];
+    final List<BudgetEnrollmentDTO> result = [];
     for (final item in dataList) {
       final itemDtos = BudgetEnrollmentDTO.fromBackendGroupedResponse(item as Map<String, dynamic>);
       result.addAll(itemDtos);

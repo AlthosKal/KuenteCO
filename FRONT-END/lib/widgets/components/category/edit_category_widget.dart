@@ -133,15 +133,15 @@ class _EditCategoryWidgetState extends State<EditCategoryWidget> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Row(
+      title: const Row(
         children: [
           Icon(
             Icons.edit_rounded,
             color: Colors.purpleAccent,
             size: 28,
           ),
-          const SizedBox(width: 12),
-          const Text(
+          SizedBox(width: 12),
+          Text(
             'Editar Categoría',
             style: TextStyle(
               fontSize: 20,

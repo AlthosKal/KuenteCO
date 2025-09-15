@@ -2,7 +2,7 @@ import '../../../../utils/enum/subscription_type_enum.dart';
 
 class CreateSubscriptionRequestDTO {
   final SubscriptionType subscriptionType;
-  String backUrl = "https://618e0b9439ba.ngrok-free.app/";
+  String backUrl = 'https://618e0b9439ba.ngrok-free.app/';
 
   CreateSubscriptionRequestDTO({
     required this.subscriptionType,

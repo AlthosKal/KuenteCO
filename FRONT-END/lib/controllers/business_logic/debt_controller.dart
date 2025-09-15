@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../core/services/app/debt_service.dart';
-import '../../dto/app/debt/new_debt_dto.dart';
 import '../../dto/app/debt/debt_dto.dart';
 import '../../dto/app/debt/debt_enrollment_dto.dart';
 import '../../dto/app/debt/debt_payment_dto.dart';
 import '../../dto/app/debt/debt_summary_dto.dart';
-import '../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
+import '../../dto/app/debt/new_debt_dto.dart';
 import '../../utils/enum/state_debt_enum.dart';
 
 class DebtController extends ChangeNotifier {
@@ -470,7 +469,7 @@ class DebtController extends ChangeNotifier {
 
   // ð Obtener deudas por prioridad (ordenadas por monto pendiente descendente)
   List<DebtDTO> get debtsByPriority {
-    List<DebtDTO> sortedDebts = List.from(debts);
+    final List<DebtDTO> sortedDebts = List.from(debts);
     sortedDebts.sort((a, b) => b.pendingAmount.compareTo(a.pendingAmount));
     return sortedDebts;
   }

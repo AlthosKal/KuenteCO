@@ -83,7 +83,7 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "¡Hola, ${profile.username}!",
+                                '¡Hola, ${profile.username}!',
                                 style: Theme.of(context)
                                     .textTheme
                                     .headlineSmall
@@ -94,7 +94,7 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                "Bienvenido de nuevo a Kuenteco",
+                                'Bienvenido de nuevo a Kuenteco',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium
@@ -132,6 +132,7 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
                                     showActions: false,
                                   );
                               }
+                              return null;
                             },
                           ),
                             ),

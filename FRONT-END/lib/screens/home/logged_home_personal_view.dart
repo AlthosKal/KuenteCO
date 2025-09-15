@@ -7,8 +7,8 @@ import '../../widgets/common/footer/footer_logged_widget.dart';
 import '../../widgets/common/navbar/navbar_logged_widget.dart';
 import '../../widgets/components/budget/budget_card_widget.dart';
 import '../../widgets/components/category/category_card_widget.dart';
-import '../../widgets/components/transaction/transaction_card_widget.dart';
 import '../../widgets/components/report/report_card.dart';
+import '../../widgets/components/transaction/transaction_card_widget.dart';
 
 class LoggedHomePersonalView extends StatelessWidget {
   final String userName;
@@ -60,7 +60,7 @@ class LoggedHomePersonalView extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "¡Hola, $userName!",
+                                '¡Hola, $userName!',
                                 style: Theme.of(context)
                                     .textTheme
                                     .headlineSmall
@@ -71,7 +71,7 @@ class LoggedHomePersonalView extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                "Bienvenido de nuevo a Kuenteco",
+                                'Bienvenido de nuevo a Kuenteco',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium

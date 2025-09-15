@@ -21,7 +21,6 @@ class EmailFormField extends StatelessWidget {
       focusNode: focusNode,
       labelText: 'Correo electrónico',
       keyboardType: TextInputType.emailAddress,
-      textInputAction: TextInputAction.next,
       onFieldSubmitted: onFieldSubmitted,
       validator: (value) {
         if (value == null || value.isEmpty) return 'Campo requerido';

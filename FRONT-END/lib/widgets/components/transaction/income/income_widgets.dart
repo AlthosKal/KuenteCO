@@ -9,7 +9,7 @@ import '../transaction_form_widget.dart';
 
 // Widget principal para mostrar la vista de ingresos
 class IncomeView extends StatefulWidget {
-  const IncomeView({Key? key}) : super(key: key);
+  const IncomeView({super.key});
 
   @override
   State<IncomeView> createState() => _IncomeViewState();
@@ -406,7 +406,7 @@ class _IncomeViewState extends State<IncomeView> {
 
 // Widget para mostrar análisis de ingresos
 class IncomeAnalyticsWidget extends StatelessWidget {
-  const IncomeAnalyticsWidget({Key? key}) : super(key: key);
+  const IncomeAnalyticsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

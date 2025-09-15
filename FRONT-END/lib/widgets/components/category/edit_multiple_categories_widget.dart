@@ -10,10 +10,10 @@ class EditMultipleCategoriesWidget extends StatefulWidget {
   final List<CategoryDTO> categoriesToEdit;
 
   const EditMultipleCategoriesWidget({
-    Key? key,
+    super.key,
     required this.controller,
     required this.categoriesToEdit,
-  }) : super(key: key);
+  });
 
   @override
   _EditMultipleCategoriesWidgetState createState() => _EditMultipleCategoriesWidgetState();
@@ -157,7 +157,7 @@ class _EditMultipleCategoriesWidgetState extends State<EditMultipleCategoriesWid
                                 ),
                                 prefixIcon: const Icon(Icons.attach_money),
                               ),
-                              keyboardType: TextInputType.numberWithOptions(decimal: true),
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Por favor ingrese un presupuesto';

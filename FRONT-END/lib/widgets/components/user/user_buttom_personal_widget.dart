@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../controllers/user_controller.dart';
 import '../../../core/services/app/auth_service.dart';
+import '../../../core/services/app/user_service.dart';
+import '../../../core/services/api_client.dart';
 import '../../../controllers/chat_controller.dart';
+import '../../../controllers/subscription_controller.dart';
+import '../../../core/services/app/subscription_service.dart';
 import '../../../routes/app_routes.dart';
 import '../notification/notification_widget.dart';
 import '../exchange_rate/currency_converter_widget.dart';
+import '../account/account_widget.dart';
+import '../subscription/subscription_widget.dart';
 
 class UserButtomPersonalWidget extends StatelessWidget {
   final String? profileImageUrl;
@@ -83,10 +90,10 @@ class UserButtomPersonalWidget extends StatelessWidget {
             _showCurrencyConverter(context);
             break;
           case 'account':
-            Navigator.pushNamed(context, AppRoutes.accountScreen);
+            _showAccount(context);
             break;
           case 'subscription':
-            Navigator.pushNamed(context, AppRoutes.suscriptions);
+            _showSubscription(context);
             break;
           case 'logout':
             _logout(context);
@@ -107,6 +114,26 @@ class UserButtomPersonalWidget extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => const CurrencyConverterWidget(),
+    );
+  }
+
+  void _showAccount(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => ChangeNotifierProvider(
+        create: (context) => UserController(userService: UserService(ApiClient())),
+        child: const AccountWidget(),
+      ),
+    );
+  }
+
+  void _showSubscription(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => ChangeNotifierProvider(
+        create: (context) => SubscriptionController(SubscriptionService(ApiClient())),
+        child: const SubscriptionWidget(),
+      ),
     );
   }
 

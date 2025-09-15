@@ -1,21 +1,21 @@
 import 'package:KuenteCO/controllers/business_logic/budget_controller.dart';
 import 'package:KuenteCO/controllers/business_logic/category_controller.dart';
+import 'package:KuenteCO/controllers/business_logic/debt_controller.dart';
+import 'package:KuenteCO/controllers/chat_controller.dart';
+import 'package:KuenteCO/controllers/excel/excel_controller.dart';
 import 'package:KuenteCO/controllers/profile_controller.dart';
 import 'package:KuenteCO/controllers/subscription_controller.dart';
 import 'package:KuenteCO/controllers/user_controller.dart';
-import 'package:KuenteCO/controllers/chat_controller.dart';
-import 'package:KuenteCO/controllers/excel/excel_controller.dart';
-import 'package:KuenteCO/controllers/business_logic/debt_controller.dart';
 import 'package:KuenteCO/core/config/is_autenticated.dart';
 import 'package:KuenteCO/core/services/api_client.dart';
 import 'package:KuenteCO/core/services/app/budget_service.dart';
 import 'package:KuenteCO/core/services/app/category_service.dart';
+import 'package:KuenteCO/core/services/app/debt_service.dart';
 import 'package:KuenteCO/core/services/app/profile_service.dart';
 import 'package:KuenteCO/core/services/app/subscription_service.dart';
 import 'package:KuenteCO/core/services/app/user_service.dart';
-import 'package:KuenteCO/core/services/chat/chat_service.dart';
 import 'package:KuenteCO/core/services/chat/chat_history_service.dart' as history;
-import 'package:KuenteCO/core/services/app/debt_service.dart';
+import 'package:KuenteCO/core/services/chat/chat_service.dart';
 import 'package:KuenteCO/routes/app_routes.dart';
 import 'package:KuenteCO/routes/route_generator.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +27,7 @@ import 'core/services/chat/excel_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: '.env');
+  await dotenv.load();
 
   final String? role = await getRoleIfAuthenticated();
   final String initialRoute = _getInitialRoute(role);

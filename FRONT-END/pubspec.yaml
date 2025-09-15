@@ -44,6 +44,7 @@ dependencies:
   # WebView for reCAPTCHA
   webview_flutter: ^4.8.0
 
+  intl: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

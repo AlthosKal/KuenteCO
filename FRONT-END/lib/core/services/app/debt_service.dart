@@ -1,9 +1,10 @@
 import 'package:decimal/decimal.dart';
-import '../../../dto/app/debt/new_debt_dto.dart';
+
 import '../../../dto/app/debt/debt_dto.dart';
 import '../../../dto/app/debt/debt_enrollment_dto.dart';
 import '../../../dto/app/debt/debt_payment_dto.dart';
 import '../../../dto/app/debt/debt_summary_dto.dart';
+import '../../../dto/app/debt/new_debt_dto.dart';
 import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 import '../../../utils/enum/state_debt_enum.dart';
 import '../api_client.dart';
@@ -98,7 +99,7 @@ class DebtService {
     String? to,
     String? kind,
   }) async {
-    return await getDebtsByState(StateDebt.DEFEATED, from: from, to: to, kind: kind);
+    return getDebtsByState(StateDebt.DEFEATED, from: from, to: to, kind: kind);
   }
 
   // â Get debts expiring soon
@@ -324,7 +325,7 @@ class DebtService {
             totalAmount: Decimal.fromInt(0), // Not available from enrollment
             pendingAmount: Decimal.fromInt(0), // Not available from enrollment
             startDate: DateTime.now(), // Default
-            expirationDate: DateTime.now().add(Duration(days: 30)), // Default expiration
+            expirationDate: DateTime.now().add(const Duration(days: 30)), // Default expiration
             state: StateDebt.ACTIVE, // Assume active
           )).toList();
     } catch (e) {
@@ -434,6 +435,6 @@ class DebtService {
 
   // â Get active debts
   Future<List<DebtDTO>> getActiveDebts() async {
-    return await getDebtsByState(StateDebt.ACTIVE);
+    return getDebtsByState(StateDebt.ACTIVE);
   }
 }

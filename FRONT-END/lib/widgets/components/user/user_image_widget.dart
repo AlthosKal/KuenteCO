@@ -219,9 +219,9 @@ class _UserImageWidgetState extends State<UserImageWidget> {
               );
             },
           ),
-          Container(
+          const ColoredBox(
             color: Colors.black26,
-            child: const Center(
+            child: Center(
               child: Text(
                 'Subiendo...',
                 style: TextStyle(

@@ -9,11 +9,11 @@ class ExcelValidationResultsWidget extends StatelessWidget {
   final VoidCallback? onProceed;
 
   const ExcelValidationResultsWidget({
-    Key? key,
+    super.key,
     required this.validationResult,
     this.onRetry,
     this.onProceed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class ExcelValidationResultsWidget extends StatelessWidget {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Container(
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(12),
@@ -101,12 +101,12 @@ class ExcelValidationResultsWidget extends StatelessWidget {
               color: Colors.green,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Row(
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.verified, color: Colors.white, size: 16),
-                const SizedBox(width: 4),
-                const Text(
+                Icon(Icons.verified, color: Colors.white, size: 16),
+                SizedBox(width: 4),
+                Text(
                   'VÃLIDO',
                   style: TextStyle(
                     color: Colors.white,

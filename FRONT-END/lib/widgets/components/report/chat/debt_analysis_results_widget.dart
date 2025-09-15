@@ -6,10 +6,10 @@ class DebtAnalysisResultsWidget extends StatelessWidget {
   final VoidCallback? onViewDetails;
 
   const DebtAnalysisResultsWidget({
-    Key? key,
+    super.key,
     required this.analysis,
     this.onViewDetails,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

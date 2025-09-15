@@ -6,11 +6,11 @@ class AnimatedTypingDots extends StatefulWidget {
   final Duration animationDuration;
 
   const AnimatedTypingDots({
-    Key? key,
+    super.key,
     this.color,
     this.size = 8.0,
     this.animationDuration = const Duration(milliseconds: 1500),
-  }) : super(key: key);
+  });
 
   @override
   State<AnimatedTypingDots> createState() => _AnimatedTypingDotsState();
@@ -53,7 +53,7 @@ class _AnimatedTypingDotsState extends State<AnimatedTypingDots>
 
   @override
   void dispose() {
-    for (var controller in _controllers) {
+    for (final controller in _controllers) {
       controller.dispose();
     }
     super.dispose();

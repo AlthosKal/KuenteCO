@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 
 import '../../../controllers/exchange_rate_controller.dart';
-import '../../../dto/app/exchange_rate/exchange_rate_dto.dart';
 import '../../../dto/app/exchange_rate/convert_currency_response_dto.dart';
+import '../../../dto/app/exchange_rate/exchange_rate_dto.dart';
 
 class CurrencyConverterWidget extends StatefulWidget {
   const CurrencyConverterWidget({super.key});
@@ -166,7 +166,7 @@ class _CurrencyConverterWidgetState extends State<CurrencyConverterWidget> {
   }
 
   Widget _buildAmountInput() {
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
@@ -179,7 +179,6 @@ class _CurrencyConverterWidgetState extends State<CurrencyConverterWidget> {
           FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
         ],
         cursorColor: Colors.white,
-        cursorWidth: 2.0,
         showCursor: true,
         decoration: InputDecoration(
           hintText: 'Ingresa el monto a convertir',
@@ -201,7 +200,6 @@ class _CurrencyConverterWidgetState extends State<CurrencyConverterWidget> {
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(
               color: Colors.white.withOpacity(0.2),
-              width: 1,
             ),
           ),
         ),
@@ -425,7 +423,7 @@ class _CurrencyConverterWidgetState extends State<CurrencyConverterWidget> {
                   ),
                 ],
               ),
-            )).toList(),
+            )),
           ],
         );
       },
