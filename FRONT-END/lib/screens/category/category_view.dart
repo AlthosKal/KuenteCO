@@ -409,32 +409,6 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                     },
                   ),
 
-                  /// HEADER CON TÍTULO
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Categorías',
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          isProfile
-                              ? 'Gestiona tus categorías de gastos'
-                              : 'Administra las categorías de tus perfiles',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.black54,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
                   /// CONTENIDO
                   Expanded(
                     child: controller.isLoading
@@ -457,8 +431,8 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                             ),
                           )
                         : isProfile
-                            ? _buildProfileView(controller)
-                            : _buildUserView(controller),
+                            ? _buildProfileViewWithHeader(controller)
+                            : _buildUserViewWithFloatingButton(controller),
                   ),
 
                   /// FOOTER
@@ -557,14 +531,68 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     }
   }
   
-  /// Vista para usuarios regulares (pueden crear/editar categorías)
+  /// Vista para usuarios regulares con botón flotante (pueden crear/editar categorías)
+  Widget _buildUserViewWithFloatingButton(CategoryController controller) {
+    return FutureBuilder<bool>(
+      future: _isProfile(),
+      builder: (context, snapshot) {
+        final isProfile = snapshot.data ?? false;
+        
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// HEADER CON TÍTULO (igual que en home)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Categorías',
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        isProfile
+                            ? 'Gestiona tus categorías de gastos'
+                            : 'Administra las categorías de tus perfiles',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              
+              /// CONTENIDO
+              Expanded(
+                child: controller.categories.isEmpty
+                    ? _buildEmptyStateWithFloatingButton()
+                    : Stack(
+                        children: [
+                          _buildUserView(controller),
+                          _buildFloatingCreateButton(),
+                        ],
+                      ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// Vista para usuarios regulares (pueden crear/editar categorías) - sin botón interno
   Widget _buildUserView(CategoryController controller) {
-    if (controller.categories.isEmpty) {
-      return _buildEmptyState();
-    }
-    
     return Container(
-      margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -578,15 +606,37 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
       ),
       child: ListView.builder(
         padding: const EdgeInsets.all(8),
-        itemCount: controller.categories.length + 1, // +1 para el botón de agregar
-        itemBuilder: (context, index) => _buildUserViewItem(context, controller, index),
+        itemCount: controller.categories.length, // Sin el +1 porque el botón está fuera
+        itemBuilder: (context, index) => _buildCategoryItem(context, controller, index),
       ),
     );
   }
   
+  /// Estado vacío con botón flotante
+  Widget _buildEmptyStateWithFloatingButton() {
+    return Stack(
+      children: [
+        _buildEmptyState(),
+        _buildFloatingCreateButton(),
+      ],
+    );
+  }
+
+  /// Botón flotante para crear categoría con estilo original
+  Widget _buildFloatingCreateButton() {
+    return Positioned(
+      bottom: 24,
+      left: 0,
+      right: 0,
+      child: _buildCreateCategoryButton(
+        'Crear nueva categoría',
+        'Toca para agregar una nueva categoría',
+      ),
+    );
+  }
+
   Widget _buildEmptyState() {
     return Container(
-      margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -620,16 +670,11 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
               ),
               const SizedBox(height: 8),
               Text(
-                'Crea tu primera categoría usando el botón de abajo',
+                'Crea tu primera categoría usando el botón flotante',
                 style: TextStyle(
                   color: Colors.grey[500],
                 ),
                 textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              _buildCreateCategoryButton(
-                'Crear primera categoría',
-                'Toca para comenzar a organizar tus gastos',
               ),
             ],
           ),
@@ -637,16 +682,8 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     );
   }
   
-  Widget _buildUserViewItem(BuildContext context, CategoryController controller, int index) {
-    // Si es el último item, mostrar el botón de agregar
-    if (index == controller.categories.length) {
-      return _buildCreateCategoryButton(
-        'Crear nueva categoría',
-        'Toca para agregar una nueva categoría',
-      );
-    }
-    
-    // Items normales de categorías
+  /// Método para construir items de categoría individuales
+  Widget _buildCategoryItem(BuildContext context, CategoryController controller, int index) {
     final category = controller.categories[index];
     return CategoryListWidget(
       key: ValueKey(category.id),
@@ -663,12 +700,67 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
       },
     );
   }
+
+  Widget _buildUserViewItem(BuildContext context, CategoryController controller, int index) {
+    // Si es el último item, mostrar el botón de agregar
+    if (index == controller.categories.length) {
+      return _buildCreateCategoryButton(
+        'Crear nueva categoría',
+        'Toca para agregar una nueva categoría',
+      );
+    }
+    
+    // Items normales de categorías
+    return _buildCategoryItem(context, controller, index);
+  }
   
+  /// Vista para perfiles con header (solo pueden ver categorías asignadas)
+  Widget _buildProfileViewWithHeader(CategoryController controller) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// HEADER CON TÍTULO (igual que en home)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Mis Categorías Asignadas',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Gestiona tus categorías de gastos',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.black54,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          
+          /// CONTENIDO
+          Expanded(
+            child: _buildProfileView(controller),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Vista para perfiles (solo pueden ver categorías asignadas)
   Widget _buildProfileView(CategoryController controller) {
     return controller.enrollments.isEmpty
         ? Container(
-            margin: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
@@ -713,7 +805,6 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
               ),
           )
         : Container(
-            margin: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
