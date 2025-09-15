@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import '../../../screens/report/report_view.dart';
 
 class ReportCard extends StatelessWidget {
-  const ReportCard({Key? key}) : super(key: key);
+  const ReportCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
@@ -14,8 +14,8 @@ class ReportCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () => _navigateToReportView(context),
-        child: Padding(
-          padding: const EdgeInsets.all(10),
+        child: const Padding(
+          padding: EdgeInsets.all(10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -24,10 +24,10 @@ class ReportCard extends StatelessWidget {
                 size: 30,
                 color: Colors.black87,
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Text(
                 'Reporte',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: Colors.black87,

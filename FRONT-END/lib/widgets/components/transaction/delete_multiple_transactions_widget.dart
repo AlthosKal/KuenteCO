@@ -9,10 +9,10 @@ class DeleteMultipleTransactionsWidget extends StatefulWidget {
   final List<TransactionDetailDTO> transactionsToDelete;
   
   const DeleteMultipleTransactionsWidget({
-    Key? key,
+    super.key,
     required this.controller,
     required this.transactionsToDelete,
-  }) : super(key: key);
+  });
 
   @override
   State<DeleteMultipleTransactionsWidget> createState() =>
@@ -266,7 +266,7 @@ class _DeleteMultipleTransactionsWidgetState
 
   void _deleteSelectedTransactions() async {
     // Get IDs of selected transactions
-    List<int> selectedIds = [];
+    final List<int> selectedIds = [];
     for (int i = 0; i < widget.transactionsToDelete.length; i++) {
       if (selectedForDeletion[i]) {
         selectedIds.add(widget.transactionsToDelete[i].id);

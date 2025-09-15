@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
+
+import 'package:flutter/material.dart';
 
 class TypewriterTextWidget extends StatefulWidget {
   final String text;
@@ -9,13 +10,13 @@ class TypewriterTextWidget extends StatefulWidget {
   final bool autoStart;
 
   const TypewriterTextWidget({
-    Key? key,
+    super.key,
     required this.text,
     this.speed = const Duration(milliseconds: 50),
     this.textStyle,
     this.onComplete,
     this.autoStart = true,
-  }) : super(key: key);
+  });
 
   @override
   State<TypewriterTextWidget> createState() => _TypewriterTextWidgetState();

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+
+import '../../controllers/business_logic/debt_controller.dart';
 import '../../controllers/chat_controller.dart';
 import '../../controllers/excel/excel_controller.dart';
-import '../../controllers/business_logic/debt_controller.dart';
-import '../../widgets/components/report/chat/ai_analysis_controls_widget.dart';
+import '../../widgets/components/report/chat/animated_typing_dots.dart';
+import '../../widgets/components/report/chat/chat_message_widget.dart';
 import '../../widgets/components/report/chat/debt_analysis_results_widget.dart';
 import '../../widgets/components/report/excel/excel_controls_widget.dart';
 import '../../widgets/components/report/excel/excel_validation_results_widget.dart';
-import '../../widgets/components/report/chat/chat_message_widget.dart';
-import '../../widgets/components/report/chat/animated_typing_dots.dart';
 
 class ReportView extends StatefulWidget {
-  const ReportView({Key? key}) : super(key: key);
+  const ReportView({super.key});
 
   @override
   State<ReportView> createState() => _ReportViewState();
@@ -339,7 +339,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
       return _buildEmptyChat(context);
     }
 
-    return Container(
+    return ColoredBox(
       color: Colors.white,
       child: Column(
         children: [
@@ -565,7 +565,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
             ),
           ),
           const SizedBox(width: 8),
-          Container(
+          DecoratedBox(
             decoration: BoxDecoration(
               color: (chatController.isLoading || chatController.isTyping) ? Colors.red[600] : Colors.blue[600],
               borderRadius: BorderRadius.circular(24),
@@ -617,7 +617,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
   ) async {
     try {
       await chatController.generatePaymentStrategy(
-        userId: "dummy_user_id",
+        userId: 'dummy_user_id',
         availableBudget: 100000.0, // Presupuesto dummy
       );
       _showSuccessMessage(context, 'Estrategia de pago generada exitosamente');
@@ -888,7 +888,6 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
         ),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 4),
       ),
     );
   }

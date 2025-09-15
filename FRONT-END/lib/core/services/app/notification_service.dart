@@ -1,5 +1,4 @@
 import '../../../dto/app/notification/notification_dto.dart';
-import '../../../dto/app/notification/notification_preferences_dto.dart';
 import '../api_client.dart';
 
 class NotificationService {

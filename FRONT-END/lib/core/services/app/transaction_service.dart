@@ -61,7 +61,7 @@ class TransactionService {
         .map((e) => TransactionDetailDTO.fromJson(e as Map<String, dynamic>))
         .toList();
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 

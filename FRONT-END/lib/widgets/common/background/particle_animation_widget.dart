@@ -41,7 +41,7 @@ class ParticlePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint();
 
-    for (var particle in particles) {
+    for (final particle in particles) {
       if (particleImage != null) {
         paint.colorFilter = ColorFilter.mode(
             Colors.white.withOpacity(particle.opacity),
@@ -121,7 +121,7 @@ class _ParticleAnimationState extends State<ParticleAnimation> with SingleTicker
   void _createFallbackImage() async {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    final size = const Size(20, 20);
+    const size = Size(20, 20);
 
     final paint = Paint()
       ..color = Colors.white
@@ -164,7 +164,7 @@ class _ParticleAnimationState extends State<ParticleAnimation> with SingleTicker
   void _updateParticles() {
     if (!mounted || _screenSize == null) return;
 
-    for (var particle in particles) {
+    for (final particle in particles) {
       particle.move(_screenSize!);
     }
 
@@ -180,13 +180,13 @@ class _ParticleAnimationState extends State<ParticleAnimation> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return ColoredBox(
       color: const Color(0xFF890cac),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final size = Size(constraints.maxWidth, constraints.maxHeight);
 
-          if ((_screenSize == null || _screenSize != size)) {
+          if (_screenSize == null || _screenSize != size) {
             _screenSize = size;
             _initializeParticles();
           }

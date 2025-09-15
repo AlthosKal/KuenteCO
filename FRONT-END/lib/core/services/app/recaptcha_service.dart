@@ -1,14 +1,15 @@
+import 'dart:async';
+import 'dart:convert';
+// Importación condicional para web
+import 'dart:html' as html;
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import '../../../dto/app/auth/request/recaptcha_request_dto.dart';
 import '../../../dto/app/auth/response/recaptcha_response_dto.dart';
 import '../api_client.dart';
-import 'dart:convert';
-import 'dart:async';
-
-// Importación condicional para web
-import 'dart:html' as html;
 
 class RecaptchaService {
   final _api = ApiClient();

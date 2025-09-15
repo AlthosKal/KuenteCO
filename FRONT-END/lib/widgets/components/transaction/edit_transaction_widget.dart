@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 
-import '../../../controllers/business_logic/category_controller.dart';
 import '../../../controllers/business_logic/budget_controller.dart';
+import '../../../controllers/business_logic/category_controller.dart';
 import '../../../controllers/business_logic/debt_controller.dart';
+import '../../../dto/app/budget/budget_enrollment_dto.dart';
 import '../../../dto/app/category/category_dto.dart';
 import '../../../dto/app/category/category_enrollment_dto.dart';
-import '../../../dto/app/budget/budget_enrollment_dto.dart';
 import '../../../dto/app/debt/debt_dto.dart';
 import '../../../dto/app/extra/description_category_extra.dart';
 import '../../../dto/app/extra/description_transaction_extra.dart';
@@ -22,11 +22,11 @@ class EditTransactionWidget extends StatefulWidget {
   final bool isLoading;
 
   const EditTransactionWidget({
-    Key? key,
+    super.key,
     required this.transaction,
     required this.onUpdateTransaction,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   State<EditTransactionWidget> createState() => _EditTransactionWidgetState();
@@ -52,7 +52,6 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
   static final CategoryEnrollmentDTO _noCategoryOption = CategoryEnrollmentDTO(
     id: -1, // Use -1 as a special ID for "no category"
     profileId: -1,
-    categoryId: null, // null means no category
     categoryName: 'Sin categoría',
     userEmail: '',
     profileEmail: '',
@@ -67,7 +66,6 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
       assignedBudget: 0.0,
       state: state_enum.State.ACTIVE,
     ),
-    budgetId: null, // null means no budget
     businessAccountId: -1,
     registerDate: DateTime.now(),
   );
@@ -469,7 +467,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                         icon: Icons.attach_money,
                         prefix: '\$',
                       ),
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       validator: (value) {
                         if (value?.isEmpty ?? true) {
                           return 'El monto es obligatorio';
@@ -558,7 +556,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                                   value: enrollment,
                                   child: Text(enrollment.categoryName),
                                 );
-                              }).toList(),
+                              }),
                             ],
                             onChanged: (value) {
                               setState(() {
@@ -588,7 +586,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                                   value: category,
                                   child: Text(category.name),
                                 );
-                              }).toList(),
+                              }),
                             ],
                             onChanged: (value) {
                               setState(() {
@@ -640,7 +638,6 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                           ),
                           items: [
                             const DropdownMenuItem(
-                              value: null,
                               child: Text('Sin presupuesto'),
                             ),
                             ...budgetController.enrollments.map((budget) {
@@ -648,7 +645,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                                 value: budget,
                                 child: Text(budget.budgetName),
                               );
-                            }).toList(),
+                            }),
                           ],
                           onChanged: (value) {
                             setState(() {
@@ -697,7 +694,6 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                           ),
                           items: [
                             const DropdownMenuItem(
-                              value: null,
                               child: Text('Sin deuda'),
                             ),
                             ...debtController.debts.map((debt) {
@@ -705,7 +701,7 @@ class _EditTransactionWidgetState extends State<EditTransactionWidget> {
                                 value: debt,
                                 child: Text(debt.name),
                               );
-                            }).toList(),
+                            }),
                           ],
                           onChanged: (value) {
                             setState(() {

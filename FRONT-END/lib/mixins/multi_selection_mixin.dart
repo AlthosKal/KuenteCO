@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 mixin MultiSelectionMixin<T extends StatefulWidget> on State<T> {
   bool _isSelectionMode = false;
-  Set<int> _selectedCategoryIds = {};
-  Set<String> _selectedEnrollmentKeys = {};
+  final Set<int> _selectedCategoryIds = {};
+  final Set<String> _selectedEnrollmentKeys = {};
 
   bool get isSelectionMode => _isSelectionMode;
   Set<int> get selectedCategoryIds => _selectedCategoryIds;

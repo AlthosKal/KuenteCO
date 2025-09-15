@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../controllers/business_logic/category_controller.dart';
 import '../../../controllers/business_logic/budget_controller.dart';
+import '../../../controllers/business_logic/category_controller.dart';
 import '../../../controllers/business_logic/debt_controller.dart';
-import '../../../dto/app/category/category_enrollment_dto.dart';
 import '../../../dto/app/budget/budget_enrollment_dto.dart';
+import '../../../dto/app/category/category_enrollment_dto.dart';
 import '../../../dto/app/debt/debt_dto.dart';
 import '../../../dto/app/extra/description_transaction_extra.dart';
 import '../../../dto/app/transaction/kuenteco/new_transaction_dto.dart';
@@ -16,10 +16,10 @@ class CreateTransactionWidget extends StatefulWidget {
   final bool isLoading;
 
   const CreateTransactionWidget({
-    Key? key,
+    super.key,
     required this.onCreateTransaction,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   State<CreateTransactionWidget> createState() => _CreateTransactionWidgetState();
@@ -42,7 +42,6 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
   static final CategoryEnrollmentDTO _noCategoryOption = CategoryEnrollmentDTO(
     id: -1, // Use -1 as a special ID for "no category"
     profileId: -1,
-    categoryId: null, // null means no category
     categoryName: 'Sin categoría',
     userEmail: '',
     profileEmail: '',
@@ -298,7 +297,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                         icon: Icons.attach_money,
                         prefix: '\$',
                       ),
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       validator: (value) {
                         if (value?.isEmpty ?? true) {
                           return 'El monto es obligatorio';
@@ -360,7 +359,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                                 value: enrollment,
                                 child: Text(enrollment.categoryName),
                               );
-                            }).toList(),
+                            }),
                           ],
                           onChanged: (value) {
                             setState(() => _selectedEnrollment = value);
@@ -408,7 +407,6 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                           ),
                           items: [
                             const DropdownMenuItem(
-                              value: null,
                               child: Text('Sin presupuesto'),
                             ),
                             ...budgetController.enrollments.map((budget) {
@@ -416,7 +414,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                                 value: budget,
                                 child: Text(budget.budgetName),
                               );
-                            }).toList(),
+                            }),
                           ],
                           onChanged: (value) {
                             setState(() => _selectedBudget = value);
@@ -463,7 +461,6 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                           ),
                           items: [
                             const DropdownMenuItem(
-                              value: null,
                               child: Text('Sin deuda'),
                             ),
                             ...debtController.debts.map((debt) {
@@ -471,7 +468,7 @@ class _CreateTransactionWidgetState extends State<CreateTransactionWidget> {
                                 value: debt,
                                 child: Text(debt.name),
                               );
-                            }).toList(),
+                            }),
                           ],
                           onChanged: (value) {
                             setState(() => _selectedDebt = value);

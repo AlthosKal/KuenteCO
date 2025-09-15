@@ -5,10 +5,10 @@ class TransactionHeaderWidget extends StatelessWidget {
   final TabController tabController;
 
   const TransactionHeaderWidget({
-    Key? key,
+    super.key,
     required this.userRole,
     required this.tabController,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class TransactionHeaderWidget extends StatelessWidget {
           const SizedBox(height: 16),
 
           /// TABS
-          Container(
+          DecoratedBox(
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.9),
               borderRadius: BorderRadius.circular(12),

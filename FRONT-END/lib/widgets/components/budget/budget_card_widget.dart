@@ -125,7 +125,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
               const Color(0xFF21CBF3).withOpacity(0.1),
             ],
           ),
-          borderGradient: LinearGradient(
+          borderGradient: const LinearGradient(
             colors: [
               Colors.transparent,
               Colors.transparent,
@@ -265,7 +265,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
   Widget _buildEnrollmentCard(BudgetController budgetController) {
     // Si no existen enrollments
     if (budgetController.enrollments.isEmpty) {
-      return Container(
+      return DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -284,7 +284,7 @@ class _BudgetCardWidgetState extends State<BudgetCardWidget> {
               const Color(0xFF890cac).withOpacity(0.3),
             ],
           ),
-          borderGradient: LinearGradient(
+          borderGradient: const LinearGradient(
             colors: [
               Colors.transparent,
               Colors.transparent,

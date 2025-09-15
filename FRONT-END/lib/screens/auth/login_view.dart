@@ -96,7 +96,7 @@ class _LoginFormState extends State<LoginForm> {
         key: _formKey,
         child: Column(
           children: [
-            FormTitleText(text: 'Inicio de Sesión'),
+            const FormTitleText(text: 'Inicio de Sesión'),
             const SizedBox(height: 20),
 
             /// â Campo email/usuario

@@ -20,7 +20,6 @@ class CategoryFormData {
   
   NewCategoryDTO toNewCategoryDTO() {
     return NewCategoryDTO(
-      budgetId: null,
       name: nameController.text.trim(),
       description: DescriptionCategory(
         assignedBudget: double.parse(budgetController.text.trim()),
@@ -51,7 +50,7 @@ class _CreateMultipleCategoriesWidgetState extends State<CreateMultipleCategorie
 
   @override
   void dispose() {
-    for (var category in _categories) {
+    for (final category in _categories) {
       category.dispose();
     }
     super.dispose();

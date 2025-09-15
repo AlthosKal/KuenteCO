@@ -1,6 +1,6 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 
-import 'package:decimal/decimal.dart';
 import '../../../controllers/business_logic/debt_controller.dart';
 import '../../../dto/app/debt/new_debt_dto.dart';
 import '../../../utils/enum/state_debt_enum.dart';
@@ -9,9 +9,9 @@ class CreateMultipleDebtsWidget extends StatefulWidget {
   final DebtController controller;
   
   const CreateMultipleDebtsWidget({
-    Key? key,
+    super.key,
     required this.controller,
-  }) : super(key: key);
+  });
 
   @override
   State<CreateMultipleDebtsWidget> createState() => _CreateMultipleDebtsWidgetState();
@@ -404,9 +404,9 @@ class _CreateMultipleDebtsWidgetState extends State<CreateMultipleDebtsWidget> {
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     )
-                  : Row(
+                  : const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Icon(Icons.save, size: 18),
                         SizedBox(width: 8),
                         Text('Crear Deudas'),

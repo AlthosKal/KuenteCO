@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 import '../../controllers/business_logic/category_controller.dart';
 import '../../core/services/app/auth_service.dart';
 import '../../mixins/multi_selection_mixin.dart';
+import '../../widgets/common/background/background_widget.dart';
+import '../../widgets/common/footer/footer_logged_widget.dart';
+import '../../widgets/common/navbar/navbar_logged_widget.dart';
 import '../../widgets/components/category/assign_category_widget.dart';
 import '../../widgets/components/category/category_list_widget.dart';
 import '../../widgets/components/category/create_category_widget.dart';
@@ -15,9 +18,6 @@ import '../../widgets/components/category/delete_multiple_categories_widget.dart
 import '../../widgets/components/category/edit_category_widget.dart';
 import '../../widgets/components/category/edit_multiple_categories_widget.dart';
 import '../../widgets/components/category/enrollment_management_widget.dart';
-import '../../widgets/common/background/background_widget.dart';
-import '../../widgets/common/navbar/navbar_logged_widget.dart';
-import '../../widgets/common/footer/footer_logged_widget.dart';
 
 class CategoryView extends StatefulWidget {
   const CategoryView({super.key});
@@ -159,7 +159,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
   }
 
   void _showCategoryDetail(BuildContext context, category) {
-    final registerDateStr = "${category.registerDate.day}/${category.registerDate.month}/${category.registerDate.year}";
+    final registerDateStr = '${category.registerDate.day}/${category.registerDate.month}/${category.registerDate.year}';
 
     showModalBottomSheet(
       context: context,
@@ -191,10 +191,10 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                 ),
               ),
               const Divider(),
-              Text("Fecha de registro: $registerDateStr"),
-              Text("Presupuesto asignado: \$${category.description.assignedBudget}"),
+              Text('Fecha de registro: $registerDateStr'),
+              Text('Presupuesto asignado: \$${category.description.assignedBudget}'),
               Text("Presupuesto ID: ${category.budgetId ?? 'Sin asignar'}"),
-              Text("Estado: ${category.description.state}"),
+              Text('Estado: ${category.description.state}'),
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 onPressed: () {
@@ -202,7 +202,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                   // Aquí podrías navegar a un reporte detallado si lo deseas
                 },
                 icon: const Icon(Icons.bar_chart),
-                label: const Text("Ver reporte completo"),
+                label: const Text('Ver reporte completo'),
               ),
             ],
           ),
@@ -355,7 +355,7 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
     } else {
       // Normal AppBar para perfiles (sin acciones) y usuarios regulares
       return AppBar(
-        title: Text(isProfile ? "Mis Categorías Asignadas" : "Categorías"),
+        title: Text(isProfile ? 'Mis Categorías Asignadas' : 'Categorías'),
         actions: [
           // Multi-select toggle button (only for regular users with categories)
           if (!isProfile && controller.categories.isNotEmpty)
@@ -484,13 +484,12 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Container(
+          child: DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: Colors.purpleAccent.withValues(alpha: 0.3),
                 width: 1.5,
-                style: BorderStyle.solid,
               ),
             ),
             child: Padding(
@@ -739,13 +738,12 @@ class _CategoryViewState extends State<CategoryView> with MultiSelectionMixin {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Container(
+                  child: DecoratedBox(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: Colors.green.withValues(alpha: 0.3),
                         width: 1.5,
-                        style: BorderStyle.solid,
                       ),
                     ),
                     child: Padding(

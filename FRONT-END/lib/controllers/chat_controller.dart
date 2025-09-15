@@ -1,16 +1,18 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import '../core/services/chat/chat_service.dart';
-import '../core/services/chat/chat_history_service.dart' as history;
+
+import 'package:flutter/material.dart';
+
 import '../core/services/app/auth_service.dart';
+import '../core/services/chat/chat_history_service.dart' as history;
+import '../core/services/chat/chat_service.dart';
 import '../dto/chat/request/chat_dto.dart';
-import '../dto/chat/response/chat_response_dto.dart';
-import '../dto/chat/response/string_chat_response_dto.dart';
-import '../dto/chat/response/dynamic_analysis_response_dto.dart';
-import '../dto/chat/response/debt_analysis_response_dto.dart';
-import '../dto/chat/response/chat_history_dto.dart';
 import '../dto/chat/response/base_dynamic_response_dto.dart';
+import '../dto/chat/response/chat_history_dto.dart';
+import '../dto/chat/response/chat_response_dto.dart';
+import '../dto/chat/response/debt_analysis_response_dto.dart';
+import '../dto/chat/response/dynamic_analysis_response_dto.dart';
 import '../dto/chat/response/report_download_response_dto.dart';
+import '../dto/chat/response/string_chat_response_dto.dart';
 
 // Modelo para mensajes de chat
 class ChatMessage {
@@ -251,7 +253,7 @@ class ChatController extends ChangeNotifier {
     
     // Agregar mensaje de cancelación solo si estábamos realmente generando algo nuevo
     if (_messages.isNotEmpty && _isLoading) {
-      final cancelMessage = 'Respuesta cancelada por el usuario.';
+      const cancelMessage = 'Respuesta cancelada por el usuario.';
       // Agregar directamente sin activar typewriter para cancelación
       final message = ChatMessage(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -641,15 +643,15 @@ class ChatController extends ChangeNotifier {
   Future<void> analyzeDebtsGeneral() async {
     // Por ahora usar datos dummy, después se puede conectar con userId real
     await analyzeDebts(
-      userId: "dummy_user_id",
-      customMessage: "Analizar todas mis deudas de forma general",
+      userId: 'dummy_user_id',
+      customMessage: 'Analizar todas mis deudas de forma general',
     );
   }
 
   Future<void> analyzeDebtsRisk() async {
     // Por ahora usar datos dummy, después se puede conectar con userId real
     await analyzeDebtRisk(
-      userId: "dummy_user_id", 
+      userId: 'dummy_user_id', 
       monthlyIncome: 50000.0, // Valor dummy
     );
   }
@@ -681,7 +683,6 @@ class ChatController extends ChangeNotifier {
       isNew: isNew,
       reportId: reportId,
       fileName: fileName,
-      showChart: false, // El widget se encargará de mostrar gráficos automáticamente
     );
     _messages.add(message);
     
@@ -773,7 +774,7 @@ class ChatController extends ChangeNotifier {
         // Procesar respuesta según su tipo
         await _processAnalysisResponse(_lastDynamicAnalysis!, message);
       } else {
-        final errorMessage = 'No se pudo obtener respuesta del servidor.';
+        const errorMessage = 'No se pudo obtener respuesta del servidor.';
         _addAIMessage(errorMessage);
       }
       
@@ -784,7 +785,7 @@ class ChatController extends ChangeNotifier {
       _setTyping(false);
       
       // Agregar mensaje de error visible al usuario
-      final errorMessage = 'Lo siento, ocurrió un error al procesar tu mensaje. Por favor, intenta nuevamente.';
+      const errorMessage = 'Lo siento, ocurrió un error al procesar tu mensaje. Por favor, intenta nuevamente.';
       _addAIMessage(errorMessage);
       _setError('Error al enviar mensaje: ${e.toString()}');
     } finally {
@@ -827,7 +828,7 @@ class ChatController extends ChangeNotifier {
         _addAIMessage(plainTextResponse);
         await _addToHistory(originalMessage, plainTextResponse);
       } else {
-        final fallbackMessage = 'He procesado tu solicitud pero no se pudo obtener la respuesta completa del servidor. Por favor, intenta nuevamente.';
+        const fallbackMessage = 'He procesado tu solicitud pero no se pudo obtener la respuesta completa del servidor. Por favor, intenta nuevamente.';
         _addAIMessage(fallbackMessage);
         await _addToHistory(originalMessage, fallbackMessage);
       }
@@ -886,10 +887,8 @@ class ChatController extends ChangeNotifier {
         content: plainTextMessage,
         isUser: false,
         timestamp: DateTime.now(),
-        isNew: true,
         reportId: reportData.reportId,
         fileName: reportData.fileName,
-        showChart: false, // Los reportes no necesitan flag de gráfico, el widget lo manejará
       );
       
       _messages.add(message);
@@ -1240,12 +1239,12 @@ class ChatController extends ChangeNotifier {
       print('🔍 ChatController: Parseando dataString: $dataString');
       
       // Remover corchetes externos
-      String cleanData = dataString.replaceAll(RegExp(r'^\[|\]$'), '').trim();
+      final String cleanData = dataString.replaceAll(RegExp(r'^\[|\]$'), '').trim();
       
       // Dividir por objetos (buscar patrones como {label: ..., value: ...})
       final objectMatches = RegExp(r'\{([^}]*)\}').allMatches(cleanData);
       
-      List<Map<String, dynamic>> result = [];
+      final List<Map<String, dynamic>> result = [];
       
       for (final match in objectMatches) {
         final objectString = match.group(1);

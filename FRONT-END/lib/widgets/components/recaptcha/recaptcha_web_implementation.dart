@@ -1,10 +1,12 @@
 // Implementación específica para Flutter Web
-import 'package:flutter/material.dart';
+import 'dart:async';
 import 'dart:html' as html;
 import 'dart:js' as js;
 import 'dart:ui_web' as ui_web;
-import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import '../../../controllers/auth/recaptcha_controller.dart';
 
 Widget createRecaptchaWebElement({
@@ -321,7 +323,7 @@ class _RecaptchaWebElementState extends State<RecaptchaWebElement> {
           valueListenable: widget.controller.isLoading,
           builder: (context, isLoading, _) {
             return isLoading
-                ? Container(
+                ? ColoredBox(
                     color: Colors.black.withValues(alpha: 0.3),
                     child: const Center(
                       child: Column(

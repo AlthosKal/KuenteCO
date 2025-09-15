@@ -17,7 +17,7 @@ class ChatMessageWidget extends StatefulWidget {
   final bool showChart; // Si debe mostrar el gráfico
 
   const ChatMessageWidget({
-    Key? key,
+    super.key,
     required this.message,
     required this.type,
     required this.timestamp,
@@ -26,7 +26,7 @@ class ChatMessageWidget extends StatefulWidget {
     this.reportId,
     this.fileName,
     this.showChart = false,
-  }) : super(key: key);
+  });
 
   @override
   State<ChatMessageWidget> createState() => _ChatMessageWidgetState();
@@ -127,7 +127,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
                                 // Mostrar botón de descarga también en typewriter
                                 if (widget.reportId != null && widget.reportId!.isNotEmpty) ...[
                                   const SizedBox(height: 12),
-                                  Container(
+                                  SizedBox(
                                     width: double.infinity,
                                     child: ElevatedButton.icon(
                                       onPressed: () => _downloadReport(context, widget.reportId!),
@@ -246,7 +246,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   }
 
   Widget _buildMessageContent() {
-    List<Widget> widgets = [];
+    final List<Widget> widgets = [];
     
     // Agregar texto del mensaje
     widgets.add(Text(
@@ -256,7 +256,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     
     // Si se debe mostrar el gráfico y es un mensaje de AI
     if (widget.type == MessageType.ai) {
-      final chatController = Provider.of<ChatController>(context, listen: true);
+      final chatController = Provider.of<ChatController>(context);
       
       // Mostrar gráfico si hay datos disponibles, independientemente del flag showChart
       if (chatController.lastChartData != null) {
@@ -283,7 +283,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     if (widget.reportId != null && widget.reportId!.isNotEmpty) {
       widgets.add(const SizedBox(height: 12));
       widgets.add(
-        Container(
+        SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
             onPressed: () => _downloadReport(context, widget.reportId!),

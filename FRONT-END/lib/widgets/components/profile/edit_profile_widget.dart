@@ -195,12 +195,12 @@ class _EditProfileState extends State<EditProfile> {
               SizedBox(
                 width: double.infinity,
                 child: PrimaryButton(
-                  label: "Cambiar contraseña",
+                  label: 'Cambiar contraseña',
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) =>
-                            VerificationCodeScreen(email: ''),
+                            const VerificationCodeScreen(email: ''),
                       ),
                     );
                   },

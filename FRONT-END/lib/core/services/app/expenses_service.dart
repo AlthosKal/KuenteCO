@@ -13,7 +13,7 @@ class ExpensesService {
 
   // â Get all expense transactions
   Future<List<TransactionDetailDTO>> getAllExpenses() async {
-    return await _transactionService.getTransactionsWithFilters(
+    return _transactionService.getTransactionsWithFilters(
       type: 'EXPENSE',
     );
   }
@@ -35,7 +35,7 @@ class ExpensesService {
 
   // â Get expenses by category
   Future<List<TransactionDetailDTO>> getExpensesByCategory(int categoryId) async {
-    return await _transactionService.getTransactionsWithFilters(
+    return _transactionService.getTransactionsWithFilters(
       categoryId: categoryId,
       type: 'EXPENSE',
     );
@@ -43,7 +43,7 @@ class ExpensesService {
 
   // â Get expenses by budget
   Future<List<TransactionDetailDTO>> getExpensesByBudget(int budgetId) async {
-    return await _transactionService.getTransactionsWithFilters(
+    return _transactionService.getTransactionsWithFilters(
       budgetId: budgetId,
       type: 'EXPENSE',
     );
@@ -51,7 +51,7 @@ class ExpensesService {
 
   // â Get expenses by profile
   Future<List<TransactionDetailDTO>> getExpensesByProfile(int profileId) async {
-    return await _transactionService.getTransactionsWithFilters(
+    return _transactionService.getTransactionsWithFilters(
       profileId: profileId,
       type: 'EXPENSE',
     );
@@ -62,7 +62,7 @@ class ExpensesService {
     required String from,
     required String to,
   }) async {
-    return await _transactionService.getTransactionsWithFilters(
+    return _transactionService.getTransactionsWithFilters(
       from: from,
       to: to,
       type: 'EXPENSE',
@@ -74,7 +74,7 @@ class ExpensesService {
     double? minAmount,
     double? maxAmount,
   }) async {
-    return await _transactionService.getTransactionsWithFilters(
+    return _transactionService.getTransactionsWithFilters(
       minAmount: minAmount,
       maxAmount: maxAmount,
       type: 'EXPENSE',
@@ -86,25 +86,25 @@ class ExpensesService {
   // â Create new expense
   Future<TransactionDetailDTO> createExpense(NewTransactionDTO dto) async {
     print('ð ExpensesService: Creating expense transaction');
-    return await _transactionService.addTransaction(dto);
+    return _transactionService.addTransaction(dto);
   }
 
   // â Create multiple expenses
   Future<List<TransactionDetailDTO>> createExpensesBatch(List<NewTransactionDTO> dtos) async {
     print('ð ExpensesService: Creating ${dtos.length} expense transactions in batch');
-    return await _transactionService.addTransactionsBatch(dtos);
+    return _transactionService.addTransactionsBatch(dtos);
   }
 
   // â Update expense
   Future<TransactionDetailDTO> updateExpense(UpdateTransactionDTO dto) async {
     print('ð ExpensesService: Updating expense transaction ID: ${dto.id}');
-    return await _transactionService.updateTransaction(dto);
+    return _transactionService.updateTransaction(dto);
   }
 
   // â Update multiple expenses
   Future<List<TransactionDetailDTO>> updateExpensesBatch(List<UpdateTransactionDTO> dtos) async {
     print('ð ExpensesService: Updating ${dtos.length} expense transactions in batch');
-    return await _transactionService.updateTransactionsBatch(dtos);
+    return _transactionService.updateTransactionsBatch(dtos);
   }
 
   // â Delete expense

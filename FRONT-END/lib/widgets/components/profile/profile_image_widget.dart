@@ -241,9 +241,9 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
               );
             },
           ),
-          Container(
+          const ColoredBox(
             color: Colors.black26,
-            child: const Center(
+            child: Center(
               child: Text(
                 'Nueva\nImagen',
                 style: TextStyle(

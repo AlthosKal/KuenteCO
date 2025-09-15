@@ -1,9 +1,11 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'dart:convert';
+
 import '../../../controllers/auth/recaptcha_controller.dart';
-import 'dart:async';
 import 'recaptcha_web_factory.dart';
 
 class RecaptchaWidget extends StatefulWidget {
@@ -37,7 +39,7 @@ class _RecaptchaWidgetState extends State<RecaptchaWidget> {
             decoration: BoxDecoration(
               color: Colors.transparent,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.white, width: 1),
+              border: Border.all(color: Colors.white),
             ),
             child: Padding(
               padding: const EdgeInsets.all(12),
@@ -62,15 +64,15 @@ class _RecaptchaWidgetState extends State<RecaptchaWidget> {
                               borderRadius: BorderRadius.circular(3),
                             ),
                             child: isLoading
-                                ? Padding(
-                                    padding: const EdgeInsets.all(2),
+                                ? const Padding(
+                                    padding: EdgeInsets.all(2),
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       color: Colors.purple,
                                     ),
                                   )
                                 : isVerified
-                                    ? Icon(
+                                    ? const Icon(
                                         Icons.check,
                                         color: Colors.green,
                                         size: 14,
@@ -82,7 +84,7 @@ class _RecaptchaWidgetState extends State<RecaptchaWidget> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          isVerified ? 'Verificado' : "No soy un robot",
+                          isVerified ? 'Verificado' : 'No soy un robot',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
@@ -99,7 +101,6 @@ class _RecaptchaWidgetState extends State<RecaptchaWidget> {
                           color: Colors.white.withValues(alpha: 0.1),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.3),
-                            width: 1,
                           ),
                         ),
                         child: Icon(
@@ -220,7 +221,7 @@ class _RecaptchaWidgetState extends State<RecaptchaWidget> {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.security, color: Colors.purple),
+                    const Icon(Icons.security, color: Colors.purple),
                     const SizedBox(width: 12),
                     const Expanded(
                       child: Text(
@@ -414,7 +415,7 @@ class _RecaptchaWebViewState extends State<RecaptchaWebView> {
           valueListenable: widget.controller.isLoading,
           builder: (context, isLoading, _) {
             return isLoading
-                ? Container(
+                ? ColoredBox(
                     color: Colors.black.withValues(alpha: 0.3),
                     child: const Center(
                       child: Column(

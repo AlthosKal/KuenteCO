@@ -122,8 +122,8 @@ class RouteGenerator {
         );
 
     // â SUSCRIPCIONES
-      case AppRoutes.suscriptions:
-        return MaterialPageRoute(builder: (_) => const SubscriptionPlansView());
+    //   case AppRoutes.suscriptions:
+    //     return MaterialPageRoute(builder: (_) => const SubscriptionPlansView());
 
     // â RUTAS LOGGED
       case AppRoutes.contactLogged:
@@ -150,10 +150,10 @@ class RouteGenerator {
 
     // â PANTALLA DE PERFILES
       case AppRoutes.profileScreen:
-        return MaterialPageRoute(builder: (_) => ProfileScreen());
+        return MaterialPageRoute(builder: (_) => const ProfileScreen());
       case AppRoutes.accountScreen:
-        return MaterialPageRoute(builder: (_) => AccountScreen());
-      case AppRoutes.categoryView:
+      //   return MaterialPageRoute(builder: (_) => const AccountScreen());
+      // case AppRoutes.categoryView:
         return MaterialPageRoute(builder: (_) => const CategoryView());
       case AppRoutes.budgetView:
         return MaterialPageRoute(builder: (_) => const BudgetView());

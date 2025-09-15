@@ -83,7 +83,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
     if (picked != null) {
       setState(() {
         // Ajustar las fechas para cubrir todo el día
-        _fromDate = DateTime(picked.start.year, picked.start.month, picked.start.day, 0, 0, 0);
+        _fromDate = DateTime(picked.start.year, picked.start.month, picked.start.day);
         _toDate = DateTime(picked.end.year, picked.end.month, picked.end.day, 23, 59, 59);
       });
       await _filterByDateRange();
@@ -176,7 +176,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
   }
 
   Widget _buildSearchBar() {
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
@@ -360,7 +360,6 @@ class _NotificationWidgetState extends State<NotificationWidget> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Colors.white.withOpacity(0.3),
-          width: 1,
         ),
       ),
       child: Column(

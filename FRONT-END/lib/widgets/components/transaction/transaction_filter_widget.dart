@@ -8,10 +8,10 @@ class TransactionFilterWidget extends StatefulWidget {
   final VoidCallback onReset;
 
   const TransactionFilterWidget({
-    Key? key,
+    super.key,
     required this.onFiltersChanged,
     required this.onReset,
-  }) : super(key: key);
+  });
 
   @override
   State<TransactionFilterWidget> createState() => _TransactionFilterWidgetState();
@@ -289,9 +289,8 @@ class _TransactionFilterWidgetState extends State<TransactionFilterWidget> {
             labelText: 'Seleccionar categoría',
             border: OutlineInputBorder(),
           ),
-          items: [
-            const DropdownMenuItem<int>(
-              value: null,
+          items: const [
+            DropdownMenuItem<int>(
               child: Text('Todas las categorías'),
             ),
             // TODO: Cargar categorías reales desde el servicio
@@ -389,10 +388,10 @@ class QuickFiltersWidget extends StatefulWidget {
   final String? selectedFilter;
 
   const QuickFiltersWidget({
-    Key? key,
+    super.key,
     required this.onFilterSelected,
     this.selectedFilter,
-  }) : super(key: key);
+  });
 
   @override
   State<QuickFiltersWidget> createState() => _QuickFiltersWidgetState();

@@ -8,10 +8,10 @@ class DeleteMultipleCategoriesWidget extends StatefulWidget {
   final List<CategoryDTO> categoriesToDelete;
   
   const DeleteMultipleCategoriesWidget({
-    Key? key,
+    super.key,
     required this.controller,
     required this.categoriesToDelete,
-  }) : super(key: key);
+  });
 
   @override
   _DeleteMultipleCategoriesWidgetState createState() => _DeleteMultipleCategoriesWidgetState();
@@ -261,7 +261,7 @@ class _DeleteMultipleCategoriesWidgetState extends State<DeleteMultipleCategorie
 
   void _deleteSelectedCategories() async {
     // Get IDs of selected categories
-    List<int> selectedIds = [];
+    final List<int> selectedIds = [];
     for (int i = 0; i < widget.categoriesToDelete.length; i++) {
       if (selectedForDeletion[i]) {
         selectedIds.add(widget.categoriesToDelete[i].id);

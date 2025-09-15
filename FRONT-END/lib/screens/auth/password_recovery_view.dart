@@ -79,7 +79,7 @@ class _RecoverPasswordFormState extends State<RecoverPasswordForm> {
         key: _formKey,
         child: Column(
           children: [
-            FormTitleText(text: 'Ingresa tu nueva contraseña'),
+            const FormTitleText(text: 'Ingresa tu nueva contraseña'),
             const SizedBox(height: 30),
 
             /// ð Campo nueva contraseña

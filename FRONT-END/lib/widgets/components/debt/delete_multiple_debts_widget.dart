@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../../controllers/business_logic/debt_controller.dart';
 import '../../../dto/app/debt/debt_dto.dart';
@@ -9,10 +8,10 @@ class DeleteMultipleDebtsWidget extends StatefulWidget {
   final List<DebtDTO> debtsToDelete;
 
   const DeleteMultipleDebtsWidget({
-    Key? key,
+    super.key,
     required this.controller,
     required this.debtsToDelete,
-  }) : super(key: key);
+  });
 
   @override
   State<DeleteMultipleDebtsWidget> createState() => _DeleteMultipleDebtsWidgetState();
@@ -215,7 +214,7 @@ class _DeleteMultipleDebtsWidgetState extends State<DeleteMultipleDebtsWidget> {
         return Card(
           margin: const EdgeInsets.only(bottom: 8),
           elevation: isSelected ? 3 : 1,
-          child: Container(
+          child: DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               border: isSelected
