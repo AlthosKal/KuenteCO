@@ -32,7 +32,7 @@ class _SubscriptionWidgetState extends State<SubscriptionWidget> {
     
     final controller = Provider.of<SubscriptionController>(context, listen: false);
     
-    // Si es Plan Básico, mostrar confirmación de cambio
+    // Si es Plan Básico, no permitir el cambio si hay suscripción paga activa
     if (type == SubscriptionType.BASIC) {
       final activePaidPlan = controller.mySubscriptions.where(
         (sub) => sub.subscriptionType != SubscriptionType.BASIC && 
@@ -40,54 +40,27 @@ class _SubscriptionWidgetState extends State<SubscriptionWidget> {
       ).firstOrNull;
       
       if (activePaidPlan != null) {
-        // Mostrar confirmación para downgrade
-        final confirmed = await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Cambiar a Plan Básico'),
-            content: const Text(
-              '¿Estás seguro de que quieres cambiar al Plan Básico? '
-              'Perderás las funcionalidades premium de tu plan actual.'
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancelar'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Confirmar'),
-              ),
-            ],
-          ),
-        );
-        
-        if (confirmed != true) return;
-        
-        // Aquí se implementaría la lógica para cancelar suscripción actual
-        // Por ahora solo mostramos mensaje
+        // No permitir cambio a Plan Básico si hay suscripción paga
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('✅ Cambiado al Plan Básico exitosamente'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        
-        // Recargar suscripciones
-        await controller.loadMySubscriptions();
-        return;
-      } else {
-        // Usuario ya tiene Plan Básico
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Ya tienes el Plan Básico activo'),
-            backgroundColor: Colors.blue,
+            content: Text('No puedes cambiar al Plan Básico mientras tengas una suscripción activa'),
+            backgroundColor: Colors.orange,
           ),
         );
         return;
       }
+      
+      // Si no hay suscripción paga, ya está en Plan Básico
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ya tienes el Plan Básico activo'),
+          backgroundColor: Colors.blue,
+        ),
+      );
+      return;
     }
 
+    // Para planes pagos, continuar con el flujo normal
     final response = await controller.createSubscription(
       CreateSubscriptionRequestDTO(subscriptionType: type, backUrl: ''),
     );
@@ -176,23 +149,12 @@ class _SubscriptionWidgetState extends State<SubscriptionWidget> {
         ),
         child: Column(
           children: [
-            // Header
+            // Header - Solo botón de cerrar
             Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
                 children: [
-                  const Icon(Icons.card_membership, color: Colors.white, size: 24),
-                  const SizedBox(width: 8),
-                  const Expanded(
-                    child: Text(
-                      'Planes de Suscripción',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                  const Spacer(),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.close, color: Colors.white),
@@ -239,18 +201,12 @@ class _SubscriptionWidgetState extends State<SubscriptionWidget> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Mostrar suscripción actual si existe
-                        if (controller.mySubscriptions.isNotEmpty) ...
-                        _buildCurrentSubscriptionSection(controller),
-
-                        const SizedBox(height: 8),
-
                         // Título de planes disponibles
                         Text(
                           'Planes Disponibles',
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.purple,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -269,6 +225,7 @@ class _SubscriptionWidgetState extends State<SubscriptionWidget> {
                               loading: controller.isLoading,
                               onSubscribe: () => _subscribe(price.type),
                               isActive: _isCurrentlySubscribed(controller, price.type),
+                              subscriptionInfo: _isCurrentlySubscribed(controller, price.type) ? _getSubscriptionInfo(controller) : null,
                             ),
                           )),
                       ],
@@ -283,60 +240,6 @@ class _SubscriptionWidgetState extends State<SubscriptionWidget> {
     );
   }
 
-  List<Widget> _buildCurrentSubscriptionSection(SubscriptionController controller) {
-    // Mostrar cualquier suscripción (ACTIVE, PENDING, etc.)
-    final activeSub = controller.mySubscriptions.firstOrNull;
-
-    if (activeSub == null) return [];
-
-    return [
-      DottedBorderCard(
-        isActive: true,
-        isCurrentSubscription: true,
-        child: Wrap(
-          spacing: 16,
-          runSpacing: 8,
-          children: [
-            Text(
-              'Próximo pago: ${_formatDate(activeSub.nextPaymentDate)}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            Text(
-              'Renovación automática: ${activeSub.isAutoRenewable ? "Sí" : "No"}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            if (activeSub.cardLastFourDigits != null)
-              Text(
-                'Tarjeta: **** ${activeSub.cardLastFourDigits}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            if (activeSub.cardBrand != null)
-              Text(
-                'Tipo: ${activeSub.cardBrand}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-          ],
-        ),
-      ),
-      const SizedBox(height: 16),
-    ];
-  }
 
   Widget _buildFallbackPlans(SubscriptionController controller) {
     final fallbackPlans = [
@@ -375,6 +278,8 @@ class _SubscriptionWidgetState extends State<SubscriptionWidget> {
           onSubscribe: () => _subscribe(plan['type'] as SubscriptionType),
           isActive: _isCurrentlySubscribed(controller, plan['type'] as SubscriptionType),
           isDefault: plan['isDefault'] == true,
+          isDisabled: _isPlanDisabled(controller, plan['type'] as SubscriptionType),
+          subscriptionInfo: _isCurrentlySubscribed(controller, plan['type'] as SubscriptionType) ? _getSubscriptionInfo(controller) : null,
         ),
       )).toList(),
     );
@@ -407,8 +312,42 @@ class _SubscriptionWidgetState extends State<SubscriptionWidget> {
     return type == SubscriptionType.BASIC;
   }
 
+  bool _isPlanDisabled(SubscriptionController controller, SubscriptionType type) {
+    // Deshabilitar Plan Básico si hay suscripción paga activa
+    if (type == SubscriptionType.BASIC) {
+      final activePaidPlan = controller.mySubscriptions.where(
+        (sub) => sub.subscriptionType != SubscriptionType.BASIC && 
+                (sub.subscriptionState.name == 'ACTIVE' || sub.subscriptionState.name == 'PENDING')
+      ).firstOrNull;
+      
+      return activePaidPlan != null;
+    }
+    
+    // Los planes pagos nunca se deshabilitan
+    return false;
+  }
+
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String? _getSubscriptionInfo(SubscriptionController controller) {
+    final activeSub = controller.mySubscriptions.firstOrNull;
+    if (activeSub == null) return null;
+    
+    List<String> info = [];
+    info.add('Próximo pago: ${_formatDate(activeSub.nextPaymentDate)}');
+    info.add('Renovación automática: ${activeSub.isAutoRenewable ? "Sí" : "No"}');
+    
+    if (activeSub.cardLastFourDigits != null) {
+      info.add('Tarjeta: **** ${activeSub.cardLastFourDigits}');
+    }
+    
+    if (activeSub.cardBrand != null) {
+      info.add('Tipo: ${activeSub.cardBrand}');
+    }
+    
+    return info.join('\n');
   }
 }
 
@@ -421,6 +360,8 @@ class _PlanCard extends StatelessWidget {
   final bool loading;
   final bool isActive;
   final bool isDefault;
+  final bool isDisabled;
+  final String? subscriptionInfo;
 
   const _PlanCard({
     required this.title,
@@ -431,19 +372,23 @@ class _PlanCard extends StatelessWidget {
     required this.loading,
     this.isActive = false,
     this.isDefault = false,
+    this.isDisabled = false,
+    this.subscriptionInfo,
   });
 
   String _getButtonLabel() {
     if (isActive) {
       return 'Plan Activo';
+    } else if (isDisabled) {
+      return 'No disponible';
     } else {
       return 'Suscribirse';
     }
   }
   
   bool _shouldDisableButton() {
-    // Solo deshabilitar si es el plan activo
-    return isActive;
+    // Deshabilitar si es el plan activo o está explícitamente deshabilitado
+    return isActive || isDisabled;
   }
 
   @override
@@ -460,7 +405,7 @@ class _PlanCard extends StatelessWidget {
                     title,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Colors.purple,
                     ),
                   ),
                 ),
@@ -489,6 +434,16 @@ class _PlanCard extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
+            if (subscriptionInfo != null) ...[
+              const SizedBox(height: 16),
+              Text(
+                subscriptionInfo!,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.purple,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
             Text(
               price,
@@ -516,11 +471,13 @@ class DottedBorderCard extends StatelessWidget {
   final Widget child;
   final bool isActive;
   final bool isCurrentSubscription;
+  final bool isDisabled;
   
   const DottedBorderCard({
     required this.child, 
     this.isActive = false,
     this.isCurrentSubscription = false,
+    this.isDisabled = false,
     super.key
   });
 
