@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/services/app/email_service.dart';
 import '../../routes/app_routes.dart';
 import '../../widgets/common/background/background_widget.dart';
 import '../../widgets/common/footer/footer_logged_widget.dart';
@@ -132,7 +133,7 @@ class _ContactLoggedViewState extends State<ContactLoggedView> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: _buildTextField(_nombreController, 'Nombre completo', Icons.person)),
+              Expanded(child: _buildTextField(_nombreController, 'Nombre', Icons.person)),
               const SizedBox(width: 16),
               Expanded(child: _buildTextField(_emailController, 'Correo electrónico', Icons.email, isEmail: true)),
             ],
@@ -210,7 +211,7 @@ class _ContactLoggedViewState extends State<ContactLoggedView> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildContactInfoItem(Icons.email, 'soporte@kuenteco.com'),
+          _buildContactInfoItem(Icons.email, 'KuenteCO@yopmail.com'),
           _buildContactInfoItem(Icons.phone, '+57 (123) 456-7890'),
           _buildContactInfoItem(Icons.access_time, 'Lun-Vie: 9:00 AM - 6:00 PM'),
         ],
@@ -239,20 +240,75 @@ class _ContactLoggedViewState extends State<ContactLoggedView> {
   }
 
   /// ð¥ Enviar formulario
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState?.validate() ?? false) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('¡Mensaje enviado correctamente!', style: TextStyle(color: Colors.white)),
-          backgroundColor: kPrimaryPurple,
-          duration: Duration(seconds: 3),
+      // Mostrar indicador de carga
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(kPrimaryPurple),
+          ),
         ),
       );
 
-      _nombreController.clear();
-      _emailController.clear();
-      _asuntoController.clear();
-      _mensajeController.clear();
+      try {
+        // Enviar email
+        final success = await EmailService.sendEmailSimple(
+          fromName: _nombreController.text.trim(),
+          fromEmail: _emailController.text.trim(),
+          subject: _asuntoController.text.trim(),
+          message: _mensajeController.text.trim(),
+        );
+
+        // Cerrar indicador de carga
+        Navigator.of(context).pop();
+
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                '¡Mensaje enviado correctamente!',
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: kPrimaryPurple,
+              duration: Duration(seconds: 3),
+            ),
+          );
+          
+          // Limpiar formulario
+          _nombreController.clear();
+          _emailController.clear();
+          _asuntoController.clear();
+          _mensajeController.clear();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Error al enviar el mensaje. Por favor intenta nuevamente.',
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } catch (e) {
+        // Cerrar indicador de carga si hay error
+        Navigator.of(context).pop();
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Error de conexión. Revisa tu internet e intenta nuevamente.',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
     }
   }
 }
