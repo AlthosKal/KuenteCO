@@ -39,7 +39,7 @@ class TransactionHeaderWidget extends StatelessWidget {
           /// TABS
           DecoratedBox(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.purple[50],
               borderRadius: BorderRadius.circular(12),
             ),
             child: TabBar(

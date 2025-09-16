@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../controllers/auth/register_controller.dart';
+import '../../controllers/auth/recaptcha_controller.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/enum/user_type_enum.dart';
 import '../../widgets/common/background/animated_background_scaffold_widget.dart';
@@ -10,6 +11,7 @@ import '../../widgets/common/form/custom_form_widget.dart';
 import '../../widgets/common/form/email_form_widget.dart';
 import '../../widgets/common/form/form_title_text_widget.dart';
 import '../../widgets/common/form/password_form_widget.dart';
+import '../../widgets/components/recaptcha/recaptcha_widget.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -30,6 +32,7 @@ class RegisterForm extends StatefulWidget {
 class _RegisterFormState extends State<RegisterForm> {
   final _formKey = GlobalKey<FormState>();
   final _registerController = RegisterController();
+  final _recaptchaController = RecaptchaController();
 
   // Campos de texto
   final _usernameController = TextEditingController();
@@ -43,7 +46,7 @@ class _RegisterFormState extends State<RegisterForm> {
   final _passwordFocusNode = FocusNode();
   final _confirmPasswordFocusNode = FocusNode();
 
-  /// â Estado del tipo de cuenta usando enum
+  /// ⚙ Estado del tipo de cuenta usando enum
   final ValueNotifier<UserType> _selectedUserType =
   ValueNotifier<UserType>(UserType.PERSONAL);
 
@@ -58,19 +61,31 @@ class _RegisterFormState extends State<RegisterForm> {
     _passwordFocusNode.dispose();
     _confirmPasswordFocusNode.dispose();
     _registerController.dispose();
+    _recaptchaController.dispose();
     _selectedUserType.dispose();
     super.dispose();
   }
 
   void _submitRegister() {
     if (!_formKey.currentState!.validate()) return;
+    
+    // Verificar que el reCAPTCHA esté validado
+    if (!_recaptchaController.isValid) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor completa el reCAPTCHA antes de continuar'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
 
     _registerController.register(
       context: context,
       username: _usernameController.text,
       email: _emailController.text,
       password: _passwordController.text,
-      type: _selectedUserType.value, // â Se envía el enum al controller
+      type: _selectedUserType.value, // ⚙ Se envía el enum al controller
     );
   }
 
@@ -87,7 +102,7 @@ class _RegisterFormState extends State<RegisterForm> {
             const FormTitleText(text: 'Registro'),
             const SizedBox(height: 20),
 
-            /// ð Nombre Completo
+            /// 👤 Nombre Completo
             CustomFormField(
               controller: _usernameController,
               focusNode: _usernameFocusNode,
@@ -101,7 +116,7 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             const SizedBox(height: 12),
 
-            /// ð Email
+            /// 📧 Email
             EmailFormField(
               controller: _emailController,
               focusNode: _emailFocusNode,
@@ -111,7 +126,7 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             const SizedBox(height: 12),
 
-            /// ð Contraseña
+            /// 🔒 Contraseña
             ValueListenableBuilder<bool>(
               valueListenable: _registerController.obscurePassword,
               builder: (context, obscure, _) {
@@ -126,7 +141,7 @@ class _RegisterFormState extends State<RegisterForm> {
               },
             ),
 
-            /// ð Confirmar Contraseña
+            /// 🔒 Confirmar Contraseña
             ValueListenableBuilder<bool>(
               valueListenable: _registerController.obscurePassword,
               builder: (context, obscure, _) {
@@ -148,7 +163,7 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             const SizedBox(height: 20),
 
-            /// ð¥ Selector de tipo de cuenta
+            /// 👥 Selector de tipo de cuenta
             const Text(
               'Tipo de cuenta',
               style: TextStyle(
@@ -185,7 +200,21 @@ class _RegisterFormState extends State<RegisterForm> {
 
             const SizedBox(height: 20),
 
-            /// ð Botón de registrar
+            /// 🤖 Widget de reCAPTCHA
+            RecaptchaWidget(
+              controller: _recaptchaController,
+              onVerified: () {
+                // Callback cuando el reCAPTCHA es verificado exitosamente
+              },
+              onError: () {
+                // Callback cuando hay un error en el reCAPTCHA
+                _recaptchaController.reset();
+              },
+            ),
+
+            const SizedBox(height: 20),
+
+            /// 🔴 Botón de registrar
             ValueListenableBuilder(
               valueListenable: _registerController.isLoading,
               builder: (context, isLoading, _) {
@@ -199,7 +228,7 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             const SizedBox(height: 12),
 
-            /// ð Botón para volver a login
+            /// 🔙 Botón para volver a login
             TextButton(
               onPressed: () => Navigator.pushNamed(context, AppRoutes.login),
               child: const Text.rich(
@@ -221,7 +250,7 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 
-  /// ð¨ Botón custom para Personal / Negocio
+  /// 🎨 Botón custom para Personal / Negocio
   Widget _buildAccountTypeButton({
     required String label,
     required IconData icon,
