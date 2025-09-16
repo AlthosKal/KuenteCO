@@ -19,6 +19,7 @@ dependencies:
   
   # HTTP & API
   dio: ^5.8.0+1
+  mailer: ^6.1.0
   
   # Storage
   hive_flutter: ^1.1.0

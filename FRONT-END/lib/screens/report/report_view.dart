@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import '../../controllers/business_logic/debt_controller.dart';
 import '../../controllers/chat_controller.dart';
 import '../../controllers/excel/excel_controller.dart';
+import '../../widgets/common/background/background_widget.dart';
+import '../../widgets/common/navbar/navbar_logged_widget.dart';
 import '../../widgets/components/report/chat/animated_typing_dots.dart';
 import '../../widgets/components/report/chat/chat_message_widget.dart';
 import '../../widgets/components/report/chat/debt_analysis_results_widget.dart';
@@ -43,42 +45,81 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Centro de Reportes',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.purple[600],
-        foregroundColor: Colors.white,
-        elevation: 0,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(
-              icon: Icon(Icons.psychology),
-              text: 'Análisis IA',
-            ),
-            Tab(
-              icon: Icon(Icons.table_chart),
-              text: 'Excel',
-            ),
-          ],
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-        ),
-      ),
-      body: Consumer3<ChatController, ExcelController, DebtController>(
-        builder: (context, chatController, excelController, debtController, child) {
-          return TabBarView(
-            controller: _tabController,
+    return Background(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: Column(
             children: [
-              _buildAIAnalysisTab(context, chatController, debtController),
-              _buildExcelTab(context, excelController),
+              /// NAVBAR
+              KuentecoLoggedNavbar(
+                currentRoute: '/reports',
+                onLogout: () {
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
+              ),
+
+              /// HEADER CON TABS
+              Container(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Reportes',
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.purple[50],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TabBar(
+                        controller: _tabController,
+                        labelColor: Theme.of(context).primaryColor,
+                        unselectedLabelColor: Colors.black54,
+                        indicator: BoxDecoration(
+                          color: Theme.of(context).primaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        dividerColor: Colors.transparent,
+                        tabs: const [
+                          Tab(
+                            icon: Icon(Icons.psychology, size: 20),
+                            text: 'Análisis IA',
+                          ),
+                          Tab(
+                            icon: Icon(Icons.table_chart, size: 20),
+                            text: 'Excel',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              /// CONTENIDO DE TABS
+              Expanded(
+                child: Consumer3<ChatController, ExcelController, DebtController>(
+                  builder: (context, chatController, excelController, debtController, child) {
+                    return TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildAIAnalysisTab(context, chatController, debtController),
+                        _buildExcelTab(context, excelController),
+                      ],
+                    );
+                  },
+                ),
+              ),
             ],
-          );
-        },
+          ),
+        ),
       ),
     );
   }
@@ -89,7 +130,22 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
     ChatController chatController,
     DebtController debtController,
   ) {
-    return Row(
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Row(
       children: [
         // Panel lateral de conversaciones
         Container(
@@ -116,6 +172,8 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
           ),
         ),
       ],
+        ),
+      ),
     );
   }
 
@@ -179,7 +237,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
           ),
           child: Row(
             children: [
-              Icon(Icons.psychology, color: Colors.blue[600], size: 20),
+              Icon(Icons.psychology, color: Colors.purple[600], size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -229,18 +287,10 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
               )
             : ListView.builder(
                 padding: const EdgeInsets.all(8),
-                itemCount: chatController.chatHistory.length + 1,
+                itemCount: chatController.chatHistory.length,
                 itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return _buildConversationTile(
-                      context: context,
-                      title: 'Conversación actual',
-                      subtitle: 'Análisis financiero',
-                      isActive: true,
-                      onTap: () {},
-                    );
-                  }
-                  final historyItem = chatController.chatHistory[index - 1];
+                  final historyItem = chatController.chatHistory[index];
+                  final isCurrentConversation = chatController.currentConversationId == historyItem.conversationId;
                   return FutureBuilder<String>(
                     future: chatController.getConversationSubtitle(historyItem),
                     builder: (context, subtitleSnapshot) {
@@ -249,7 +299,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
                         context: context,
                         title: _truncateText(historyItem.prompt, 30),
                         subtitle: subtitle,
-                        isActive: false,
+                        isActive: isCurrentConversation,
                         onTap: () => _loadConversation(chatController, historyItem),
                         onDelete: () => _deleteConversation(chatController, historyItem.conversationId),
                       );
@@ -279,9 +329,9 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: isActive ? Colors.blue[50] : Colors.transparent,
+            color: isActive ? Colors.purple[50] : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
-            border: isActive ? Border.all(color: Colors.blue[200]!) : null,
+            border: isActive ? Border.all(color: Colors.purple[300]!, width: 2) : null,
           ),
           child: Row(
             children: [
@@ -293,7 +343,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
                       title,
                       style: TextStyle(
                         fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-                        color: isActive ? Colors.blue[800] : Colors.grey[800],
+                        color: isActive ? Colors.purple[800] : Colors.grey[800],
                         fontSize: 13,
                       ),
                       maxLines: 2,
@@ -390,13 +440,13 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.blue[50],
+              color: Colors.purple[50],
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.psychology,
               size: 48,
-              color: Colors.blue[600],
+              color: Colors.purple[600],
             ),
           ),
           const SizedBox(height: 24),
@@ -438,8 +488,8 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
         style: const TextStyle(fontSize: 12),
       ),
       onPressed: () => _sendSuggestedMessage(text),
-      backgroundColor: Colors.blue[50],
-      side: BorderSide(color: Colors.blue[200]!),
+      backgroundColor: Colors.purple[50],
+      side: BorderSide(color: Colors.purple[200]!),
     );
   }
 
@@ -453,7 +503,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: Colors.blue[600],
+              color: Colors.purple[600],
               borderRadius: BorderRadius.circular(18),
               boxShadow: [
                 BoxShadow(
@@ -482,7 +532,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
               child: Row(
                 children: [
                   AnimatedTypingDots(
-                    color: Colors.blue[400],
+                    color: Colors.purple[400],
                     size: 6,
                   ),
                   const SizedBox(width: 12),
@@ -550,7 +600,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide(color: Colors.blue[600]!),
+                    borderSide: BorderSide(color: Colors.purple[600]!),
                   ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
@@ -567,7 +617,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
           const SizedBox(width: 8),
           DecoratedBox(
             decoration: BoxDecoration(
-              color: (chatController.isLoading || chatController.isTyping) ? Colors.red[600] : Colors.blue[600],
+              color: (chatController.isLoading || chatController.isTyping) ? Colors.red[600] : Colors.purple[600],
               borderRadius: BorderRadius.circular(24),
             ),
             child: IconButton(
@@ -679,7 +729,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
       builder: (context) => AlertDialog(
         title: const Row(
           children: [
-            Icon(Icons.psychology, color: Colors.blue),
+            Icon(Icons.psychology, color: Colors.purple),
             SizedBox(width: 8),
             Text('Detalles del Análisis IA'),
           ],
@@ -742,7 +792,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
         builder: (context) => Scaffold(
           appBar: AppBar(
             title: const Text('Análisis Detallado'),
-            backgroundColor: Colors.blue[600],
+            backgroundColor: Colors.purple[600],
             foregroundColor: Colors.white,
           ),
           body: SingleChildScrollView(
@@ -902,7 +952,7 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
             Expanded(child: Text(message)),
           ],
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.purple,
         behavior: SnackBarBehavior.floating,
       ),
     );

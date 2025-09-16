@@ -337,32 +337,6 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
                     },
                   ),
 
-                  /// HEADER CON TÍTULO
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Presupuestos',
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          isProfile
-                              ? 'Gestiona tus presupuestos personales'
-                              : 'Administra los presupuestos de tus perfiles',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.black54,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
                   /// CONTENIDO
                   Expanded(
                     child: controller.isLoading
@@ -385,8 +359,8 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
                             ),
                           )
                         : isProfile
-                            ? _buildProfileView(controller)
-                            : _buildUserView(controller),
+                            ? _buildProfileViewWithHeader(controller)
+                            : _buildUserViewWithFloatingButton(controller),
                   ),
 
                   /// FOOTER
@@ -485,14 +459,68 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
     }
   }
   
-  /// Vista para usuarios regulares (pueden crear/editar presupuestos)
+  /// Vista para usuarios regulares con botón flotante (pueden crear/editar presupuestos)
+  Widget _buildUserViewWithFloatingButton(BudgetController controller) {
+    return FutureBuilder<bool>(
+      future: _isProfile(),
+      builder: (context, snapshot) {
+        final isProfile = snapshot.data ?? false;
+        
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// HEADER CON TÍTULO (igual que en home)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Presupuestos',
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        isProfile
+                            ? 'Gestiona tus presupuestos personales'
+                            : 'Administra los presupuestos de tus perfiles',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              
+              /// CONTENIDO
+              Expanded(
+                child: controller.budgets.isEmpty
+                    ? _buildEmptyStateWithFloatingButton()
+                    : Stack(
+                        children: [
+                          _buildUserView(controller),
+                          _buildFloatingCreateButton(),
+                        ],
+                      ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// Vista para usuarios regulares (pueden crear/editar presupuestos) - sin botón interno
   Widget _buildUserView(BudgetController controller) {
-    if (controller.budgets.isEmpty) {
-      return _buildEmptyState();
-    }
-    
     return Container(
-      margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -506,15 +534,37 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
       ),
       child: ListView.builder(
         padding: const EdgeInsets.all(8),
-        itemCount: controller.budgets.length + 1, // +1 para el botón de agregar
-        itemBuilder: (context, index) => _buildUserViewItem(context, controller, index),
+        itemCount: controller.budgets.length, // Sin el +1 porque el botón está fuera
+        itemBuilder: (context, index) => _buildBudgetItem(context, controller, index),
       ),
     );
   }
   
+  /// Estado vacío con botón flotante
+  Widget _buildEmptyStateWithFloatingButton() {
+    return Stack(
+      children: [
+        _buildEmptyState(),
+        _buildFloatingCreateButton(),
+      ],
+    );
+  }
+
+  /// Botón flotante para crear presupuesto con estilo original
+  Widget _buildFloatingCreateButton() {
+    return Positioned(
+      bottom: 24,
+      left: 0,
+      right: 0,
+      child: _buildCreateBudgetButton(
+        'Crear nuevo presupuesto',
+        'Toca para agregar un nuevo presupuesto',
+      ),
+    );
+  }
+
   Widget _buildEmptyState() {
     return Container(
-      margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -548,16 +598,11 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
               ),
               const SizedBox(height: 8),
               Text(
-                'Crea tu primer presupuesto usando el botón de abajo',
+                'Crea tu primer presupuesto usando el botón flotante',
                 style: TextStyle(
                   color: Colors.grey[500],
                 ),
                 textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              _buildCreateBudgetButton(
-                'Crear primer presupuesto',
-                'Toca para comenzar a gestionar tu dinero',
               ),
             ],
           ),
@@ -565,16 +610,8 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
     );
   }
   
-  Widget _buildUserViewItem(BuildContext context, BudgetController controller, int index) {
-    // Si es el último item, mostrar el botón de agregar
-    if (index == controller.budgets.length) {
-      return _buildCreateBudgetButton(
-        'Crear nuevo presupuesto',
-        'Toca para agregar un nuevo presupuesto',
-      );
-    }
-    
-    // Items normales de presupuestos
+  /// Método para construir items de presupuesto individuales
+  Widget _buildBudgetItem(BuildContext context, BudgetController controller, int index) {
     final budget = controller.budgets[index];
     return BudgetListWidget(
       key: ValueKey(budget.id),
@@ -591,12 +628,67 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
       },
     );
   }
+
+  Widget _buildUserViewItem(BuildContext context, BudgetController controller, int index) {
+    // Si es el último item, mostrar el botón de agregar
+    if (index == controller.budgets.length) {
+      return _buildCreateBudgetButton(
+        'Crear nuevo presupuesto',
+        'Toca para agregar un nuevo presupuesto',
+      );
+    }
+    
+    // Items normales de presupuestos
+    return _buildBudgetItem(context, controller, index);
+  }
   
+  /// Vista para perfiles con header (solo pueden ver presupuestos asignados)
+  Widget _buildProfileViewWithHeader(BudgetController controller) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// HEADER CON TÍTULO (igual que en home)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Mis Presupuestos Asignados',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Gestiona tus presupuestos personales',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.black54,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          
+          /// CONTENIDO
+          Expanded(
+            child: _buildProfileView(controller),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Vista para perfiles (solo pueden ver presupuestos asignados)
   Widget _buildProfileView(BudgetController controller) {
     return controller.enrollments.isEmpty
         ? Container(
-            margin: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
@@ -641,7 +733,6 @@ class _BudgetViewState extends State<BudgetView> with MultiSelectionMixin {
               ),
           )
         : Container(
-            margin: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/services/app/email_service.dart';
 import '../../widgets/common/background/background_widget.dart';
 import '../../widgets/common/footer/footer_guest_widget.dart';
 import '../../widgets/common/navbar/navbar_guest_widget.dart';
@@ -145,7 +146,7 @@ class _ContactoPageState extends State<ContactView> {
   Widget _buildNameField() {
     return _buildTextField(
       controller: _nombreController,
-      label: 'Nombre completo',
+      label: 'Nombre',
       icon: Icons.person,
     );
   }
@@ -206,7 +207,7 @@ class _ContactoPageState extends State<ContactView> {
         children: [
           _buildContactInfoItem(
             icon: Icons.email,
-            text: 'soporte@kuenteco.com',
+            text: 'KuenteCO@yopmail.com',
           ),
           _buildContactInfoItem(
             icon: Icons.phone,
@@ -293,22 +294,75 @@ class _ContactoPageState extends State<ContactView> {
     );
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState?.validate() ?? false) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            '¡Mensaje enviado correctamente!',
-            style: TextStyle(color: Colors.white),
+      // Mostrar indicador de carga
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(kPrimaryPurple),
           ),
-          backgroundColor: kPrimaryPurple,
-          duration: Duration(seconds: 3),
         ),
       );
-      _nombreController.clear();
-      _emailController.clear();
-      _asuntoController.clear();
-      _mensajeController.clear();
+
+      try {
+        // Enviar email
+        final success = await EmailService.sendEmailSimple(
+          fromName: _nombreController.text.trim(),
+          fromEmail: _emailController.text.trim(),
+          subject: _asuntoController.text.trim(),
+          message: _mensajeController.text.trim(),
+        );
+
+        // Cerrar indicador de carga
+        Navigator.of(context).pop();
+
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                '¡Mensaje enviado correctamente!',
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: kPrimaryPurple,
+              duration: Duration(seconds: 3),
+            ),
+          );
+          
+          // Limpiar formulario
+          _nombreController.clear();
+          _emailController.clear();
+          _asuntoController.clear();
+          _mensajeController.clear();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Error al enviar el mensaje. Por favor intenta nuevamente.',
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } catch (e) {
+        // Cerrar indicador de carga si hay error
+        Navigator.of(context).pop();
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Error de conexión. Revisa tu internet e intenta nuevamente.',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
     }
   }
 }
