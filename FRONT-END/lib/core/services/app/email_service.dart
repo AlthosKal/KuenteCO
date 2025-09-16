@@ -67,25 +67,6 @@ class EmailService {
     }
   }
 
-  /// Simula el envío de email para desarrollo
-  static Future<bool> _simulateEmailSend({
-    required String fromName,
-    required String fromEmail,
-    required String subject,
-    required String message,
-  }) async {
-    // Simular delay de red
-    await Future.delayed(const Duration(seconds: 2));
-    
-    print('📧 SIMULANDO ENVÍO DE EMAIL');
-    print('📤 De: $fromName ($fromEmail)');
-    print('📨 Para: $_destinationEmail');
-    print('📋 Asunto: $subject');
-    print('💬 Mensaje: $message');
-    print('✅ Email simulado enviado correctamente');
-    
-    return true;
-  }
 
   /// Construye el HTML del email
   static String _buildHtmlEmail({
