@@ -20,7 +20,7 @@ class LoggedHomePersonalView extends StatelessWidget {
     required this.profileImageUrl,
   });
 
-  /// â Factory que carga el usuario autenticado antes de mostrar la vista
+  /// â Factory que carga el usuario autenticado antes de mostrar la vista
   static Future<Widget> create() async {
     final user = await AuthService().getAuthenticatedUser();
     return LoggedHomePersonalView(
@@ -37,7 +37,7 @@ class LoggedHomePersonalView extends StatelessWidget {
         body: SafeArea(
           child: Column(
             children: [
-              /// â NAVBAR ARRIBA
+              /// â NAVBAR ARRIBA
               KuentecoLoggedNavbar(
                 currentRoute: '/homePersonal',
                 onLogout: () {
@@ -45,14 +45,14 @@ class LoggedHomePersonalView extends StatelessWidget {
                 },
               ),
 
-              /// â CONTENIDO PRINCIPAL
+              /// â CONTENIDO PRINCIPAL
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      /// ð·ï¸ HEADER
+                      /// ð·ï¸ HEADER
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -83,45 +83,56 @@ class LoggedHomePersonalView extends StatelessWidget {
                       ),
                       const SizedBox(height: 20),
 
-                      /// ð² CARD CONTENEDOR GRANDE
-                      BlurredCard(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: /// â GRID DE 4 CARDS AJUSTADOS
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: 4,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 6,
-                          childAspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
-                        ),
-                        itemBuilder: (context, index) {
-                          switch (index) {
-                            case 0:
-                              return const CategoryCardWidget();
-                            case 1:
-                              return const BudgetCardWidget();
-                            case 2:
-                              return const TransactionCardWidget(
-                                isHomeCard: true,
-                                showActions: false,
-                              );
-                            case 3:
-                              return const ReportCard();
-                            default:
-                              return Container();
-                          }
-                        },
-                      ),
+                      /// ð² CARD CONTENEDOR GRANDE
+                      Expanded(
+                        child: BlurredCard(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                // Primera fila: 2 cards
+                                Expanded(
+                                  flex: 2,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: const CategoryCardWidget(),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: const BudgetCardWidget(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                // Segunda fila: 2 cards del mismo ancho
+                                Expanded(
+                                  flex: 2,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: const TransactionCardWidget(
+                                          isHomeCard: true,
+                                          showActions: false,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: const ReportCard(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
 
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 16),
 
-                      /// â FOOTER
+                      /// â FOOTER
                       const FooterLoggedWidget(),
                     ],
                   ),
@@ -134,7 +145,7 @@ class LoggedHomePersonalView extends StatelessWidget {
     );
   }
 
-  /// ðï¸ CARD PEQUEÃO
+  /// ðï¸ CARD PEQUEÑO
   Widget _buildCardItem({
     required IconData icon,
     required String title,

@@ -106,35 +106,48 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
 
 
                           /// ð² CARD CONTENEDOR GRANDE
-                          BlurredCard(
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: /// GRID DE 4 CARDS
-                          GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: 4,
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 8,
-                              mainAxisSpacing: 6,
-                              childAspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
-                            ),
-                            itemBuilder: (context, index) {
-                              switch (index) {
-                                case 0:
-                                  return const CategoryCardWidget();
-                                case 1:
-                                  return const BudgetCardWidget();
-                                case 2:
-                                  return const TransactionCardWidget(
-                                    isHomeCard: true,
-                                    showActions: false,
-                                  );
-                              }
-                              return null;
-                            },
-                          ),
+                          Expanded(
+                            child: BlurredCard(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  children: [
+                                    // Primera fila: 2 cards
+                                    Expanded(
+                                      flex: 2,
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: const CategoryCardWidget(),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: const BudgetCardWidget(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    // Segunda fila: 1 card centrado del mismo ancho
+                                    Expanded(
+                                      flex: 2,
+                                      child: Row(
+                                        children: [
+                                          Expanded(flex: 1, child: Container()),
+                                          Expanded(
+                                            flex: 2,
+                                            child: const TransactionCardWidget(
+                                              isHomeCard: true,
+                                              showActions: false,
+                                            ),
+                                          ),
+                                          Expanded(flex: 1, child: Container()),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
 

@@ -47,16 +47,6 @@ class ProfileButtonWidget extends StatelessWidget {
             ],
           ),
         ),
-        const PopupMenuItem(
-          value: 'profile',
-          child: Row(
-            children: [
-              Icon(Icons.person, size: 20),
-              SizedBox(width: 8),
-              Text('Mi Perfil'),
-            ],
-          ),
-        ),
         const PopupMenuDivider(),
         const PopupMenuItem(
           value: 'logout',
