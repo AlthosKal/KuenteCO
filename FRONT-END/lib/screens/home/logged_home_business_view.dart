@@ -93,33 +93,49 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                       BlurredCard(
                         child: Padding(
                           padding: const EdgeInsets.all(16),
-                          child: GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: 4,
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 8,
-                              mainAxisSpacing: 6,
-                              childAspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
-                            ),
-                            itemBuilder: (context, index) {
-                              switch (index) {
-                                case 0:
-                                  return const CategoryCardWidget();
-                                case 1:
-                                  return const BudgetCardWidget();
-                                case 2:
-                                  return const TransactionCardWidget(
-                                    isHomeCard: true,
-                                    showActions: false,
-                                  );
-                                case 3:
-                                  return const ReportCard();
-                                default:
-                                  return Container();
-                              }
-                            },
+                          child: Column(
+                            children: [
+                              // Primera fila: 2 cards
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: AspectRatio(
+                                      aspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
+                                      child: const CategoryCardWidget(),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: AspectRatio(
+                                      aspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
+                                      child: const BudgetCardWidget(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              // Segunda fila: 2 cards
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: AspectRatio(
+                                      aspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
+                                      child: const TransactionCardWidget(
+                                        isHomeCard: true,
+                                        showActions: false,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: AspectRatio(
+                                      aspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
+                                      child: const ReportCard(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ),

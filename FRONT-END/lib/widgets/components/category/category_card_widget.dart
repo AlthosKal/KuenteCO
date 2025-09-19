@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:glassmorphism/glassmorphism.dart';
 import 'package:provider/provider.dart';
 
 import '../../../controllers/business_logic/category_controller.dart';
 import '../../../routes/app_routes.dart';
+import '../../common/hover_card.dart';
 
 class CategoryCardWidget extends StatefulWidget {
   const CategoryCardWidget({super.key});
@@ -153,156 +153,78 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
   Widget _buildCategoryCard(CategoryController categoryController) {
     // ð¹ Si no hay categorías â mostrar botón para crear
     if (categoryController.categories.isEmpty) {
-      return InkWell(
+      return HoverCard(
+        title: 'Categorías',
+        icon: Icons.category_outlined,
+        subtitle: 'Gestionar categorías',
         onTap: () => Navigator.pushNamed(context, AppRoutes.categoryView),
-        borderRadius: BorderRadius.circular(20),
-        child: GlassmorphicContainer(
-          width: 180,
-          height: 180,
-          borderRadius: 20,
-          blur: 15,
-          alignment: Alignment.center,
-          border: 2,
-          linearGradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF6C63FF).withOpacity(0.3),
-              const Color(0xFF4CAF50).withOpacity(0.1),
-            ],
-          ),
-          borderGradient: const LinearGradient(
-            colors: [
-              Colors.transparent,
-              Colors.transparent,
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.category_outlined,
-                    size: 28,
-                    color: Colors.purple,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Categorías',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.purple,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Gestionar categorías',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white70,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
+        baseColor: const Color(0xFF890cac).withOpacity(0.3),
+        hoverColor: const Color(0xFF890cac).withOpacity(0.5),
       );
     }
 
     // ð¹ Si hay categorías â mostrar información de la primera
     final category = categoryController.categories.first;
-    return InkWell(
+    return HoverCard(
+      title: category.name,
+      icon: Icons.folder_special,
       onTap: () => Navigator.pushNamed(context, AppRoutes.categoryView),
-      borderRadius: BorderRadius.circular(20),
-      child: GlassmorphicContainer(
-        width: double.infinity,
-        height: double.infinity,
-        borderRadius: 20,
-        blur: 15,
-        alignment: Alignment.center,
-        border: 2,
-        linearGradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF667eea).withOpacity(0.3),
-            const Color(0xFF764ba2).withOpacity(0.1),
-          ],
-        ),
-        borderGradient: LinearGradient(
-          colors: [
-            Colors.white.withOpacity(0.5),
-            Colors.white.withOpacity(0.5),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.folder_special,
-                  size: 28,
-                  color: Colors.purpleAccent,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                category.name,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.purpleAccent,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '\$${category.description.assignedBudget}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.purpleAccent,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 2),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '${categoryController.categories.length} categoría${categoryController.categories.length > 1 ? 's' : ''}',
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: Colors.purpleAccent,
-                  ),
-                ),
-              ),
-            ],
+      baseColor: const Color(0xFF890cac).withOpacity(0.3),
+      hoverColor: const Color(0xFF890cac).withOpacity(0.5),
+      customContent: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.folder_special,
+              size: 28,
+              color: Colors.white,
+            ),
           ),
-        ),
+          const SizedBox(height: 8),
+          Text(
+            category.name,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '\$${category.description.assignedBudget}',
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.white70,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 2),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              '${categoryController.categories.length} categoría${categoryController.categories.length > 1 ? 's' : ''}',
+              style: const TextStyle(
+                fontSize: 10,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -311,156 +233,25 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
   Widget _buildEnrollmentCard(CategoryController categoryController) {
     // ð¹ Si no hay enrollments â mostrar mensaje sin navegación
     if (categoryController.enrollments.isEmpty) {
-      return DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: GlassmorphicContainer(
-          width: 180,
-          height: 180,
-          borderRadius: 20,
-          blur: 15,
-          alignment: Alignment.center,
-          border: 2,
-          linearGradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF890cac).withOpacity(0.3),
-              const Color(0xFF890cac).withOpacity(0.3),
-            ],
-          ),
-          borderGradient: const LinearGradient(
-            colors: [
-              Colors.transparent,
-              Colors.transparent,
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.assignment_ind_outlined,
-                    size: 28,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Categorías',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'El administrador aún no te ha asignado categorías',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
+      return HoverCard(
+        title: 'Categorías',
+        icon: Icons.assignment_ind_outlined,
+        subtitle: 'El administrador aún no te ha asignado categorías',
+        onTap: () {}, // Sin navegación para perfiles sin enrollments
+        baseColor: const Color(0xFF890cac).withOpacity(0.3),
+        hoverColor: const Color(0xFF890cac).withOpacity(0.5),
       );
     }
 
     // ð¹ Si hay enrollments â mostrar información del primero
     final enrollment = categoryController.enrollments.first;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF56AB2F), Color(0xFFA8E6CF)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.green.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => Navigator.pushNamed(context, AppRoutes.categoryView),
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.assignment_turned_in,
-                    size: 28,
-                    color: Colors.purpleAccent,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  enrollment.categoryName,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.purpleAccent,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Categorías asignadas',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.purpleAccent,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 2),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '${categoryController.enrollments.length} asignada${categoryController.enrollments.length > 1 ? 's' : ''}',
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: Colors.purpleAccent,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return HoverCard(
+      title: enrollment.categoryName,
+      icon: Icons.assignment_turned_in,
+      subtitle: '${categoryController.enrollments.length} asignada${categoryController.enrollments.length > 1 ? 's' : ''}',
+      onTap: () => Navigator.pushNamed(context, AppRoutes.categoryView),
+      baseColor: const Color(0xFF890cac).withOpacity(0.3),
+      hoverColor: const Color(0xFF890cac).withOpacity(0.5),
     );
   }
 
@@ -469,68 +260,13 @@ class _CategoryCardWidgetState extends State<CategoryCardWidget> {
     required String errorMessage,
     required VoidCallback onRetry,
   }) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.red.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => Navigator.pushNamed(context, AppRoutes.categoryView),
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.warning_rounded,
-                    size: 28,
-                    color: Colors.purple,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Error',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.purple,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Toca para reintentar',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white70,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return HoverCard(
+      title: 'Error',
+      icon: Icons.warning_rounded,
+      subtitle: 'Toca para reintentar',
+      onTap: () => Navigator.pushNamed(context, AppRoutes.categoryView),
+      baseColor: const Color(0xFFFF6B6B).withOpacity(0.3),
+      hoverColor: const Color(0xFFFF6B6B).withOpacity(0.5),
     );
   }
 }
