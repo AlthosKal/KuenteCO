@@ -90,52 +90,48 @@ class _LoggedHomeBusinessViewState extends State<LoggedHomeBusinessView> {
                       const SizedBox(height: 20),
 
                       /// ð² CARD CONTENEDOR GRANDE
-                      BlurredCard(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            children: [
-                              // Primera fila: 2 cards
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: AspectRatio(
-                                      aspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
-                                      child: const CategoryCardWidget(),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: AspectRatio(
-                                      aspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
-                                      child: const BudgetCardWidget(),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              // Segunda fila: 2 cards
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: AspectRatio(
-                                      aspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
-                                      child: const TransactionCardWidget(
-                                        isHomeCard: true,
-                                        showActions: false,
+                      Expanded(
+                        child: BlurredCard(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                // Primera fila: 2 cards
+                                Expanded(
+                                  flex: 2,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: const CategoryCardWidget(),
                                       ),
-                                    ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: const BudgetCardWidget(),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: AspectRatio(
-                                      aspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
-                                      child: const ReportCard(),
-                                    ),
+                                ),
+                                const SizedBox(height: 8),
+                                // Segunda fila: 2 cards del mismo ancho
+                                Expanded(
+                                  flex: 2,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: const TransactionCardWidget(
+                                          isHomeCard: true,
+                                          showActions: false,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: const ReportCard(),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

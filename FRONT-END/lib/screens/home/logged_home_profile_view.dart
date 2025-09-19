@@ -106,49 +106,48 @@ class _LoggedHomeProfileViewState extends State<LoggedHomeProfileView> {
 
 
                           /// ð² CARD CONTENEDOR GRANDE
-                          BlurredCard(
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: /// LAYOUT DE 3 CARDS CENTRADOS
-                          Column(
-                            children: [
-                              // Primera fila: 2 cards
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: AspectRatio(
-                                      aspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
-                                      child: const CategoryCardWidget(),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: AspectRatio(
-                                      aspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
-                                      child: const BudgetCardWidget(),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              // Segunda fila: 1 card centrado
-                              Row(
-                                children: [
-                                  Expanded(child: Container()), // Espaciador izquierdo
-                                  Expanded(
-                                    child: AspectRatio(
-                                      aspectRatio: MediaQuery.of(context).size.width > 400 ? 3.2 : 2.8,
-                                      child: const TransactionCardWidget(
-                                        isHomeCard: true,
-                                        showActions: false,
+                          Expanded(
+                            child: BlurredCard(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  children: [
+                                    // Primera fila: 2 cards
+                                    Expanded(
+                                      flex: 2,
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: const CategoryCardWidget(),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: const BudgetCardWidget(),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ),
-                                  Expanded(child: Container()), // Espaciador derecho
-                                ],
+                                    const SizedBox(height: 8),
+                                    // Segunda fila: 1 card centrado del mismo ancho
+                                    Expanded(
+                                      flex: 2,
+                                      child: Row(
+                                        children: [
+                                          Expanded(flex: 1, child: Container()),
+                                          Expanded(
+                                            flex: 2,
+                                            child: const TransactionCardWidget(
+                                              isHomeCard: true,
+                                              showActions: false,
+                                            ),
+                                          ),
+                                          Expanded(flex: 1, child: Container()),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
                             ),
                           ),
 
