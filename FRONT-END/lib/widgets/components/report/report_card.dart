@@ -1,43 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../../screens/report/report_view.dart';
+import '../../common/hover_card.dart';
 
 class ReportCard extends StatelessWidget {
   const ReportCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () => _navigateToReportView(context),
-        child: const Padding(
-          padding: EdgeInsets.all(10),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.assessment_outlined,
-                size: 30,
-                color: Colors.black87,
-              ),
-              SizedBox(height: 8),
-              Text(
-                'Reporte',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
+    return HoverCard(
+      title: 'Reporte',
+      icon: Icons.assessment_outlined,
+      onTap: () => _navigateToReportView(context),
+      baseColor: const Color(0xFF890cac).withOpacity(0.3),
+      hoverColor: const Color(0xFF890cac).withOpacity(0.5),
     );
   }
 

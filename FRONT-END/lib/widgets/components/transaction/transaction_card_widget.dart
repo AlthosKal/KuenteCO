@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
+import 'package:provider/provider.dart';
 
+import '../../../controllers/business_logic/budget_controller.dart';
+import '../../../controllers/business_logic/category_controller.dart';
+import '../../../controllers/business_logic/debt_controller.dart';
+import '../../../controllers/transactions/transaction_controller.dart';
 import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 import '../../../utils/enum/transaction_type_enum.dart';
 import '../../../utils/formatters.dart';
+import '../../common/hover_card.dart';
 
-class TransactionCardWidget extends StatelessWidget {
+class TransactionCardWidget extends StatefulWidget {
   final TransactionDetailDTO? transaction; // Opcional para el home
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
@@ -26,8 +32,77 @@ class TransactionCardWidget extends StatelessWidget {
   });
 
   @override
+  State<TransactionCardWidget> createState() => _TransactionCardWidgetState();
+}
+
+class _TransactionCardWidgetState extends State<TransactionCardWidget> {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isHomeCard) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _loadTransactions();
+      });
+    }
+  }
+
+  Future<void> _loadTransactions() async {
+    final transactionController = Provider.of<TransactionController>(context, listen: false);
+    final categoryController = Provider.of<CategoryController>(context, listen: false);
+    final budgetController = Provider.of<BudgetController>(context, listen: false);
+    final debtController = Provider.of<DebtController>(context, listen: false);
+    
+    try {
+      await Future.wait([
+        transactionController.loadTransactions(),
+        categoryController.loadCategories(),
+        budgetController.loadBudgets(),
+        debtController.loadDebts(),
+      ]);
+    } catch (e) {
+      // Error manejado por el controller
+    }
+  }
+
+  String _getEntityName(TransactionDetailDTO transaction) {
+    final categoryController = Provider.of<CategoryController>(context, listen: false);
+    final budgetController = Provider.of<BudgetController>(context, listen: false);
+    final debtController = Provider.of<DebtController>(context, listen: false);
+
+    // Prioridad: Categoría > Presupuesto > Deuda
+    if (transaction.categoryId != null) {
+      final category = categoryController.categories
+          .where((c) => c.id == transaction.categoryId)
+          .firstOrNull;
+      if (category != null) {
+        return 'Cat: ${category.name}';
+      }
+    }
+
+    if (transaction.budgetId != null) {
+      final budget = budgetController.budgets
+          .where((b) => b.id == transaction.budgetId)
+          .firstOrNull;
+      if (budget != null) {
+        return 'Pres: ${budget.name}';
+      }
+    }
+
+    if (transaction.debtId != null) {
+      final debt = debtController.debts
+          .where((d) => d.id == transaction.debtId)
+          .firstOrNull;
+      if (debt != null) {
+        return 'Deuda: ${debt.name}';
+      }
+    }
+
+    return 'Sin asignar';
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (isHomeCard) {
+    if (widget.isHomeCard) {
       return _buildHomeCard(context);
     }
     
@@ -35,89 +110,146 @@ class TransactionCardWidget extends StatelessWidget {
   }
 
   Widget _buildHomeCard(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(20),
-      onTap: onTap ?? () {
-        Navigator.pushNamed(context, '/transactionView');
+    return Consumer<TransactionController>(
+      builder: (context, transactionController, _) {
+        // Si está cargando
+        if (transactionController.isLoading) {
+          return HoverCard(
+            title: 'Transacciones',
+            icon: Icons.swap_horiz,
+            subtitle: 'Cargando...',
+            onTap: widget.onTap ?? () {
+              Navigator.pushNamed(context, '/transactionView');
+            },
+            baseColor: const Color(0xFF890cac).withOpacity(0.3),
+            hoverColor: const Color(0xFF890cac).withOpacity(0.5),
+          );
+        }
+
+        // Si hay error
+        if (transactionController.errorMessage != null) {
+          return HoverCard(
+            title: 'Error',
+            icon: Icons.warning_rounded,
+            subtitle: 'Toca para reintentar',
+            onTap: () => _loadTransactions(),
+            baseColor: const Color(0xFFFF6B6B).withOpacity(0.3),
+            hoverColor: const Color(0xFFFF6B6B).withOpacity(0.5),
+          );
+        }
+
+        // Si no hay transacciones
+        if (transactionController.transactions.isEmpty) {
+          return HoverCard(
+            title: 'Transacciones',
+            icon: Icons.swap_horiz,
+            subtitle: 'Gestionar transacciones',
+            onTap: widget.onTap ?? () {
+              Navigator.pushNamed(context, '/transactionView');
+            },
+            baseColor: const Color(0xFF890cac).withOpacity(0.3),
+            hoverColor: const Color(0xFF890cac).withOpacity(0.5),
+          );
+        }
+
+        // Si hay transacciones - mostrar información de la más reciente (ordenar por fecha)
+        final sortedTransactions = List<TransactionDetailDTO>.from(transactionController.transactions)
+          ..sort((a, b) => b.date.compareTo(a.date)); // Ordenar por fecha descendente (más reciente primero)
+        final latestTransaction = sortedTransactions.first;
+        final transactionType = _determineTransactionType(latestTransaction);
+        final transactionIcon = _getTransactionIconByType(transactionType);
+        final isIncome = transactionType == TransactionType.INCOME;
+
+        return HoverCard(
+          title: latestTransaction.name,
+          icon: transactionIcon,
+          onTap: widget.onTap ?? () {
+            Navigator.pushNamed(context, '/transactionView');
+          },
+          baseColor: const Color(0xFF890cac).withOpacity(0.3),
+          hoverColor: const Color(0xFF890cac).withOpacity(0.5),
+          customContent: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  transactionIcon,
+                  size: 28,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                latestTransaction.name,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    isIncome ? Icons.arrow_upward : Icons.arrow_downward,
+                    size: 12,
+                    color: isIncome ? Colors.green : Colors.red,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    Formatters.formatCurrency(latestTransaction.amount),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isIncome ? Colors.green : Colors.red,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 2),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${_getEntityName(latestTransaction)} • ${transactionController.transactions.length} transacción${transactionController.transactions.length > 1 ? 'es' : ''}',
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
       },
-      child: GlassmorphicContainer(
-        width: 180,
-        height: 180,
-        borderRadius: 20,
-        blur: 15,
-        alignment: Alignment.center,
-        border: 2,
-        linearGradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.blue.shade400.withOpacity(0.3),
-            Colors.blue.shade600.withOpacity(0.1),
-          ],
-        ),
-        borderGradient: const LinearGradient(
-          colors: [
-            Colors.transparent,
-            Colors.transparent,
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.swap_horiz,
-                size: 28,
-                color: Colors.purpleAccent,
-              ),
-            ),
-            const SizedBox(height: 12),
-            
-            // Título
-            const Text(
-              'Transacciones',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.purpleAccent,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            
-            const SizedBox(height: 8),
-            
-            // Información
-            const Text(
-              'Ver todas las transacciones',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.purpleAccent,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
     );
   }
 
   Widget _buildDetailCard(BuildContext context) {
-    if (transaction == null) {
+    if (widget.transaction == null) {
       return const SizedBox.shrink();
     }
 
     final theme = Theme.of(context);
     
     // Determinar el tipo de transacción usando lógica híbrida
-    final TransactionType transactionType = _determineTransactionType(transaction!);
+    final TransactionType transactionType = _determineTransactionType(widget.transaction!);
     
     // Determinar color e icono basado en el tipo de transacción
-    final Color cardColor = customColor ?? _getTransactionColorByType(transactionType);
+    final Color cardColor = widget.customColor ?? _getTransactionColorByType(transactionType);
     final IconData transactionIcon = _getTransactionIconByType(transactionType);
 
     return Card(
@@ -127,7 +259,7 @@ class TransactionCardWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: InkWell(
-        onTap: onTap,
+        onTap: widget.onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -155,7 +287,7 @@ class TransactionCardWidget extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          transaction!.name,
+                          widget.transaction!.name,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
@@ -176,7 +308,7 @@ class TransactionCardWidget extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    Formatters.formatCurrency(transaction!.amount),
+                    Formatters.formatCurrency(widget.transaction!.amount),
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: cardColor,
                       fontWeight: FontWeight.bold,
@@ -197,30 +329,17 @@ class TransactionCardWidget extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    Formatters.formatDate(transaction!.date),
+                    Formatters.formatDate(widget.transaction!.date),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                   const Spacer(),
-                  if (transaction!.categoryId != null) ...[
-                    Icon(
-                      Icons.category,
-                      size: 16,
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Cat. ${transaction!.categoryId}',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
-                      ),
-                    ),
-                  ],
+                  _buildEntityInfo(theme),
                 ],
               ),
               
-              if (showActions) ...[
+              if (widget.showActions) ...[
                 const SizedBox(height: 12),
                 const Divider(height: 1),
                 const SizedBox(height: 8),
@@ -229,19 +348,19 @@ class TransactionCardWidget extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    if (onEdit != null)
+                    if (widget.onEdit != null)
                       TextButton.icon(
-                        onPressed: onEdit,
+                        onPressed: widget.onEdit,
                         icon: const Icon(Icons.edit, size: 16),
                         label: const Text('Editar'),
                         style: TextButton.styleFrom(
                           foregroundColor: theme.colorScheme.primary,
                         ),
                       ),
-                    if (onDelete != null) ...[
+                    if (widget.onDelete != null) ...[
                       const SizedBox(width: 8),
                       TextButton.icon(
-                        onPressed: onDelete,
+                        onPressed: widget.onDelete,
                         icon: const Icon(Icons.delete, size: 16),
                         label: const Text('Eliminar'),
                         style: TextButton.styleFrom(
@@ -301,18 +420,53 @@ class TransactionCardWidget extends StatelessWidget {
     }
   }
 
+  Widget _buildEntityInfo(ThemeData theme) {
+    if (widget.transaction == null) return const SizedBox.shrink();
+    
+    final entityName = _getEntityName(widget.transaction!);
+    IconData icon;
+    
+    if (widget.transaction!.categoryId != null) {
+      icon = Icons.category;
+    } else if (widget.transaction!.budgetId != null) {
+      icon = Icons.account_balance_wallet;
+    } else if (widget.transaction!.debtId != null) {
+      icon = Icons.account_balance;
+    } else {
+      icon = Icons.help_outline;
+    }
+    
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          icon,
+          size: 16,
+          color: theme.colorScheme.onSurface.withOpacity(0.6),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          entityName,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurface.withOpacity(0.6),
+          ),
+        ),
+      ],
+    );
+  }
+
   String _getTransactionDescription() {
-    if (transaction == null) return '';
+    if (widget.transaction == null) return '';
     
     // Priorizar descriptionExtra.description si existe
-    if (transaction!.descriptionExtra != null) {
-      final desc = transaction!.descriptionExtra!.description;
+    if (widget.transaction!.descriptionExtra != null) {
+      final desc = widget.transaction!.descriptionExtra!.description;
       return (desc != 'No description') ? desc : '';
     }
     
     // Fallback al campo description simple
-    if (transaction!.description != null && transaction!.description != 'No description') {
-      return transaction!.description!;
+    if (widget.transaction!.description != null && widget.transaction!.description != 'No description') {
+      return widget.transaction!.description!;
     }
     
     return '';
@@ -393,9 +547,9 @@ class TransactionListItemWidget extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          if (showCategory && transaction.categoryId != null)
+          if (showCategory)
             Text(
-              'Cat. ${transaction.categoryId}',
+              _getEntityNameStatic(transaction, context),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface.withOpacity(0.6),
               ),
@@ -460,5 +614,41 @@ class TransactionListItemWidget extends StatelessWidget {
     }
     
     return '';
+  }
+
+  static String _getEntityNameStatic(TransactionDetailDTO transaction, BuildContext context) {
+    final categoryController = Provider.of<CategoryController>(context, listen: false);
+    final budgetController = Provider.of<BudgetController>(context, listen: false);
+    final debtController = Provider.of<DebtController>(context, listen: false);
+
+    // Prioridad: Categoría > Presupuesto > Deuda
+    if (transaction.categoryId != null) {
+      final category = categoryController.categories
+          .where((c) => c.id == transaction.categoryId)
+          .firstOrNull;
+      if (category != null) {
+        return 'Cat: ${category.name}';
+      }
+    }
+
+    if (transaction.budgetId != null) {
+      final budget = budgetController.budgets
+          .where((b) => b.id == transaction.budgetId)
+          .firstOrNull;
+      if (budget != null) {
+        return 'Pres: ${budget.name}';
+      }
+    }
+
+    if (transaction.debtId != null) {
+      final debt = debtController.debts
+          .where((d) => d.id == transaction.debtId)
+          .firstOrNull;
+      if (debt != null) {
+        return 'Deuda: ${debt.name}';
+      }
+    }
+
+    return 'Sin asignar';
   }
 }
