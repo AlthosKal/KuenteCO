@@ -181,31 +181,17 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
     BuildContext context,
     ExcelController excelController,
   ) {
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Gestión de Archivos Excel',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+          Expanded(
+            child: ExcelControlsWidget(
+              onExport: () => _exportToExcel(context, excelController),
+              onDownloadTemplate: () => _downloadTemplate(context, excelController),
+              onImport: (file) => _importFromExcel(context, excelController, file),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Exporta e importa datos financieros en formato Excel para análisis externos o respaldo de información.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 24),
-          
-          ExcelControlsWidget(
-            onExport: () => _exportToExcel(context, excelController),
-            onDownloadTemplate: () => _downloadTemplate(context, excelController),
-            onImport: (file) => _importFromExcel(context, excelController, file),
           ),
           
           const SizedBox(height: 16),
@@ -750,40 +736,6 @@ class _ReportViewState extends State<ReportView> with SingleTickerProviderStateM
     );
   }
 
-  void _showExcelDetails(BuildContext context, ExcelController excelController) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.table_chart, color: Colors.green),
-            SizedBox(width: 8),
-            Text('Detalles de Excel'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(excelController.downloadInfo),
-            if (excelController.lastDownloadedFile != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                'Archivo: ${excelController.lastDownloadedFile}',
-                style: TextStyle(color: Colors.grey[600], fontSize: 12),
-              ),
-            ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cerrar'),
-          ),
-        ],
-      ),
-    );
-  }
 
 
   void _showFullAnalysisDetails(BuildContext context, ChatController chatController) {

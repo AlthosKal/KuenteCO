@@ -74,24 +74,37 @@ class _TransactionsTabWidgetState extends State<TransactionsTabWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          if (widget.userRole == 'ROLE_PROFILE')
-            MultipleOperationsWidget(
-              title: 'Operaciones Múltiples',
-              color: Theme.of(context).primaryColor,
-              onCreateMultiple: () => _navigateToCreateMultiple(context),
-              onEditMultiple: () => _navigateToEditMultiple(context),
-              onDeleteMultiple: () => _navigateToDeleteMultiple(context),
+      padding: const EdgeInsets.all(16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
             ),
-          
-          Expanded(
-            child: widget.userRole == 'ROLE_PROFILE'
-                ? _buildProfileTransactionsView(context)
-                : _buildUserTransactionsView(context),
-          ),
-        ],
+          ],
+        ),
+        child: Column(
+          children: [
+            if (widget.userRole == 'ROLE_PROFILE')
+              MultipleOperationsWidget(
+                title: 'Operaciones Múltiples',
+                color: Theme.of(context).primaryColor,
+                onCreateMultiple: () => _navigateToCreateMultiple(context),
+                onEditMultiple: () => _navigateToEditMultiple(context),
+                onDeleteMultiple: () => _navigateToDeleteMultiple(context),
+              ),
+            
+            Expanded(
+              child: widget.userRole == 'ROLE_PROFILE'
+                  ? _buildProfileTransactionsView(context)
+                  : _buildUserTransactionsView(context),
+            ),
+          ],
+        ),
       ),
     );
   }
