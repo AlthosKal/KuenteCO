@@ -75,49 +75,25 @@ class _DebtListWidgetState extends State<DebtListWidget> {
           return _buildErrorState(controller);
         }
 
-        return Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Column(
-            children: [
-              if (widget.showFilters) _buildSearchBar(),
-              Expanded(
-                child: filteredDebts.isEmpty
-                    ? _buildEmptyState()
-                    : _buildDebtsList(filteredDebts),
+        return Column(
+          children: [
+            // Barra de búsqueda
+            if (widget.showFilters) _buildSearchBar(),
+            
+            // Lista de deudas
+            Expanded(
+              child: filteredDebts.isEmpty
+                  ? _buildEmptyState()
+                  : _buildDebtsList(filteredDebts),
+            ),
+            
+            // Botón integrado para agregar deuda
+            if (widget.showFab && widget.onAddDebt != null)
+              Flexible(
+                fit: FlexFit.loose,
+                child: _buildAddDebtButton(),
               ),
-            ],
-          ),
-          bottomNavigationBar: widget.showFab && widget.onAddDebt != null
-              ? SafeArea(
-                  top: false,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: widget.onAddDebt,
-                        icon: const Icon(Icons.account_balance_wallet, color: Colors.white),
-                        label: const Text(
-                          'Nueva Deuda',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 3,
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              : null,
+          ],
         );
       },
     );
@@ -163,18 +139,6 @@ class _DebtListWidgetState extends State<DebtListWidget> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Row(
         children: [
           Expanded(
@@ -214,32 +178,17 @@ class _DebtListWidgetState extends State<DebtListWidget> {
   }
 
   Widget _buildDebtsList(List<DebtDTO> debts) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: RefreshIndicator(
-        onRefresh: () async {
-          _loadDebts();
+    return RefreshIndicator(
+      onRefresh: () async {
+        _loadDebts();
+      },
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: debts.length,
+        itemBuilder: (context, index) {
+          final debt = debts[index];
+          return _buildDebtCard(debt);
         },
-        child: ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: debts.length,
-          itemBuilder: (context, index) {
-            final debt = debts[index];
-            return _buildDebtCard(debt);
-          },
-        ),
       ),
     );
   }
@@ -298,7 +247,7 @@ class _DebtListWidgetState extends State<DebtListWidget> {
             ),
             if (widget.onDebtEdit != null || widget.onDebtDelete != null || widget.onMarkAsPaid != null || widget.onDebtAssign != null)
               PopupMenuButton(
-                icon: Icon(Icons.more_vert, size: 20, color: Colors.grey[600]),
+                icon: Icon(Icons.more_horiz, size: 20, color: Colors.grey[600]),
                 itemBuilder: (context) => [
                   if (widget.onDebtEdit != null)
                     PopupMenuItem(
@@ -371,20 +320,7 @@ class _DebtListWidgetState extends State<DebtListWidget> {
 
   Widget _buildEmptyState() {
     return Container(
-      margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -448,5 +384,32 @@ class _DebtListWidgetState extends State<DebtListWidget> {
     
     // Una deuda está vencida si su fecha de vencimiento ya pasó o está marcada como DEFEATED
     return now.isAfter(expirationDate) || debt.state == StateDebt.DEFEATED;
+  }
+
+  Widget _buildAddDebtButton() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+      child: ElevatedButton.icon(
+        onPressed: widget.onAddDebt,
+        icon: const Icon(Icons.account_balance_wallet, color: Colors.white, size: 18),
+        label: const Text(
+          'Nueva Deuda',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          elevation: 2,
+        ),
+      ),
+    );
   }
 }

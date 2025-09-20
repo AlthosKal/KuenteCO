@@ -29,27 +29,41 @@ class DebtsTabWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          // Solo mostrar operaciones múltiples para usuarios (NO perfiles)
-          if (userRole != 'ROLE_PROFILE')
-            MultipleOperationsWidget(
-              title: 'Operaciones Múltiples de Deudas',
-              color: Colors.red,
-              onCreateMultiple: () => _showCreateMultipleDebtsModal(context),
-              onEditMultiple: () => _showEditMultipleDebtsModal(context),
-              onDeleteMultiple: () => _showDeleteMultipleDebtsModal(context),
+      padding: const EdgeInsets.all(16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
             ),
-          
-          Expanded(
-            // Los usuarios normales (NO perfiles) tienen acceso completo a deudas
-            // Los perfiles (ROLE_PROFILE) tienen acceso limitado o nulo
-            child: userRole != 'ROLE_PROFILE'
-                ? _buildUserDebtsView(context)
-                : _buildProfileDebtsView(context),
-          ),
-        ],
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Solo mostrar operaciones múltiples para usuarios (NO perfiles)
+            if (userRole != 'ROLE_PROFILE')
+              MultipleOperationsWidget(
+                title: 'Operaciones Múltiples de Deudas',
+                color: Colors.red,
+                onCreateMultiple: () => _showCreateMultipleDebtsModal(context),
+                onEditMultiple: () => _showEditMultipleDebtsModal(context),
+                onDeleteMultiple: () => _showDeleteMultipleDebtsModal(context),
+              ),
+            
+            Expanded(
+              // Los usuarios normales (NO perfiles) tienen acceso completo a deudas
+              // Los perfiles (ROLE_PROFILE) tienen acceso limitado o nulo
+              child: userRole != 'ROLE_PROFILE'
+                  ? _buildUserDebtsView(context)
+                  : _buildProfileDebtsView(context),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -69,20 +83,7 @@ class DebtsTabWidget extends StatelessWidget {
   // Vista para perfiles (SIN acceso a deudas)
   Widget _buildProfileDebtsView(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
