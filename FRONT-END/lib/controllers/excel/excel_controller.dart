@@ -15,7 +15,6 @@ class ExcelController extends ChangeNotifier {
   String? _errorMessage;
   String? _successMessage;
   DebtExcelValidationResultDTO? _validationResult;
-  String? _lastDownloadedFile;
 
   ExcelController(this._excelService);
 
@@ -25,7 +24,6 @@ class ExcelController extends ChangeNotifier {
   String? get successMessage => _successMessage;
   DebtExcelValidationResultDTO? get validationResult => _validationResult;
   DebtExcelValidationResultDTO? get lastValidationResult => _validationResult;
-  String? get lastDownloadedFile => _lastDownloadedFile;
 
   void _setLoading(bool loading) {
     _isLoading = loading;
@@ -75,7 +73,6 @@ class ExcelController extends ChangeNotifier {
         // Usar descarga multiplataforma
         final filePath = await download.downloadFile(bytes, filename);
         
-        _lastDownloadedFile = filePath ?? filename;
         _setSuccess('Datos exportados exitosamente a: $filename');
         print('✅ ExcelController: Exportación completada');
       } else {
@@ -164,7 +161,6 @@ class ExcelController extends ChangeNotifier {
       // Usar la función de descarga específica de la plataforma
       final result = await download.downloadFile(bytes, filename);
       
-      _lastDownloadedFile = result ?? filename;
       _setSuccess('Plantilla descargada: $filename');
       print('✅ ExcelController: Plantilla descargada: $filename');
     } catch (e) {
@@ -200,7 +196,6 @@ class ExcelController extends ChangeNotifier {
         // Usar descarga multiplataforma
         final filePath = await download.downloadFile(bytes, filename);
         
-        _lastDownloadedFile = filePath ?? filename;
         _setSuccess('Plantilla descargada: $filename');
         print('✅ ExcelController: Plantilla descargada');
       } else {
@@ -233,7 +228,6 @@ class ExcelController extends ChangeNotifier {
     _errorMessage = null;
     _successMessage = null;
     _validationResult = null;
-    _lastDownloadedFile = null;
     notifyListeners();
   }
 
@@ -243,15 +237,7 @@ class ExcelController extends ChangeNotifier {
     return _validationResult!.summaryMessage;
   }
 
-  /// Verificar si hay un archivo descargado recientemente
-  bool get hasRecentDownload => _lastDownloadedFile != null;
 
-  /// Obtener información del último archivo descargado
-  String get downloadInfo {
-    if (_lastDownloadedFile == null) return 'No hay descargas recientes';
-    final filename = _lastDownloadedFile!.split('/').last;
-    return 'Ãltimo archivo: $filename';
-  }
 
   /// Verificar si la última validación tuvo advertencias
   bool get hasValidationWarnings {

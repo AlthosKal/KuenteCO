@@ -4,14 +4,12 @@ import 'package:provider/provider.dart';
 import '../../../controllers/transactions/transaction_controller.dart';
 import '../../../dto/app/transaction/kuenteco/transaction_detail_dto.dart';
 import 'transaction_card_widget.dart';
-import 'transaction_filter_widget.dart';
 
 class TransactionListWidget extends StatefulWidget {
   final String? filterType; // 'income', 'expense', 'debt', o null para todas
   final Function(TransactionDetailDTO)? onTransactionTap;
   final Function(TransactionDetailDTO)? onTransactionEdit;
   final Function(TransactionDetailDTO)? onTransactionDelete;
-  final bool showFilters;
   final bool showFab;
   final VoidCallback? onAddTransaction;
   final bool compact; // true para mostrar como ListItems, false para Cards
@@ -22,7 +20,6 @@ class TransactionListWidget extends StatefulWidget {
     this.onTransactionTap,
     this.onTransactionEdit,
     this.onTransactionDelete,
-    this.showFilters = true,
     this.showFab = true,
     this.onAddTransaction,
     this.compact = false,
@@ -58,39 +55,14 @@ class _TransactionListWidgetState extends State<TransactionListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Barra de búsqueda y filtros
-          if (widget.showFilters) _buildSearchAndFilterBar(),
-          
-          // Panel de filtros
-          if (_showFilters && widget.showFilters) 
-            TransactionFilterWidget(
-              onFiltersChanged: _applyFilters,
-              onReset: _resetFilters,
-            ),
-
-          // Lista de transacciones
-          Expanded(child: _buildTransactionsList()),
-          
-          // Botón integrado para agregar transacción
-          if (widget.showFab && widget.onAddTransaction != null)
-            _buildAddTransactionButton(),
-        ],
-      ),
+    return Column(
+      children: [
+        // Lista de transacciones
+        Expanded(child: _buildTransactionsList()),
+        // Botón integrado para agregar transacción
+        if (widget.showFab && widget.onAddTransaction != null)
+          _buildAddTransactionButton(),
+      ],
     );
   }
 

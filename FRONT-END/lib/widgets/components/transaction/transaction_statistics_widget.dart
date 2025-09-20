@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../controllers/transactions/transaction_controller.dart';
+import '../../../utils/enum/transaction_type_enum.dart';
 import '../../../utils/formatters.dart';
 
 class TransactionStatisticsWidget extends StatefulWidget {
@@ -87,10 +88,13 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
         
         // Calcular estadísticas
         final incomes = transactions.where((t) => 
+            t.descriptionExtra?.type == TransactionType.INCOME ||
             t.name.toLowerCase().contains('ingreso') || 
             t.name.toLowerCase().contains('income')).toList();
         final expenses = transactions.where((t) => 
+            t.descriptionExtra?.type == TransactionType.EXPENSE ||
             t.name.toLowerCase().contains('gasto') || 
+            t.name.toLowerCase().contains('egreso') || 
             t.name.toLowerCase().contains('expense')).toList();
         final debts = transactions.where((t) => 
             t.name.toLowerCase().contains('deuda') || 
@@ -144,10 +148,10 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
                 const SizedBox(width: 12),
                 Expanded(
                   child: _buildSummaryCard(
-                    'Gastos',
+                    'Egresos',
                     Formatters.formatCurrency(totalExpenses),
                     Icons.trending_down,
-                    Colors.orange,
+                    Colors.red,
                     '${expenses.length} registros',
                   ),
                 ),
@@ -230,10 +234,13 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
 
         // Calcular distribución por tipo
         final incomes = transactions.where((t) => 
+            t.descriptionExtra?.type == TransactionType.INCOME ||
             t.name.toLowerCase().contains('ingreso') || 
             t.name.toLowerCase().contains('income')).length;
         final expenses = transactions.where((t) => 
+            t.descriptionExtra?.type == TransactionType.EXPENSE ||
             t.name.toLowerCase().contains('gasto') || 
+            t.name.toLowerCase().contains('egreso') || 
             t.name.toLowerCase().contains('expense')).length;
         final debts = transactions.where((t) => 
             t.name.toLowerCase().contains('deuda') || 
@@ -270,7 +277,7 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
               if (expenses > 0) ...[
                 const SizedBox(height: 8),
                 _buildDistributionRow(
-                  'Gastos', 
+                  'Egresos', 
                   expenses, 
                   total, 
                   Colors.red,
@@ -283,7 +290,7 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
                   'Deudas',
                   debts, 
                   total, 
-                  Colors.orange,
+                  Colors.red,
                   Icons.account_balance_wallet,
                 ),
               ],
@@ -385,9 +392,12 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
               const SizedBox(height: 12),
               
               ...recentTransactions.map((transaction) {
-                final isIncome = transaction.name.toLowerCase().contains('ingreso') || 
+                final isIncome = transaction.descriptionExtra?.type == TransactionType.INCOME ||
+                                transaction.name.toLowerCase().contains('ingreso') || 
                                 transaction.name.toLowerCase().contains('income');
-                final isExpense = transaction.name.toLowerCase().contains('gasto') || 
+                final isExpense = transaction.descriptionExtra?.type == TransactionType.EXPENSE ||
+                                 transaction.name.toLowerCase().contains('gasto') || 
+                                 transaction.name.toLowerCase().contains('egreso') || 
                                  transaction.name.toLowerCase().contains('expense');
                 final isDebt = transaction.name.toLowerCase().contains('deuda') || 
                                transaction.name.toLowerCase().contains('debt');
@@ -402,7 +412,7 @@ class _TransactionStatisticsWidgetState extends State<TransactionStatisticsWidge
                   color = Colors.red;
                   icon = Icons.trending_down;
                 } else if (isDebt) {
-                  color = Colors.orange;
+                  color = Colors.red;
                   icon = Icons.account_balance_wallet;
                 }
 
