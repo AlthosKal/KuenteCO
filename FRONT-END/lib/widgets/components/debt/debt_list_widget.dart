@@ -87,12 +87,9 @@ class _DebtListWidgetState extends State<DebtListWidget> {
                   : _buildDebtsList(filteredDebts),
             ),
             
-            // Botón integrado para agregar deuda
+            // Botón fijo para agregar deuda
             if (widget.showFab && widget.onAddDebt != null)
-              Flexible(
-                fit: FlexFit.loose,
-                child: _buildAddDebtButton(),
-              ),
+              _buildAddDebtButton(),
           ],
         );
       },
@@ -199,121 +196,144 @@ class _DebtListWidgetState extends State<DebtListWidget> {
     
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: cardColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            isOverdue ? Icons.warning : Icons.account_balance_wallet,
-            color: cardColor,
-            size: 20,
-          ),
-        ),
-        title: Text(
-          debt.name,
-          style: const TextStyle(fontWeight: FontWeight.w600),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('${debt.startDate.day}/${debt.startDate.month}/${debt.startDate.year}', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-            if (isOverdue)
-              const Text(
-                'VENCIDA',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
+      child: InkWell(
+        onTap: widget.onDebtTap != null ? () => widget.onDebtTap!(debt) : null,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              // Leading icon
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: cardColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  isOverdue ? Icons.warning : Icons.account_balance_wallet,
+                  color: cardColor,
+                  size: 20,
                 ),
               ),
-          ],
-        ),
-        trailing: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '\$${debt.totalAmount.toDouble().toStringAsFixed(0)}',
-              style: TextStyle(
-                color: cardColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+              const SizedBox(width: 12),
+              
+              // Main content
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      debt.name,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${debt.startDate.day}/${debt.startDate.month}/${debt.startDate.year}',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                    ),
+                    if (isOverdue) ...[
+                      const SizedBox(height: 2),
+                      const Text(
+                        'VENCIDA',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
-            ),
-            if (widget.onDebtEdit != null || widget.onDebtDelete != null || widget.onMarkAsPaid != null || widget.onDebtAssign != null)
-              PopupMenuButton(
-                icon: Icon(Icons.more_horiz, size: 20, color: Colors.grey[600]),
-                itemBuilder: (context) => [
-                  if (widget.onDebtEdit != null)
-                    PopupMenuItem(
-                      value: 'edit',
-                      child: Row(
-                        children: [
-                          Icon(Icons.edit, size: 18, color: Colors.blue[600]),
-                          const SizedBox(width: 12),
-                          const Text('Editar'),
-                        ],
-                      ),
+              
+              // Trailing content
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '\$${debt.totalAmount.toDouble().toStringAsFixed(0)}',
+                    style: TextStyle(
+                      color: cardColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
-                  if (widget.onMarkAsPaid != null)
-                    const PopupMenuItem(
-                      value: 'pay',
-                      child: Row(
-                        children: [
-                          Icon(Icons.check, size: 18, color: Colors.green),
-                          SizedBox(width: 12),
-                          Text('Marcar como pagada'),
-                        ],
-                      ),
-                    ),
-                  if (widget.onDebtAssign != null)
-                    PopupMenuItem(
-                      value: 'assign',
-                      child: Row(
-                        children: [
-                          Icon(Icons.person_add, size: 18, color: Colors.orange[600]),
-                          const SizedBox(width: 12),
-                          const Text('Asignar al perfil'),
-                        ],
-                      ),
-                    ),
-                  if (widget.onDebtDelete != null)
-                    const PopupMenuItem(
-                      value: 'delete',
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete, size: 18, color: Colors.red),
-                          SizedBox(width: 12),
-                          Text('Eliminar'),
-                        ],
-                      ),
+                  ),
+                  if (widget.onDebtEdit != null || widget.onDebtDelete != null || widget.onMarkAsPaid != null || widget.onDebtAssign != null)
+                    PopupMenuButton(
+                      icon: Icon(Icons.more_horiz, size: 20, color: Colors.grey[600]),
+                      itemBuilder: (context) => [
+                        if (widget.onDebtEdit != null)
+                          PopupMenuItem(
+                            value: 'edit',
+                            child: Row(
+                              children: [
+                                Icon(Icons.edit, size: 18, color: Colors.blue[600]),
+                                const SizedBox(width: 12),
+                                const Text('Editar'),
+                              ],
+                            ),
+                          ),
+                        if (widget.onMarkAsPaid != null)
+                          const PopupMenuItem(
+                            value: 'pay',
+                            child: Row(
+                              children: [
+                                Icon(Icons.check, size: 18, color: Colors.green),
+                                SizedBox(width: 12),
+                                Text('Marcar como pagada'),
+                              ],
+                            ),
+                          ),
+                        if (widget.onDebtAssign != null)
+                          PopupMenuItem(
+                            value: 'assign',
+                            child: Row(
+                              children: [
+                                Icon(Icons.person_add, size: 18, color: Colors.orange[600]),
+                                const SizedBox(width: 12),
+                                const Text('Asignar al perfil'),
+                              ],
+                            ),
+                          ),
+                        if (widget.onDebtDelete != null)
+                          const PopupMenuItem(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete, size: 18, color: Colors.red),
+                                SizedBox(width: 12),
+                                Text('Eliminar'),
+                              ],
+                            ),
+                          ),
+                      ],
+                      onSelected: (value) {
+                        switch (value) {
+                          case 'edit':
+                            widget.onDebtEdit?.call(debt);
+                            break;
+                          case 'pay':
+                            widget.onMarkAsPaid?.call(debt.id);
+                            break;
+                          case 'assign':
+                            widget.onDebtAssign?.call(debt);
+                            break;
+                          case 'delete':
+                            widget.onDebtDelete?.call(debt);
+                            break;
+                        }
+                      },
                     ),
                 ],
-                onSelected: (value) {
-                  switch (value) {
-                    case 'edit':
-                      widget.onDebtEdit?.call(debt);
-                      break;
-                    case 'pay':
-                      widget.onMarkAsPaid?.call(debt.id);
-                      break;
-                    case 'assign':
-                      widget.onDebtAssign?.call(debt);
-                      break;
-                    case 'delete':
-                      widget.onDebtDelete?.call(debt);
-                      break;
-                  }
-                },
               ),
-          ],
+            ],
+          ),
         ),
-        onTap: widget.onDebtTap != null ? () => widget.onDebtTap!(debt) : null,
       ),
     );
   }
@@ -389,7 +409,7 @@ class _DebtListWidgetState extends State<DebtListWidget> {
   Widget _buildAddDebtButton() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+      padding: const EdgeInsets.fromLTRB(16, 2, 16, 4),
       child: ElevatedButton.icon(
         onPressed: widget.onAddDebt,
         icon: const Icon(Icons.account_balance_wallet, color: Colors.white, size: 18),
@@ -403,7 +423,7 @@ class _DebtListWidgetState extends State<DebtListWidget> {
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.red,
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 6),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),

@@ -62,6 +62,33 @@ class DebtsTabWidget extends StatelessWidget {
                   ? _buildUserDebtsView(context)
                   : _buildProfileDebtsView(context),
             ),
+            
+            // Botón de Nueva Deuda fijo en la parte inferior
+            if (userRole != 'ROLE_PROFILE')
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                child: ElevatedButton.icon(
+                  onPressed: () => _showCreateDebtModal(context),
+                  icon: const Icon(Icons.account_balance_wallet, color: Colors.white, size: 18),
+                  label: const Text(
+                    'Nueva Deuda',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 2,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -76,7 +103,7 @@ class DebtsTabWidget extends StatelessWidget {
       onDebtDelete: (debt) => _deleteDebt(context, debt),
       onMarkAsPaid: (debtId) => _markDebtAsPaid(context, debtId),
       onDebtAssign: (debt) => _assignDebtToProfile(context, debt),
-      onAddDebt: () => _showCreateDebtModal(context),
+      showFab: false, // Deshabilitar botón interno
     );
   }
 
