@@ -16,13 +16,12 @@ public class KuentecoChatApplication {
         // Conexión al modelo de OpenAI
         System.setProperty("OPENAI_KEY", dotenv.get("OPENAI_KEY"));
         System.setProperty("OPENAI_MODEL", dotenv.get("OPENAI_MODEL"));
-        //System.setProperty("OPENAI_BASE_URL", dotenv.get("OPENAI_BASE_URL"));
+        // System.setProperty("OPENAI_BASE_URL", dotenv.get("OPENAI_BASE_URL"));
 
-        /* Conexión al modelo de DeepSeek
-        System.setProperty("DEEPSEEK_KEY", dotenv.get("DEEPSEEK_KEY"));
-        System.setProperty("DEEPSEEK_MODEL", dotenv.get("DEEPSEEK_MODEL"));
-        System.setProperty("DEEPSEEK_BASE_URL", dotenv.get("DEEPSEEK_BASE_URL"));
-         */
+        // Conexión Twilio
+        System.setProperty("TWILIO_ACCOUNT_SID", dotenv.get("TWILIO_ACCOUNT_SID"));
+        System.setProperty("TWILIO_AUTH_TOKEN", dotenv.get("TWILIO_AUTH_TOKEN"));
+        System.setProperty("TWILIO_PHONE_NUMBER", dotenv.get("TWILIO_PHONE_NUMBER"));
 
         // Conexion con el microservicio que contiene la logica de negocio
         System.setProperty("KUENTECO_APP_URL", dotenv.get("KUENTECO_APP_URL"));

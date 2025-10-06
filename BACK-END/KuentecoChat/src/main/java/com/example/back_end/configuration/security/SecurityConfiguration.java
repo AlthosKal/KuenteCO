@@ -43,7 +43,8 @@ public class SecurityConfiguration {
                                                 "/api-docs/**",
                                                 "/api/api-docs/**",
                                                 "/v3/api-docs/**",
-                                                "/webjars/**" // , "/v1/model/**"
+                                                "/webjars/**",
+                                                "/v1/voice/**" // , "/v1/model/**"
                                                 )
                                         .permitAll() // Public endpoints
                                         .anyRequest()

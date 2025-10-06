@@ -1,8 +1,6 @@
 package com.example.back_end.dto.request;
 
-import com.example.back_end.enums.Model;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data

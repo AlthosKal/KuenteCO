@@ -496,8 +496,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     private Prompt getPrompt(ChatDTO request, String fileContent) {
-        PromptTemplate promptTemplate =
-                new PromptTemplate(loadPromptFromClasspath());
+        PromptTemplate promptTemplate = new PromptTemplate(loadPromptFromClasspath());
 
         Map<String, Object> params =
                 Map.of("fileContent", fileContent, "prompt", request.getPrompt());
@@ -506,7 +505,9 @@ public class ChatServiceImpl implements ChatService {
 
     private String loadPromptFromClasspath() {
         try (InputStream inputStream =
-                getClass().getClassLoader().getResourceAsStream("prompts/" + "ai_prompt_template.txt")) {
+                getClass()
+                        .getClassLoader()
+                        .getResourceAsStream("prompts/" + "ai_prompt_template.txt")) {
             if (inputStream == null) throw new FileNotFoundException("Prompt file not found");
             return StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
@@ -535,7 +536,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     private ChatClient getChatClient() {
-            return openaiChatClient;
+        return openaiChatClient;
     }
 
     private KuentecoAppConnector getConnector() {
@@ -558,7 +559,10 @@ public class ChatServiceImpl implements ChatService {
 
         // Manejo específico de timeouts
         if (rootCause instanceof io.netty.handler.timeout.ReadTimeoutException) {
-            LOGGER.warn("Timeout calling {} model for prompt: {}", Model.OPENAI.name(), dto.getPrompt());
+            LOGGER.warn(
+                    "Timeout calling {} model for prompt: {}",
+                    Model.OPENAI.name(),
+                    dto.getPrompt());
             return new AiProfileException(
                     ApiError.AI_PROVIDER_TIMEOUT.getHttpStatus(),
                     ApiError.AI_PROVIDER_TIMEOUT.getMessage(),
@@ -573,12 +577,15 @@ public class ChatServiceImpl implements ChatService {
         if (e instanceof org.springframework.web.client.ResourceAccessException
                 || rootCause instanceof java.net.ConnectException
                 || rootCause instanceof java.net.UnknownHostException) {
-            LOGGER.warn("Network error calling {} model: {}", Model.OPENAI.name(), rootCause.getMessage());
+            LOGGER.warn(
+                    "Network error calling {} model: {}",
+                    Model.OPENAI.name(),
+                    rootCause.getMessage());
             return new AiProfileException(
                     ApiError.AI_PROVIDER_UNAVAILABLE.getHttpStatus(),
                     ApiError.AI_PROVIDER_UNAVAILABLE.getMessage(),
                     List.of(
-                            "Cannot connect to " + Model.OPENAI.name()+ " provider",
+                            "Cannot connect to " + Model.OPENAI.name() + " provider",
                             "Check your internet connection",
                             "The AI service may be temporarily unavailable",
                             "Try again in a few minutes"));
@@ -600,7 +607,8 @@ public class ChatServiceImpl implements ChatService {
         }
 
         // Error genérico - no sabemos exactamente qué pasó
-        LOGGER.error("Unexpected error processing chat request with {} model", Model.OPENAI.name(), e);
+        LOGGER.error(
+                "Unexpected error processing chat request with {} model", Model.OPENAI.name(), e);
         return new AiProfileException(
                 ApiError.INTERNAL_ERROR.getHttpStatus(),
                 ApiError.INTERNAL_ERROR.getMessage(),
@@ -1130,8 +1138,7 @@ public class ChatServiceImpl implements ChatService {
 
                 if (value != null && expectedType.isAssignableFrom(value.getClass())) {
                     return (T) value;
-                } else if (expectedType == Double.class
-                        && value instanceof Number) {
+                } else if (expectedType == Double.class && value instanceof Number) {
                     return (T) Double.valueOf(((Number) value).doubleValue());
                 } else if (value != null && expectedType == String.class) {
                     return (T) value.toString();
@@ -1146,8 +1153,7 @@ public class ChatServiceImpl implements ChatService {
 
                     if (value != null && expectedType.isAssignableFrom(value.getClass())) {
                         return (T) value;
-                    } else if (expectedType == Double.class
-                            && value instanceof Number) {
+                    } else if (expectedType == Double.class && value instanceof Number) {
                         return (T) Double.valueOf(((Number) value).doubleValue());
                     } else if (value != null && expectedType == String.class) {
                         return (T) value.toString();
