@@ -19,6 +19,7 @@ public class KuentecoChatApplication {
         // System.setProperty("OPENAI_BASE_URL", dotenv.get("OPENAI_BASE_URL"));
 
         // Conexión Twilio
+        System.setProperty("TWILIO_BASE_URL", dotenv.get("TWILIO_BASE_URL"));
         System.setProperty("TWILIO_ACCOUNT_SID", dotenv.get("TWILIO_ACCOUNT_SID"));
         System.setProperty("TWILIO_AUTH_TOKEN", dotenv.get("TWILIO_AUTH_TOKEN"));
         System.setProperty("TWILIO_PHONE_NUMBER", dotenv.get("TWILIO_PHONE_NUMBER"));
