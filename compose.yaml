@@ -15,8 +15,12 @@ services:
 
 # API KUENTECO-APP DEL BACKEND DE LA APLICACION
   kuenteco-app:
-    image: yefff/image-backend-kuenteco-app:1.0.6
+    image: yefff/image-backend-kuenteco-app:1.0.7
     container_name: KuentecoApp
+    volumes:
+      - ./BACK-END/KuentecoApp/.env.docker:/workspace/.env
+    env_file:
+      - ./BACK-END/KuentecoApp/.env.docker
     ports:
       - "8080:8080"
     depends_on:
@@ -69,8 +73,12 @@ services:
 
 # API KUENTECO-CHAT DEL BACKEND DE LA APLICACION :D
   kuenteco-chat:
-    image: yefff/image-backend-kuenteco-chat:1.0.4
+    image: yefff/image-backend-kuenteco-chat:1.0.6
     container_name: KuentecoChat
+    volumes:
+      - ./BACK-END/KuentecoChat/.env.docker:/workspace/.env
+    env_file:
+      - ./BACK-END/KuentecoChat/.env.docker
     ports:
       - "7070:7070"
     depends_on:
