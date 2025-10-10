@@ -49,8 +49,7 @@ public class IvrCallController {
 
     @PostMapping("/call-ended")
     public ResponseEntity<Void> handleCallEnded(
-            @RequestParam("CallSid") String callSid,
-            @RequestParam("CallStatus") String status) {
+            @RequestParam("CallSid") String callSid, @RequestParam("CallStatus") String status) {
         ivrCallService.cleanupCall(callSid);
         return ResponseEntity.ok().build();
     }

@@ -3,17 +3,14 @@ package com.example.back_end.service;
 import com.example.back_end.configuration.twilio.TwilioConfigProperties;
 import com.example.back_end.connector.KuentecoAppConnector;
 import com.example.back_end.service.functions.IncomesAndExpensesByPeriodFunction;
-import com.twilio.rest.api.v2010.account.Call;
-import com.twilio.twiml.VoiceResponse;
-import com.twilio.twiml.voice.Gather;
-import com.twilio.twiml.voice.Say;
+import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,125 +28,107 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
-@Service
 @Slf4j
-public class IvrCallServiceImpl implements IvrCallService {
+@Service
+public class WhatsAppMessageServiceImpl implements WhatsAppMessageService {
     private final ChatModel openaiChatModel;
     private final KuentecoAppConnector kuentecoAppConnector;
     private final TwilioConfigProperties twilioConfigProperties;
 
-    // Almacenar memoria y ChatClient por CallSid
+    // Almacenar memoria y ChatClient por número de WhatsApp
     private final Map<String, InMemoryChatMemory> conversationMemories = new ConcurrentHashMap<>();
     private final Map<String, ChatClient> chatClients = new ConcurrentHashMap<>();
 
-    @Value("${twilio.base-url}")
-    private String baseUrl;
+    // Agregar timestamp de última actividad
+    private final Map<String, LocalDateTime> conversationLastActivity = new ConcurrentHashMap<>();
 
-    public IvrCallServiceImpl(
+    public WhatsAppMessageServiceImpl(
             @Qualifier(value = "openAiChatModel") ChatModel openaiChatModel,
             KuentecoAppConnector kuentecoAppConnector,
             TwilioConfigProperties twilioConfigProperties) {
-        this.twilioConfigProperties = twilioConfigProperties;
         this.openaiChatModel = openaiChatModel;
         this.kuentecoAppConnector = kuentecoAppConnector;
+        this.twilioConfigProperties = twilioConfigProperties;
     }
 
     @Override
-    public String handleIncomingCall(String callSid, String from) {
-
+    public void handleIncomingMessage(String from, String body) {
+        // Actualizar ultima actividad
+        conversationLastActivity.put(from, LocalDateTime.now());
         // Inicializar el ChatClient en esta llamada
-        getChatClientForCall(callSid);
-
-        VoiceResponse voiceResponse =
-                new VoiceResponse.Builder()
-                        .say(
-                                new Say.Builder(
-                                                "Bienvenido, soy tu asistente financiero, Estoy aquí para ayudarte")
-                                        .language(Say.Language.ES_MX)
-                                        .build())
-                        .gather(
-                                new Gather.Builder()
-                                        .inputs(List.of(Gather.Input.SPEECH))
-                                        .speechTimeout("auto")
-                                        .timeout(10) // Espera 10 segundos de silencio
-                                        .action(baseUrl + "/api/chat/v1/voice/process-speech")
-                                        .build())
-                        .say(
-                                new Say.Builder("No escuché nada. Adiós.")
-                                        .language(Say.Language.ES_MX)
-                                        .build())
-                        .build();
-        return voiceResponse.toXml();
+        ChatClient chatClient = getChatClientForConversation(from);
+        // El LLM procesa el mensaje del usuario
+        String message = generateResponse(body, chatClient);
+        // Enviar respuesta por WhatsApp
+        sendWhatsAppMessage(from, message);
     }
 
     @Override
-    public String initiateCall(String toPhoneNumber) {
-        log.info("Initiating call to: {}", toPhoneNumber);
+    public void handleMessageStatus(
+            String messageSid,
+            String messageStatus,
+            String from,
+            String to,
+            String errorCode,
+            String errorMessage) {
 
-        // Formatear el número al formato E.164 si es necesario
-        String formattedNumber = formatPhoneNumber(toPhoneNumber);
+        log.info(
+                "Message status update - MessageSid: {}, Status: {}, From: {}, To: {}",
+                messageSid,
+                messageStatus,
+                from,
+                to);
 
-        Call call =
-                Call.creator(
-                                new PhoneNumber(formattedNumber), // Número destino
-                                new PhoneNumber(
-                                        twilioConfigProperties
-                                                .getPhoneNumber()), // Tu número Twilio
-                                URI.create(
-                                        baseUrl + "/api/chat/v1/voice/incoming") // URL del webhook
-                                )
-                        .setMachineDetection("DetectMessageEnd") // Detectar contestadora
-                        .setMachineDetectionTimeout(30)
-                        .setStatusCallback(URI.create(baseUrl + "/api/chat/v1/voice/call-ended"))
-                        .setStatusCallbackEvent(List.of("completed", "no-answer", "busy", "failed"))
-                        .create();
-
-        log.info("Call initiated successfully. CallSid: {}", call.getSid());
-        return call.getSid();
-    }
-
-    @Override
-    public String processSpeech(String speechResult, String callSid) {
-        // Obtener el ChatClient especifico para esta conversación
-        ChatClient chatClient = getChatClientForCall(callSid);
-        // Generando respuesta usando el ChatClient con memoria
-        String llmResponse = generateResponse(speechResult, chatClient);
-
-        VoiceResponse voiceResponse =
-                new VoiceResponse.Builder()
-                        .say(new Say.Builder(llmResponse).language(Say.Language.ES_MX).build())
-                        .gather(
-                                new Gather.Builder()
-                                        .inputs(List.of(Gather.Input.SPEECH))
-                                        .speechTimeout("auto")
-                                        .action(baseUrl + "/api/chat/v1/voice/process-speech")
-                                        .build())
-                        .build();
-        return voiceResponse.toXml();
-    }
-
-    @Override
-    public void cleanupCall(String callSid) {
-        log.info("Cleaning up conversation memory for CallSid: {}", callSid);
-
-        InMemoryChatMemory memory = conversationMemories.remove(callSid);
-        ChatClient client = chatClients.remove(callSid);
-
-        if (memory != null || client != null) {
-            log.info("Successfully cleaned up resources for CallSid: {}", callSid);
-        } else {
-            log.warn("No resources found to cleanup for CallSid: {}", callSid);
+        switch (messageStatus.toLowerCase()) {
+            case "delivered":
+                log.info("Message {} successfully delivered", messageSid);
+                break;
+            case "read":
+                log.info("Message {} was read by user", messageSid);
+                break;
+            case "failed":
+            case "undelivered":
+                log.error(
+                        "Message {} failed - ErrorCode: {}, ErrorMessage: {}",
+                        messageSid,
+                        errorCode,
+                        errorMessage);
+                // Aquí podrías implementar lógica de reintento o notificación
+                break;
+            default:
+                log.debug("Message {} status: {}", messageSid, messageStatus);
         }
     }
 
+    @Scheduled(fixedRate = 86400)
+    public void cleanupCalls() {
+        log.info("Cleaning up conversation memory");
+        LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(30);
+
+        conversationLastActivity
+                .entrySet()
+                .removeIf(
+                        entry -> {
+                            if (entry.getValue().isBefore(cutoffTime)) {
+                                log.info(
+                                        "Cleaning up inactive conversation for: {}",
+                                        entry.getKey());
+                                conversationMemories.remove(entry.getKey());
+                                chatClients.remove(entry.getKey());
+                                return true;
+                            }
+                            return false;
+                        });
+    }
+
     // Obtener o crear ChatClient para una conversación específica
-    private ChatClient getChatClientForCall(String callSid) {
+    private ChatClient getChatClientForConversation(String from) {
         return chatClients.computeIfAbsent(
-                callSid,
+                from,
                 sid -> {
                     log.info("Creating new ChatClient with memory for CallSid: {}", sid);
 
@@ -162,6 +141,21 @@ public class IvrCallServiceImpl implements IvrCallService {
                                     new MessageChatMemoryAdvisor(memory))
                             .build();
                 });
+    }
+
+    private void sendWhatsAppMessage(String userPhoneNumber, String message) {
+        try {
+            Message twilioMessage = Message.creator(
+                            new PhoneNumber(userPhoneNumber), // To: usuario que recibirá la respuesta
+                            new PhoneNumber(twilioConfigProperties.getWhatsappNumber()), // From: tu número de Twilio
+                            message)
+                    .create();
+
+            log.info("Message sent successfully. SID: {}", twilioMessage.getSid());
+        } catch (Exception e) {
+            log.error("Error sending WhatsApp message to {}: {}", userPhoneNumber, e.getMessage());
+            throw e;
+        }
     }
 
     private String generateResponse(String userInput, ChatClient chatClient) {
@@ -219,7 +213,7 @@ public class IvrCallServiceImpl implements IvrCallService {
             return response.getData();
         } catch (Exception e) {
             log.error("Error executing incomes and expenses function", e);
-            return null;
+            return "";
         }
     }
 
@@ -306,28 +300,5 @@ public class IvrCallServiceImpl implements IvrCallService {
             return detectedFunction;
         }
         return detectedFunction;
-    }
-
-    private String formatPhoneNumber(String phoneNumber) {
-        // Eliminar espacios y caracteres especiales
-        String clean = phoneNumber.replaceAll("[^0-9+]", "");
-
-        // Si ya tiene +, retornar
-        if (clean.startsWith("+")) {
-            return clean;
-        }
-
-        // Para Colombia: si no tiene código de país, agregarlo
-        if (!clean.startsWith("57") && clean.length() == 10) {
-            clean = "57" + clean;
-        }
-
-        // Agregar el + si no lo tiene
-        if (!clean.startsWith("+")) {
-            clean = "+" + clean;
-        }
-
-        log.info("Formatted phone number: {} -> {}", phoneNumber, clean);
-        return clean;
     }
 }

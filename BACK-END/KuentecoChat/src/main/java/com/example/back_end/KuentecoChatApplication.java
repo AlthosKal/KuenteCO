@@ -3,7 +3,9 @@ package com.example.back_end;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableScheduling
 @SpringBootApplication
 public class KuentecoChatApplication {
 
@@ -23,6 +25,7 @@ public class KuentecoChatApplication {
         System.setProperty("TWILIO_ACCOUNT_SID", dotenv.get("TWILIO_ACCOUNT_SID"));
         System.setProperty("TWILIO_AUTH_TOKEN", dotenv.get("TWILIO_AUTH_TOKEN"));
         System.setProperty("TWILIO_PHONE_NUMBER", dotenv.get("TWILIO_PHONE_NUMBER"));
+        System.setProperty("TWILIO_WHATSAPP_NUMBER", dotenv.get("TWILIO_WHATSAPP_NUMBER"));
 
         // Conexion con el microservicio que contiene la logica de negocio
         System.setProperty("KUENTECO_APP_URL", dotenv.get("KUENTECO_APP_URL"));
