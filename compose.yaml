@@ -73,7 +73,7 @@ services:
 
 # API KUENTECO-CHAT DEL BACKEND DE LA APLICACION :D
   kuenteco-chat:
-    image: yefff/image-backend-kuenteco-chat:1.0.6
+    image: yefff/image-backend-kuenteco-chat:1.0.8
     container_name: KuentecoChat
     volumes:
       - ./BACK-END/KuentecoChat/.env.docker:/workspace/.env
