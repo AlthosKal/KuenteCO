@@ -1,4 +1,4 @@
-package com.example.back_end.service;
+package com.example.back_end.service.report;
 
 import java.awt.*;
 import java.io.ByteArrayOutputStream;

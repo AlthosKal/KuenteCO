@@ -1,8 +1,8 @@
-package com.example.back_end.service.functions;
+package com.example.back_end.service.function.list;
 
 import com.example.back_end.connector.KuentecoAppConnector;
 import com.example.back_end.connector.config.KuentecoEndpoint;
-import com.example.back_end.connector.rest.debt.DebtDTO;
+import com.example.back_end.connector.rest.transaction.TransactionSummaryDTO;
 import com.example.back_end.exception.ApiResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class AnalyzeDebtRiskFunction
-        implements Function<AnalyzeDebtRiskFunction.Request, ApiResponse<List<DebtDTO>>> {
+public class SuggestExpenseReductionsFunction
+        implements Function<
+                SuggestExpenseReductionsFunction.Request,
+                ApiResponse<List<TransactionSummaryDTO>>> {
 
     public record Request(
             @JsonProperty(required = true, value = "from")
@@ -27,14 +29,14 @@ public class AnalyzeDebtRiskFunction
 
     private final KuentecoAppConnector connector;
 
-    public AnalyzeDebtRiskFunction(KuentecoAppConnector connector) {
+    public SuggestExpenseReductionsFunction(KuentecoAppConnector connector) {
         this.connector = connector;
     }
 
     @Override
-    public ApiResponse<List<DebtDTO>> apply(Request request) {
+    public ApiResponse<List<TransactionSummaryDTO>> apply(Request request) {
         return connector.call(
-                KuentecoEndpoint.GET_USER_DEBTS,
+                KuentecoEndpoint.GET_TRANSACTIONS_SUMMARY,
                 Map.of("from", request.from(), "to", request.to(), "kind", request.kind()),
                 new TypeReference<>() {});
     }

@@ -5,7 +5,8 @@ public enum KuentecoEndpoint {
     GET_USER_TRANSACTIONS("transaction", "get-user-transactions"),
     GET_BUDGET_SUMMARY("budget", "get-budget-summary"),
     GET_BUDGET_COMPARISON("budget", "get-budget-comparison"),
-    GET_USER_DEBTS("debt", "get-user-debts");
+    GET_USER_DEBTS("debt", "get-user-debts"),
+    AUTH_USER("auth", "login");
 
     private final String hostKey;
     private final String endpointKey;

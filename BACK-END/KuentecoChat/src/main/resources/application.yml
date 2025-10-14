@@ -3,6 +3,13 @@ jwt:
   secret: ${JWT_SECRET}
   expiration: 86400
 
+twilio:
+  base-url: ${TWILIO_BASE_URL}
+  account-sid: ${TWILIO_ACCOUNT_SID}
+  auth-token: ${TWILIO_AUTH_TOKEN}
+  phone-number: ${TWILIO_PHONE_NUMBER}
+  whatsapp-number: ${TWILIO_WHATSAPP_NUMBER}
+
 front-end:
   web-url: ${WEB_URL}
   mobile-url: ${MOBILE_URL}
@@ -20,7 +27,7 @@ spring:
       chat:
         options:
           model: ${OPENAI_MODEL}
-          temperature: 0.7
+          temperature: 1
   cache:
     type: caffeine
 
@@ -78,6 +85,17 @@ http-connector:
           connectionTimeout: 5000
         get-user-transactions:
           url: ""
+          readTimeout: 10000
+          writeTimeout: 5000
+          connectionTimeout: 5000
+
+    # Configuración para inicio de sesión dentro de la aplicación
+    auth:
+      host: ${KUENTECO_APP_URL}
+      base-path: "/api/app/v1/auth"
+      endpoints:
+        login:
+          url: "/login"
           readTimeout: 10000
           writeTimeout: 5000
           connectionTimeout: 5000

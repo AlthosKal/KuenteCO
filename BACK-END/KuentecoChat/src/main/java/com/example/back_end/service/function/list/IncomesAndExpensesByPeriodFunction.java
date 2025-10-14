@@ -1,4 +1,4 @@
-package com.example.back_end.service.functions;
+package com.example.back_end.service.function.list;
 
 import com.example.back_end.connector.KuentecoAppConnector;
 import com.example.back_end.connector.config.KuentecoEndpoint;
@@ -12,11 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class BalanceOverTimeFunction
+public class IncomesAndExpensesByPeriodFunction
         implements Function<
-                BalanceOverTimeFunction.Request, ApiResponse<List<TransactionSummaryDTO>>> {
+                IncomesAndExpensesByPeriodFunction.Request,
+                ApiResponse<List<TransactionSummaryDTO>>> {
 
-    @JsonClassDescription("Request for balance over time calculation")
+    @JsonClassDescription("Request for incomes and expenses by period")
     public record Request(
             @JsonProperty(required = true, value = "from")
                     @JsonPropertyDescription("Start date in YYYY-MM-DD format")
@@ -25,12 +26,12 @@ public class BalanceOverTimeFunction
                     @JsonPropertyDescription("End date in YYYY-MM-DD format")
                     String to,
             @JsonProperty(required = true, value = "kind")
-                    @JsonPropertyDescription("Type of balance calculation: 'daily' or 'weekly'")
+                    @JsonPropertyDescription("Type of data to retrieve: 'incomes' or 'expenses'")
                     String kind) {}
 
     private final KuentecoAppConnector connector;
 
-    public BalanceOverTimeFunction(KuentecoAppConnector connector) {
+    public IncomesAndExpensesByPeriodFunction(KuentecoAppConnector connector) {
         this.connector = connector;
     }
 

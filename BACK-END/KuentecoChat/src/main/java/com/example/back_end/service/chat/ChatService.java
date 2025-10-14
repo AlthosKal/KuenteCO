@@ -1,4 +1,4 @@
-package com.example.back_end.service;
+package com.example.back_end.service.chat;
 
 import com.example.back_end.dto.request.*;
 import com.example.back_end.dto.response.DynamicAnalysisResponseDTO;

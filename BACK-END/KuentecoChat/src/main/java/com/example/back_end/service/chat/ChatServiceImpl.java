@@ -1,12 +1,9 @@
-package com.example.back_end.service;
+package com.example.back_end.service.chat;
 
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
 import com.example.back_end.configuration.security.JwtUtil;
-import com.example.back_end.connector.KuentecoAppConnector;
-import com.example.back_end.connector.rest.transaction.TransactionResponseWrapper;
-import com.example.back_end.connector.rest.transaction.UserProfilesWithTransactionsDTO;
 import com.example.back_end.dto.request.*;
 import com.example.back_end.dto.response.CharDataDTO;
 import com.example.back_end.dto.response.DynamicAnalysisResponseDTO;
@@ -20,18 +17,12 @@ import com.example.back_end.exception.AiProfileException;
 import com.example.back_end.mapper.ChatHistoryForConversationMapper;
 import com.example.back_end.mapper.ChatHistoryMapper;
 import com.example.back_end.repository.AiHistoryRepository;
-import com.example.back_end.service.functions.*;
+import com.example.back_end.service.function.FunctionService;
+import com.example.back_end.service.report.ReportGenerationService;
+import com.example.back_end.service.report.ResponseTypeDetectorService;
 import com.example.back_end.util.KuentecoChatUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,11 +32,9 @@ import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StreamUtils;
 
 @Service
 public class ChatServiceImpl implements ChatService {
@@ -56,8 +45,8 @@ public class ChatServiceImpl implements ChatService {
     private final ChatHistoryMapper chatHistoryMapper;
     private final ResponseTypeDetectorService responseTypeDetector;
     private final JwtUtil jwtUtil;
-    private final KuentecoAppConnector kuentecoAppConnector;
     private final ReportGenerationService reportGenerationService;
+    private final FunctionService functionService;
 
     public ChatServiceImpl(
             @Qualifier(value = "openAiChatModel") ChatModel openaiChatClient,
@@ -66,7 +55,7 @@ public class ChatServiceImpl implements ChatService {
             ChatHistoryForConversationMapper chatHistoryForConversationMapper,
             ChatHistoryMapper chatHistoryMapper,
             ResponseTypeDetectorService responseTypeDetectorService,
-            KuentecoAppConnector kuentecoAppConnector,
+            FunctionService functionService,
             ReportGenerationService reportGenerationService) {
 
         InMemoryChatMemory memory = new InMemoryChatMemory();
@@ -81,7 +70,7 @@ public class ChatServiceImpl implements ChatService {
         this.repository = repository;
         this.chatHistoryForConversationMapper = chatHistoryForConversationMapper;
         this.responseTypeDetector = responseTypeDetectorService;
-        this.kuentecoAppConnector = kuentecoAppConnector;
+        this.functionService = functionService;
         this.reportGenerationService = reportGenerationService;
         this.chatHistoryMapper = chatHistoryMapper;
     }
@@ -94,18 +83,19 @@ public class ChatServiceImpl implements ChatService {
             String token = jwtUtil.resolveToken(request);
             String email = jwtUtil.extractEmail(token);
             // Detectar qué función se va a ejecutar basándose en el prompt
-            String detectedFunction = detectFunctionFromPrompt(dto.getPrompt());
+            String detectedFunction = functionService.detectFunctionFromPrompt(dto.getPrompt());
 
             // Obtener datos de la función ejecutada ANTES de llamar al AI
-            Object functionData = getFunctionData(detectedFunction, dto);
+            Object functionData = functionService.getFunctionData(detectedFunction, dto);
 
             // Crear contexto con información disponible
             String contextualPrompt =
-                    createContextualPrompt(dto.getPrompt(), detectedFunction, functionData);
+                    functionService.createContextualPrompt(
+                            dto.getPrompt(), detectedFunction, functionData);
 
             // Ejecutar la función con el contexto mejorado
             String response =
-                    getChatClient()
+                    openaiChatClient
                             .prompt()
                             .user(contextualPrompt)
                             .advisors(
@@ -163,245 +153,6 @@ public class ChatServiceImpl implements ChatService {
                     e.getMessage(),
                     e);
             throw handleChatException(e, dto);
-        }
-    }
-
-    // Método auxiliar para dete    ctar función desde el prompt
-    private String detectFunctionFromPrompt(String prompt) {
-        String lowerPrompt = prompt.toLowerCase();
-        String detectedFunction = "general";
-
-        if (lowerPrompt.contains("balance") || lowerPrompt.contains("saldo")) {
-            detectedFunction = "BalanceOverTime";
-        } else if (lowerPrompt.contains("deuda") || lowerPrompt.contains("debt")) {
-            detectedFunction = "analyzeDebtRisk";
-        } else if (lowerPrompt.contains("gasto") || lowerPrompt.contains("patrón")) {
-            detectedFunction = "analyzeUserSpendingPatterns";
-        } else if (lowerPrompt.contains("salud financiera") || lowerPrompt.contains("score")) {
-            detectedFunction = "calculateFinancialHealthScore";
-        } else if (lowerPrompt.contains("ingreso") && lowerPrompt.contains("gasto")) {
-            detectedFunction = "IncomesAndExpensesByPeriod";
-        } else if (lowerPrompt.contains("proyección") || lowerPrompt.contains("projection")) {
-            detectedFunction = "projectFinancialBalance";
-        } else if (lowerPrompt.contains("reducir gastos")
-                || lowerPrompt.contains("expense reduction")) {
-            detectedFunction = "suggestExpenseReductions";
-        } else if (lowerPrompt.contains("comparar") || lowerPrompt.contains("compare")) {
-            detectedFunction = "compareFinancialPeriods";
-        } else if (lowerPrompt.contains("reporte") || lowerPrompt.contains("statement")) {
-            detectedFunction = "financialStatement";
-        } else if (lowerPrompt.contains("transacciones") || lowerPrompt.contains("transactions")) {
-            detectedFunction = "analyzeUserSpendingPatterns";
-        } else if (lowerPrompt.contains("presupuesto") || lowerPrompt.contains("budget")) {
-            detectedFunction = "compareFinancialPeriods";
-        } else if (lowerPrompt.contains("performance") || lowerPrompt.contains("rendimiento")) {
-            detectedFunction = "calculateFinancialHealthScore";
-        }
-
-        LOGGER.info("Detected function '{}' from prompt: '{}'", detectedFunction, prompt);
-        return detectedFunction;
-    }
-
-    private Object getFunctionData(String functionName, ChatDTO request) {
-        try {
-            return switch (functionName) {
-                case "BalanceOverTime" -> executeBalanceFunction(request);
-                case "analyzeDebtRisk" -> executeDebtAnalysisFunction(request);
-                case "analyzeUserSpendingPatterns" -> executeSpendingPatternsFunction(request);
-                case "calculateFinancialHealthScore" -> executeFinancialHealthFunction(request);
-                case "IncomesAndExpensesByPeriod" -> executeIncomesAndExpensesFunction(request);
-                case "projectFinancialBalance" -> executeProjectFinancialBalanceFunction(request);
-                case "suggestExpenseReductions" -> executeSuggestExpenseReductionsFunction(request);
-                case "compareFinancialPeriods" -> executeCompareFinancialPeriodsFunction(request);
-                case "financialStatement" -> executeFinancialStatementFunction(request);
-                default -> null;
-            };
-        } catch (Exception e) {
-            LOGGER.error("Error executing function: {}", functionName, e);
-            return null;
-        }
-    }
-
-    // Métodos auxiliares para ejecutar funciones específicas
-    private Object executeBalanceFunction(ChatDTO request) {
-        try {
-            LOGGER.info("Executing balance function for prompt: {}", request.getPrompt());
-
-            Map<String, String> params = extractDateParameters(request.getPrompt());
-            LOGGER.info("Extracted parameters: {}", params);
-
-            BalanceOverTimeFunction.Request functionRequest =
-                    new BalanceOverTimeFunction.Request(
-                            params.get("from"), params.get("to"), params.get("kind"));
-
-            LOGGER.info("Created function request: {}", functionRequest);
-
-            BalanceOverTimeFunction function = new BalanceOverTimeFunction(getConnector());
-            LOGGER.info("Calling balance function...");
-
-            var response = function.apply(functionRequest);
-            LOGGER.info(
-                    "Function response received: success={}, data={}",
-                    response.isSuccess(),
-                    response.getData());
-
-            if (!response.isSuccess()) {
-                LOGGER.error("Function call failed: {}", response.getMessage());
-                return null;
-            }
-
-            return response.getData();
-        } catch (Exception e) {
-            LOGGER.error("Error executing balance function", e);
-            return null;
-        }
-    }
-
-    private Object executeDebtAnalysisFunction(ChatDTO request) {
-        try {
-            Map<String, String> params = extractDateParameters(request.getPrompt());
-            AnalyzeDebtRiskFunction.Request functionRequest =
-                    new AnalyzeDebtRiskFunction.Request(
-                            params.get("from"), params.get("to"), params.get("kind"));
-
-            AnalyzeDebtRiskFunction function = new AnalyzeDebtRiskFunction(getConnector());
-            var response = function.apply(functionRequest);
-            return response.getData();
-        } catch (Exception e) {
-            LOGGER.error("Error executing debt analysis function", e);
-            return null;
-        }
-    }
-
-    private Object executeSpendingPatternsFunction(ChatDTO request) {
-        try {
-            Map<String, String> params = extractDateParameters(request.getPrompt());
-            AnalyzeUserSpendingPatternsFunction.Request functionRequest =
-                    new AnalyzeUserSpendingPatternsFunction.Request(
-                            params.get("from"), params.get("to"));
-
-            AnalyzeUserSpendingPatternsFunction function =
-                    new AnalyzeUserSpendingPatternsFunction(getConnector());
-            var response = function.apply(functionRequest);
-
-            if (!response.isSuccess()) {
-                LOGGER.error("Function call failed: {}", response.getMessage());
-                return null;
-            }
-
-            // Extraer datos del TransactionResponseWrapper
-            return extractDataFromWrapper(response.getData(), "spending patterns");
-        } catch (Exception e) {
-            LOGGER.error("Error executing spending patterns function", e);
-            return null;
-        }
-    }
-
-    private Object executeFinancialHealthFunction(ChatDTO request) {
-        try {
-            Map<String, String> params = extractDateParameters(request.getPrompt());
-            CalculateFinancialHealthScoreWithTransactionsFunction.Request functionRequest =
-                    new CalculateFinancialHealthScoreWithTransactionsFunction.Request(
-                            params.get("from"), params.get("to"));
-
-            CalculateFinancialHealthScoreWithTransactionsFunction function =
-                    new CalculateFinancialHealthScoreWithTransactionsFunction(getConnector());
-            var response = function.apply(functionRequest);
-
-            if (!response.isSuccess()) {
-                LOGGER.error("Function call failed: {}", response.getMessage());
-                return null;
-            }
-
-            // Extraer datos del TransactionResponseWrapper
-            return extractDataFromWrapper(response.getData(), "financial health");
-        } catch (Exception e) {
-            LOGGER.error("Error executing financial health function", e);
-            return null;
-        }
-    }
-
-    private Object executeIncomesAndExpensesFunction(ChatDTO request) {
-        try {
-            Map<String, String> params = extractDateParameters(request.getPrompt());
-            IncomesAndExpensesByPeriodFunction.Request functionRequest =
-                    new IncomesAndExpensesByPeriodFunction.Request(
-                            params.get("from"), params.get("to"), params.get("kind"));
-
-            IncomesAndExpensesByPeriodFunction function =
-                    new IncomesAndExpensesByPeriodFunction(getConnector());
-            var response = function.apply(functionRequest);
-            return response.getData();
-        } catch (Exception e) {
-            LOGGER.error("Error executing incomes and expenses function", e);
-            return null;
-        }
-    }
-
-    private Object executeProjectFinancialBalanceFunction(ChatDTO request) {
-        try {
-            Map<String, String> params = extractDateParameters(request.getPrompt());
-            ProjectFinancialBalanceFunction.Request functionRequest =
-                    new ProjectFinancialBalanceFunction.Request(
-                            params.get("from"), params.get("to"), params.get("kind"));
-
-            ProjectFinancialBalanceFunction function =
-                    new ProjectFinancialBalanceFunction(getConnector());
-            var response = function.apply(functionRequest);
-            return response.getData();
-        } catch (Exception e) {
-            LOGGER.error("Error executing project financial balance function", e);
-            return null;
-        }
-    }
-
-    private Object executeSuggestExpenseReductionsFunction(ChatDTO request) {
-        try {
-            Map<String, String> params = extractDateParameters(request.getPrompt());
-            SuggestExpenseReductionsFunction.Request functionRequest =
-                    new SuggestExpenseReductionsFunction.Request(
-                            params.get("from"), params.get("to"), params.get("kind"));
-
-            SuggestExpenseReductionsFunction function =
-                    new SuggestExpenseReductionsFunction(getConnector());
-            var response = function.apply(functionRequest);
-            return response.getData();
-        } catch (Exception e) {
-            LOGGER.error("Error executing suggest expense reductions function", e);
-            return null;
-        }
-    }
-
-    private Object executeCompareFinancialPeriodsFunction(ChatDTO request) {
-        try {
-            Map<String, String> params = extractDateParameters(request.getPrompt());
-            CompareFinancialPeriodsFunction.Request functionRequest =
-                    new CompareFinancialPeriodsFunction.Request(
-                            params.get("from"), params.get("to"), params.get("kind"));
-
-            CompareFinancialPeriodsFunction function =
-                    new CompareFinancialPeriodsFunction(getConnector());
-            var response = function.apply(functionRequest);
-            return response.getData();
-        } catch (Exception e) {
-            LOGGER.error("Error executing compare financial periods function", e);
-            return null;
-        }
-    }
-
-    private Object executeFinancialStatementFunction(ChatDTO request) {
-        try {
-            Map<String, String> params = extractDateParameters(request.getPrompt());
-            FinancialStatementFunction.Request functionRequest =
-                    new FinancialStatementFunction.Request(
-                            params.get("from"), params.get("to"), params.get("kind"));
-
-            FinancialStatementFunction function = new FinancialStatementFunction(getConnector());
-            var response = function.apply(functionRequest);
-            return response.getData();
-        } catch (Exception e) {
-            LOGGER.error("Error executing financial statement function", e);
-            return null;
         }
     }
 
@@ -470,11 +221,11 @@ public class ChatServiceImpl implements ChatService {
     private String askToAI(ChatDTO dto, String fileContent, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
         String email = jwtUtil.extractEmail(token);
-        Prompt prompt = getPrompt(dto, fileContent);
+        Prompt prompt = functionService.getPrompt(dto, fileContent);
         LOGGER.info(prompt.getInstructions().toString());
 
         String response =
-                getChatClient()
+                openaiChatClient
                         .prompt()
                         .user(prompt.toString())
                         .advisors(
@@ -493,25 +244,6 @@ public class ChatServiceImpl implements ChatService {
         }
 
         return response;
-    }
-
-    private Prompt getPrompt(ChatDTO request, String fileContent) {
-        PromptTemplate promptTemplate =
-                new PromptTemplate(loadPromptFromClasspath());
-
-        Map<String, Object> params =
-                Map.of("fileContent", fileContent, "prompt", request.getPrompt());
-        return promptTemplate.create(params);
-    }
-
-    private String loadPromptFromClasspath() {
-        try (InputStream inputStream =
-                getClass().getClassLoader().getResourceAsStream("prompts/" + "ai_prompt_template.txt")) {
-            if (inputStream == null) throw new FileNotFoundException("Prompt file not found");
-            return StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load prompt template", e);
-        }
     }
 
     private boolean isReportRequest(String prompt) {
@@ -534,14 +266,6 @@ public class ChatServiceImpl implements ChatService {
         return "PDF"; // Por defecto
     }
 
-    private ChatClient getChatClient() {
-            return openaiChatClient;
-    }
-
-    private KuentecoAppConnector getConnector() {
-        return this.kuentecoAppConnector;
-    }
-
     /**
      * Maneja excepciones de manera inteligente para proporcionar errores más específicos
      *
@@ -558,7 +282,10 @@ public class ChatServiceImpl implements ChatService {
 
         // Manejo específico de timeouts
         if (rootCause instanceof io.netty.handler.timeout.ReadTimeoutException) {
-            LOGGER.warn("Timeout calling {} model for prompt: {}", Model.OPENAI.name(), dto.getPrompt());
+            LOGGER.warn(
+                    "Timeout calling {} model for prompt: {}",
+                    Model.OPENAI.name(),
+                    dto.getPrompt());
             return new AiProfileException(
                     ApiError.AI_PROVIDER_TIMEOUT.getHttpStatus(),
                     ApiError.AI_PROVIDER_TIMEOUT.getMessage(),
@@ -573,12 +300,15 @@ public class ChatServiceImpl implements ChatService {
         if (e instanceof org.springframework.web.client.ResourceAccessException
                 || rootCause instanceof java.net.ConnectException
                 || rootCause instanceof java.net.UnknownHostException) {
-            LOGGER.warn("Network error calling {} model: {}", Model.OPENAI.name(), rootCause.getMessage());
+            LOGGER.warn(
+                    "Network error calling {} model: {}",
+                    Model.OPENAI.name(),
+                    rootCause.getMessage());
             return new AiProfileException(
                     ApiError.AI_PROVIDER_UNAVAILABLE.getHttpStatus(),
                     ApiError.AI_PROVIDER_UNAVAILABLE.getMessage(),
                     List.of(
-                            "Cannot connect to " + Model.OPENAI.name()+ " provider",
+                            "Cannot connect to " + Model.OPENAI.name() + " provider",
                             "Check your internet connection",
                             "The AI service may be temporarily unavailable",
                             "Try again in a few minutes"));
@@ -600,7 +330,8 @@ public class ChatServiceImpl implements ChatService {
         }
 
         // Error genérico - no sabemos exactamente qué pasó
-        LOGGER.error("Unexpected error processing chat request with {} model", Model.OPENAI.name(), e);
+        LOGGER.error(
+                "Unexpected error processing chat request with {} model", Model.OPENAI.name(), e);
         return new AiProfileException(
                 ApiError.INTERNAL_ERROR.getHttpStatus(),
                 ApiError.INTERNAL_ERROR.getMessage(),
@@ -643,136 +374,6 @@ public class ChatServiceImpl implements ChatService {
     }
 
     /**
-     * Extrae parámetros de fecha y tipo desde el prompt del usuario
-     *
-     * @param prompt El prompt del usuario
-     * @return Map con los parámetros extraídos: from, to, kind
-     */
-    private Map<String, String> extractDateParameters(String prompt) {
-        Map<String, String> params = new HashMap<>();
-
-        // Valores por defecto
-        LocalDate now = LocalDate.now();
-        String defaultFrom = now.minusMonths(3).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String defaultTo = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String defaultKind = "daily";
-
-        // Patrones para extraer fechas
-        Pattern datePattern = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})");
-        Pattern periodPattern =
-                Pattern.compile("(\\d+)\\s*(día|días|semana|semanas|mes|meses|año|años)");
-
-        String lowerPrompt = prompt.toLowerCase();
-
-        // Extraer fechas explícitas
-        Matcher dateMatcher = datePattern.matcher(prompt);
-        List<String> foundDates = new ArrayList<>();
-        while (dateMatcher.find()) {
-            foundDates.add(dateMatcher.group(1));
-        }
-
-        if (foundDates.size() >= 2) {
-            params.put("from", foundDates.get(0));
-            params.put("to", foundDates.get(1));
-        } else if (foundDates.size() == 1) {
-            params.put("to", foundDates.get(0));
-            params.put("from", defaultFrom);
-        } else {
-            // Extraer períodos relativos
-            Matcher periodMatcher = periodPattern.matcher(lowerPrompt);
-            if (periodMatcher.find()) {
-                int amount = Integer.parseInt(periodMatcher.group(1));
-                String unit = periodMatcher.group(2);
-
-                LocalDate fromDate = now;
-                switch (unit) {
-                    case "día", "días" -> fromDate = now.minusDays(amount);
-                    case "semana", "semanas" -> fromDate = now.minusWeeks(amount);
-                    case "mes", "meses" -> fromDate = now.minusMonths(amount);
-                    case "año", "años" -> fromDate = now.minusYears(amount);
-                }
-
-                params.put("from", fromDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-                params.put("to", defaultTo);
-            } else {
-                // Usar valores por defecto
-                params.put("from", defaultFrom);
-                params.put("to", defaultTo);
-            }
-        }
-
-        // Determinar el tipo de agrupación
-        if (lowerPrompt.contains("diario") || lowerPrompt.contains("daily")) {
-            params.put("kind", "daily");
-        } else if (lowerPrompt.contains("semanal") || lowerPrompt.contains("weekly")) {
-            params.put("kind", "weekly");
-        } else if (lowerPrompt.contains("mensual") || lowerPrompt.contains("monthly")) {
-            params.put("kind", "monthly");
-        } else {
-            params.put("kind", defaultKind);
-        }
-
-        LOGGER.info("Extracted parameters from prompt '{}': {}", prompt, params);
-        return params;
-    }
-
-    /**
-     * Crea un prompt contextual que incluye información sobre los datos disponibles
-     *
-     * @param originalPrompt El prompt original del usuario
-     * @param functionName La función detectada
-     * @param functionData Los datos obtenidos de la función
-     * @return Prompt mejorado con contexto
-     */
-    private String createContextualPrompt(
-            String originalPrompt, String functionName, Object functionData) {
-        StringBuilder contextBuilder = new StringBuilder();
-
-        // Agregar contexto sobre datos disponibles
-        contextBuilder.append("📊 CONTEXTO FINANCIERO DISPONIBLE:\n");
-
-        if (functionData != null) {
-            contextBuilder.append("✅ Tengo acceso completo a tus datos financieros actuales.\n");
-            contextBuilder
-                    .append("📈 He analizado tu información de: ")
-                    .append(functionName)
-                    .append("\n");
-
-            // Agregar información específica según el tipo de datos
-            if (functionName.equals("analyzeDebtRisk") && functionData instanceof List<?> list) {
-                contextBuilder
-                        .append("💳 Encontré ")
-                        .append(list.size())
-                        .append(" deudas activas en tu perfil.\n");
-            } else if (functionName.contains("Health") && functionData instanceof List<?> list) {
-                contextBuilder
-                        .append("💰 He calculado tu puntuaje de salud financiera basado en ")
-                        .append(list.size())
-                        .append(" registros.\n");
-            } else if (functionData instanceof List<?> list) {
-                contextBuilder
-                        .append("📉 Analizé ")
-                        .append(list.size())
-                        .append(" registros financieros.\n");
-            }
-        } else {
-            contextBuilder.append(
-                    "⚠️ No se encontraron datos específicos para esta consulta, pero puedo brindarte asesoría general.\n");
-        }
-
-        contextBuilder.append("\n🗺️ CONSULTA DEL USUARIO:\n");
-        contextBuilder.append(originalPrompt);
-        contextBuilder.append("\n\n🎩 INSTRUCCIONES IMPORTANTES:\n");
-        contextBuilder.append(
-                "- Proporciona un análisis detallado basado en los datos disponibles\n");
-        contextBuilder.append("- Si tienes datos, NO menciones que necesitas más información\n");
-        contextBuilder.append("- Brinda recomendaciones específicas y actionables\n");
-        contextBuilder.append("- Usa un tono profesional pero accesible\n");
-
-        return contextBuilder.toString();
-    }
-
-    /**
      * Crea una respuesta dinámica basada en la función detectada
      *
      * @param functionName Nombre de la función ejecutada
@@ -791,80 +392,6 @@ public class ChatServiceImpl implements ChatService {
             LOGGER.error("Error creating dynamic response for function: {}", functionName, e);
             // Fallback a respuesta simple en caso de error
             return responseTypeDetector.detectAndCreateResponse(response, "general", null);
-        }
-    }
-
-    /**
-     * Extrae los datos reales del TransactionResponseWrapper
-     *
-     * @param data El objeto que puede ser un TransactionResponseWrapper
-     * @param functionContext Contexto de la función para logging
-     * @return Los datos extraídos o una lista con el UserProfilesWithTransactionsDTO
-     */
-    private Object extractDataFromWrapper(Object data, String functionContext) {
-        try {
-            if (data instanceof TransactionResponseWrapper wrapper) {
-                LOGGER.info(
-                        "Extracting data from TransactionResponseWrapper for {}, type: {}",
-                        functionContext,
-                        wrapper.getType());
-
-                switch (wrapper.getType()) {
-                    case USER_PROFILES -> {
-                        // Para usuarios BUSINESS, devolver una lista con el
-                        // UserProfilesWithTransactionsDTO
-                        UserProfilesWithTransactionsDTO userProfiles = wrapper.getUserProfiles();
-                        if (userProfiles != null) {
-                            LOGGER.info(
-                                    "Found user profiles data for {}: {} profiles, {} transactions",
-                                    functionContext,
-                                    userProfiles.getTotalProfiles(),
-                                    userProfiles.getTotalTransactions());
-                            return List.of(userProfiles);
-                        }
-                    }
-                    case TRANSACTION_LIST -> {
-                        // Para usuarios PERSONAL, devolver directamente la lista de transacciones
-                        if (wrapper.getTransactionList() != null
-                                && !wrapper.getTransactionList().isEmpty()) {
-                            LOGGER.info(
-                                    "Found transaction list for {}: {} transactions",
-                                    functionContext,
-                                    wrapper.getTransactionList().size());
-                            return wrapper.getTransactionList();
-                        }
-                    }
-                    case MESSAGE -> {
-                        LOGGER.info(
-                                "Received message response for {}: {}",
-                                functionContext,
-                                wrapper.getMessage());
-                        return Collections.emptyList();
-                    }
-                    case UNKNOWN -> {
-                        LOGGER.warn(
-                                "Unknown wrapper type for {}: {}",
-                                functionContext,
-                                wrapper.getType());
-                        return Collections.emptyList();
-                    }
-                }
-            } else {
-                LOGGER.debug(
-                        "Data is not a TransactionResponseWrapper for {}, returning as-is: {}",
-                        functionContext,
-                        data != null ? data.getClass().getSimpleName() : "null");
-                return data;
-            }
-
-            return Collections.emptyList();
-        } catch (Exception e) {
-            LOGGER.error(
-                    "Error extracting data from wrapper for {}: {}",
-                    functionContext,
-                    e.getMessage(),
-                    e);
-            return Collections.emptyList();
         }
     }
 
@@ -1130,8 +657,7 @@ public class ChatServiceImpl implements ChatService {
 
                 if (value != null && expectedType.isAssignableFrom(value.getClass())) {
                     return (T) value;
-                } else if (expectedType == Double.class
-                        && value instanceof Number) {
+                } else if (expectedType == Double.class && value instanceof Number) {
                     return (T) Double.valueOf(((Number) value).doubleValue());
                 } else if (value != null && expectedType == String.class) {
                     return (T) value.toString();
@@ -1146,8 +672,7 @@ public class ChatServiceImpl implements ChatService {
 
                     if (value != null && expectedType.isAssignableFrom(value.getClass())) {
                         return (T) value;
-                    } else if (expectedType == Double.class
-                            && value instanceof Number) {
+                    } else if (expectedType == Double.class && value instanceof Number) {
                         return (T) Double.valueOf(((Number) value).doubleValue());
                     } else if (value != null && expectedType == String.class) {
                         return (T) value.toString();

@@ -1,4 +1,4 @@
-package com.example.back_end.service;
+package com.example.back_end.service.report;
 
 import com.example.back_end.connector.rest.budget.BudgetSummaryDTO;
 import com.example.back_end.connector.rest.budget.BudgetVsActualDTO;

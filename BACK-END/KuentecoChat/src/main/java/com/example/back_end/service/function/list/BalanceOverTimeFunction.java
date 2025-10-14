@@ -1,8 +1,8 @@
-package com.example.back_end.service.functions;
+package com.example.back_end.service.function.list;
 
 import com.example.back_end.connector.KuentecoAppConnector;
 import com.example.back_end.connector.config.KuentecoEndpoint;
-import com.example.back_end.connector.rest.budget.BudgetSummaryDTO;
+import com.example.back_end.connector.rest.transaction.TransactionSummaryDTO;
 import com.example.back_end.exception.ApiResponse;
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,9 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class FinancialStatementFunction
+public class BalanceOverTimeFunction
         implements Function<
-                FinancialStatementFunction.Request, ApiResponse<List<BudgetSummaryDTO>>> {
+                BalanceOverTimeFunction.Request, ApiResponse<List<TransactionSummaryDTO>>> {
+
     @JsonClassDescription("Request for balance over time calculation")
     public record Request(
             @JsonProperty(required = true, value = "from")
@@ -29,14 +30,14 @@ public class FinancialStatementFunction
 
     private final KuentecoAppConnector connector;
 
-    public FinancialStatementFunction(KuentecoAppConnector connector) {
+    public BalanceOverTimeFunction(KuentecoAppConnector connector) {
         this.connector = connector;
     }
 
     @Override
-    public ApiResponse<List<BudgetSummaryDTO>> apply(Request request) {
+    public ApiResponse<List<TransactionSummaryDTO>> apply(Request request) {
         return connector.call(
-                KuentecoEndpoint.GET_BUDGET_SUMMARY,
+                KuentecoEndpoint.GET_TRANSACTIONS_SUMMARY,
                 Map.of("from", request.from(), "to", request.to(), "kind", request.kind()),
                 new TypeReference<>() {});
     }

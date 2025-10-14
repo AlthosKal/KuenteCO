@@ -1,4 +1,4 @@
-package com.example.back_end.service.functions;
+package com.example.back_end.service.function.list;
 
 import java.util.UUID;
 import org.springframework.stereotype.Service;

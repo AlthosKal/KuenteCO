@@ -4,7 +4,7 @@ import com.example.back_end.controller.resource.ChatHistoryResource;
 import com.example.back_end.dto.request.ChatHistoryDTO;
 import com.example.back_end.dto.request.ChatHistoryForConversationDTO;
 import com.example.back_end.exception.ApiResponse;
-import com.example.back_end.service.ChatService;
+import com.example.back_end.service.chat.ChatService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

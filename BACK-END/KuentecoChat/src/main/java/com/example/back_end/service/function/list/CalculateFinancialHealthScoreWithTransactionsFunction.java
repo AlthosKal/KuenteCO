@@ -1,4 +1,4 @@
-package com.example.back_end.service.functions;
+package com.example.back_end.service.function.list;
 
 import com.example.back_end.connector.KuentecoAppConnector;
 import com.example.back_end.connector.config.KuentecoEndpoint;
@@ -9,22 +9,22 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.Map;
 import java.util.function.Function;
 
-public class AnalyzeUserSpendingPatternsFunction
+public class CalculateFinancialHealthScoreWithTransactionsFunction
         implements Function<
-                AnalyzeUserSpendingPatternsFunction.Request,
+                CalculateFinancialHealthScoreWithTransactionsFunction.Request,
                 ApiResponse<TransactionResponseWrapper>> {
 
     public record Request(
-            @JsonProperty(required = true)
-                    @JsonPropertyDescription("Fecha de inicio en formato YYYY-MM-DD")
-                    String startDate,
-            @JsonProperty(required = true)
-                    @JsonPropertyDescription("Fecha de fin en formato YYYY-MM-DD")
-                    String endDate) {}
+            @JsonProperty(required = true, value = "from")
+                    @JsonPropertyDescription("Start date in YYYY-MM-DD format")
+                    String from,
+            @JsonProperty(required = true, value = "to")
+                    @JsonPropertyDescription("End date in YYYY-MM-DD format")
+                    String to) {}
 
     private final KuentecoAppConnector connector;
 
-    public AnalyzeUserSpendingPatternsFunction(KuentecoAppConnector connector) {
+    public CalculateFinancialHealthScoreWithTransactionsFunction(KuentecoAppConnector connector) {
         this.connector = connector;
     }
 
@@ -34,7 +34,7 @@ public class AnalyzeUserSpendingPatternsFunction
                 connector.callTransactionEndpoint(
                         KuentecoEndpoint.GET_USER_TRANSACTIONS,
                         Map.of(
-                                "from", request.startDate(),
-                                "to", request.endDate()));
+                                "from", request.from(),
+                                "to", request.to()));
     }
 }
