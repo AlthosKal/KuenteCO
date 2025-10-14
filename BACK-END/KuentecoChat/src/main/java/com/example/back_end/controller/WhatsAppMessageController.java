@@ -1,6 +1,6 @@
 package com.example.back_end.controller;
 
-import com.example.back_end.service.WhatsAppMessageService;
+import com.example.back_end.service.twilio.whatsapp.WhatsAppMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,7 +1,7 @@
 package com.example.back_end.configuration.ia;
 
 import com.example.back_end.connector.KuentecoAppConnector;
-import com.example.back_end.service.functions.*;
+import com.example.back_end.service.function.list.*;
 import org.springframework.ai.model.function.FunctionCallback;
 import org.springframework.ai.model.function.FunctionCallbackWrapper;
 import org.springframework.context.annotation.Bean;
@@ -101,6 +101,15 @@ public class AiConfiguration {
                 .withName("analyzeDebtRisk")
                 .withDescription(
                         "Evalúa el riesgo de sobreendeudamiento en función de ingresos, deudas activas y vencimientos.")
+                .build();
+    }
+
+    @Bean(name = "authenticateUser")
+    public FunctionCallback authenticateUserFunction() {
+        return FunctionCallbackWrapper.builder(new AuthenticateUserFunction(kuentecoAppConnector))
+                .withName("authenticateUser")
+                .withDescription(
+                        "Autentica al usuario cuando la interacción es por llamadas IVR o WhatsApp")
                 .build();
     }
 }

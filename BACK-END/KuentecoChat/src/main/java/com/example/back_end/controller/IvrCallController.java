@@ -3,7 +3,7 @@ package com.example.back_end.controller;
 import com.example.back_end.dto.request.InitiateCallDTO;
 import com.example.back_end.dto.response.InitiateCallResponseDTO;
 import com.example.back_end.exception.ApiResponse;
-import com.example.back_end.service.IvrCallService;
+import com.example.back_end.service.twilio.ivr.IvrCallService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -39,6 +39,9 @@ public class KuentecoAppConnector {
     private final HttpConnectorConfiguration configuration;
     private final ObjectMapper objectMapper;
 
+    // ThreadLocal para tokens de sesión (WhatsApp/IVR)
+    private static final ThreadLocal<String> sessionToken = new ThreadLocal<>();
+
     @Autowired
     public KuentecoAppConnector(
             HttpConnectorConfiguration configuration, ObjectMapper objectMapper) {
@@ -47,6 +50,16 @@ public class KuentecoAppConnector {
         LOGGER.info(
                 "KuentecoAppConnector initialized with hosts: {}",
                 configuration.getHosts() != null ? configuration.getHosts().keySet() : "null");
+    }
+
+    // Método para establecer el token de sesión
+    public static void setSessionToken(String token) {
+        sessionToken.set(token);
+    }
+
+    // Método para limpiar el token de sesión
+    public static void clearSessionToken() {
+        sessionToken.remove();
     }
 
     public <T> ApiResponse<T> call(
@@ -58,8 +71,66 @@ public class KuentecoAppConnector {
                 endpoint.getEndpointKey(),
                 Map.of(),
                 queryParams,
+                null,
                 typeReference,
-                extractJwtFromSecurityContext());
+                extractJwtFromSecurityContext(),
+                "GET",
+                true);
+    }
+
+    // Método sobrecargado para permitir especificar método HTTP y si requiere token
+    public <T> ApiResponse<T> call(
+            KuentecoEndpoint endpoint,
+            Map<String, String> queryParams,
+            TypeReference<T> typeReference,
+            String httpMethod,
+            boolean requiresAuth) {
+        return callKuentecoApp(
+                endpoint.getHostKey(),
+                endpoint.getEndpointKey(),
+                Map.of(),
+                queryParams,
+                null,
+                typeReference,
+                requiresAuth ? extractJwtFromSecurityContext() : null,
+                httpMethod,
+                requiresAuth);
+    }
+
+    // Método sobrecargado con body para POST requests
+    public <T> ApiResponse<T> callWithBody(
+            KuentecoEndpoint endpoint,
+            Object requestBody,
+            TypeReference<T> typeReference,
+            boolean requiresAuth) {
+        return callKuentecoApp(
+                endpoint.getHostKey(),
+                endpoint.getEndpointKey(),
+                Map.of(),
+                Map.of(),
+                requestBody,
+                typeReference,
+                requiresAuth ? extractJwtFromSecurityContext() : null,
+                "POST",
+                requiresAuth);
+    }
+
+    // Método sobrecargado para proporcionar un token explícito (usado en WhatsApp/IVR)
+    public <T> ApiResponse<T> callWithToken(
+            KuentecoEndpoint endpoint,
+            Map<String, String> queryParams,
+            TypeReference<T> typeReference,
+            String token) {
+        return callKuentecoApp(
+                endpoint.getHostKey(),
+                endpoint.getEndpointKey(),
+                Map.of(),
+                queryParams,
+                null,
+                typeReference,
+                token,
+                "GET",
+                true);
     }
 
     // Método específico para manejar respuestas variables de transacciones
@@ -74,25 +145,34 @@ public class KuentecoAppConnector {
                 extractJwtFromSecurityContext());
     }
 
+    // Método específico para transacciones con token explícito
+    public ApiResponse<?> callTransactionEndpointWithToken(
+            KuentecoEndpoint endpoint, Map<String, String> queryParams, String token) {
+
+        return callKuentecoAppWithVariableResponse(
+                endpoint.getHostKey(),
+                endpoint.getEndpointKey(),
+                Map.of(),
+                queryParams,
+                token);
+    }
+
     private <T> ApiResponse<T> callKuentecoApp(
             String hostKey,
             String endpointKey,
             Map<String, String> pathParams,
             Map<String, String> queryParams,
+            Object requestBody,
             TypeReference<T> typeReference,
-            String jwtToken) {
+            String jwtToken,
+            String httpMethod,
+            boolean requiresAuth) {
 
         try {
             LOGGER.debug(
                     "Attempting to call API with hostKey: {}, endpointKey: {}",
                     hostKey,
                     endpointKey);
-
-            if (jwtToken == null || jwtToken.isEmpty()) {
-                String msg = "Authentication token not available";
-                LOGGER.error(msg);
-                return (ApiResponse<T>) (ApiResponse<?>) ApiResponse.error(msg, endpointKey);
-            }
 
             LOGGER.debug("Available hosts: {}", configuration.getHosts().keySet());
 
@@ -136,31 +216,71 @@ public class KuentecoAppConnector {
             String baseUrl = buildBaseUrl(hostConfig, endpointConfig);
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(baseUrl);
 
-            // Add query parameters
-            if (queryParams != null && !queryParams.isEmpty()) {
+            // Add query parameters only if no request body
+            if (requestBody == null && queryParams != null && !queryParams.isEmpty()) {
                 queryParams.forEach(uriBuilder::queryParam);
             }
 
             String finalUrl = uriBuilder.toUriString();
-            LOGGER.info("Making API call to URL: {}", finalUrl);
+            LOGGER.info(
+                    "Making API call to URL: {} with method: {}, hasBody: {}",
+                    finalUrl,
+                    httpMethod,
+                    requestBody != null);
 
             HttpClient httpClient = createHttpClient(endpointConfig);
-            WebClient client =
+            WebClient.Builder clientBuilder =
                     WebClient.builder()
                             .defaultHeader(
                                     HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                            .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
-                            .clientConnector(new ReactorClientHttpConnector(httpClient))
-                            .build();
+                            .clientConnector(new ReactorClientHttpConnector(httpClient));
 
-            String responseBody =
-                    client.get()
-                            .uri(finalUrl)
-                            .retrieve()
-                            .bodyToMono(String.class)
-                            .timeout(Duration.ofMillis(endpointConfig.getReadTimeout()))
-                            .block();
+            // Solo agregar el header de autorización si requiere autenticación y hay un token
+            if (requiresAuth && jwtToken != null && !jwtToken.isEmpty()) {
+                clientBuilder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken);
+                LOGGER.debug("Added Authorization header with token");
+            } else {
+                LOGGER.debug("Skipping Authorization header (requiresAuth: {}, hasToken: {})", requiresAuth, jwtToken != null);
+            }
+
+            WebClient client = clientBuilder.build();
+
+            // Ejecutar el método HTTP apropiado
+            String responseBody;
+            if ("POST".equalsIgnoreCase(httpMethod)) {
+                if (requestBody != null) {
+                    // POST con body JSON
+                    LOGGER.debug("POST request with body: {}", requestBody);
+                    responseBody =
+                            client.post()
+                                    .uri(finalUrl)
+                                    .bodyValue(requestBody)
+                                    .retrieve()
+                                    .bodyToMono(String.class)
+                                    .timeout(Duration.ofMillis(endpointConfig.getReadTimeout()))
+                                    .block();
+                } else {
+                    // POST sin body (query params en URL)
+                    LOGGER.debug("POST request without body");
+                    responseBody =
+                            client.post()
+                                    .uri(finalUrl)
+                                    .retrieve()
+                                    .bodyToMono(String.class)
+                                    .timeout(Duration.ofMillis(endpointConfig.getReadTimeout()))
+                                    .block();
+                }
+            } else {
+                // GET request
+                responseBody =
+                        client.get()
+                                .uri(finalUrl)
+                                .retrieve()
+                                .bodyToMono(String.class)
+                                .timeout(Duration.ofMillis(endpointConfig.getReadTimeout()))
+                                .block();
+            }
 
             LOGGER.debug("API Response received: {}", responseBody);
 
@@ -433,6 +553,14 @@ public class KuentecoAppConnector {
 
     private String extractJwtFromSecurityContext() {
         try {
+            // Primero verificar si hay un token de sesión (WhatsApp/IVR)
+            String token = sessionToken.get();
+            if (token != null && !token.isEmpty()) {
+                LOGGER.debug("JWT token extracted from session ThreadLocal");
+                return token;
+            }
+
+            // Si no hay token de sesión, intentar extraer del SecurityContext
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null) {
                 LOGGER.debug("No authentication found in security context");
@@ -441,7 +569,7 @@ public class KuentecoAppConnector {
 
             Object credentials = auth.getCredentials();
             if (credentials instanceof String) {
-                LOGGER.debug("JWT token extracted successfully");
+                LOGGER.debug("JWT token extracted from SecurityContext");
                 return (String) credentials;
             } else {
                 LOGGER.debug(
