@@ -115,24 +115,6 @@ public class KuentecoAppConnector {
                 requiresAuth);
     }
 
-    // Método sobrecargado para proporcionar un token explícito (usado en WhatsApp/IVR)
-    public <T> ApiResponse<T> callWithToken(
-            KuentecoEndpoint endpoint,
-            Map<String, String> queryParams,
-            TypeReference<T> typeReference,
-            String token) {
-        return callKuentecoApp(
-                endpoint.getHostKey(),
-                endpoint.getEndpointKey(),
-                Map.of(),
-                queryParams,
-                null,
-                typeReference,
-                token,
-                "GET",
-                true);
-    }
-
     // Método específico para manejar respuestas variables de transacciones
     public ApiResponse<?> callTransactionEndpoint(
             KuentecoEndpoint endpoint, Map<String, String> queryParams) {
@@ -143,18 +125,6 @@ public class KuentecoAppConnector {
                 Map.of(),
                 queryParams,
                 extractJwtFromSecurityContext());
-    }
-
-    // Método específico para transacciones con token explícito
-    public ApiResponse<?> callTransactionEndpointWithToken(
-            KuentecoEndpoint endpoint, Map<String, String> queryParams, String token) {
-
-        return callKuentecoAppWithVariableResponse(
-                endpoint.getHostKey(),
-                endpoint.getEndpointKey(),
-                Map.of(),
-                queryParams,
-                token);
     }
 
     private <T> ApiResponse<T> callKuentecoApp(
@@ -241,7 +211,10 @@ public class KuentecoAppConnector {
                 clientBuilder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken);
                 LOGGER.debug("Added Authorization header with token");
             } else {
-                LOGGER.debug("Skipping Authorization header (requiresAuth: {}, hasToken: {})", requiresAuth, jwtToken != null);
+                LOGGER.debug(
+                        "Skipping Authorization header (requiresAuth: {}, hasToken: {})",
+                        requiresAuth,
+                        jwtToken != null);
             }
 
             WebClient client = clientBuilder.build();

@@ -7,7 +7,6 @@ import com.example.back_end.connector.rest.auth.TokenResponseDTO;
 import com.example.back_end.exception.ApiResponse;
 import com.example.back_end.service.session.SessionManager;
 import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;

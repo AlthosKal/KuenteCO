@@ -89,9 +89,12 @@ public class FunctionServiceImpl implements FunctionService {
                     case "analyzeUserSpendingPatterns" -> executeSpendingPatternsFunction(request);
                     case "calculateFinancialHealthScore" -> executeFinancialHealthFunction(request);
                     case "IncomesAndExpensesByPeriod" -> executeIncomesAndExpensesFunction(request);
-                    case "projectFinancialBalance" -> executeProjectFinancialBalanceFunction(request);
-                    case "suggestExpenseReductions" -> executeSuggestExpenseReductionsFunction(request);
-                    case "compareFinancialPeriods" -> executeCompareFinancialPeriodsFunction(request);
+                    case "projectFinancialBalance" ->
+                            executeProjectFinancialBalanceFunction(request);
+                    case "suggestExpenseReductions" ->
+                            executeSuggestExpenseReductionsFunction(request);
+                    case "compareFinancialPeriods" ->
+                            executeCompareFinancialPeriodsFunction(request);
                     case "financialStatement" -> executeFinancialStatementFunction(request);
                     case "authenticateUser" -> executeAuthenticateUserFunction(request);
                     default -> null;
